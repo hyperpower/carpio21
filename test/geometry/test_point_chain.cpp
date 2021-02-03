@@ -70,7 +70,7 @@ TEST(point_chain, is_simple){
 		  Point(1,   1),
 		  Point(0,   1)};
 	PC pc(l);
-	std::cout << "Is Simple = " << pc.is_simple() << std::endl;
+	// std::cout << "Is Simple = " << pc.is_simple() << std::endl;
 	Gnuplot gnu;
 	gnu.set_xrange(-0.5, 2);
 	gnu.set_yrange(-0.5, 2);
