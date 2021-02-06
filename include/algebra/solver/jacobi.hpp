@@ -52,7 +52,7 @@ protected:
 
 		St n = b.size();
 		MatSCR T(A);
-		Arr C(n, 1.0 / SMALL);
+		Arr C(n, 1.0 / _SMALL_);
 		Arr newx(n);
 
 		Vt normb = Nrm2(b);
@@ -151,7 +151,7 @@ protected:
 				for (St j = 0; j < n; j++){
 					dx[i] -= A[i][j] * x[j];
 				}
-				dx[i]   /= A[i][i] + SMALL;
+				dx[i]   /= A[i][i] + _SMALL_;
 				newx[i] += dx[i];
 			}
 			// critic

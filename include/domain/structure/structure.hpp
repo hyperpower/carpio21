@@ -5,6 +5,7 @@
 #include "structure_define.hpp"
 #include "sindex.hpp"
 #include "grid/sgrid.hpp"
+#include "grid/uniform.hpp"
 #include "ghost/sghost.hpp"
 #include "order/sorder.hpp"
 #include "field/sfield.hpp"

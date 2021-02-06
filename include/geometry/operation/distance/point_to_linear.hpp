@@ -12,7 +12,7 @@ template <typename NUM>
 NUM Distance_PointToLine(const NUM& x0, const NUM& y0,
 		                 const NUM& a,  const NUM& b,  const NUM& c){
 	double s = a * a + b * b;
-	s = (s==0)?SMALL:s;
+	s = (s==0)?_SMALL_:s;
 	return std::abs(a * x0 + b * y0 + c) / std::sqrt(s);
 }
 template <typename NUM>

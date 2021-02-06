@@ -7,20 +7,27 @@
 #include <memory>
 
 namespace carpio {
-
 template<typename NUM>
-NUM InterseptX(const NUM& a, const NUM& alpha, const NUM& small = 1e-10){
-	if(std::abs(a) < small){
-		return  alpha / (small);
+NUM InterseptX(const NUM& a, const NUM& alpha){
+	if(std::abs(a) < (_SMALL_)){
+		return  alpha / (_SMALL_);
+	}else{
+		return alpha / a;
+	}
+}
+template<typename NUM>
+NUM InterseptX(const NUM& a, const NUM& alpha, const Vt& s){
+	if(std::abs(a) < (s)){
+		return  alpha / s;
 	}else{
 		return alpha / a;
 	}
 }
 
 template<typename NUM>
-NUM InterseptY(const NUM& b, const NUM& alpha, const NUM& small = 1e-10){
-	if(std::abs(b) < small){
-		return  alpha / (small);
+NUM InterseptY(const NUM& b, const NUM& alpha, const Vt& s){
+	if(std::abs(b) < s){
+		return  alpha / (s);
 	}else{
 		return alpha / b;
 	}
@@ -29,9 +36,9 @@ NUM InterseptY(const NUM& b, const NUM& alpha, const NUM& small = 1e-10){
 template<typename NUM>
 NUM CalculateX(const NUM& a, const NUM& b, const NUM& alpha,  // The line
 		       const NUM& value,                              // Y = value
-		       const NUM& small = 1e-10){
-	if(std::abs(a) < small){
-		return (alpha - value * b) / small;
+		       const NUM& s = 1e-10){
+	if(std::abs(a) < s){
+		return (alpha - value * b) / s;
 	} else {
 		return (alpha - value * b) / a;
 	}
@@ -39,9 +46,9 @@ NUM CalculateX(const NUM& a, const NUM& b, const NUM& alpha,  // The line
 template<typename NUM>
 NUM CalculateY(const NUM& a, const NUM& b, const NUM& alpha,  // The line
 		       const NUM& value,                              // X = value
-		       const NUM& small = 1e-10){
-	if(std::abs(b) < small){
-		return (alpha - value * a) / small;
+		       const NUM& s = 1e-10){
+	if(std::abs(b) < s){
+		return (alpha - value * a) / s;
 	} else {
 		return (alpha - value * a) / b;
 	}
@@ -49,11 +56,11 @@ NUM CalculateY(const NUM& a, const NUM& b, const NUM& alpha,  // The line
 template<typename NUM>
 NUM Calculate(const NUM& a,  const NUM& b, const NUM& alpha,  // The line
 		      const Axes& axe, const NUM& value,              // Axes = value
-		      const NUM& small = 1e-10){
+		      const NUM& s = 1e-10){
 	if(axe == _X_){
-		return CalculateY(a, b, alpha, value, small);
+		return CalculateY(a, b, alpha, value, s);
 	}else{
-		return CalculateX(a, b, alpha, value, small);
+		return CalculateX(a, b, alpha, value, s);
 	}
 }
 template<typename NUM>
@@ -152,16 +159,16 @@ public:
 	// _X_=v ---> value of _Y_
 	// _Y_=v ---> value of _X_
 	Vt cal(Axes a, Vt v) const{
-		return Calculate(this->a(), this->b(), this->alpha(), a, v, SMALL);
+		return Calculate(this->a(), this->b(), this->alpha(), a, v, _SMALL_);
 	}
 	Vt slope() const {
-		return -this->a() / (this->b() + SMALL);
+		return -this->a() / (this->b() + _SMALL_);
 	}
 	Vt intersept_x() const {
-		return InterseptX(this->a(), this->alpha(), SMALL);
+		return InterseptX(this->a(), this->alpha(), _SMALL_);
 	}
 	Vt intersept_y() const {
-		return InterseptY(this->b(), this->alpha(), SMALL);
+		return InterseptY(this->b(), this->alpha(), _SMALL_);
 	}
 	Vt intersept(Axes aix) const {
 		ASSERT(aix!=_Z_);
@@ -180,9 +187,9 @@ public:
 	// (x,y) is another vector
 	// true  --- (x, y) direction is normal to the line
 	// false --- (x, y) direction is not norma to he line
-	bool is_norm(Vt x, Vt y, Vt small = 1e-10) const{
+	bool is_norm(Vt x, Vt y, Vt s = 1e-10) const{
 		Vt dot = this->shear_x() * x + this->shear_y() * y;
-		if (std::abs(dot) < small){
+		if (std::abs(dot) < s){
 			return true;
 		}else{
 			return false;

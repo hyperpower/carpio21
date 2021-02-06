@@ -1105,6 +1105,14 @@ namespace GnuplotActor {
 typedef std::shared_ptr<carpio::Gnuplot_actor> spActor;
 typedef std::list<spActor> list_spActor;
 
+template<class OBJECT>
+spActor WireFrame(const OBJECT& obj){
+	//This function needs to be partial specializated
+	std::cout << "WireFrame in gnuplot" << std::endl;
+	SHOULD_NOT_REACH;
+	return nullptr;
+}
+
 template<typename X, typename Y>
 spActor XY(const X& x, const Y& y,
         const std::string &pcmd = "using 1:2 title \"\" ",

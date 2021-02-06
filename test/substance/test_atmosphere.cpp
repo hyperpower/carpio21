@@ -7,6 +7,9 @@ using namespace carpio;
 
 const std::string OUTPUTPATH = "./test_output/";
 
+const int fig_width  = 600;
+const int fig_height = 900;
+
 TEST(atmosphere, mkdir){
     // Do not disable this test
     CreateDir("./test_output/");
@@ -32,7 +35,7 @@ TEST(atmosphere, test1) {
                   x, y,
                   "using 1:2 title \"\" ",
                   "with lines lw 1"));
-    gnu.set_terminal_png(OUTPUTPATH + "Fig3MolecularScaleTemperature", 400, 600);
+    gnu.set_terminal_png(OUTPUTPATH + "Fig3MolecularScaleTemperature", fig_width, fig_height);
     gnu.plot();
 }
 
@@ -57,7 +60,7 @@ TEST(atmosphere, test2) {
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
-    gnu.set_terminal_png(OUTPUTPATH + "Fig6MolecularWeight", 400, 600);
+    gnu.set_terminal_png(OUTPUTPATH + "Fig6MolecularWeight", fig_width, fig_height);
     gnu.plot();
 }
 
@@ -84,7 +87,7 @@ TEST(atmosphere, pressure) {
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
-    gnu.set_terminal_png(OUTPUTPATH + "Fig7Pressure", 500, 600);
+    gnu.set_terminal_png(OUTPUTPATH + "Fig7Pressure", fig_width, fig_height);
     gnu.plot();
 }
 
@@ -111,7 +114,7 @@ TEST(atmosphere, Density) {
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
-    gnu.set_terminal_png(OUTPUTPATH + "Fig7Density", 500, 600);
+    gnu.set_terminal_png(OUTPUTPATH + "Fig7Density", fig_width, fig_height);
     gnu.plot();
 }
 
@@ -138,7 +141,7 @@ TEST(atmosphere, SpeedOfSound) {
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
-    gnu.set_terminal_png(OUTPUTPATH + "Fig13SpeedOfSound", 500, 600);
+    gnu.set_terminal_png(OUTPUTPATH + "Fig13SpeedOfSound", fig_width, fig_height);
     gnu.plot();
 }
 
@@ -165,7 +168,7 @@ TEST(atmosphere, DynamicViscosity) {
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
-    gnu.set_terminal_png(OUTPUTPATH + "Fig14DynamciViscosity", 500, 600);
+    gnu.set_terminal_png(OUTPUTPATH + "Fig14DynamciViscosity", fig_width, fig_height);
     gnu.plot();
 }
 

@@ -82,24 +82,24 @@ public:
 		return _min == _max;
 	}
 
-	Vt min(int a) const {
-		ASSERT(a < Dim);
-		return _min[a];
+	Vt pmin(int& idx) const {
+		ASSERT(idx < Dim);
+		return self._min[idx];
 	}
-	Vt max(int a) const {
+	Vt pmax(int a) const {
 		ASSERT(a < Dim);
 		return _max[a];
 	}
-	Point& min() {
+	Point& pmin() {
 		return _min;
 	}
-	const Point& min() const {
+	const Point& pmin() const {
 		return _min;
 	}
-	Point& max() {
+	Point& pmax() {
 		return _max;
 	}
-	const Point& max() const {
+	const Point& pmax() const {
 		return _max;
 	}
 
