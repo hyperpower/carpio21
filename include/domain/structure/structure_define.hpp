@@ -5,7 +5,7 @@
 
 namespace carpio{
 
-struct StructureType;
+struct StructureType{};
 
 }
 

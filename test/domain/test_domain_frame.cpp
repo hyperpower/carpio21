@@ -6,8 +6,7 @@ using namespace carpio;
 
 TEST(domain, initial){
     std::cout << "== Domain test ==" << std::endl;
-    typedef SIndex_<1> Index;
-    typedef SGrid_<1, Index> Grid;
+    typedef SGrid_<1> Grid;
     typedef SGhost_<1, Grid> Ghost;
     typedef SOrder_<1, Grid, Ghost> Order;
 

@@ -6,7 +6,9 @@
 namespace carpio{
 
 template<St DIM, class GRID>
-class SGhost_: public GhostBase_<DIM>{
+class SGhost_<DIM, GRID>{
+public: 
+    typedef GRID Grid;
 
 
 
@@ -14,11 +16,6 @@ class SGhost_: public GhostBase_<DIM>{
 
 
 
-
-
-
 }
-
-
 
 #endif

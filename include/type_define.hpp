@@ -16,7 +16,7 @@
 #define CAST_REF(type, p)       (*((type)p))
 #define _IF_TRUE_RETRUN(expr)   if(expr){return;};
 #define _IF_FALSE_RETRUN(expr)  if(false==(expr)){return;};
-#define SMALL (1e-12)
+#define _SMALL_ (1e-12)
 //return code
 #define _SUCCESS   0
 #define _ERROR     1
