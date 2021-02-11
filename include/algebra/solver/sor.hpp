@@ -43,7 +43,7 @@ public:
 
 		St n = b.size();
 		Mat T(A);
-		Arr C(n, 1.0 / SMALL);
+		Arr C(n, 1.0 / _SMALL_);
 		//Arr newx(n);
 
 		Vt normb = Nrm2(b);

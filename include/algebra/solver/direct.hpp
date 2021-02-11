@@ -147,9 +147,9 @@ int Solve(VALUE a1, VALUE b1, VALUE c1,
 	if (a2 == 0) {
 		y = double(c2) / double(b2);
 	} else {
-		y = double(c1 - a1 * c2 / a2) / double(b1 - a1 * b2 / a2 + SMALL);
+		y = double(c1 - a1 * c2 / a2) / double(b1 - a1 * b2 / a2 + _SMALL_);
 	}
-	x = double(c1 - b1 * y) / double(a1 + SMALL);
+	x = double(c1 - b1 * y) / double(a1 + _SMALL_);
 }
 
 

@@ -125,8 +125,8 @@ public:
 
 	void reconstruct(Vt a, Vt b, Vt c) {
 		if (a == 0.0 && b == 0.0) {
-			a = SMALL;
-			b = SMALL;
+			a = _SMALL_;
+			b = _SMALL_;
 		}
 		this->a() = a;
 		this->b() = b;
@@ -215,7 +215,7 @@ public:
 		const Vt& b = this->at(1);
 		const Vt& c = this->at(2);
 		Vt s = a * a + b * b;
-		s = (s == 0) ? SMALL : s;
+		s = (s == 0) ? _SMALL_ : s;
 		return Point(-a * c / s, -b *c /s);
 	}
 

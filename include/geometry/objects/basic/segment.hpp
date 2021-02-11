@@ -168,7 +168,7 @@ public:
 	}
 	Vt slope() const {
 		ASSERT(Dim == 2);
-		return (pey() - psy()) / (pex() - psx() + SMALL);
+		return (pey() - psy()) / (pex() - psx() + _SMALL_);
 	}
 
 	Box box() const {

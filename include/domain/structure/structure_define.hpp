@@ -3,6 +3,10 @@
 
 #include "domain/domain_define.hpp"
 
+
+#define FOR_EACH_DIM for(St d=0;d<DIM;++d)
+
+
 namespace carpio{
 
 struct StructureType{};

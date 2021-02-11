@@ -84,6 +84,7 @@ public:
 
 	Vt pmin(int& idx) const {
 		ASSERT(idx < Dim);
+		Self& self = (*this);
 		return self._min[idx];
 	}
 	Vt pmax(int a) const {

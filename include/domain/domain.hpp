@@ -11,7 +11,7 @@ namespace carpio{
 template<class FIELD, class BDYIDX>
 FIELD Laplacian(const FIELD& field, const BDYIDX bi, const std::string& method){
     LaplacianImplement_<FIELD::Dim,
-                        FIELD::ValueType,
+                        typename FIELD::ValueType,
                         typename FIELD::Grid, 
                         typename FIELD::Ghost,
                         typename FIELD::Order,

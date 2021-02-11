@@ -34,8 +34,8 @@ public:
 	}
 	void reconstruct(const vt& a, const vt& b, const vt& c, const vt& alpha) {
 		if (a == 0.0 && b == 0.0) {
-			a = SMALL;
-			b = SMALL;
+			a = _SMALL_;
+			b = _SMALL_;
 		}
 		this->a() = a;
 		this->b() = b;
@@ -68,21 +68,21 @@ public:
 	}
 	vt cal_x(const vt& y, const vt& z) const {
 		if (this->a() == 0.0) {
-			return (this->alpha() - this->b() * y - this->c() * z) / SMALL;
+			return (this->alpha() - this->b() * y - this->c() * z) / _SMALL_;
 		} else {
 			return (this->alpha() - this->b() * y - this->c() * z) / this->a();
 		}
 	}
 	vt cal_y(const vt& x, const vt& z) const {
 		if (this->b() == 0.0) {
-			return (this->alpha() - this->a() * x - this->c() * z) / SMALL;
+			return (this->alpha() - this->a() * x - this->c() * z) / _SMALL_;
 		} else {
 			return (this->alpha() - this->a() * x - this->c() * z) / this->b();
 		}
 	}
 	vt cal_z(const vt& x, const vt& y) const {
 		if (this->c() == 0.0) {
-			return (this->alpha() - this->a() * x - this->b() * y) / SMALL;
+			return (this->alpha() - this->a() * x - this->b() * y) / _SMALL_;
 		} else {
 			return (this->alpha() - this->a() * x - this->b() * y) / this->c();
 		}

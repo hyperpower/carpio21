@@ -15,7 +15,7 @@
 namespace carpio{
 
 
-template<St Dim>
+template<St DIM>
 class StructureDomain_{
 public:
     static const St Dim = DIM;
