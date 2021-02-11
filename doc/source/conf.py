@@ -58,11 +58,11 @@ pygments_style = None
 
 # -- Options for HTML output -------------------------------------------------
 
-mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
-mathjax_config = {
-    'extensions': ['tex2jax.js'],
-    'jax': ['input/TeX', 'output/HTML-CSS'],
-}
+# mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+# mathjax_config = {
+#     'extensions': ['tex2jax.js'],
+#     'jax': ['input/TeX', 'output/HTML-CSS'],
+# }
 
 # Figure Number
 # If true, figures, tables and code-blocks are automatically numbered if they has caption. 

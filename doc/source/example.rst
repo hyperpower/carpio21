@@ -63,7 +63,7 @@ gives you super user powers!
 Math
 -------------
 
-here is a inline math. Since Pythagoras, we know that :math:`a^2 + b^2 = c^2`.
+here is a inline math. Since Pythagoras, we know that :math:`\alpha > \beta`.
 
 
 .. math::
