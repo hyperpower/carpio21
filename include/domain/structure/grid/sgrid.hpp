@@ -30,62 +30,59 @@ public:
         return "SGrid";
     };
     // ghost layer ============================
-    virtual Idx ghost_layer() const{};
+    virtual Idx ghost_layer() const{return 0;};
     // index ==================================
-    virtual const Index& n() const{};
-    virtual const Index& N() const{};
-    virtual Idx n(St dim) const{};
-    virtual Idx N(St dim) const{};
+    virtual Index n() const{return Index();};
+    virtual Index N() const{return Index();};
+    virtual Idx n(St dim) const{return 0;};
+    virtual Idx N(St dim) const{return 0;};
 
     // size ===================================
-    virtual inline Vt s_(St dim, Idx i) const{};
-    virtual inline Vt s_(St dim, Index idx) const{};
+    virtual inline Vt s_(St dim, Idx i) const{return 0;};
+    virtual inline Vt s_(St dim, Index idx) const{return 0;};
 
     // half size
-    virtual inline Vt hs_(St dim, Idx i) const {};
-    virtual inline Vt hs_(St dim, Index idx) const {};
+    virtual inline Vt hs_(St dim, Idx i) const {return 0;};
+    virtual inline Vt hs_(St dim, Index idx) const {return 0;};
     // volume ==================================
-    virtual inline Vt volume(Index idx) const {};
+    virtual inline Vt volume(Index idx) const {return 0;};
     // center ==================================
-    virtual Poi c(Idx i, Idx j = 0, Idx k = 0) const {}
-    virtual Poi c(const Index& index) const {}
-    virtual Vt  c_(const St& dim, const Idx& idx) const {}
-    virtual Vt  c_(const St& dim, const Index& idx) const {}
+    virtual Poi c (Idx i, Idx j = 0, Idx k = 0)      const {return Poi();}
+    virtual Poi c (const Index& index)               const {return Poi();}
+    virtual Vt  c_(const St& dim, const Idx& idx)   const {return 0;}
+    virtual Vt  c_(const St& dim, const Index& idx) const {return 0;}
 
-    virtual Vt cx(Idx i, Idx j = 0, Idx k = 0) const {}
-    virtual Vt cy(Idx i, Idx j = 0, Idx k = 0) const {}
-    virtual Vt cz(Idx i, Idx j = 0, Idx k = 0) const {}
+    virtual Vt cx(Idx i, Idx j = 0, Idx k = 0) const {return 0;}
+    virtual Vt cy(Idx i, Idx j = 0, Idx k = 0) const {return 0;}
+    virtual Vt cz(Idx i, Idx j = 0, Idx k = 0) const {return 0;}
 
-    virtual St num_cells() const {}
-    virtual St num_vertex() const {}
-    virtual St num_face() const {}
+    virtual St num_cells()  const  {return 0;}
+    virtual St num_vertex() const  {return 0;}
+    virtual St num_face()   const  {return 0;}
 
-    virtual Vt min_size() const {}
-    virtual Vt min_size(St dim) const {}
+    virtual Vt min_size()       const {return 0;}
+    virtual Vt min_size(St) const {return 0;}
 
     // face  ===================================
-    virtual Poi f(St dim,  int ori, const Index& index) const {}
-    virtual Poi f(St dim,  int fb, Idx i, Idx j = 0, Idx k = 0) const {}
-    virtual Vt  f_(St dim, int ori, Idx idx) const {}
+    virtual Poi f (St, int, const Index&) const {return Poi();}
+    virtual Poi f (St, int, Idx, Idx j = 0, Idx k = 0) const {return Poi();}
+    virtual Vt  f_(St, int, Idx) const {return 0;}
     // face area
-    virtual Vt  fa(St dim,  int ori, const Index& index) const {}
+    virtual Vt  fa(St, int, const Index&) const {return 0;}
 
     // distance to face
-    virtual Vt df_(St dim, Idx idx) const {}
+    virtual Vt df_(St, Idx) const {return 0;}
     // vertex ================================
-    virtual Poi v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {}
-    virtual Poi v(Idx order, Index index) const{}
+    virtual Poi v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {return Poi();}
+    virtual Poi v(Idx order, Index index) const{return Poi();}
 
     virtual Poi v(Idx i,     short oi,
                   Idx j = 0, short oj = 0,
-                  Idx k = 0, short ok = 0) const {
-    }
+                  Idx k = 0, short ok = 0) const {return Poi();}
 
 
     // Point is in the range
-    virtual inline bool is_in_on(Poi p) {
-
-    }
+    virtual inline bool is_in_on(Poi p) {return false;}
     //  find closest index on the negative direction
     //  for example:
     //
@@ -95,9 +92,7 @@ public:
     //                      ^
     //               cor = 1.5
     //  return 2
-    virtual inline Idx find_close_idx_m(St dim, Vt cor) {
-
-    }
+    virtual inline Idx find_close_idx_m(St dim, Vt cor) {return 0;}
     //  find closest index on the positive direction
     //  for example:
     //
@@ -107,16 +102,12 @@ public:
     //                      ^
     //               cor = 1.5
     //  return 3
-    virtual inline Idx find_close_idx_p(St dim, Vt cor) {
+    virtual inline Idx find_close_idx_p(St dim, Vt cor) {return 0;}
 
-    }
-
-    virtual inline St _IDX(const Idx& i) const {
-    }
-    virtual inline Idx _idx(const St& I) const {
-    }
-    virtual Index to_Index(const Index& INDEX) const{}
-    virtual Index to_INDEX(const Index& Index) const{}
+    virtual inline St _IDX(const Idx&) const {return 0;}
+    virtual inline Idx _idx(const St&) const {return 0;}
+    virtual Index to_Index(const Index&) const{return Index();}
+    virtual Index to_INDEX(const Index&) const{return Index();}
 
     virtual void for_each(FunIndex){}
     virtual void for_each_INDEX(FunIndex){}

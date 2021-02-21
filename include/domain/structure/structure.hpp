@@ -10,6 +10,8 @@
 #include "order/sorder.hpp"
 #include "field/sfield.hpp"
 
+#include "io/sgnuplot_actor.hpp"
+
 #include "operator/slaplacian.hpp"
 
 namespace carpio{

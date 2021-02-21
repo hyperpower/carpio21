@@ -71,10 +71,10 @@ public:
     };
 
     // index ==================================
-    const Index& n() const{
+    Index n() const{
         return _n;
     };
-    const Index& N() const{
+    Index N() const{
         return _ng;
     };
     // The number of the nodes on each direction are same
@@ -258,7 +258,7 @@ public:
     // Point is in the range
     inline bool is_in_on(Poi p) {
         bool res = true;
-        for(St d = 0; d < Dim; ++d) { 
+        FOR_EACH_DIM
         {
             Vt min = this->_min[d];
             Vt max = _cs * _n[d] + this->_min[d];
@@ -277,8 +277,6 @@ public:
     //                      ^
     //               cor = 1.5
     //  return 2
-
-
     inline Idx find_close_idx_m(St dim, Vt cor) {
         ASSERT(dim < Dim);
         St res = 0;
@@ -360,6 +358,7 @@ public:
 	}
 
 };
+
 
 }
 
