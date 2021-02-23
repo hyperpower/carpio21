@@ -29,10 +29,6 @@ TEST(structure, initial){
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid", fig_width, fig_height);
 	gnu.plot();
 
-	// Plotly ply;
-	// ply.add(PlotlyActor::WireFrame(*spsg));
-	// ply.plot();
-
 }
 
 TEST(structure, initial1){
@@ -53,9 +49,25 @@ TEST(structure, initial1){
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid1", fig_width, fig_height);
 	gnu.plot();
 
-	// Plotly ply;
-	// ply.add(PlotlyActor::WireFrame(*spsg));
-	// ply.plot();
+}
+
+TEST(structure, nonuniform){
+	typedef std::shared_ptr<SGrid_<2> > spGrid;
+	typedef SGridNonUniform_<2> GridNonUniform;
+	typedef std::shared_ptr<GridNonUniform> spGridUniform;
+
+	Point_<Vt, 2> pmin(0, 0, 0);
+	Point_<Vt, 2> pmax(3, 3, 3);
+	spGridUniform spsg(new GridNonUniform(pmin, pmax, {10, 15}, 2));
+
+	Gnuplot gnu;
+	GAMStructure_<2> maker;
+	gnu.set_xrange(-0.5, 3.5);
+	gnu.set_yrange(-0.5, 3.5);
+	gnu.set_equal_ratio();
+	gnu.add(maker.wire_frame(*spsg));
+    gnu.set_terminal_png(OUTPUTPATH + "NonUniformSturctureGrid", fig_width, fig_height);
+	gnu.plot();
 
 }
 

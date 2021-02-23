@@ -6,7 +6,11 @@
 #include "sindex.hpp"
 #include "grid/sgrid.hpp"
 #include "grid/uniform.hpp"
+#include "grid/nonuniform.hpp"
+
 #include "ghost/sghost.hpp"
+#include "ghost/regular.hpp"
+
 #include "order/sorder.hpp"
 #include "field/sfield.hpp"
 
