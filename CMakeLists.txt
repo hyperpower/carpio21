@@ -42,6 +42,8 @@ set(cmake_cxx_standard 11)
 # settings on Windows
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
+
+
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/third-party/googletest)

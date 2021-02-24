@@ -7,13 +7,26 @@ set(Sources
     # test_box.cpp
     test_point.cpp
     test_point_chain.cpp
+    test_ts.cpp
 )
 
 add_executable(${This} ${Sources})
 
+IF(PYTHONLIBS_FOUND)
+  INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}")
+ELSE()
+  MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
+ENDIF()
+
 target_link_libraries(${This} PUBLIC
     gtest_main
 )
+
+if(PYTHON_LIBRARIES)
+  TARGET_LINK_LIBRARIES(${This} ${PYTHON_LIBRARIES})
+ELSE()
+  MESSAGE(FATAL_ERROR "Unable to link python libraries")
+ENDIF()
 
 add_test(
     NAME ${This}

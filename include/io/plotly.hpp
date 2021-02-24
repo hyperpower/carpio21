@@ -3,11 +3,20 @@
 
 #include "io_define.hpp"
 #include "algebra/array/array_list.hpp"
-#include <Python.h>
+
+// #include <Python.h>
 #include <map>
 #include <cmath>
 #include <memory>
 #include <algorithm>
+
+#ifdef _DEBUG
+  #undef _DEBUG
+  #include <python.h>
+  #define _DEBUG
+#else
+  #include <python.h>
+#endif
 
 namespace carpio {
 
@@ -476,8 +485,7 @@ protected:
         ASSERT(!(!_funPlot || !PyCallable_Check(_funPlot)));
     }
 
-}
-;
+};
 
 
 namespace PlotlyActor{
