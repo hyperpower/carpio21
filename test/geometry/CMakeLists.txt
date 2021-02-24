@@ -3,11 +3,12 @@ cmake_minimum_required(VERSION 2.8)
 set(This Geometry)
 
 set(Sources
-    test_bezier.cpp
+    # test_bezier.cpp
     # test_box.cpp
-    test_point.cpp
-    test_point_chain.cpp
-    test_ts.cpp
+    # test_point.cpp
+    # test_point_chain.cpp
+    # test_ts.cpp
+    test_tri_tri.cpp
 )
 
 add_executable(${This} ${Sources})
