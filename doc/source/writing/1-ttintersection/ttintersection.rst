@@ -1,8 +1,6 @@
 Triangle intersection method
 ==============================
 
-This file used for testing reStructureText file
-
 Basic Vector operator
 ----------------------
 
@@ -66,6 +64,36 @@ The cross product of two vectors a and b is defined only in three-dimensional sp
    \mathbf{j}
 
 
+三角形定义
+++++++++++++++++++++
+三角形通常由三个点组成, :math:`T=(P_0, P_1, P_2)`. 三角形的法向定义为： :math:`\mathbf{n}= \mathbf{v_1} \times \mathbf{v_2}`, 其中，:math:`\mathbf{v_1} = (P_1 - P_0)`, :math:`\mathbf{v_2} = (P_2 - P_0)`.
 
-H4 -- Subsubsection
-+++++++++++++++++++
+
+问题描述
+----------------------
+已知两个三角形, :math:`U=(P_0, P_1, P_2)`, :math:`V=(Q_0, Q_1, Q_2)`. 
+
+- 三角形 :math:`U` 是否与 :math:`V` 相交?
+- 如果他们相交，结果是什么?
+
+方法
+----------------------
+
+将三角形 :math:`U` 的 :math:`P_0` 点作为原点
+++++++++++++++++++++++++++++++++++++++++++++
+对于三角形 :math:`U` ，
+
+.. math::
+   :label: minus_u
+
+   \mathbf{e_1} &= P_1 - P_0 \\
+   \mathbf{e_2} &= P_2 - P_0
+
+对于三角形 :math:`V` ，
+
+.. math::
+   :label: minus_v
+
+   \mathbf{r_0} &= Q_0 - P_0 \\
+   \mathbf{r_1} &= Q_1 - P_0 \\
+   \mathbf{r_2} &= Q_2 - P_0
