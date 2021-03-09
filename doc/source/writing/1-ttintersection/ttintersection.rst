@@ -97,3 +97,9 @@ The cross product of two vectors a and b is defined only in three-dimensional sp
    \mathbf{r_0} &= Q_0 - P_0 \\
    \mathbf{r_1} &= Q_1 - P_0 \\
    \mathbf{r_2} &= Q_2 - P_0
+
+
+.. jupyter-execute:: ./fig1_tt_ply.py
+   :hide-code:
+
+上图为三维坐标系下的两个三角形。
