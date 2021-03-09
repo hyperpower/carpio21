@@ -1,22 +1,22 @@
 Triangle intersection method
 ==============================
 
-Basic Vector operator
+基础向量运算
 ----------------------
 
-Vector Define
+向量的定义
 +++++++++++++++++
 
-vector :math:`\mathbf{a}` belongs to :math:`\mathbf{R^3}`
+向量 :math:`\mathbf{a}` 属于 :math:`\mathbf{R^3}`
 
 .. math::
    :label: vector_define
 
    \mathbf{a} = (a_0, a_1, a_2)
 
-Cross product
+向量的叉乘
 +++++++++++++++++
-The cross product of two vectors a and b is defined only in three-dimensional space and is denoted by :math:`\mathbf{a} \times \mathbf{b}`.
+两个向量 :math:`\mathbf{a}` 和 :math:`\mathbf{b}` 的叉乘在三维空间表示为 :math:`\mathbf{a} \times \mathbf{b}`.
 
 .. math::
    :label: cross_product1
@@ -76,6 +76,11 @@ The cross product of two vectors a and b is defined only in three-dimensional sp
 - 三角形 :math:`U` 是否与 :math:`V` 相交?
 - 如果他们相交，结果是什么?
 
+.. jupyter-execute:: ./fig1_tt_ply.py
+   :hide-code:
+
+上图为三维坐标系下的两个三角形。
+
 方法
 ----------------------
 
@@ -99,7 +104,68 @@ The cross product of two vectors a and b is defined only in three-dimensional sp
    \mathbf{r_2} &= Q_2 - P_0
 
 
-.. jupyter-execute:: ./fig1_tt_ply.py
-   :hide-code:
+计算三角形的相对位置
+++++++++++++++++++++++
 
-上图为三维坐标系下的两个三角形。
+以 :math:`P_0` 为原点三角形 :math:`U` 作为基准三角形。可以计算出三角形 :math:`V` 的三个顶点的相对位置。
+
+.. math::
+
+   \mathbf{D_0} &= \mathbf{r_0} \cdot (\mathbf{e_1} \times \mathbf{e_2}) \\
+   \mathbf{D_1} &= \mathbf{r_1} \cdot (\mathbf{e_1} \times \mathbf{e_2}) \\
+   \mathbf{D_2} &= \mathbf{r_2} \cdot (\mathbf{e_1} \times \mathbf{e_2})
+
+即：
+
+.. math::
+   :label: d_vg
+
+   D_i = \mathbf{r_i} \cdot (\mathbf{e_1} \times \mathbf{e_2}) 
+                = \mathbf{r_i} \cdot \mathbf{n_0} \quad i=0,1,2
+
+如果 :math:`D_i>0` 则 :math:`\mathbf{r_i}` 与 :math:`\mathbf{n_0}` 的同方向。
+
+如果 :math:`D_i<0` 则 :math:`\mathbf{r_i}` 与 :math:`\mathbf{n_0}` 的反方向。
+
+如果 :math:`D_i=0` 则 :math:`\mathbf{r_i}` 与三角形 :math:`V` 的共面（coplane）。
+
+
+根据 :math:`D_i` 判断类型
++++++++++++++++++++++++++
+
+============  ===========  =========== ============
+:math:`D_0`   :math:`D_1`  :math:`D_2`    Case
+============  ===========  =========== ============
+0             0            0           全共面
+0             0            －           线共面
+0             0            ＋           线共面
+0             －            0           线共面
+0             －            －           点共面
+0             －            ＋           点共面异侧
+0             ＋            0           点共面
+0             ＋            －           点共面异侧
+0             ＋            ＋           点共面
+－             0            0           线共面
+－             0            －           点共面
+－             0            ＋           点共面异侧
+－             －            0           线共面
+－             －            －           不相交
+－             －            ＋           异侧
+－             ＋            0           点共面异侧
+－             ＋            －           异侧
+－             ＋            ＋           异侧
+＋             0            0           线共面
+＋             0            －           点共面异侧
+＋             0            ＋           点共面
+＋             －            0           点共面异侧
+＋             －            －           异侧
+＋             －            ＋           异侧
+＋             ＋            0           点共面
+＋             ＋            －           异侧
+＋             ＋            ＋           不相交
+============  ===========  =========== ============
+
+
+
+
+
