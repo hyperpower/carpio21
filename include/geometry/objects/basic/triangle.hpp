@@ -5,6 +5,10 @@
 #include "point.hpp"
 #include <array>
 #include "math.h"
+
+#undef max
+#undef min
+
 namespace carpio {
 
 template<typename TYPE, St DIM, class POINT = Point_<TYPE, DIM> >
