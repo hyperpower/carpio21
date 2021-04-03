@@ -20,18 +20,19 @@ TEST(tritri, initial){
     Point3 z(0, 0, 1);
 
     Point3 x2(0.0, 0.0, 0.0);
-    Point3 y2(0,   1.2, 0.0);
+    Point3 y2(0,   1.2, 0.2);
     Point3 z2(1.1,   0, 0.0);
 
     Tri t1(x,y,z);
     Tri t2(x2,y2,z2);
 
+    t1.show();
+    t2.show();
     IntersectionTriTri_<Vt, 3> inter(t1, t2);
-    IntersectionTriTri_<Vt, 3> inter2(t1, t2);
     std::cout << "Is Init     : " << inter.is_init() <<std::endl;
 
     inter.is_intersect();
 
-    t1.show();
+
     
 }

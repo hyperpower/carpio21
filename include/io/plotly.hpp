@@ -12,7 +12,7 @@
 
 #ifdef _DEBUG
   #undef _DEBUG
-  #include <Python.h>
+  #include <python.h>
   #define _DEBUG
 #else
   #include <Python.h>

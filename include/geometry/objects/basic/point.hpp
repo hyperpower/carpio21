@@ -264,6 +264,13 @@ public:
 
 };
 template<typename TYPE, St DIM>
+inline Point_<TYPE, DIM> operator*(
+        Point_<TYPE, DIM> lhs,
+        const TYPE& rhs) {
+    lhs *= rhs;
+    return lhs;
+}
+template<typename TYPE, St DIM>
 inline Point_<TYPE, DIM> operator+(
         Point_<TYPE, DIM> lhs,
         const Point_<TYPE, DIM>& rhs) {

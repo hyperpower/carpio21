@@ -28,6 +28,10 @@ class SingletonTTHelper
      */
 public:
     typedef std::bitset<6> BS;
+
+    std::array<int, 3> _arr012;
+    std::array<int, 3> _arr135;
+    std::array<int, 3> _arr024;
 private:
     static SingletonTTHelper * pinstance_;
     static std::mutex mutex_;
@@ -35,6 +39,7 @@ protected:
     SingletonTTHelper()
     {
         _init_mapD();
+        _init_arridx();
     }
     ~SingletonTTHelper() {}
 
@@ -83,6 +88,22 @@ protected:
         //4 one point on plane, other two points on different side 
         //5 points on different side
     }
+
+    void _init_arridx(){
+        _arr012[0] = 0;
+        _arr012[1] = 1;
+        _arr012[2] = 2;
+
+        _arr135[0] = 1;
+        _arr135[1] = 3;
+        _arr135[2] = 5;
+
+        _arr024[0] = 0;
+        _arr024[1] = 2;
+        _arr024[2] = 4;
+    }
+
+    
 
 public:
     /**
@@ -165,6 +186,8 @@ protected:
     std::array<Vec, 3> _ve;
     Vec _n0;
     std::array<Vt,  3> _D;
+
+    std::array<Vec, 2> _vt;  // intersection points on plane t2
 public:
     IntersectionTriTri_():Base(){};
 
@@ -173,10 +196,10 @@ public:
         this->_inited = true;
     };
 
-    bool is_intersect(){
+    ReturnType is_intersect(){
         if(!this->is_init()){
             std::cerr << "!> Triangles are not initialed" << std::endl;
-            return false;
+            return this->no_intersections();
         }
         this->_rebase();
         // _n0
@@ -198,8 +221,21 @@ public:
         SingletonTTHelper* phelper = SingletonTTHelper::GetInstance();
         int td = phelper->type_D(Dcode);
         std::cout << "type d = " << td << std::endl;
+        // D type cases
+        switch (td) {
+            case 0: 
+                return this->no_intersections();
+            case 1:
+                return _all_coplane();
+            case 2:
+                return _line_coplane(Dcode);
+            case 3:
+                return _point_coplane(Dcode);
+            case 4:
+                return _point_coplane_different_side(Dcode);
+        }
         
-        return false;
+        return this->no_intersections();
 
     }
 protected:
@@ -230,6 +266,69 @@ protected:
         }else{
             return 0; // 00
         } 
+    }
+
+    
+    ReturnType _all_coplane(){
+        std::cout << "In coplane "<< std::endl;
+        return ReturnType();
+    } 
+    ReturnType _line_coplane(const std::bitset<6>& D){
+        std::cout << "In line coplane "<< std::endl;
+        int idx  = 0;
+        
+        SingletonTTHelper* phelper = SingletonTTHelper::GetInstance();
+        for(auto& i : phelper->_arr012){
+            if(idx > 1){
+                break;
+            }
+            if(   D[phelper->_arr024[i]] == 0 
+               && D[phelper->_arr135[i]] == 0){
+                _vt[idx] = _vr[i];
+                idx++;
+            }
+        }
+        return ReturnType();
+    } 
+    ReturnType _point_coplane(const std::bitset<6>& D){
+        std::cout << "In point coplane "<< std::endl;
+        
+        SingletonTTHelper* phelper = SingletonTTHelper::GetInstance();
+        for(auto& i : phelper->_arr012){
+            if(   D[phelper->_arr024[i]] == 0 
+               && D[phelper->_arr135[i]] == 0){
+                _vt[0] = _vr[i];
+                break;
+            }
+        }
+        return ReturnType();
+    }
+
+    ReturnType _point_coplane_different_side(const std::bitset<6>& D){
+        std::cout << "In one point coplane different side"<< std::endl;
+        
+        SingletonTTHelper* phelper = SingletonTTHelper::GetInstance();
+
+        for(auto& i : phelper->_arr012){
+            if(   D[phelper->_arr024[i]] == 0 
+               && D[phelper->_arr135[i]] == 0){
+                _vt[0] = _vr[i];
+                break;
+            }
+        }  // get one point coplane
+
+        cal_vt(_vt[1], 1, 2);
+
+
+        return ReturnType();
+    }
+    // calculate vt
+    // return res
+    void cal_vt(Vec& res, int i, int j) const{
+        Vt beta = _D[i]/(_D[i] - _D[j]);
+        std::cout << "beta = " << beta << std::endl;
+        res = _vr[i] * beta + _vr[j] * (1.0 - beta);
+        std::cout << res << std::endl;
     }
 
 };
