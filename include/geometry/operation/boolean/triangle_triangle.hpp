@@ -165,7 +165,6 @@ SingletonTTHelper *SingletonTTHelper::GetInstance()
     return pinstance_;
 }
 
-
 template<typename TYPE, St DIM>
 class IntersectionTriTri_:public IntersectionBase_<Triangle_<TYPE, DIM>, Triangle_<TYPE, DIM> >{
 public:
@@ -330,10 +329,7 @@ protected:
         res = _vr[i] * beta + _vr[j] * (1.0 - beta);
         std::cout << res << std::endl;
     }
-
 };
-
-
 
 }
 
