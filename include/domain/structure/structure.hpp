@@ -12,6 +12,7 @@
 #include "ghost/regular.hpp"
 
 #include "order/sorder.hpp"
+#include "order/xyz.hpp"
 #include "field/sfield.hpp"
 
 #include "io/sgnuplot_actor.hpp"

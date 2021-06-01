@@ -27,39 +27,49 @@ public:
     virtual std::string type() const{
         return "SGhost";
     }
-    virtual St type(const Index& idx) const{}
+    virtual St type(const Index& idx) const{return 0;}
 
-    virtual Grid& grid() {
-        SHOULD_NOT_REACH;
-        return Grid();
-    }
+    // virtual Grid& grid() {
+    //     SHOULD_NOT_REACH;
+    //     return Grid();
+    // }
 
-    virtual const Grid& grid() const {
-        SHOULD_NOT_REACH;
-        return Grid();
-    }
+    // virtual const Grid& grid() const {
+    //     SHOULD_NOT_REACH;
+    //     return Grid();
+    // }
 
-    virtual bool is_ghost(const Index& index) const{};
-    virtual bool is_not_ghost(const Index& index) const{};
+    virtual bool is_ghost(const Index& index) const{return false;};
+    virtual bool is_not_ghost(const Index& index) const{return false;};
     virtual bool is_boundary(
             const Index& index,
             const St&    a,
-            const St&    o) const{};
+            const St&    o) const{
+        return false;
+    };
     virtual bool is_cut(
-            const Index& index) const{};
-    virtual bool is_normal(const Index& index) const{};
+            const Index& index) const{return false;};
+    virtual bool is_normal(const Index& index) const{return false;};
 
 
     virtual int boundary_id(const Index& indexc,
                             const Index& indexg,
                             const St&  axe,
-                            const St& ori) const{};
+                            const St& ori) const{
+                                return 0;
+                            };
     virtual Index boundary_index(const Index& indexc,
                                  const Index& indexg,
                                  const St&    axe,
-                                 const St&    ori) const{};
-    virtual St size_normal() const{}
-    virtual St size_not_ghost() const{}
+                                 const St&    ori) const{
+                                     return Index();
+                                 };
+    virtual St size_normal() const{
+        return 0;
+    }
+    virtual St size_not_ghost() const{
+        return 0;
+    }
 };
 
 

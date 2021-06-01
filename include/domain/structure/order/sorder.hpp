@@ -35,12 +35,12 @@ public:
 
     virtual St get_order(const Index&) const{return 0;}
 
-    virtual const Grid& grid() const {
-        return Grid();
-    }
-    virtual const Ghost& ghost() const {
-        return Ghost();
-    }
+    // virtual const Grid& grid() const {
+    //     return Grid();
+    // }
+    // virtual const Ghost& ghost() const {
+    //     return Ghost();
+    // }
     virtual spGrid spgrid() const{
         return nullptr;
     }

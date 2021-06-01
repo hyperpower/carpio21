@@ -22,7 +22,7 @@ TEST(point, point_initial){
 	Point3 x(1, 0, 0);
 	Point3 y(0, 1, 0);
 	Point3 z(0, 0, 1);
-	std::cout << "Initial three points and output/n";
+	std::cout << "[==========] Initial three points and output/n";
 	std::cout << "Point x = " << x << std::endl;
 	std::cout << "Point y = " << y << std::endl;
 	std::cout << "Point z = " << z << std::endl;

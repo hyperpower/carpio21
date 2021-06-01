@@ -42,7 +42,6 @@ public:
         }
     }
 
-
     SGridUniform_(
             const Poi& minp,
             const Idx& nx,

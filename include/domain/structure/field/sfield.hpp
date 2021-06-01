@@ -16,6 +16,21 @@ public:
     typedef VT    ValueType;
     typedef StructureType TraitType;
 
+    typedef std::shared_ptr<Grid>  spGrid;
+    typedef std::shared_ptr<Ghost> spGhost;
+    typedef std::shared_ptr<Order> spOrder;
+protected:
+    spGrid  _spgrid;
+    spGhost _spghost;
+    spOrder _sporder;
+public:
+    SField_(){}
+
+    virtual ~SField_(){}
+
+    virtual Grid&  grid(){return *_spgrid;};
+    virtual Ghost& ghost(){return *_spghost;};
+    virtual Order& order(){return *_sporder;};
 
 };
 

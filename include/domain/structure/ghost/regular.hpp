@@ -29,20 +29,21 @@ public:
 protected:
     spGrid _grid;
 public:
-    SGhostRegular_(spGrid spg): _grid(spg){
+    SGhostRegular_(): _grid(nullptr){
 
     }
+    SGhostRegular_(spGrid spg): _grid(spg){
+    }
     virtual ~SGhostRegular_(){
-
     }
 
     virtual std::string type() const{
         return "SGhostRegular";
     }
 
-    virtual St type(const Index& idx) const{
-        return this->is_ghost(idx) ? _GHOST_ : _NORMAL_;
-    }
+    // virtual St type(const Index& idx) const{
+    //     return this->is_ghost(idx) ? _GHOST_ : _NORMAL_;
+    // }
 
     virtual Grid& grid() {
            return *_grid;

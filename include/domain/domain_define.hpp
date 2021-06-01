@@ -52,9 +52,9 @@ public:
 
     virtual ~FieldBase_(){}
 
-    virtual Grid&  grid(){return Grid();};
-    virtual Ghost& ghost(){return Ghost();};
-    virtual Order& order(){return Order();};
+    // virtual Grid&  grid(){return Grid();};
+    // virtual Ghost& ghost(){return Ghost();};
+    // virtual Order& order(){return Order();};
 
 };
 
