@@ -48,7 +48,8 @@ protected:
 public:
     //constructor==================================
     ArrayListT_();
-    ArrayListT_(const ArrayListT_<T>& a);
+    ArrayListT_(const ArrayListT_<T>&  a);
+    ArrayListT_(ArrayListT_<T>&& a);
     ArrayListT_(size_type Len);
     ArrayListT_(const std::initializer_list<T>& l);
     void reconstruct(size_type Len);
@@ -72,6 +73,7 @@ public:
     reference at(size_type index);
     //operator=====================================
     ArrayListT_<T>& operator=(const ArrayListT_<T> &a);
+    ArrayListT_<T>& operator=(ArrayListT_<T>&&a);
     // iterator support============================
     iterator begin() {
         return m_p;
@@ -126,6 +128,13 @@ ArrayListT_<T>::ArrayListT_(const ArrayListT_<T>& a) {
     m_p   = new T[m_Len];
     //unrolled loop
     Copy(m_Len, a.m_p, this->m_p);
+}
+template<typename T>
+ArrayListT_<T>::ArrayListT_(ArrayListT_<T>&& a) {
+    m_Len = a.m_Len;
+    m_p   = a.m_p;
+    a.m_Len = 0;
+    a.m_p   = nullptr;
 }
 
 template<typename T>
@@ -243,7 +252,18 @@ ArrayListT_<T>& ArrayListT_<T>::operator=(const ArrayListT_<T> &a) {
     }
     return *this;
 }
-
+template<typename T>
+ArrayListT_<T>& ArrayListT_<T>::operator=(ArrayListT_<T> &&a) {
+    if (this == &a) {
+        return *this;
+    } else {
+        m_Len   = a.m_Len;
+        m_p     = a.m_p;
+        a.m_Len = 0;
+        a.m_p   = nullptr;
+    }
+    return *this;
+}
 template<typename T>
 void ArrayListT_<T>::set(size_type i, const T& value) {
     ASSERT(i >= 0 && i < m_Len);

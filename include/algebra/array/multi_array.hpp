@@ -36,7 +36,7 @@ class MultiArray_ {
     typedef typename ArrayListT_<value_t>::const_iterator const_iterator;
   private:
     std::array<St, Dim> m_len;
-    ArrayListT_<value_t> m_mp;
+    ArrayListT_<value_t> m_array;
   public:
     //constructor==========================
     MultiArray_(){
@@ -44,7 +44,7 @@ class MultiArray_ {
     }
     MultiArray_(const Self& a){
     	this->m_len = a.m_len;
-    	this->m_mp = a.m_mp;
+    	this->m_array = a.m_array;
     }
     MultiArray_(St iLen, St jLen= 0, St kLen= 0){
     	St len         = iLen;
@@ -59,7 +59,7 @@ class MultiArray_ {
 			this->m_len[2] = kLen;
 			len *= kLen;
 		}
-		this->m_mp.reconstruct(len);
+		this->m_array.reconstruct(len);
     }
 
     void reconstruct(St iLen, St jLen = 0, St kLen= 0){
@@ -75,7 +75,7 @@ class MultiArray_ {
 			this->m_len[2] = kLen;
 			len *= kLen;
 		}
-		this->m_mp.reconstruct(len);
+		this->m_array.reconstruct(len);
     }
     //=============================================
     MultiArray_<T, DIM>& operator=(const MultiArray_<T, DIM>& a){
@@ -83,7 +83,7 @@ class MultiArray_ {
 			return *this;
 		}
 		this->m_len = a.m_len;
-		this->m_mp  = a.m_mp;
+		this->m_array  = a.m_array;
 		return *this;
     }
     //=============================================
@@ -92,7 +92,7 @@ class MultiArray_ {
 
     //Capacity=====================================
     St size() const {
-        return m_mp.size();
+        return m_array.size();
     }
     St size_i() const {
         return m_len[0];
@@ -104,22 +104,22 @@ class MultiArray_ {
         return Dim >= 3 ? m_len[2] : 0;
     }
     bool empty() const {
-        return m_mp.empty();
+        return m_array.empty();
     }
     /*
      *  iterator
      */
     iterator       begin() {
-        return m_mp.begin();
+        return m_array.begin();
     }
     const_iterator begin() const {
-        return m_mp.begin();
+        return m_array.begin();
     }
     iterator       end() {
-        return m_mp.end();
+        return m_array.end();
     }
     const_iterator end() const {
-        return m_mp.end();
+        return m_array.end();
     }
     //Element access===============================
     St to_1d_idx(St i, St j = 0, St k = 0) const{
@@ -151,11 +151,11 @@ class MultiArray_ {
 
     reference       at(St i, St j= 0, St k= 0){
     	 St idx = to_1d_idx(i, j, k);
-    	 return m_mp[idx];
+    	 return m_array[idx];
     }
     const_reference at(St i, St j = 0, St k = 0) const{
     	St idx = to_1d_idx(i, j, k);
-    	return m_mp[idx];
+    	return m_array[idx];
     }
 
     reference       operator()(St i, St j = 0, St k = 0){
@@ -165,8 +165,8 @@ class MultiArray_ {
       	return at(i, j, k);
     }
 
-    reference       at_1d(St i){        return m_mp[i];}
-    const_reference at_1d(St i) const{  return m_mp[i];}
+    reference       at_1d(St i){        return m_array[i];}
+    const_reference at_1d(St i) const{  return m_array[i];}
 
     T    get(St i, St j = 0,  St k = 0){
     	return at(i, j, k);
@@ -176,7 +176,7 @@ class MultiArray_ {
     }
 
     void assign(const T& value){
-    	 m_mp.assign(value);
+    	 m_array.assign(value);
     }
 
     //element access===============================
@@ -197,7 +197,7 @@ class MultiArray_ {
     }
 
     inline St count_equal(const T& nd) const { //overload ==
-        return m_mp.count_equal(nd);
+        return m_array.count_equal(nd);
     }
 };
 
@@ -222,14 +222,14 @@ class MultiArrayV_ {
     typedef typename ArrayListT_<value_t>::const_iterator const_iterator;
   private:
     std::array<St, Dim> m_len;
-    ArrayListV_<value_t> m_mp;
+    ArrayListV_<value_t> m_array;
   public:
     //constructor==========================
     MultiArrayV_(){
     	m_len.fill(0);
     }
     MultiArrayV_(const Self& a):
-    	m_len(a.m_len), m_mp(a.m_mp){
+    	m_len(a.m_len), m_array(a.m_array){
     }
     MultiArrayV_(St iLen, St jLen= 0, St kLen= 0){
     	St len         = iLen;
@@ -244,7 +244,7 @@ class MultiArrayV_ {
 			this->m_len[2] = kLen;
 			len *= kLen;
 		}
-		this->m_mp.reconstruct(len);
+		this->m_array.reconstruct(len);
     }
 
     void reconstruct(St iLen, St jLen = 0, St kLen= 0){
@@ -263,7 +263,7 @@ class MultiArrayV_ {
 			this->m_len[2] = kLen;
 			Len = iLen * jLen * kLen;
 		}
-		this->m_mp.reconstruct(Len);
+		this->m_array.reconstruct(Len);
     }
     //=============================================
     ref_Self operator=(const Self& a){
@@ -271,7 +271,7 @@ class MultiArrayV_ {
 			return *this;
 		}
 		this->m_len = a.m_len;
-		this->m_mp = a.m_mp;
+		this->m_array = a.m_array;
 		return *this;
     }
     //=============================================
@@ -280,7 +280,7 @@ class MultiArrayV_ {
 
     //Capacity=====================================
     St size() const {
-        return m_mp.size();
+        return m_array.size();
     }
     St size_i() const {
         return m_len[0];
@@ -292,7 +292,7 @@ class MultiArrayV_ {
         return Dim >= 3 ? m_len[2] : 0;
     }
     bool empty() const {
-        return m_mp.empty();
+        return m_array.empty();
     }
     bool is_compatible(const Self& other) const{
     	for(St i = 0; i< Dim;++i){
@@ -306,16 +306,16 @@ class MultiArrayV_ {
      *  iterator
      */
     iterator       begin() {
-        return m_mp.begin();
+        return m_array.begin();
     }
     const_iterator begin() const {
-        return m_mp.begin();
+        return m_array.begin();
     }
     iterator       end() {
-        return m_mp.end();
+        return m_array.end();
     }
     const_iterator end() const {
-        return m_mp.end();
+        return m_array.end();
     }
     //Element access===============================
     St to_1d_idx(St i, St j = 0, St k = 0) const{
@@ -349,13 +349,13 @@ class MultiArrayV_ {
     		           const St& j= 0,
 					   const St& k= 0){
     	 St idx = to_1d_idx(i, j, k);
-    	 return m_mp[idx];
+    	 return m_array[idx];
     }
     const_reference at(const St& i,
     		           const St& j = 0,
 					   const St& k = 0) const{
     	St idx = to_1d_idx(i, j, k);
-    	return m_mp[idx];
+    	return m_array[idx];
     }
 
     reference       operator()(const St& i,
@@ -369,8 +369,8 @@ class MultiArrayV_ {
       	return at(i, j, k);
     }
 
-    reference       at_1d(St i){        return m_mp[i];}
-    const_reference at_1d(St i) const{  return m_mp[i];}
+    reference       at_1d(St i){        return m_array[i];}
+    const_reference at_1d(St i) const{  return m_array[i];}
 
     T    get(St i, St j = 0,  St k = 0){
     	return at(i, j, k);
@@ -380,30 +380,30 @@ class MultiArrayV_ {
     }
 
     void assign(const T& value){
-    	 m_mp.assign(value);
+    	 m_array.assign(value);
     }
 
 
 	T max() const {
-		return this->m_mp.max();
+		return this->m_array.max();
 	}
 
 	T min() const {
-		return this->m_mp.min();
+		return this->m_array.min();
 	}
 
 	void abs(){
-		this->m_mp.abs();
+		this->m_array.abs();
 	}
 
 	T norm1() const{
-		return this->m_mp.norm1();
+		return this->m_array.norm1();
 	}
 	T norm2() const{
-		return this->m_mp.norm2();
+		return this->m_array.norm2();
 	}
 	T norminf() const{
-		return this->m_mp.norminf();
+		return this->m_array.norminf();
 	}
 
     //element access===============================
@@ -422,48 +422,48 @@ class MultiArrayV_ {
     }
 
     inline St count_equal(const T& nd) const { //overload ==
-        return m_mp.count_equal(nd);
+        return m_array.count_equal(nd);
     }
     // operator ====================================
     Self operator-(){
     	Self res(*this);
-    	res.m_mp = -res.m_mp;
+    	res.m_array = -res.m_array;
     	return res;
     }
 	ref_Self operator+=(const Self& a) {
 		ASSERT(this->is_compatible(a));
-		m_mp += a.m_mp;
+		m_array += a.m_array;
 		return *this;
 	}
 	ref_Self operator-=(const Self& a) {
 		ASSERT(this->is_compatible(a));
-		m_mp -= a.m_mp;
+		m_array -= a.m_array;
 		return *this;
 	}
 	ref_Self operator*=(const Self& a) {
 		ASSERT(this->is_compatible(a));
-		m_mp *= a.m_mp;
+		m_array *= a.m_array;
 		return *this;
 	}
 	ref_Self operator/=(const Self& a) {
 		ASSERT(this->is_compatible(a));
-		m_mp /= a.m_mp;
+		m_array /= a.m_array;
 		return *this;
 	}
 	ref_Self operator+=(const Vt& a) {
-		m_mp += a;
+		m_array += a;
 		return *this;
 	}
 	ref_Self operator-=(const Vt& a) {
-		m_mp -= a;
+		m_array -= a;
 		return *this;
 	}
 	ref_Self operator*=(const Vt& a) {
-		m_mp *= a;
+		m_array *= a;
 		return *this;
 	}
 	ref_Self operator/=(const Vt& a) {
-		m_mp /= a;
+		m_array /= a;
 		return *this;
 	}
 };
@@ -471,6 +471,35 @@ template<typename T, St DIM>
 MultiArrayV_<T, DIM> Abs(const MultiArrayV_<T, DIM> a){
 	MultiArrayV_<T, DIM> res(a);
 
+}
+template<typename V, St DIM>
+MultiArrayV_<V, DIM> operator+(      MultiArrayV_<V, DIM> x, 
+                               const MultiArrayV_<V, DIM> &y){
+	ASSERT(x.size() == y.size());
+	x += y;
+	return x;
+}
+template<typename V, St DIM>
+MultiArrayV_<V, DIM> operator+(MultiArrayV_<V, DIM> x, const V &a){
+	x += a;
+	return x;
+}
+template<typename V, St DIM>
+MultiArrayV_<V, DIM> operator+(const V &a, MultiArrayV_<V, DIM> x){
+	x += a;
+	return x;
+}
+template<typename V, St DIM>
+MultiArrayV_<V, DIM> operator-(      MultiArrayV_<V, DIM> x, 
+                               const MultiArrayV_<V, DIM> &y){
+	ASSERT(x.size() == y.size());
+	x -= y;
+	return x;
+}
+template<typename V, St DIM>
+MultiArrayV_<V, DIM> operator-(MultiArrayV_<V, DIM> x, const V &a){
+	x -= a;
+	return x;
 }
 
 }
