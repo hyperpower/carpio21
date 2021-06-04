@@ -22,14 +22,14 @@
 namespace carpio{
 
 
-template<St DIM>
-class StructureDomain_{
-public:
-    static const St Dim = DIM;
+// template<St DIM>
+// class StructureDomain_{
+// public:
+//     static const St Dim = DIM;
 
-    typedef SIndex_<Dim> Index;
+//     typedef SIndex_<Dim> Index;
 
-};
+// };
 
 
 

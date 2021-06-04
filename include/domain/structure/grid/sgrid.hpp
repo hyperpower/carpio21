@@ -34,12 +34,12 @@ public:
     // index ==================================
     virtual Index n() const{return Index();};
     virtual Index N() const{return Index();};
-    virtual Idx n(St dim) const{return 0;};
-    virtual Idx N(St dim) const{return 0;};
+    virtual Idx n(St) const{return 0;};
+    virtual Idx N(St) const{return 0;};
 
     // size ===================================
-    virtual inline Vt s_(St dim, Idx i) const{return 0;};
-    virtual inline Vt s_(St dim, Index idx) const{return 0;};
+    virtual inline Vt s_(St, Idx) const{return 0;};
+    virtual inline Vt s_(St, Index) const{return 0;};
 
     // half size
     virtual inline Vt hs_(St dim, Idx i) const {return 0;};
@@ -47,8 +47,8 @@ public:
     // volume ==================================
     virtual inline Vt volume(Index idx) const {return 0;};
     // center ==================================
-    virtual Poi c (Idx i, Idx j = 0, Idx k = 0)      const {return Poi();}
-    virtual Poi c (const Index& index)               const {return Poi();}
+    virtual Poi c (Idx i, Idx j = 0, Idx k = 0)     const {return Poi();}
+    virtual Poi c (const Index& index)              const {return Poi();}
     virtual Vt  c_(const St& dim, const Idx& idx)   const {return 0;}
     virtual Vt  c_(const St& dim, const Index& idx) const {return 0;}
 
@@ -60,7 +60,7 @@ public:
     virtual St num_vertex() const  {return 0;}
     virtual St num_face()   const  {return 0;}
 
-    virtual Vt min_size()       const {return 0;}
+    virtual Vt min_size()   const {return 0;}
     virtual Vt min_size(St) const {return 0;}
 
     // face  ===================================
@@ -79,7 +79,6 @@ public:
     virtual Poi v(Idx i,     short oi,
                   Idx j = 0, short oj = 0,
                   Idx k = 0, short ok = 0) const {return Poi();}
-
 
     // Point is in the range
     virtual inline bool is_in_on(Poi p) {return false;}
@@ -104,8 +103,8 @@ public:
     //  return 3
     virtual inline Idx find_close_idx_p(St dim, Vt cor) {return 0;}
 
-    virtual inline St _IDX(const Idx&) const {return 0;}
-    virtual inline Idx _idx(const St&) const {return 0;}
+    virtual inline St _IDX(const Idx&)   const {return 0;}
+    virtual inline Idx _idx(const St&)   const {return 0;}
     virtual Index to_Index(const Index&) const{return Index();}
     virtual Index to_INDEX(const Index&) const{return Index();}
 
