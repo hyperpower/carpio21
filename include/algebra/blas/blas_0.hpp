@@ -91,7 +91,18 @@ void DivideEqual(const ST& n, VT* src, const VT& dst) {
 		src[i] /= dst;
 	}
 }
-
+template<typename ST, typename VT>
+void Nagative(const ST& n, VT* src) {
+	for (ST i = 0; i < n; ++i) {
+		src[i] =  -(src[i]);
+	}
+}
+template<typename ST, typename VT>
+void Nagative(const ST& n, const VT* src, VT* dst) {
+	for (ST i = 0; i < n; ++i) {
+		dst[i] =  -(src[i]);
+	}
+}
 }
 
 #endif

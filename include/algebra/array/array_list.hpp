@@ -667,9 +667,7 @@ ArrayListV_<V> operator-(const V &a, const ArrayListV_<V>& x){
 template<typename V>
 ArrayListV_<V> ArrayListV_<V>::operator-() const{
 	ArrayListV_<V> tmp(this->m_Len);
-	for (size_type i = 0; i < this->m_Len; i++) {
-		tmp[i] = -(this->m_p[i]);
-	}
+    Nagative(this->m_Len, this->m_p, tmp.m_p);
 	return tmp;
 }
 

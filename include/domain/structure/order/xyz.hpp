@@ -100,6 +100,11 @@ public:
         SHOULD_NOT_REACH;
         return 0;
     }
+    St get_order(int i, int j = 0, int k = 0) const{
+        Index idx(i,j,k);
+        return get_order(idx);
+    }
+     
     const Grid& grid() const {
         return (*_grid);
     }
