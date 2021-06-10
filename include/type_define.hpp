@@ -50,6 +50,8 @@ enum Axes {
 	_Y_ = 1, //
 	_Z_ = 2, //
 };
+
+
 inline Axes ToAxes(const St& i) {
 	ASSERT(i >= 0 && i < 3);
 	switch (i) {
@@ -90,6 +92,7 @@ enum Orientation {
 	_P_ = 1, //
 	_C_ = 2, //
 };
+
 inline Orientation ToOrientation(const St& i) {
 	ASSERT(i >= 0 && i < 3);
 	switch (i) {

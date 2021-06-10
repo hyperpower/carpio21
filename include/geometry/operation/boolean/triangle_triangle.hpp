@@ -32,14 +32,17 @@ public:
     std::array<int, 3> _arr012;
     std::array<int, 3> _arr135;
     std::array<int, 3> _arr024;
+
+    std::array<std::array<int,3>, 3> _mapte0e1;
 private:
     static SingletonTTHelper * pinstance_;
     static std::mutex mutex_;
 protected:
     SingletonTTHelper()
     {
-        _init_mapD();
+        _init_map_D();
         _init_arridx();
+        _init_map_te0e1();
     }
     ~SingletonTTHelper() {}
 
@@ -47,7 +50,7 @@ protected:
 
     std::unordered_map<std::bitset<6>, int> _mapD;
 
-    void _init_mapD(){
+    void _init_map_D(){
         // std::cout<<"init_mapD" << std::endl;
         // 00 = 0, 01 = -, 11 = +
         //                    D2D1D0
@@ -101,6 +104,19 @@ protected:
         _arr024[0] = 0;
         _arr024[1] = 2;
         _arr024[2] = 4;
+    }
+
+    void _init_map_te0e1(){
+        // 0 = 0, + = 1, - = 2
+        _mapte0e1[0][0] = 0;
+        _mapte0e1[2][0] = 1;
+        _mapte0e1[2][2] = 2;
+        _mapte0e1[0][2] = 3;
+        _mapte0e1[1][2] = 4;
+        _mapte0e1[1][0] = 5;
+        _mapte0e1[1][1] = 6;
+        _mapte0e1[0][1] = 7;
+        _mapte0e1[2][1] = 8;
     }
 
     
@@ -181,8 +197,8 @@ protected:
     spTri _t1;
     spTri _t2;
 
-    std::array<Vec, 3> _vr;
-    std::array<Vec, 3> _ve;
+    std::array<Vec, 3> _vr; // rebased triangle
+    std::array<Vec, 3> _ve; // rebased triangle
     Vec _n0;
     std::array<Vt,  3> _D;
 
@@ -203,6 +219,7 @@ public:
         this->_rebase();
         // _n0
         _n0 = Cross(_ve[0], _ve[1]);
+        std::cout << "n0 = " << _n0 << std::endl;
 
         //calculate D
         _D[0] = Dot(_vr[0],_n0); 
@@ -232,6 +249,8 @@ public:
                 return _point_coplane(Dcode);
             case 4:
                 return _point_coplane_different_side(Dcode);
+            case 5:
+                return _different_side(Dcode);
         }
         
         return this->no_intersections();
@@ -252,6 +271,7 @@ protected:
 
         _ve[0] = (*_t2)[1] - (*_t2)[0];
         _ve[1] = (*_t2)[2] - (*_t2)[0];
+        // _ve[2].assign(0)
     }
 
     int _D_code(Vt D, int idx, std::bitset<6>& bset){
@@ -265,6 +285,18 @@ protected:
         }else{
             return 0; // 00
         } 
+    }
+
+    int index_t_e_n(const Vec& t, const Vec& e, const Vec& n){
+        auto res = Dot(Cross(t,e), n);
+        std::cout << res << std::endl;
+        if(res > 0.0){
+            return 1;
+        }else if(res < 0.0){
+            return 2;
+        }else{
+            return 0;
+        }
     }
 
     
@@ -316,8 +348,29 @@ protected:
             }
         }  // get one point coplane
 
-        cal_vt(_vt[1], 1, 2);
 
+        cal_vt(_vt[1], 1, 2);
+        std::cout << "vt[0] = " << _vt[0] << std::endl;
+        std::cout << "vt[1] = " << _vt[1] << std::endl;
+
+        // index (t0 x e0) . n0
+        int idxt00 = index_t_e_n(_vt[0], _ve[0], _n0);
+        int idxt01 = index_t_e_n(_vt[0], _ve[1], _n0);
+
+        int idxt10 = index_t_e_n(_vt[1], _ve[0], _n0);
+        int idxt11 = index_t_e_n(_vt[1], _ve[1], _n0);
+
+        auto t0e = phelper->_mapte0e1[idxt00][idxt01];
+        auto t1e = phelper->_mapte0e1[idxt10][idxt11];
+        std::cout << "(t0e) = " << t0e << std::endl;
+        std::cout << "(t1e) = " << t1e << std::endl;
+
+
+        return ReturnType();
+    }
+
+    ReturnType _different_side(const std::bitset<6>& D){
+        std::cout << "In different side"<< std::endl;
 
         return ReturnType();
     }
@@ -325,9 +378,9 @@ protected:
     // return res
     void cal_vt(Vec& res, int i, int j) const{
         Vt beta = _D[i]/(_D[i] - _D[j]);
-        std::cout << "beta = " << beta << std::endl;
+        // std::cout << "beta = " << beta << std::endl;
         res = _vr[i] * beta + _vr[j] * (1.0 - beta);
-        std::cout << res << std::endl;
+        // std::cout << res << std::endl;
     }
 };
 

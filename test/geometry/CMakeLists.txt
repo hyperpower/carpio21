@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 set(This Geometry)
 
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
 set(Sources
     # test_bezier.cpp
     # test_box.cpp

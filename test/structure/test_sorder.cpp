@@ -22,7 +22,7 @@ TEST(order, initial){
 
 	Point_<Vt, 2> pmin(0, 0, 0);
 	Point_<Vt, 2> pmax(1, 1, 1);
-	spGrid spgrid(new Grid(pmin, {10, 10}, 0.3, 2));
+	spGrid  spgrid(new Grid(pmin, {10, 10}, 0.3, 2));
 
 	spGhost spghost(new Ghost(spgrid));
 

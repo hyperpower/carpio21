@@ -15,13 +15,13 @@ typedef Triangle_<double, 3> Tri;
 
 
 TEST(tritri, initial){
-    Point3 x(0, 0, 0);
-    Point3 y(0, 1, 0);
-    Point3 z(0, 0, 1);
+    Point3 x(0,   0,    0);
+    Point3 y(0.5, 0.5, -1.0);
+    Point3 z(0.5, 0.5, 1.0);
 
     Point3 x2(0.0, 0.0, 0.0);
-    Point3 y2(0,   1.2, 0.2);
-    Point3 z2(1.1,   0, 0.0);
+    Point3 y2(1.0, 0.0, 0.0);
+    Point3 z2(0.0, 1.0, 0.0);
 
     Tri t1(x,y,z);
     Tri t2(x2,y2,z2);

@@ -24,21 +24,21 @@ plt.plot(x0, y0, "--", c="grey")
 
 plt.annotate("0 (0,0)", [0.0,0.05], fontsize=16, ha='left', va='bottom', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
-plt.annotate("1 (+,0)", [0.6,0.7], fontsize=16,ha='left', va='center', color="black",
+plt.annotate("1 (-,0)", [0.6,0.7], fontsize=16,ha='left', va='center', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
-plt.annotate("2 (+,+)", [0.0,0.6], fontsize=16,ha='left', va='center', color="black",
+plt.annotate("2 (-,-)", [0.0,0.6], fontsize=16,ha='left', va='center', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
-plt.annotate("3 (0,+)", [-0.5,0.6], fontsize=16,ha='center', va='center', color="black",
+plt.annotate("3 (0,-)", [-0.5,0.6], fontsize=16,ha='center', va='center', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
-plt.annotate("4 (-,+)", [-0.5,-0.0], fontsize=16,ha='center', va='center', color="black",
+plt.annotate("4 (+,-)", [-0.5,-0.0], fontsize=16,ha='center', va='center', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
-plt.annotate("5 (-,0)", [-0.5,-0.5], fontsize=16,ha='center', va='center', color="black",
+plt.annotate("5 (+,0)", [-0.5,-0.5], fontsize=16,ha='center', va='center', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
-plt.annotate("6 (-,-)", [-0.0,-0.5], fontsize=16,ha='left', va='center', color="black",
+plt.annotate("6 (+,+)", [-0.0,-0.5], fontsize=16,ha='left', va='center', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
-plt.annotate("7 (0,-)", [0.7,-0.85], fontsize=16,ha='center', va='center', color="black",
+plt.annotate("7 (0,+)", [0.7,-0.85], fontsize=16,ha='center', va='center', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
-plt.annotate("8 (+,-)", [0.7,0.0], fontsize=16,ha='center', va='center', color="black",
+plt.annotate("8 (-,+)", [0.7,0.0], fontsize=16,ha='center', va='center', color="black",
               bbox=dict(boxstyle='round,pad=0.2', fc="white",alpha=1.0))
 
 plt.annotate("$e_0$", [0.4, -0.39], fontsize=16, ha='left', va='center', color=cblue)

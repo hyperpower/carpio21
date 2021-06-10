@@ -1,29 +1,29 @@
 #ifndef _BOOLEAN_INTERSECTION_BASE_HPP_
 #define _BOOLEAN_INTERSECTION_BASE_HPP_
 
-
 #include "geometry/geometry_define.hpp"
 
 namespace carpio{
 
 
 template<class VEC>
-VEC Cross(const VEC& a, const VEC& b){
+inline VEC Cross(const VEC& a, const VEC& b){
     return VEC(a[1]*b[2]-b[1]*a[2], 
                b[0]*a[2]-a[0]*b[2],
                a[0]*b[1]-b[0]*a[1]);
 }
 template<class VEC>
-Vt Dot(const VEC& a, const VEC& b){
+inline Vt Dot(const VEC& a, const VEC& b){
     return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; 
 }
 
 template<class VEC, class NUM>
-VEC Times(VEC& vec, const NUM& v){
+inline VEC Times(VEC& vec, const NUM& v){
     return VEC(vec[0] * v, 
                vec[1] * v, 
                vec[2] * v); 
 }
+
 
 template<typename TYPE, St DIM>
 struct IntersectionReturn_{

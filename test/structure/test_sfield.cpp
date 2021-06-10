@@ -41,5 +41,4 @@ TEST(field, initial){
 	a = -a + 3 + a;
 	std::cout << "a = -a + 3 + a Access value " << idx << "  = " << a(idx) << std::endl; 
 
-
 }
