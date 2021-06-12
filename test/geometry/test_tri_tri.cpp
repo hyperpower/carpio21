@@ -4,6 +4,7 @@
 
 using namespace carpio;
 
+const std::string OUTPUTPATH = "./test_output/";
 const St dim = 3;
 
 typedef Point_<double, dim> Point;
@@ -35,4 +36,20 @@ TEST(tritri, initial){
 
 
     
+}
+
+
+TEST(output_triangle, triangle){
+    Point3 x(0,   0,    0);
+    Point3 y(0.5, 0.5, -1.0);
+    Point3 z(0.5, 0.5, 1.0);
+    
+    Tri t1(x,y,z);
+    std::list<Tri> ts;
+    ts.push_back(t1);
+
+    t1.show();
+
+    GFile_<double, 3> gf;
+    gf.WriteTriangles(OUTPUTPATH + "tri.txt", ts);
 }

@@ -191,6 +191,7 @@ public:
     typedef Triangle_<TYPE, DIM> Triangle;     
     typedef Point_<TYPE, DIM>                        Point;     
     typedef Point_<TYPE, DIM>                        Vec;     
+    typedef std::shared_ptr<Vec>                   spVec;     
     typedef std::shared_ptr<Point_<TYPE, DIM> >    spPoint;     
     typedef std::shared_ptr<Triangle>              spTri;     
 protected:
@@ -364,7 +365,6 @@ protected:
         auto t1e = phelper->_mapte0e1[idxt10][idxt11];
         std::cout << "(t0e) = " << t0e << std::endl;
         std::cout << "(t1e) = " << t1e << std::endl;
-
 
         return ReturnType();
     }

@@ -265,8 +265,8 @@ Triangle intersection method
    ------ ------------------------------------------------------------
      t0     0      1      2      3     4     5      6      7     8
    ====== ====== ======== ====== ===== ===== ====== ====== ===== =====
-    0     a      b j1     c      c     c     c      c      b     d
-    1            b 2j1    e j1   e j1  e j1  b j1   f      f     g      
+    0     a      b        c      c     c     c      c      b     8
+    1            b11      e12    e13   e j1  b j1   f      f     g      
     2                     no     no    no    no     f      f     g
     3                            no    no    no     no     b j1  g
     4                                  no    no     no     e     f                     
@@ -276,7 +276,19 @@ Triangle intersection method
     8                                                            f3
    ====== ====== ======== ====== ===== ===== ====== ====== ===== =====
 
+定义 ED(t) = :math:`(\mathbf{e_0} - \mathbf{t}) \times (\mathbf{e_1} - \mathbf{t})` 与 :math:`\mathbf{e_0} \times \mathbf{e_1}` 同向
 
+b :math:`(\mathbf{e_0} - \mathbf{t_1}) \times (\mathbf{e_1} - \mathbf{t_1})` 与  :math:`\mathbf{e_0} \times \mathbf{e_1}`
+同向则相交，共线，两点
+
+
+c 点点接触，:math:`\mathbf{t_0}` 
+
+b1 
+
+
+
+2 - 7
 - j1 :math:`\mathbf{t_0}` 或 :math:`\mathbf{t_1}` 在 :math:`\mathbf{e_0}` 或 :math:`\mathbf{e_1}` 上，判断内外。
 - j2 :math:`\mathbf{t_0}` 和 :math:`\mathbf{t_1}` 连线是否与 :math:`\mathbf{e_0}` 或 :math:`\mathbf{e_1}` 相交。
 - j3 :math:`\mathbf{t_0}` 和 :math:`\mathbf{t_1}` 连线是否与 :math:`\mathbf{e_0}` 和 :math:`\mathbf{e_1}` 连线相交。

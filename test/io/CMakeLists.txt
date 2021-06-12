@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 set(This IO)
 
 set(Sources
-    test_csv.cpp
+    # test_csv.cpp
+    test_textfile.cpp
 )
 
 add_executable(${This} ${Sources})

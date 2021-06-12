@@ -23,7 +23,10 @@ inline VEC Times(VEC& vec, const NUM& v){
                vec[1] * v, 
                vec[2] * v); 
 }
-
+template<class VEC>
+inline VEC SquareSum(VEC& vec){
+    return vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]; 
+}
 
 template<typename TYPE, St DIM>
 struct IntersectionReturn_{

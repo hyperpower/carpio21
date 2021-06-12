@@ -167,7 +167,7 @@ public:
 		}
 		txtf.write();
 	}
-}
-;
+};
+
 }
 #endif
