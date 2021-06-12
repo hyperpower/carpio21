@@ -45,6 +45,7 @@ plt.annotate("$e_0$", [0.4, -0.39], fontsize=16, ha='left', va='center', color=c
 plt.annotate("$e_1$", [0.45, 0.65], fontsize=16, ha='left', va='center', color=cblue)
 
 plt.axis('off')
+plt.tight_layout()
 
 # plt.show()
 plt.savefig("./source/writing/1-ttintersection/fig2_tt.png")

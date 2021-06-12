@@ -22,6 +22,7 @@ class Segment_: public std::array< Point_<TYPE, DIM>, 2> {
 public:
 	static const St Dim = DIM;
 	typedef TagSegment Tag;
+    typedef TYPE ValueType;
 	typedef TYPE Vt;
 	typedef Vt& ref_Vt;
 	typedef const Vt& const_ref_Vt;

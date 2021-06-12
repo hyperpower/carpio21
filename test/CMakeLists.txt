@@ -31,10 +31,10 @@ cmake_minimum_required(VERSION 2.8)
 
   ## Uncomment here to run the test
   # add_subdirectory(algebra)
-  add_subdirectory(io)
+  # add_subdirectory(io)
   # add_subdirectory(utility)
   # add_subdirectory(substance)
-  # add_subdirectory(geometry)
+  add_subdirectory(geometry)
   # add_subdirectory(structure)
   # add_subdirectory(equation)
   # add_subdirectory(domain)

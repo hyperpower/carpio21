@@ -204,6 +204,11 @@ protected:
     std::array<Vt,  3> _D;
 
     std::array<Vec, 2> _vt;  // intersection points on plane t2
+
+    //tmp
+    std::array<std::array<spVec, 2>, 2> _mte;
+    std::array<std::array<spVec, 2>, 2> _met;
+    
 public:
     IntersectionTriTri_():Base(){};
 
