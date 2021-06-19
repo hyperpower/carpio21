@@ -72,5 +72,5 @@ plt.axis('off')
 plt.tight_layout()
 
 # plt.show()
-# plt.savefig("./source/writing/1-ttintersection/fig3_tt.png")
-plt.savefig("./fig3_tt.png")
+plt.savefig("./source/writing/1-ttintersection/fig3_tt.png")
+# plt.savefig("./fig3_tt.png")
