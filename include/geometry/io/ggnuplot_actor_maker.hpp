@@ -86,7 +86,7 @@ public:
         int color = color_idx > 0? color_idx : 0;
         spActor actor = spActor(new Gnuplot_actor());
         actor->command() = "using 1:2:3 title \"\" ";
-        actor->style()   = "with lines_points lc variable";
+        actor->style()   = "with linespoints lc variable";
 
         auto iterps = begin;
         auto iterpe = std::next(begin);
