@@ -198,16 +198,24 @@ public:
         _aseg[1] = t1;
     }
 
+    int triangle_intersection_code(int idx){
+        return _loccode[idx][0];
+    }
+    int segment_intersection_code(int idx){
+        return _loccode[idx][1];
+    }
+
     bool is_intersect(){
         // std::cout << "location code 0 = " << _code[0] << std::endl;
         // std::cout << "location code 1 = " << _code[1] << std::endl;
-        MatLoc mat;
+        MatLoc& mat = this->_loccode;
         mat.fill({-1,-1});
         bool upper = (this->_code[0]<this->_code[1])?true : false;
         this->_matfun[this->_code[0]][this->_code[1]](
             this->_atri, this->_aseg, mat, upper);
         std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
         std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
+        return false;
     }
 protected:
     void _rebase(const Triangle& t, const Segment& s){

@@ -15,6 +15,19 @@ typedef Triangle_<double, 2> Tri2;
 typedef Segment_<double, 2> Seg2;
 
 
+typename GAM::spActor plot_triangle_by_code(const Tri2& t, int code){
+	// input location code
+	GAM gam;
+	GAM::spActor actor;
+	switch(code){
+		case 0: {
+			actor = gam.points(t[0]);
+			actor->style() = "with linespoints pt 5 ps 1 lc variable";
+		};break;
+	};
+	return actor;
+}
+
 
 TEST(segtri, initial){
 	typedef IntersectionSegTri_<double, 2> Inter;
@@ -35,6 +48,9 @@ TEST(segtri, initial){
 	auto gax = gam.points(x);
 	auto gay = gam.points(y);
 	auto gseg = gam.lines_points(seg.begin(),seg.end());
+    gseg->style()   = "with linespoints pt 6 ps 2 lc variable";
+	int ct0 = inter.triangle_intersection_code(0);
+	gnu.add(plot_triangle_by_code(tri, ct0));
 
 	auto gat = gam.lines_points(tri.begin(), tri.end(), -1, true);
 
