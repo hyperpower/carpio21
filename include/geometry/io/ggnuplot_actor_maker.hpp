@@ -264,6 +264,17 @@ public:
         return actor;
     }
 
+    spActor arrows(const Point& p1, const Point& p2, int color_idx = -1) {
+        spActor actor = spActor(new Gnuplot_actor());
+        int color = color_idx > 0 ? color_idx : 0;
+        actor->command() = "using 1:2:3:4:5 title \"\" ";
+        actor->style()   = "with vectors lc variable";
+        actor->data().push_back(
+                ToString(p1[0],  p1[1],
+                         p2[0] - p1[0],
+                         p2[1] - p1[1], color, " "));
+        return actor;
+    }
     spActor arrows(
             const PointChain& pc,
             int color_idx = -1) {

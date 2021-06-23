@@ -249,7 +249,19 @@ protected:
         _matfun[1][0] = Self::_fun0_1;
         _matfun[0][2] = Self::_fun0_2;
         _matfun[2][0] = Self::_fun0_2;
+        _matfun[1][1] = Self::_fun1_1;
     }
+
+    static const int _N_ = 2;  
+    static const int _O_ = 0;  
+    static const int _P_ = 1;
+
+    static inline int _SideToLoc(const int& side,
+                             const int& pl,
+                             const int& ol,
+                             const int& nl){
+        return (side == _P_) ? pl : (side == _O_) ? ol : nl;
+    }  
 
     static void _fun0_1(const ArrayVec& tri,
                         const ArrayVec& seg,
@@ -262,8 +274,8 @@ protected:
         if(rc == 2){
             ml[zero][zero] = 0;
             ml[zero][one]  = 0;
-            ml[one][zero]  = 3;
-            ml[one][one]   = 1;
+            ml[one][zero]  = 1;
+            ml[one][one]   = 2;
         }else if(rc == 0){
             ml[zero][zero] = 0;
             ml[zero][one]  = 0;
@@ -307,29 +319,31 @@ protected:
                         const ArrayVec& seg,
                         MatLoc& ml,
                         const bool& upper){
-        int zero = upper?0:1; 
-        int one  = upper?1:0; 
+        int T1 = 0, T2 = 1, TE = 3, TO = 7;
+        int S1 = 0, S2 = 1, SE = 2, SO = 3;
         int rc0 = WhichSide32D(
-            tri[one], seg[zero], tri[zero]);
-
+            tri[1], seg[0], tri[0]);
         int rc1 = WhichSide32D(
-            tri[one], seg[one], tri[zero]);
- 
-        if(rc0 == 2){
-            ml[zero][zero] = 3;
-            ml[zero][one]  = 0;
-            ml[one][zero]  = rc1==0?1:(rc1==1?3:7);
-            ml[one][one]   = rc1==0?1:(rc1==1?1:2);
-        }else if(rc0 == 0){
-            ml[zero][zero] = 1;
-            ml[zero][one]  = 0;
-            ml[one][zero]  = rc1==0?1:(rc1==1?3:7);
-            ml[one][one]   = rc1==0?1:(rc1==1?1:3);
-        }else{
-            ml[zero][zero] = rc1==0?1:(rc1==1?7:3);
-            ml[zero][one]  = 0; // not good
-            ml[one][zero]  = 1; // not good
-            ml[one][one]   = 2; // not good
+            tri[1], seg[1], tri[0]);
+        switch(rc0){
+            case _P_:{
+                ml[0][0] = TE;
+                ml[0][1] = S1; 
+                ml[1][0] = _SideToLoc(rc1, TE, T2, T2); 
+                ml[1][1] = _SideToLoc(rc1, S2, S2, SE); 
+            };break;
+            case _O_:{
+                ml[0][0] = T2;
+                ml[0][1] = S1; 
+                ml[1][0] = _SideToLoc(rc1, TE, T2, T2); 
+                ml[1][1] = _SideToLoc(rc1, S2, S2, SO); 
+            };break;
+            case _N_:{
+                ml[0][0] = _SideToLoc(rc1, T2, T2, TO);
+                ml[0][1] = _SideToLoc(rc1, S2, S2, SO); 
+                ml[1][0] = _SideToLoc(rc1, TE, T2, TO); 
+                ml[1][1] = _SideToLoc(rc1, S2, S2, SO); 
+            };break;
         }
     }
 };
