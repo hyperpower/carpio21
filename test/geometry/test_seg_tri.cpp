@@ -44,15 +44,40 @@ void plot_triangle_by_code(Gnuplot& gnu, const Tri2& t, int code0, int code1){
 		}
 		gnu.add(actor);
 	}
+}
 
-
+void plot_segment_by_code(Gnuplot& gnu, const Seg2& seg, int code0, int code1){
+	GAM gam;
+	for(int i = 0; i < 2; i++){
+		GAM::spActor actor = gam.points(seg[i], 1);
+		if((code0 == i) || (code1 == i)){
+			actor->style() = "with points pt 6 ps 2 lc variable";
+		}else{
+			actor->style() = "with points pt 2 ps 1 lc variable";
+		}
+		gnu.add(actor);
+	}
+	// plot edge
+	for(int i = 0; i < 3; i++){
+		// auto& pair = arridx[i];    
+		auto& p0 = seg[0];
+		auto& p1 = seg[1];
+		auto actor = gam.arrows(p0,p1, 1);
+		if((code0 == 2) || (code1 == 2)){
+			std::cout << "S edge = " << i << "intersect" << std::endl;
+			actor->style() = "with vectors lw 2 lc variable";
+		}else{
+			actor->style() = "with vectors lc variable";
+		}
+		gnu.add(actor);
+	}
 }
 
 
 TEST(segtri, initial){
 	typedef IntersectionSegTri_<double, 2> Inter;
-	Point2 x(0.1, 0.0);
-	Point2 y(0.3, 0.9);
+	Point2 x(0.5, 0.0);
+	Point2 y(0.5, 0.5);
 	Seg2 seg(x, y);
 	Point2 t0(0,   0);
 	Point2 t1(1.,  0.0);
@@ -67,18 +92,19 @@ TEST(segtri, initial){
 	GAM     gam;
 	auto gax = gam.points(x);
 	auto gay = gam.points(y);
-	auto gseg = gam.lines_points(seg.begin(),seg.end());
-    gseg->style()   = "with linespoints pt 6 ps 2 lc variable";
+	// auto gseg = gam.lines_points(seg.begin(),seg.end());
+    // gseg->style()   = "with linespoints pt 6 ps 2 lc variable";
 	int ct0 = inter.triangle_intersection_code(0);
 	int ct1 = inter.triangle_intersection_code(1);
 	plot_triangle_by_code(gnu, tri, ct0, ct1);
+	int cs0 = inter.segment_intersection_code(0);
+	int cs1 = inter.segment_intersection_code(1);
+	plot_segment_by_code(gnu, seg, cs0, cs1);
 
 	// auto gat = gam.lines_points(tri.begin(), tri.end(), -1, true);
-
-	gnu.add(gseg);
+	// gnu.add(gseg);
 	// gnu.add(gat);
 
 	gnu.set_equal_aspect_ratio();
 	gnu.plot();
-
 }

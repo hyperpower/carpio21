@@ -273,12 +273,15 @@ protected:
     static const int _N_ = 2;  
     static const int _O_ = 0;  
     static const int _P_ = 1;
-    static const short S1 = 0, S2 = 1, SE = 2, SO = 3, TO = 7, TIN = 6;
+    static const short S1 = 0;
+    static const short S2 = 1;
+    static const short SE = 2;
+    static const short SO = 3;
+    static const short TO = 7;
+    static const short TIN = 6;
 
-    static inline short _SideToLoc(const short& side,
-                             const short& pl,
-                             const short& ol,
-                             const short& nl){
+    static inline short _SideToLoc(
+        short side, short pl, short ol, short nl){
         return (side == _P_) ? pl : (side == _O_) ? ol : nl;
     }  
 
@@ -293,7 +296,7 @@ protected:
         int zero = c1>c0?0:1; 
         int one  = c1>c0?1:0; 
         int rc = WhichSide32D(
-            tri[one], seg[one], tri[zero]);
+            tri[1], seg[one], tri[0]);
         if(rc == _N_){
             ml[zero][zero] = T1;
             ml[zero][one]  = S1;
@@ -331,7 +334,7 @@ protected:
         int zero = c1>c0?0:1; 
         int one  = c1>c0?1:0; 
         int rc = WhichSide32D(
-            tri[one], seg[one], tri[zero]);
+            tri[1], seg[one], tri[0]);
         if(rc == 2){
             ml[zero][zero] = 0;
             ml[zero][one]  = 0;
@@ -355,33 +358,37 @@ protected:
                         const int& c0, const int& c1,
                         MatLoc& ml){
         short zero = c1>c0?0:1; 
+        short _S1  = c1>c0?S1:S2; 
+        short _S2  = c1>c0?S2:S1; 
         short one  = c1>c0?1:0; 
         short T2 = 1, TE = 3, TE2 = 5; 
         if (c0 == 3 || c1 == 3) {
             T2 = 2, TE = 4;
         }
         short rc0 = WhichSide32D(
-            tri[one], seg[zero], tri[zero]);
+            tri[1], seg[zero], tri[0]);
         short rc1 = WhichSide32D(
-            tri[one], seg[one], tri[zero]);
+            tri[1], seg[one], tri[0]);
+        std::cout << "rc0 = " << rc0 << std::endl;;
+        std::cout << "rc1 = " << rc1 << std::endl;;
         switch(rc0){
             case _P_:{
-                ml[0][0] = TE;
-                ml[0][1] = S1; 
-                ml[1][0] = _SideToLoc(rc1, TIN, TE2, TE2); 
-                ml[1][1] = _SideToLoc(rc1, S2, SE, SE); 
+                ml[zero][0] = TE;
+                ml[zero][1] = _S1; 
+                ml[one][0] = _SideToLoc(rc1, TIN, TE2, TE2); 
+                ml[one][1] = _SideToLoc(rc1, _S2, _S2, SE); 
             };break;
             case _O_:{
-                ml[0][0] = T2;
-                ml[0][1] = S1; 
-                ml[1][0] = _SideToLoc(rc1, TIN, TE2, TO); 
-                ml[1][1] = _SideToLoc(rc1, S2, S2, SO); 
+                ml[zero][0] = T2;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = _SideToLoc(rc1, TIN, TE2, TO); 
+                ml[one][1]  = _SideToLoc(rc1, _S2, _S2, SO); 
             };break;
             case _N_:{
-                ml[0][0] = _SideToLoc(rc1, TE2, TE2, TO);
-                ml[0][1] = _SideToLoc(rc1, SE, SE, SO); 
-                ml[1][0] = _SideToLoc(rc1, TE, T2, TO); 
-                ml[1][1] = _SideToLoc(rc1, S2, S2, SO); 
+                ml[zero][0] = _SideToLoc(rc1, TE2, TE2, TO);
+                ml[zero][1] = _SideToLoc(rc1, SE, SE, SO); 
+                ml[one][0]  = _SideToLoc(rc1, TE2, TE2, TO); 
+                ml[one][1]  = _SideToLoc(rc1, _S2, _S2, SO); 
             };break;
         }
     }
