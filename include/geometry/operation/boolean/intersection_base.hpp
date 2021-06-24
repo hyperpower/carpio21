@@ -31,7 +31,7 @@ inline Vt SquareSum(VEC& vec){
 }
 
 template<class VEC>
-inline int WhichSide32D(const VEC& p, const VEC& vec){
+inline short WhichSide32D(const VEC& p, const VEC& vec){
     // vec must be 0 base
     /// d1    = v1 - v3
     /// d2    = v2 - v3
@@ -47,7 +47,7 @@ inline int WhichSide32D(const VEC& p, const VEC& vec){
 }
 
 template<class VEC>
-inline int WhichSide32D(const VEC& v1, const VEC& v2, const VEC& v3){
+inline short WhichSide32D(const VEC& v1, const VEC& v2, const VEC& v3){
     /// d1    = v1 - v3
     /// d2    = v2 - v3
     /// cross = d1x * d2y - d1y * d2x

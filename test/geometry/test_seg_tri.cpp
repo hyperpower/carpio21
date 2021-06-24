@@ -51,12 +51,12 @@ void plot_triangle_by_code(Gnuplot& gnu, const Tri2& t, int code0, int code1){
 
 TEST(segtri, initial){
 	typedef IntersectionSegTri_<double, 2> Inter;
-	Point2 x(1., 0.0);
-	Point2 y(1.1, 0.0);
-	Seg2 seg(y, x);
-	Point2 t0(0,  0);
-	Point2 t1(1., 0.0);
-	Point2 t2(0.1, 1.2);
+	Point2 x(0.1, 0.0);
+	Point2 y(0.3, 0.9);
+	Seg2 seg(x, y);
+	Point2 t0(0,   0);
+	Point2 t1(1.,  0.0);
+	Point2 t2(0.0, 1.0);
 	Tri2 tri(t0, t1, t2);
 	Inter inter(tri, seg);
 	inter.is_intersect();
