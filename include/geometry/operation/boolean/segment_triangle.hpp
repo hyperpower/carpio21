@@ -269,6 +269,15 @@ protected:
         _matfun[2][1] = Self::_fun12_32;
         _matfun[1][3] = Self::_fun13;
         _matfun[3][1] = Self::_fun13;
+        _matfun[1][4] = Self::_fun14;
+        _matfun[4][1] = Self::_fun14;
+        _matfun[2][4] = Self::_fun14;
+        _matfun[4][2] = Self::_fun14;
+        _matfun[3][8] = Self::_fun14;
+        _matfun[8][3] = Self::_fun14;
+        _matfun[2][8] = Self::_fun14;
+        _matfun[8][2] = Self::_fun14;
+
         _matfun[3][2] = Self::_fun12_32;
         _matfun[2][3] = Self::_fun12_32;
 
@@ -404,7 +413,65 @@ protected:
             };break;
         }
     }
-    
+    static void _fun14(
+                    const ArrayVec& tri,
+                    const ArrayVec& seg,
+                    const int& c0, const int& c1,
+                    MatLoc& ml){
+        short zero, one, _S1, _S2;
+        int c[2] = {c0, c1};
+        bool upper = c1>c0;
+        zero = upper?0:1; 
+        one  = upper?1:0;
+        _S1  = upper?S1:S2; 
+        _S2  = upper?S2:S1;
+        short BP, BO, BN, EN, EV, EP, IdxV;
+
+        if(c[zero] == 1){
+            BP = 3, BO = 1, BN = TO; 
+        }else if (c[zero] == 2){ // == 2
+            BP = 6, BO = 5, BN = TO; 
+        }else{ // == 3
+            BP = 4, BO = 2, BN = TO; 
+        }
+        if(c[one] == 4){
+            EN = 4, EV = 2, EP = 5;
+            IdxV  = 1; 
+        }else{ // == 8
+            EN = 3, EV = 1, EP = 5;
+            IdxV  = 0;
+        }
+        short rc0 = WhichSide32D(
+            tri[1], seg[zero], tri[0]);
+        short rc1;
+        if(c[one] == 4){
+            rc1= WhichSide32D(
+                seg[one], tri[IdxV], seg[zero]);
+        }else{
+            rc1 = WhichSide32D(
+                seg[zero], tri[IdxV], seg[one]);
+        }
+        switch(rc0){
+            case _P_:{
+                ml[zero][0] = BP;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = _SideToLoc(rc1, EP, EV, EN); 
+                ml[one][1]  = SE; 
+            };break;
+            case _O_:{
+                ml[zero][0] = BO;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = _SideToLoc(rc1, TO, EV, EN); 
+                ml[one][1]  = _SideToLoc(rc1, SO, SE, SE); 
+            };break;
+            case _N_:{
+                ml[zero][0] = _SideToLoc(rc1, TO, EV, EP); 
+                ml[zero][1] = _SideToLoc(rc1, SO, SE, SE); 
+                ml[one][0]  = _SideToLoc(rc1, TO, EV, EN); 
+                ml[one][1]  = _SideToLoc(rc1, SO, SE, SE); 
+            };break;
+        }
+    }
     static void _fun12_32(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
