@@ -277,6 +277,26 @@ protected:
         _matfun[8][3] = Self::_fun14;
         _matfun[2][8] = Self::_fun14;
         _matfun[8][2] = Self::_fun14;
+        _matfun[3][4] = Self::_fun34;
+        _matfun[4][3] = Self::_fun34;
+        _matfun[3][5] = Self::_fun34;
+        _matfun[5][3] = Self::_fun34;
+        _matfun[3][6] = Self::_fun34;
+        _matfun[6][3] = Self::_fun34;
+        _matfun[1][8] = Self::_fun34;
+        _matfun[8][1] = Self::_fun34;
+        _matfun[1][7] = Self::_fun34;
+        _matfun[7][1] = Self::_fun34;
+        _matfun[1][6] = Self::_fun34;
+        _matfun[6][1] = Self::_fun34;
+        _matfun[2][5] = Self::_fun25;
+        _matfun[5][2] = Self::_fun25;
+        _matfun[2][7] = Self::_fun25;
+        _matfun[7][2] = Self::_fun25;
+        _matfun[1][5] = Self::_fun15;
+        _matfun[5][1] = Self::_fun15;
+        _matfun[3][7] = Self::_fun15;
+        _matfun[7][3] = Self::_fun15;
 
         _matfun[3][2] = Self::_fun12_32;
         _matfun[2][3] = Self::_fun12_32;
@@ -472,6 +492,143 @@ protected:
             };break;
         }
     }
+    static void _fun25(
+                    const ArrayVec& tri,
+                    const ArrayVec& seg,
+                    const int& c0, const int& c1,
+                    MatLoc& ml){
+        short zero, one, _S1, _S2;
+        int c[2] = {c0, c1};
+        bool upper = c1>c0;
+        zero = upper?0:1; 
+        one  = upper?1:0;
+        _S1  = upper?S1:S2; 
+        _S2  = upper?S2:S1;
+        short BP, BO, BN, EN, EV, EP, IdxV;
+
+        BP = 6, BO = 5, BN = TO; 
+        if(c[one] == 5){
+            EN = 4, EV = 2, EP = 5;
+            IdxV  = 1; 
+        }else{ // == 7
+            EN = 3, EV = 1, EP = 5;
+            IdxV  = 0;
+        }
+        short rc0 = WhichSide32D(
+            tri[1], seg[zero], tri[0]);
+        short rc1;
+        if(c[one] == 5){
+            rc1= WhichSide32D(
+                seg[one], tri[IdxV], seg[zero]);
+        }else{
+            rc1 = WhichSide32D(
+                seg[zero], tri[IdxV], seg[one]);
+        }
+        switch(rc0){
+            case _P_:{
+                ml[zero][0] = BP;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = EN; 
+                ml[one][1]  = SE; 
+            };break;
+            case _O_:{
+                ml[zero][0] = BO;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = EN; 
+                ml[one][1]  = SE; 
+            };break;
+            case _N_:{
+                ml[zero][0] = _SideToLoc(rc1, TO, EV, EP); 
+                ml[zero][1] = _SideToLoc(rc1, SO, SE, SE); 
+                ml[one][0]  = _SideToLoc(rc1, TO, EV, EN); 
+                ml[one][1]  = _SideToLoc(rc1, SO, SE, SE); 
+            };break;
+        }
+    }
+    static void _fun34(const ArrayVec& tri,
+                        const ArrayVec& seg,
+                        const int& c0, const int& c1,
+                        MatLoc& ml){
+        short zero, one, _S1;
+        int c[2] = {c0, c1};
+        bool upper = c1>c0;
+        zero = upper?0:1; 
+        one  = upper?1:0;
+        _S1  = upper?S1:S2; 
+        // _S2  = upper?S2:S1;
+        short BP, BO;
+
+        if(c[zero] == 3){
+            BP = 4, BO = 2;
+        }else{ // 1 
+            BP = 3, BO = 1;
+        }
+        short rc0 = WhichSide32D(
+            tri[1], seg[zero], tri[0]);
+        switch(rc0){
+            case _P_:{
+                ml[zero][0] = BP;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = TO; 
+                ml[one][1]  = SO; 
+            };break;
+            case _O_:{
+                ml[zero][0] = BO;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = TO; 
+                ml[one][1]  = SO; 
+            };break;
+            case _N_:{
+                ml[zero][0] = TO; 
+                ml[zero][1] = SO; 
+                ml[one][0]  = TO; 
+                ml[one][1]  = SO; 
+            };break;
+        }
+    
+    }
+    static void _fun15(const ArrayVec& tri,
+                        const ArrayVec& seg,
+                        const int& c0, const int& c1,
+                        MatLoc& ml){
+        short zero, one, _S1;
+        int c[2] = {c0, c1};
+        bool upper = c1>c0;
+        zero = upper?0:1; 
+        one  = upper?1:0;
+        _S1  = upper?S1:S2; 
+        // _S2  = upper?S2:S1;
+        short BP, BO;
+
+        if(c[zero] == 1){
+            BP = 3, BO = 1;
+        }else{ // 5 
+            BP = 4, BO = 2;
+        }
+        short rc0 = WhichSide32D(
+            tri[1], seg[zero], tri[0]);
+        switch(rc0){
+            case _P_:{
+                ml[zero][0] = BP;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = 0; 
+                ml[one][1]  = SE; 
+            };break;
+            case _O_:{
+                ml[zero][0] = BO;
+                ml[zero][1] = _S1; 
+                ml[one][0]  = 0; 
+                ml[one][1]  = SE; 
+            };break;
+            case _N_:{
+                ml[zero][0] = BO; 
+                ml[zero][1] = SE; 
+                ml[one][0]  = 0; 
+                ml[one][1]  = SE; 
+            };break;
+        }
+    
+    }
     static void _fun12_32(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
@@ -522,9 +679,9 @@ protected:
                         const int& c0, const int& c1,
                         MatLoc& ml){
         short TE = 5;
-        int rc0 = WhichSide32D(
+        short rc0 = WhichSide32D(
             tri[1], seg[0], tri[0]);
-        int rc1 = WhichSide32D(
+        short rc1 = WhichSide32D(
             tri[1], seg[1], tri[0]);
         if(rc0 == _N_){
             ml[0][0] = _SideToLoc(rc1, TE, TE, TO);
