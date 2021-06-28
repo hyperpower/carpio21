@@ -36,6 +36,8 @@ plt.annotate("$e_1$", [0.45, 0.65], fontsize=16, ha='left', va='center', color=c
 plt.annotate("$t_0$", vt0, fontsize=16, ha='left', va='bottom', color="k")
 plt.annotate("$t_1$", vt1, fontsize=16, ha='left', va='bottom', color="k")
 
+plt.annotate("1", vt0, fontsize=16, ha='left', va='bottom', color="k")
+
 plt.axis('off')
 
 # plt.show()
