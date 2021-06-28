@@ -260,21 +260,94 @@ Triangle intersection method
 .. table:: 
    :widths: 10 10 10 10 10 10 10 10 10 10
 
-   ====== ====== ======== ====== ===== ===== ====== ====== ===== =====
+   ====== ====== ====== ====== ===== ===== ====== ======== ===== =====
     交点                             t1
    ------ ------------------------------------------------------------
      t0     0      1      2      3     4     5      6      7     8
-   ====== ====== ======== ====== ===== ===== ====== ====== ===== =====
-    0     a      b        c      c     c     c      c      b     8
-    1            b11      e12    e13   e j1  b j1   f      f     g      
-    2                     no     no    no    no     f      f     g
-    3                            no    no    no     no     b j1  g
-    4                                  no    no     no     e     f                     
-    5                                        no     no     e     f1
-    6                                               no     e     f1
-    7                                                      b2j1  f2
-    8                                                            f3
-   ====== ====== ======== ====== ===== ===== ====== ====== ===== =====
+   ====== ====== ====== ====== ===== ===== ====== ======== ===== =====
+    0     0      a1     a1     a1    4     4      4        4     4
+    1            a0a1   a0a1   a0a1  a0a1  a0     a0       a0    a0      
+    2                   a0a1   a0a1  a0a1  a0b1   a0c0b0b1 a0b0  a0b0
+    3                          a0a1  a0    a0     a0       a0    a0b0
+    4                                no    no     no       no    a0a1                 
+    5                                      no     no       no    no
+    6                                             no       no    no
+    7                                                      no    no
+    8                                                            no
+   ====== ====== ====== ====== ===== ===== ====== ======== ===== =====
+
+
+a0=C(e0->t0, e0->e1)
+a1=C(e0->t1, e0->e1)
+
+b0=C(t0->e0, t0->t1)
+b1=C(t0->e1, t0->t1)
+
+c0=C(t0->0, t0->t1)
+
+
+
+
+0 不可能发生
+
+
+1 共线，叉乘 :math:`(\mathbf{t_1} - \mathbf{e_0})` 和 :math:`(\mathbf{e_1} - \mathbf{e_0})` 
+
+
+- 如果为+，返回 线接触，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{e_0}`
+- 如果为-，返回 线接触，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{t_1}`
+- 如果为0，返回 线接触，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{t_1}`
+
+
+2 叉乘， :math:`(\mathbf{t_1} - \mathbf{e_0})` 和 :math:`(\mathbf{e_1} - \mathbf{e_0})`
+
+
+- 如果为+，返回 相交，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{c_0}`，需要新算。
+- 如果为-，返回 相交，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{t_1}`
+- 如果为0，返回 点接触，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{t_1}`
+
+
+3 共线，叉乘， :math:`(\mathbf{t_1} - \mathbf{e_0})` 和 :math:`(\mathbf{e_1} - \mathbf{e_0})`
+
+
+- 如果为+，返回 相交，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{e_1}`
+- 如果为-，返回 相交，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{t_1}`
+- 如果为0，返回 点接触，2点，:math:`\mathbf{t_0}`，:math:`\mathbf{t_1}`
+
+
+4 点接触，返回 点接触，1点，:math:`\mathbf{t_0}`
+
+
+5 1-1 共线，叉乘 :math:`(\mathbf{t_1} - \mathbf{e_0})` 和 :math:`(\mathbf{e_1} - \mathbf{e_0})`； 叉乘 :math:`(\mathbf{t_0} - \mathbf{e_0})` 和 :math:`(\mathbf{e_1} - \mathbf{e_0})`
+
+
+- 新计算交点 t0->t1 , e0->e1
+
+
+6 叉乘 :math:`(\mathbf{t_1} - \mathbf{e_0})` 和 :math:`(\mathbf{e_1} - \mathbf{e_0})`； 叉乘 :math:`(\mathbf{t_0} - \mathbf{e_0})` 和 :math:`(\mathbf{e_1} - \mathbf{e_0})`
+
+
+- 新计算交点 t0->t1 与 e0->e1
+- 新计算交点 t0->t1 与 e1
+
+
+7 共线，叉乘， :math:`(\mathbf{t_1} - \mathbf{e_0})` 和 :math:`(\mathbf{e_1} - \mathbf{e_0})`
+
+
+8 C(e0->t1,e0->e1)，C(e0->t2,e0->e1)
+
+9 C(e0->t0,e0->e1)，C(t0->e1,t0->t1)
+
+10 C(e0->t0,e0->e1)，C(t0->e1,t0->t1)，C(t0->e0,t0->t1)
+
+11 C(e0->t0,e0->e1)，C(t0->e0,t0->t1)
+
+
+
+
+
+
+
 
 定义 ED(t) = :math:`(\mathbf{e_0} - \mathbf{t}) \times (\mathbf{e_1} - \mathbf{t})` 与 :math:`\mathbf{e_0} \times \mathbf{e_1}` 同向
 
@@ -284,7 +357,50 @@ b :math:`(\mathbf{e_0} - \mathbf{t_1}) \times (\mathbf{e_1} - \mathbf{t_1})` 与
 
 c 点点接触，:math:`\mathbf{t_0}` 
 
-b1 
+b11 ED(t0) ED(t1)
+
+e12-4 ED(t0)
+
+b15 ED(t0)
+
+f16 
+ ED(t0) ED(t1) 
+ +      +      intersect t0->cal0
+ +      -      intersect t0->cal2
+ +      0      intersect t0->cal0
+ -      +      intersect cal2->cal0
+ -      -      no
+ -      0      no
+ 0      +      intersect t0->cal0
+ 0      -      pointouch t0
+ 0      0      linetouch e1->e0
+
+ f17 
+ ED(t0) ED(t1) 
+ +      +      intersect t0->t1
+ +      -      intersect t0->cal2
+ +      0      intersect t0->t1
+ -      +      intersect cal2->t1
+ -      -      no
+ -      0      pointouch t1
+ 0      +      intersect t0->t1
+ 0      -      pointouch t0
+ 0      0      linetouch t0->t1
+
+f26 
+ ED(t0) ED(t1) 
+ +      +      intersect t0->t1
+ +      -      intersect t0->cal2
+ +      0      intersect t0->t1
+ -      +      intersect cal2->t1
+ -      -      no
+ -      0      pointouch t1
+ 0      +      intersect t0->t1
+ 0      -      pointouch t0
+ 0      0      linetouch t0->t1
+
+
+
 
 
 

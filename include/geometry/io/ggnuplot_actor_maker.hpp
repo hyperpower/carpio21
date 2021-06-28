@@ -86,7 +86,7 @@ public:
         int color = color_idx > 0? color_idx : 0;
         spActor actor = spActor(new Gnuplot_actor());
         actor->command() = "using 1:2:3 title \"\" ";
-        actor->style()   = "with lines_points lc variable";
+        actor->style()   = "with linespoints lc variable";
 
         auto iterps = begin;
         auto iterpe = std::next(begin);
@@ -251,19 +251,22 @@ public:
         actor->data().push_back(ToString(pc.front().x(), pc.front().y(), color, " "));
         return actor;
     }
+    
     spActor arrows(const Segment& seg, int color_idx = -1) {
+        return arrows(seg[0], seg[1], color_idx);
+    }
+
+    spActor arrows(const Point& p1, const Point& p2, int color_idx = -1) {
         spActor actor = spActor(new Gnuplot_actor());
         int color = color_idx > 0 ? color_idx : 0;
         actor->command() = "using 1:2:3:4:5 title \"\" ";
         actor->style()   = "with vectors lc variable";
         actor->data().push_back(
-                ToString(seg.psx(), seg.psy(),
-                         seg.pex() - seg.psx(),
-                         seg.pey() - seg.psy(), color, " "));
-
+                ToString(p1[0],  p1[1],
+                         p2[0] - p1[0],
+                         p2[1] - p1[1], color, " "));
         return actor;
     }
-
     spActor arrows(
             const PointChain& pc,
             int color_idx = -1) {
