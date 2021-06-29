@@ -301,8 +301,8 @@ protected:
         _matfun[3][2] = Self::_fun12_32;
         _matfun[2][3] = Self::_fun12_32;
 
-        _matfun[0][2] = Self::_fun0_2;
-        _matfun[2][0] = Self::_fun0_2;
+        _matfun[0][2] = Self::_fun02;
+        _matfun[2][0] = Self::_fun02;
         _matfun[1][1] = Self::_fun11_33;
         _matfun[2][2] = Self::_fun22;
         _matfun[3][3] = Self::_fun11_33;
@@ -368,7 +368,7 @@ protected:
         ml[one][1]  = SO;
     }
 
-    static void _fun0_2(const ArrayVec& tri,
+    static void _fun02(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
                         MatLoc& ml){
