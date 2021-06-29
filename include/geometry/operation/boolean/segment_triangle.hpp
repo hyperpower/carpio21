@@ -299,6 +299,8 @@ protected:
         _matfun[7][3] = Self::_fun15;
         _matfun[2][6] = Self::_fun26;
         _matfun[6][2] = Self::_fun26;
+        _matfun[4][8] = Self::_fun48;
+        _matfun[8][4] = Self::_fun48;
 
         _matfun[3][2] = Self::_fun12_32;
         _matfun[2][3] = Self::_fun12_32;
@@ -499,13 +501,12 @@ protected:
                     const ArrayVec& seg,
                     const int& c0, const int& c1,
                     MatLoc& ml){
-        short zero, one, _S1, _S2;
+        short zero, one, _S1;
         int c[2] = {c0, c1};
         bool upper = c1>c0;
         zero = upper?0:1; 
         one  = upper?1:0;
         _S1  = upper?S1:S2; 
-        _S2  = upper?S2:S1;
         Vec p0(0.0,0.0);
         short rc0 = WhichSide32D(
             tri[1], seg[zero], tri[0]);
@@ -548,6 +549,61 @@ protected:
             };break;
         }
 
+    }
+    static void _fun48(
+                    const ArrayVec& tri,
+                    const ArrayVec& seg,
+                    const int& c0, const int& c1,
+                    MatLoc& ml){
+        short zero, one, _S1;
+        int c[2] = {c0, c1};
+        bool upper = c1>c0;
+        zero = upper?0:1; 
+        one  = upper?1:0;
+        _S1  = upper?S1:S2; 
+        Vec p0(0.0,0.0);
+        // short rc0 = WhichSide32D(
+            // tri[1], seg[zero], tri[0]);
+        short tc0 = WhichSide32D(
+            seg[one], p0, seg[zero]);            
+        switch(tc0){
+            case _P_:{
+                ml[zero][0] = TO;
+                ml[zero][1] = SO; 
+                ml[one][0]  = TO; 
+                ml[one][1]  = SO; 
+            };break;
+            case _O_:{
+                ml[zero][0] = 0;
+                ml[zero][1] = SE; 
+                ml[one][0]  = 0; 
+                ml[one][1]  = SE; 
+            };break;
+            case _N_:{
+                short tc1 = WhichSide32D(
+                    seg[one], tri[0], seg[zero]);
+                short tc2 = WhichSide32D(
+                    seg[one], tri[1], seg[zero]);
+                std::cout << "tc1 = " << tc1 << std::endl;
+                std::cout << "tc2 = " << tc2 << std::endl;
+                if(tc2 == _P_){
+                    ml[zero][0] = 4; 
+                    ml[zero][1] = SE; 
+                    ml[one][0]  = _SideToLoc(tc1, 3, 1, 5); 
+                    ml[one][1]  = SE;
+                } else if(tc2 == _O_){
+                    ml[zero][0] = 2; 
+                    ml[zero][1] = SE; 
+                    ml[one][0]  = _SideToLoc(tc1, 1, 3, TO); 
+                    ml[one][1]  = _SideToLoc(tc1, SE,SE,SO);
+                } else {
+                    ml[zero][0] = _SideToLoc(tc1, 5, 2, TO); 
+                    ml[zero][1] = _SideToLoc(tc1, SE,SE,SO); 
+                    ml[one][0]  = _SideToLoc(tc1, 3, 1, TO); 
+                    ml[one][1]  = _SideToLoc(tc1, SE,SE,SO);
+                }
+            };break;     
+        }      
     }
     static void _fun25(
                     const ArrayVec& tri,
