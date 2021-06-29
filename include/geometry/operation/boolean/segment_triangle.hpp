@@ -219,8 +219,8 @@ public:
         this->_matfun[this->_code[0]][this->_code[1]](
             this->_atri, this->_aseg, 
             this->_code[0], this->_code[1], mat);
-        std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
-        std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
+        // std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
+        // std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
         return false;
     }
 protected:
@@ -241,16 +241,17 @@ protected:
         // std::cout<< "s0 = " << side0 << std::endl;
         // std::cout<< "s1 = " << side1 << std::endl;
         _code[0] = phelper->point_location_in_coordinate(side0, side1);
-        std::cout << "location code 0 = " << _code[0] << std::endl;
+        // std::cout << "location code 0 = " << _code[0] << std::endl;
         side0 = WhichSide32D(_atri[0], _aseg[1]);
         side1 = WhichSide32D(_atri[1], _aseg[1]);
         // std::cout<< "s0 = " << side0 << std::endl;
         // std::cout<< "s1 = " << side1 << std::endl;
         _code[1] = phelper->point_location_in_coordinate(side0, side1);
-        std::cout << "location code 1 = " << _code[1] << std::endl;
+        // std::cout << "location code 1 = " << _code[1] << std::endl;
     }
 
     void _init_mat_fun(){
+        _matfun[0][0] = Self::_fun00;
         _matfun[0][1] = Self::_fun01_03;
         _matfun[1][0] = Self::_fun01_03;
         _matfun[0][3] = Self::_fun01_03;
@@ -310,6 +311,19 @@ protected:
         _matfun[1][1] = Self::_fun11_33;
         _matfun[2][2] = Self::_fun22;
         _matfun[3][3] = Self::_fun11_33;
+
+        _matfun[4][4] = Self::_fun_no;
+        _matfun[4][5] = Self::_fun_no;
+        _matfun[4][6] = Self::_fun_no;
+        _matfun[4][7] = Self::_fun_no;
+        _matfun[5][4] = Self::_fun_no;
+        _matfun[6][4] = Self::_fun_no;
+        _matfun[7][4] = Self::_fun_no;
+        for(int i = 5; i < 9; i++){
+            for(int j = 5; j < 9; j++){
+                _matfun[i][j] = Self::_fun_no;
+            }
+        }
     }
 
     static const int _N_ = 2;  
@@ -326,7 +340,24 @@ protected:
         short side, short pl, short ol, short nl){
         return (side == _P_) ? pl : (side == _O_) ? ol : nl;
     }  
-
+    static void _fun_no(const ArrayVec& tri,
+                        const ArrayVec& seg,
+                        const int& c0, const int& c1,
+                        MatLoc& ml){
+        ml[0][0] = 7;
+        ml[0][1] = 3;
+        ml[1][0] = 7;
+        ml[1][1] = 3;
+    }
+    static void _fun00(const ArrayVec& tri,
+                        const ArrayVec& seg,
+                        const int& c0, const int& c1,
+                        MatLoc& ml){
+        ml[0][0] = 0;
+        ml[0][1] = 0;
+        ml[1][0] = 0;
+        ml[1][1] = 1;
+    }
     static void _fun01_03(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
@@ -584,8 +615,8 @@ protected:
                     seg[one], tri[0], seg[zero]);
                 short tc2 = WhichSide32D(
                     seg[one], tri[1], seg[zero]);
-                std::cout << "tc1 = " << tc1 << std::endl;
-                std::cout << "tc2 = " << tc2 << std::endl;
+                // std::cout << "tc1 = " << tc1 << std::endl;
+                // std::cout << "tc2 = " << tc2 << std::endl;
                 if(tc2 == _P_){
                     ml[zero][0] = 4; 
                     ml[zero][1] = SE; 

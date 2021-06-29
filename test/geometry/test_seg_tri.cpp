@@ -21,9 +21,9 @@ void plot_triangle_by_code(Gnuplot& gnu, const Tri2& t, int code0, int code1){
     for(int i = 0; i < 3; i++){
         GAM::spActor actor = gam.points(t[i], -1);
         if((code0 == i) || (code1 == i)){
-            actor->style() = "with points pt 5 ps 1 lc variable";
+            actor->style() = "with points pt 5 ps 1 lc rgb \"blue\"";
         }else{
-            actor->style() = "with points pt 2 ps 1 lc variable";
+            actor->style() = "with points pt 2 ps 1 lc rgb \"web-blue\"";
         }
         gnu.add(actor);
     }
@@ -37,10 +37,10 @@ void plot_triangle_by_code(Gnuplot& gnu, const Tri2& t, int code0, int code1){
         auto& p1 = t[pair[1]];
         auto actor = gam.arrows(p0,p1);
         if((code0 == i + 3) || (code1 == i + 3)){
-            std::cout << "T edge = " << i + 3 << "intersect" << std::endl;
-            actor->style() = "with vectors lw 3 lc variable";
+            // std::cout << "T edge = " << i + 3 << "intersect" << std::endl;
+            actor->style() = "with vectors lw 3 lc rgb \"blue\"";
         }else{
-            actor->style() = "with vectors lc variable";
+            actor->style() = "with vectors lc rgb \"web-blue\"";
         }
         gnu.add(actor);
     }
@@ -64,7 +64,7 @@ void plot_segment_by_code(Gnuplot& gnu, const Seg2& seg, int code0, int code1){
         auto& p1 = seg[1];
         auto actor = gam.arrows(p0,p1, 1);
         if((code0 == 2) || (code1 == 2)){
-            std::cout << "S edge = " << i << "intersect" << std::endl;
+            // std::cout << "S edge = " << i << "intersect" << std::endl;
             actor->style() = "with vectors lw 3 lc variable";
         }else{
             actor->style() = "with vectors lc variable";
@@ -96,6 +96,10 @@ void one_test(const Tri2& t,const Seg2& s,
         gnu.set_yrange(-0.5, 1.5);
         plot_triangle_by_code(gnu, t, ct0, ct1);
         plot_segment_by_code(gnu, s, cs0, cs1);
+        gnu.set_label(1, "ct0 = " + ToString(ct0), -0.4, 1.4);
+        gnu.set_label(2, "ct1 = " + ToString(ct1), -0.4, 1.3);
+        gnu.set_label(3, "cs0 = " + ToString(cs0), -0.4, 1.2);
+        gnu.set_label(4, "cs1 = " + ToString(cs1), -0.4, 1.1);
         gnu.set_equal_aspect_ratio();
         gnu.plot();
     }
@@ -278,7 +282,7 @@ std::list<std::vector<double> > data{{
     {{-0.3, 1.3,  1.0, -0.3, 4, 8, 4, 3, 2, 2}},  
 }};
 
-TEST(segtri, many){
+TEST(segtri, DISABLED_many){
     int n = data.size();
     int count =0;
     for(auto& r : data){
@@ -298,3 +302,62 @@ TEST(segtri, many){
         count++;
     }
 }
+
+std::list<Point2> generate_seg2(const Point2& st, double r, double dd, int num){
+    std::list<Point2> res;
+    for(int i = 0; i < num; i++){
+        double x = st.x() + r * std::cos(dd * i / 180 * 3.1415926);
+        double y = st.y() + r * std::sin(dd * i / 180 * 3.1415926);
+        res.push_back(Point2(x, y));
+    } 
+    return res;
+}
+
+TEST(segtri, segment_rotate){
+    Point2 t0(0,   0);
+    Point2 t1(1.0, 0.0);
+    Point2 t2(0.0, 1.0);
+    Tri2 tri(t0, t1, t2);
+
+    Point2 s1(0.3, 0.3);
+    auto lp = generate_seg2(s1, 0.5, 5, 72);
+
+    int count = 0;
+    for(auto& s2 : lp){
+        Seg2 s(s1, s2);
+        Inter inter(tri, s);
+        inter.is_intersect();
+
+        int l0 = inter.location_code(0);
+        int l1 = inter.location_code(1);
+
+        int ct0 = inter.triangle_intersection_code(0);
+        int ct1 = inter.triangle_intersection_code(1);
+        int cs0 = inter.segment_intersection_code(0);
+        int cs1 = inter.segment_intersection_code(1);
+
+        Gnuplot gnu;
+        std::ostringstream sst;
+        sst << "fig_" << count;
+        gnu.set_terminal_png(sst.str());
+        gnu.set_xrange(-0.5, 1.5);
+        gnu.set_yrange(-0.5, 1.5);
+        plot_triangle_by_code(gnu, tri, ct0, ct1);
+        plot_segment_by_code( gnu,  s,  cs0, cs1);
+        gnu.set_equal_aspect_ratio();
+        gnu.set_label(1, "ct0 = " + ToString(ct0), -0.4, 1.4);
+        gnu.set_label(2, "ct1 = " + ToString(ct1), -0.4, 1.3);
+        gnu.set_label(3, "cs0 = " + ToString(cs0), -0.4, 1.2);
+        gnu.set_label(4, "cs1 = " + ToString(cs1), -0.4, 1.1);
+        gnu.set_label(5, "lc0 = " + ToString(l0),  -0.0, 1.4);
+        gnu.set_label(6, "lc1 = " + ToString(l1),  -0.0, 1.3);
+
+        gnu.plot();
+        std::cout << "plot " << sst.str() << std::endl;
+        count++;        
+    }
+
+   
+}
+
+
