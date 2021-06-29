@@ -185,9 +185,11 @@ public:
 
         _rebase(*_tri, *_seg);
 
-        _cal_location_code();
-
         _init_mat_fun();
+
+        _cal_location_code();
+        _cal_intersection_code();
+
     }
     // Intitial from rebased objects
     IntersectionSegTri_(const Vec& e0, 
@@ -211,7 +213,7 @@ public:
         return _code[idx];
     }
 
-    bool is_intersect(){
+    void cal_intersect(){
         // std::cout << "location code 0 = " << _code[0] << std::endl;
         // std::cout << "location code 1 = " << _code[1] << std::endl;
         MatLoc& mat = this->_loccode;
@@ -221,7 +223,6 @@ public:
             this->_code[0], this->_code[1], mat);
         // std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
         // std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
-        return false;
     }
 protected:
     void _rebase(const Triangle& t, const Segment& s){
@@ -248,6 +249,17 @@ protected:
         // std::cout<< "s1 = " << side1 << std::endl;
         _code[1] = phelper->point_location_in_coordinate(side0, side1);
         // std::cout << "location code 1 = " << _code[1] << std::endl;
+    }
+    void _cal_intersection_code(){
+        // std::cout << "location code 0 = " << _code[0] << std::endl;
+        // std::cout << "location code 1 = " << _code[1] << std::endl;
+        MatLoc& mat = this->_loccode;
+        mat.fill({-1,-1});
+        this->_matfun[this->_code[0]][this->_code[1]](
+            this->_atri, this->_aseg, 
+            this->_code[0], this->_code[1], mat);
+        // std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
+        // std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
     }
 
     void _init_mat_fun(){
@@ -877,6 +889,31 @@ protected:
             };break;
         }
     }
+    // normal intersection
+	Point _cal_intersection_point(const Vec& v0, 
+                                 const Vec& v1,
+                                 const Vec& v2, 
+                                 const Vec& v3){
+		// The intersection type must be _SS_INTERSECT_
+		Vt x0 = v0[0];
+		Vt x1 = v1[0];
+		Vt x2 = v2[0];
+		Vt x3 = v3[0];
+
+		Vt y0 = v0[1];
+		Vt y1 = v1[1];
+		Vt y2 = v2[1];
+		Vt y3 = v3[1];
+
+		double denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e-20;
+
+		double x = ((x0 * y1 - y0 * x1) * (x2 - x3)
+				- (x0 - x1) * (x2 * y3 - y2 * x3)) / denom ;
+		double y = ((x0 * y1 - y0 * x1) * (y2 - y3)
+				- (y0 - y1) * (x2 * y3 - y2 * x3)) / denom;
+
+		return Point(x, y);
+	}
 };
 
 template<typename TYPE>

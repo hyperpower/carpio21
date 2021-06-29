@@ -78,7 +78,7 @@ void one_test(const Tri2& t,const Seg2& s,
     short act0, short act1, short acs0, short acs1, 
     bool plot = false){
     Inter inter(t, s);
-    inter.is_intersect();
+    inter.cal_intersect();
 
     int l0 = inter.location_code(0);
     int l1 = inter.location_code(1);
@@ -100,6 +100,8 @@ void one_test(const Tri2& t,const Seg2& s,
         gnu.set_label(2, "ct1 = " + ToString(ct1), -0.4, 1.3);
         gnu.set_label(3, "cs0 = " + ToString(cs0), -0.4, 1.2);
         gnu.set_label(4, "cs1 = " + ToString(cs1), -0.4, 1.1);
+        gnu.set_label(5, "lc0 = " + ToString(l0),  -0.0, 1.4);
+        gnu.set_label(6, "lc1 = " + ToString(l1),  -0.0, 1.3);
         gnu.set_equal_aspect_ratio();
         gnu.plot();
     }
@@ -114,7 +116,7 @@ void one_test_reverse_seg(const Tri2& t,const Seg2& s,
     bool plot = false){
     Seg2 sr(s[1],s[0]);
     Inter inter(t, sr);
-    inter.is_intersect();
+    inter.cal_intersect();
 
     int l0 = inter.location_code(0);
     int l1 = inter.location_code(1);
@@ -132,6 +134,12 @@ void one_test_reverse_seg(const Tri2& t,const Seg2& s,
         gnu.set_yrange(-0.5, 1.5);
         plot_triangle_by_code(gnu, t, ct0, ct1);
         plot_segment_by_code(gnu, sr, cs0, cs1);
+        gnu.set_label(1, "ct0 = " + ToString(ct0), -0.4, 1.4);
+        gnu.set_label(2, "ct1 = " + ToString(ct1), -0.4, 1.3);
+        gnu.set_label(3, "cs0 = " + ToString(cs0), -0.4, 1.2);
+        gnu.set_label(4, "cs1 = " + ToString(cs1), -0.4, 1.1);
+        gnu.set_label(5, "lc0 = " + ToString(l0),  -0.0, 1.4);
+        gnu.set_label(6, "lc1 = " + ToString(l1),  -0.0, 1.3);
         gnu.set_equal_aspect_ratio();
         gnu.plot();
     }
@@ -146,14 +154,15 @@ void one_test_reverse_seg(const Tri2& t,const Seg2& s,
 }
 
 TEST(segtri, just_one){
-    Point2 x(0.5, 0.0);
-    Point2 y(0.5, 0.5);
+    Point2 x(1.0, 0.0);
+    Point2 y(0.5, 0.0);
     Seg2 seg(x, y);
     Point2 t0(0,   0);
     Point2 t1(1.,  0.0);
     Point2 t2(0.0, 1.0);
     Tri2 tri(t0, t1, t2);
-    one_test(tri, seg, 1, 2, 3, 5, 0, 1, false);
+    one_test(tri, seg, 1, 1, 1, 3, 0, 1, true);
+    one_test_reverse_seg(tri, seg, 1, 1, 1, 3, 0, 1, true);
 }
 
 std::list<std::vector<double> > data{{
@@ -313,7 +322,7 @@ std::list<Point2> generate_seg2(const Point2& st, double r, double dd, int num){
     return res;
 }
 
-TEST(segtri, segment_rotate){
+TEST(segtri, DISABLED_segment_rotate){
     Point2 t0(0,   0);
     Point2 t1(1.0, 0.0);
     Point2 t2(0.0, 1.0);
@@ -326,7 +335,7 @@ TEST(segtri, segment_rotate){
     for(auto& s2 : lp){
         Seg2 s(s1, s2);
         Inter inter(tri, s);
-        inter.is_intersect();
+        inter.cal_intersect();
 
         int l0 = inter.location_code(0);
         int l1 = inter.location_code(1);
