@@ -163,6 +163,9 @@ TEST(segtri, just_one){
     Tri2 tri(t0, t1, t2);
     one_test(tri, seg, 1, 1, 1, 3, 0, 1, true);
     one_test_reverse_seg(tri, seg, 1, 1, 1, 3, 0, 1, true);
+
+    auto p = GetWorkingPath();
+    std::cout << "path = " << p << std::endl;  
 }
 
 std::list<std::vector<double> > data{{

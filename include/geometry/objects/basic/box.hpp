@@ -8,6 +8,8 @@
 #include <map>
 #include "utility/any.hpp"
 
+#undef max
+#undef min
 
 namespace carpio {
 
@@ -82,25 +84,24 @@ public:
 		return _min == _max;
 	}
 
-	Vt pmin(int& idx) const {
-		ASSERT(idx < Dim);
-		Self& self = (*this);
-		return self._min[idx];
+	Vt min(int a) const {
+		ASSERT(a < Dim);
+		return _min[a];
 	}
-	Vt pmax(int a) const {
+	Vt max(int a) const {
 		ASSERT(a < Dim);
 		return _max[a];
 	}
-	Point& pmin() {
+	Point& min() {
 		return _min;
 	}
-	const Point& pmin() const {
+	const Point& min() const {
 		return _min;
 	}
-	Point& pmax() {
+	Point& max() {
 		return _max;
 	}
-	const Point& pmax() const {
+	const Point& max() const {
 		return _max;
 	}
 

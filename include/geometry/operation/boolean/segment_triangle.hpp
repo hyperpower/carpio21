@@ -183,6 +183,8 @@ public:
         this->_tri = std::make_shared<Triangle>(t);
         this->_seg = std::make_shared<Segment>(s);
 
+        this->_inited = true;
+
         _rebase(*_tri, *_seg);
 
         _init_mat_fun();
@@ -891,9 +893,9 @@ protected:
     }
     // normal intersection
 	Point _cal_intersection_point(const Vec& v0, 
-                                 const Vec& v1,
-                                 const Vec& v2, 
-                                 const Vec& v3){
+                                  const Vec& v1,
+                                  const Vec& v2, 
+                                  const Vec& v3){
 		// The intersection type must be _SS_INTERSECT_
 		Vt x0 = v0[0];
 		Vt x1 = v1[0];
