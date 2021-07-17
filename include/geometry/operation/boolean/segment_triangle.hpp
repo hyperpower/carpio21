@@ -154,11 +154,11 @@ public:
     typedef std::shared_ptr<Point_<TYPE, 2> >    spPoint;     
     typedef std::shared_ptr<Triangle>              spTri;
 
-    typedef std::array<std::array<short,2>, 2> MatLoc;
+    typedef std::array<std::array<short,2>, 2> MatIC;
     typedef std::array<Vec, 2> ArrayVec;
     typedef std::function<void(
         const ArrayVec&, const ArrayVec&, 
-        const int&, const int&, MatLoc&)> IFun;
+        const int&, const int&, MatIC&)> IFun;
     typedef std::array<std::array<IFun, 9>, 9> MatFun;
 protected:
     spTri _tri;
@@ -168,12 +168,16 @@ protected:
 
     std::array<int, 2> _code;
 
-    MatLoc _loccode;
+    MatIC _mat_ic;
     //                   code of triangle, code of segment
     // intersect point1[[      0~7       ,       0~3      ], 
     // intersect point2 [      0~7       ,       0~3      ]] 
 
     MatFun _matfun;
+
+    // rebased results
+    int _num_valid;
+    std::array<Vec, 2> _res;
 public:
     // Intitial from shared_ptr
     IntersectionSegTri_(spTri spt, spSeg sps): _tri(spt), _seg(sps){
@@ -205,10 +209,10 @@ public:
     }
 
     int triangle_intersection_code(int idx){
-        return _loccode[idx][0];
+        return _mat_ic[idx][0];
     }
     int segment_intersection_code(int idx){
-        return _loccode[idx][1];
+        return _mat_ic[idx][1];
     }
 
     int location_code(int idx){
@@ -218,7 +222,7 @@ public:
     void cal_intersect(){
         // std::cout << "location code 0 = " << _code[0] << std::endl;
         // std::cout << "location code 1 = " << _code[1] << std::endl;
-        MatLoc& mat = this->_loccode;
+        MatIC& mat = this->_mat_ic;
         mat.fill({-1,-1});
         this->_matfun[this->_code[0]][this->_code[1]](
             this->_atri, this->_aseg, 
@@ -255,13 +259,30 @@ protected:
     void _cal_intersection_code(){
         // std::cout << "location code 0 = " << _code[0] << std::endl;
         // std::cout << "location code 1 = " << _code[1] << std::endl;
-        MatLoc& mat = this->_loccode;
+        MatIC& mat = this->_mat_ic;
         mat.fill({-1,-1});
         this->_matfun[this->_code[0]][this->_code[1]](
             this->_atri, this->_aseg, 
             this->_code[0], this->_code[1], mat);
         // std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
         // std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
+    }
+
+    void _cal_intersection(){
+        // find intersetion point from mat_ic
+        _num_valid = 0;
+        if(_mat_ic[0][0] == 0){
+            _res[0] = Vec(0.0, 0.0);
+            _num_valid++;
+        }else if(_mat_ic[0][0] < 3){
+            _res[0] = _atri[_mat_ic[0][0] + 1];
+            _num_valid++;
+        }else if(_mat_ic[0][1] < 2){
+            _res[0] = _aseg[_mat_ic[0][1]];
+            _num_valid++;
+        }
+
+
     }
 
     void _init_mat_fun(){
@@ -357,7 +378,7 @@ protected:
     static void _fun_no(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         ml[0][0] = 7;
         ml[0][1] = 3;
         ml[1][0] = 7;
@@ -366,7 +387,7 @@ protected:
     static void _fun00(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         ml[0][0] = 0;
         ml[0][1] = 0;
         ml[1][0] = 0;
@@ -375,7 +396,7 @@ protected:
     static void _fun01_03(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         short T1   = 0, T2 = 1, TE = 3;
         short _S1  = c1>c0?S1:S2; 
         short _S2  = c1>c0?S2:S1; 
@@ -407,7 +428,7 @@ protected:
     static void _fun0_45678(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         int zero   = c1>c0?0:1; 
         int one    = c1>c0?1:0; 
         short _S1  = c1>c0?S1:S2; 
@@ -420,7 +441,7 @@ protected:
     static void _fun02(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         short zero = c1>c0?0:1; 
         short one  = c1>c0?1:0; 
         short _S1  = c1>c0?S1:S2; 
@@ -449,7 +470,7 @@ protected:
                     const ArrayVec& tri,
                     const ArrayVec& seg,
                     const int& c0, const int& c1,
-                    MatLoc& ml){
+                    MatIC& ml){
         short zero, one, _S1, _S2;
         zero = c1>c0?0:1; 
         one  = c1>c0?1:0;
@@ -486,7 +507,7 @@ protected:
                     const ArrayVec& tri,
                     const ArrayVec& seg,
                     const int& c0, const int& c1,
-                    MatLoc& ml){
+                    MatIC& ml){
         short zero, one, _S1, _S2;
         int c[2] = {c0, c1};
         bool upper = c1>c0;
@@ -545,7 +566,7 @@ protected:
                     const ArrayVec& tri,
                     const ArrayVec& seg,
                     const int& c0, const int& c1,
-                    MatLoc& ml){
+                    MatIC& ml){
         short zero, one, _S1;
         int c[2] = {c0, c1};
         bool upper = c1>c0;
@@ -599,7 +620,7 @@ protected:
                     const ArrayVec& tri,
                     const ArrayVec& seg,
                     const int& c0, const int& c1,
-                    MatLoc& ml){
+                    MatIC& ml){
         short zero, one, _S1;
         int c[2] = {c0, c1};
         bool upper = c1>c0;
@@ -654,7 +675,7 @@ protected:
                     const ArrayVec& tri,
                     const ArrayVec& seg,
                     const int& c0, const int& c1,
-                    MatLoc& ml){
+                    MatIC& ml){
         short zero, one, _S1, _S2;
         int c[2] = {c0, c1};
         bool upper = c1>c0;
@@ -706,7 +727,7 @@ protected:
     static void _fun34(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         short zero, one, _S1;
         int c[2] = {c0, c1};
         bool upper = c1>c0;
@@ -748,7 +769,7 @@ protected:
     static void _fun15(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         short zero, one, _S1;
         int c[2] = {c0, c1};
         bool upper = c1>c0;
@@ -790,7 +811,7 @@ protected:
     static void _fun12_32(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         short zero, one, _S1, _S2;
         if(c0 == 1 || c1 == 1){
             zero = c1>c0?0:1; 
@@ -835,7 +856,7 @@ protected:
     static void _fun22(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         short TE = 5;
         short rc0 = WhichSide32D(
             tri[1], seg[0], tri[0]);
@@ -861,7 +882,7 @@ protected:
     static void _fun11_33(const ArrayVec& tri,
                         const ArrayVec& seg,
                         const int& c0, const int& c1,
-                        MatLoc& ml){
+                        MatIC& ml){
         short T1 = 0, T2 = 1, TE = 3;
         if(c0 == 3){
             T1 = 0, T2 = 2, TE = 4;
