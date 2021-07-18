@@ -3,6 +3,7 @@
 
 #include "geometry/geometry_define.hpp"
 #include "intersection_base.hpp"
+#include "segment_segment.hpp"
 #include "geometry/objects/basic/point.hpp"
 #include "geometry/objects/basic/segment.hpp"
 #include "geometry/objects/basic/triangle.hpp"
@@ -196,6 +197,8 @@ public:
         _cal_location_code();
         _cal_intersection_code();
 
+        _cal_intersection();
+
     }
     // Intitial from rebased objects
     IntersectionSegTri_(const Vec& e0, 
@@ -268,21 +271,62 @@ protected:
         // std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
     }
 
+    bool _has_point(int idx){
+        if(_mat_ic[idx][0] == 7 && _mat_ic[idx][1] == 3){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    bool _find_exist_point(int idx){
+        if(_mat_ic[idx][0] == 0){
+            _res[idx] = Vec(0.0, 0.0);
+            return true;
+        }else if(_mat_ic[idx][0] < 3){ // 1,2
+            _res[idx] = _atri[_mat_ic[0][0] + 1];
+            return true;
+        }else if(_mat_ic[idx][1] < 2){ // 0,1
+            _res[idx] = _aseg[_mat_ic[idx][1]];
+            return true;
+        }
+        return false;
+    }
+
+    int _cal_one_point(int idx){
+        if(_has_point(idx)){
+            if(!_find_exist_point(idx)){
+                switch(_mat_ic[idx][0]){
+                    case 3:{
+                        _res[idx] = CalSegmentsIntersection(
+                            _atri[0], _aseg[0], _aseg[1]);
+                    }break;
+                    case 4:{
+                        _res[idx] = CalSegmentsIntersection(
+                            _atri[1], _aseg[0], _aseg[1]);
+                    }break;
+                    case 5:{
+                        _res[idx] = CalSegmentsIntersection(
+                            _atri[0], _atri[1], _aseg[0], _aseg[1]);
+                    }break;
+                    default: {
+                        throw std::invalid_argument::invalid_argument("Not a Triangle Edge Code");
+                    }
+                }
+            }
+        }
+        return -1; // no point
+    }
+    
+
     void _cal_intersection(){
         // find intersetion point from mat_ic
-        _num_valid = 0;
-        if(_mat_ic[0][0] == 0){
-            _res[0] = Vec(0.0, 0.0);
-            _num_valid++;
-        }else if(_mat_ic[0][0] < 3){
-            _res[0] = _atri[_mat_ic[0][0] + 1];
-            _num_valid++;
-        }else if(_mat_ic[0][1] < 2){
-            _res[0] = _aseg[_mat_ic[0][1]];
-            _num_valid++;
-        }
+        _cal_one_point(0);
+        _cal_one_point(1);
 
-
+        std::cout <<"P1" << _res[0] << std::endl;
+        std::cout <<"P2" << _res[1] << std::endl;
+        
     }
 
     void _init_mat_fun(){

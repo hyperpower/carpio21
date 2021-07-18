@@ -53,6 +53,51 @@ static const short _SSTYPE[7][7] = {
 	{_SS_OVERLAP_, _SS_NO_,      _SS_NO_,      _SS_OVERLAP_, _SS_CONNECT_, _SS_OVERLAP_, _SS_NO_      }
 };
 
+
+template<class VEC>
+inline VEC CalSegmentsIntersection(const VEC& s1s, const VEC& s1e,
+                                   const VEC& s2s, const VEC& s2e){
+		ASSERT(VEC::Dim == 2);
+		auto x0 = s1s[0];
+		auto x1 = s1e[0];
+		auto x2 = s2s[0];
+		auto x3 = s2e[0];
+
+		auto y0 = s1s[1];
+		auto y1 = s1e[1];
+		auto y2 = s2s[1];
+		auto y3 = s2e[1];
+
+		double denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e-20;
+
+		double x = ((x0 * y1 - y0 * x1) * (x2 - x3)
+				- (x0 - x1) * (x2 * y3 - y2 * x3)) / denom ;
+		double y = ((x0 * y1 - y0 * x1) * (y2 - y3)
+				- (y0 - y1) * (x2 * y3 - y2 * x3)) / denom;
+
+		return {{x, y}};
+}
+template<class VEC> // s1s = {0,0}
+inline VEC CalSegmentsIntersection(const VEC& s1e,
+                                   const VEC& s2s, const VEC& s2e){
+		ASSERT(VEC::Dim == 2);
+		// double x0 = 0.0;
+		auto x1 = s1e[0];
+		auto x2 = s2s[0];
+		auto x3 = s2e[0];
+
+		// double y0 = 0.0;
+		auto y1 = s1e[1];
+		auto y2 = s2s[1];
+		auto y3 = s2e[1];
+
+		double denom = (-x1) * (y2- y3) - (- y1) * (x2- x3) + 1e-20;
+
+		double x = (x1 * (x2 * y3 - y2 * x3)) / denom ;
+		double y = (y1 * (x2 * y3 - y2 * x3)) / denom;
+
+		return {{x, y}};
+}
 template<typename TYPE, St DIM>
 class IntersectionPairSS_ {
 public:
@@ -173,14 +218,7 @@ public:
 		Vt y2 = (*(_arrp[2])).y();
 		Vt y3 = (*(_arrp[3])).y();
 
-		double denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e-20;
-
-		double x = ((x0 * y1 - y0 * x1) * (x2 - x3)
-				- (x0 - x1) * (x2 * y3 - y2 * x3)) / denom ;
-		double y = ((x0 * y1 - y0 * x1) * (y2 - y3)
-				- (y0 - y1) * (x2 * y3 - y2 * x3)) / denom;
-
-		return Point(x, y);
+		return CalSegmentsIntersection((*(_arrp[0])), (*(_arrp[1])), (*(_arrp[3])),(*(_arrp[4])))
 	}
 
 

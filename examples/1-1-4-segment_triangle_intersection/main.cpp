@@ -36,7 +36,7 @@ void plot_emphasis_by_segment_code(Gnuplot& gnu, const Seg2& s,
 
 int main(){
     std::string fn = "point_location_code";
-    Point2 x(0.0, 0.0);
+    Point2 x{{0.0, 0.0, 3.0}};
     Point2 y(1.0, 1.0);
     Seg2 seg(x, y);
     Point2 t0(0,   0);

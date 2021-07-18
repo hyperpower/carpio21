@@ -47,6 +47,17 @@ public:
         }
     }
 
+    Point_(std::initializer_list<TYPE> l) {
+        St i = 0;
+        for(auto& v : l){
+            (*this)[i] = v;
+            ++i;
+            if(i >= Dim){
+                break;
+            }
+        }
+    }
+
     const_reference operator()(St idx) const {
         ASSERT(idx < Dim);
         return this->at(idx);
