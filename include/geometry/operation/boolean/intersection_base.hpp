@@ -120,8 +120,8 @@ public:
     // virtual ReturnType cal_intersection() const{}
     // virtual ReturnType cal_intersection(const Object1&, const Object2) const{}
 
-    // virtual bool is_intersect() const{}
-    // virtual bool is_intersect(const Object1&, const Object2) const{}
+    // virtual void intersection_code() const{}
+    // virtual void intersection_code(const Object1&, const Object2) const{}
 
 
 };

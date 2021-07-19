@@ -12,6 +12,7 @@
 #include <mutex>          // std::mutex
 #include <unordered_map>
 #include <bitset>
+#include <stdexcept>
 
 namespace carpio {
 
@@ -240,6 +241,16 @@ public:
     bool has_intersect_point(const St& idx){
         return _rfs[idx] >= 0 ;
     }
+
+    bool is_same_intersect_point(){
+        if((_mat_ic[0][0] == _mat_ic[1][0]) && _mat_ic[0][0] < 3){
+            return true;
+        }
+        if((_mat_ic[0][1] == _mat_ic[1][1]) && _mat_ic[0][1] < 2){
+            return true;
+        }
+        return false;
+    }
 protected:
     void _rebase(const Triangle& t, const Segment& s){
         // rebase to tri0
@@ -317,7 +328,7 @@ protected:
                             _atri[0], _atri[1], _aseg[0], _aseg[1]);
                     }break;
                     default: {
-                        throw std::invalid_argument::invalid_argument("Not a Triangle Edge Code");
+                        throw std::invalid_argument("Not a Triangle Edge Code");
                     }
                 }
                 return 1; // cal a new one
@@ -700,8 +711,6 @@ protected:
                     seg[one], tri[0], seg[zero]);
                 short tc2 = WhichSide32D(
                     seg[one], tri[1], seg[zero]);
-                // std::cout << "tc1 = " << tc1 << std::endl;
-                // std::cout << "tc2 = " << tc2 << std::endl;
                 if(tc2 == _P_){
                     ml[zero][0] = 4; 
                     ml[zero][1] = SE; 
@@ -710,10 +719,10 @@ protected:
                 } else if(tc2 == _O_){
                     ml[zero][0] = 2; 
                     ml[zero][1] = SE; 
-                    ml[one][0]  = _SideToLoc(tc1, 1, 3, TO); 
+                    ml[one][0]  = _SideToLoc(tc1, 3, 1, TO); 
                     ml[one][1]  = _SideToLoc(tc1, SE,SE,SO);
                 } else {
-                    ml[zero][0] = _SideToLoc(tc1, 5, 2, TO); 
+                    ml[zero][0] = _SideToLoc(tc1, 5, 1, TO); 
                     ml[zero][1] = _SideToLoc(tc1, SE,SE,SO); 
                     ml[one][0]  = _SideToLoc(tc1, 3, 1, TO); 
                     ml[one][1]  = _SideToLoc(tc1, SE,SE,SO);
@@ -912,6 +921,8 @@ protected:
             tri[1], seg[0], tri[0]);
         short rc1 = WhichSide32D(
             tri[1], seg[1], tri[0]);
+        std::cout << "tc0 = " << rc0 << std::endl;
+        std::cout << "tc1 = " << rc1 << std::endl;
         if(rc0 == _N_){
             ml[0][0] = _SideToLoc(rc1, TE, TE, TO);
             ml[0][1] = _SideToLoc(rc1, SE, SO, SO);

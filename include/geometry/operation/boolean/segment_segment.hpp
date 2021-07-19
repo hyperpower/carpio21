@@ -218,7 +218,7 @@ public:
 		Vt y2 = (*(_arrp[2])).y();
 		Vt y3 = (*(_arrp[3])).y();
 
-		return CalSegmentsIntersection((*(_arrp[0])), (*(_arrp[1])), (*(_arrp[3])),(*(_arrp[4])))
+		return CalSegmentsIntersection((*(_arrp[0])), (*(_arrp[1])), (*(_arrp[3])),(*(_arrp[4])));
 	}
 
 

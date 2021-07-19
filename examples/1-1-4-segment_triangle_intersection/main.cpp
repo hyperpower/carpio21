@@ -40,8 +40,8 @@ int main(){
     Point2 y(1.0, 1.0);
     Seg2 seg(x, y);
     Point2 t0(0,   0);
-    Point2 t1(1.,  -0.1);
-    Point2 t2(0.2, 1.1);
+    Point2 t1(1.,  -0.0);
+    Point2 t2(0.0, 1.0);
     Tri2 tri(t0, t1, t2);
     plot_point_location_code(fn, tri);
 
@@ -51,8 +51,8 @@ int main(){
     plot_segment_location(fn, seg);
 
     fn = "t_intersection";
-    Point2 x2(0.7, 0.2);
-    Point2 y2(1.3, -0.4);
+    Point2 y2( 0.11,  0.9);
+    Point2 x2( 0.5,  0.5);
     Seg2 seg2(x2, y2);
     plot_intersection(fn, tri, seg2);
     
@@ -103,16 +103,16 @@ void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
         actor->style() = "with points pt 2 ps 4 lc rgb \"red\"";
         gnu.add(actor);
     }
-    gnu.set_label(1, "Location Code0 = " + ToString(l0), 1.1, 1.3, "front font \",10\"");
+    gnu.set_label(1, "Location Code1 = " + ToString(l0), 1.1, 1.3, "front font \",10\"");
     gnu.set_label(2, "Location Code2 = " + ToString(l1), 1.1, 1.2, "front font \",10\"");
 
     gnu.set_label(3, "Code Triangle = " + ToString(ct0) + ", " + ToString(ct1),
                      1.1, 1.1, "front font \",10\"");
     gnu.set_label(4, "Code Segment  = " + ToString(cs0) + ", " + ToString(cs1),
                      1.1, 1.0, "front font \",10\"");
-    
-    
-
+    if(inter.is_same_intersect_point()){
+        gnu.set_label(5, "Same point",1.1, 0.9, "front font \",10\"");
+    }
     gnu.plot();
 }
 void plot_emphasis_by_segment_code(Gnuplot& gnu, const Seg2& s, 
@@ -153,12 +153,12 @@ void plot_emphasis_by_triangle_code(Gnuplot& gnu, const Tri2& t,
         };break;
         case 1:{
             GAM::spActor actor = gam.points(t[1], -1);
-            actor->style() = "with points pt 7 ps 3 lc rgb \"blue\"";
+            actor->style() = "with points pt 6 ps 3 lc rgb \"blue\"";
             gnu.add(actor);
         };break;
         case 2:{
             GAM::spActor actor = gam.points(t[2], -1);
-            actor->style() = "with points pt 7 ps 3 lc rgb \"blue\"";
+            actor->style() = "with points pt 6 ps 3 lc rgb \"blue\"";
             gnu.add(actor);
         };break;
         case 3:{ //edge 0-1

@@ -5,6 +5,7 @@
 #include "point.hpp"
 //#include "box.hpp"
 #include <array>
+#include <vector>
 #include <type_traits>
 #include <typeinfo>
 #include "math.h"
