@@ -177,8 +177,8 @@ protected:
     MatFun _matfun;
 
     // rebased results
-    int _num_valid;
     std::array<Vec, 2> _res;
+    std::array<int, 2> _rfs;
 public:
     // Intitial from shared_ptr
     IntersectionSegTri_(spTri spt, spSeg sps): _tri(spt), _seg(sps){
@@ -196,7 +196,6 @@ public:
 
         _cal_location_code();
         _cal_intersection_code();
-
         _cal_intersection();
 
     }
@@ -232,6 +231,14 @@ public:
             this->_code[0], this->_code[1], mat);
         // std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
         // std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
+    }
+    
+    Point get_intersect_point(const St& idx){
+        return _res[idx]+(*_tri)[0];
+    }
+
+    bool has_intersect_point(const St& idx){
+        return _rfs[idx] >= 0 ;
     }
 protected:
     void _rebase(const Triangle& t, const Segment& s){
@@ -284,7 +291,7 @@ protected:
             _res[idx] = Vec(0.0, 0.0);
             return true;
         }else if(_mat_ic[idx][0] < 3){ // 1,2
-            _res[idx] = _atri[_mat_ic[0][0] + 1];
+            _res[idx] = _atri[_mat_ic[idx][0] - 1];
             return true;
         }else if(_mat_ic[idx][1] < 2){ // 0,1
             _res[idx] = _aseg[_mat_ic[idx][1]];
@@ -313,6 +320,9 @@ protected:
                         throw std::invalid_argument::invalid_argument("Not a Triangle Edge Code");
                     }
                 }
+                return 1; // cal a new one
+            }else{
+                return 0; //exist point
             }
         }
         return -1; // no point
@@ -321,12 +331,8 @@ protected:
 
     void _cal_intersection(){
         // find intersetion point from mat_ic
-        _cal_one_point(0);
-        _cal_one_point(1);
-
-        std::cout <<"P1" << _res[0] << std::endl;
-        std::cout <<"P2" << _res[1] << std::endl;
-        
+        _rfs[0] = _cal_one_point(0);
+        _rfs[1] = _cal_one_point(1);
     }
 
     void _init_mat_fun(){

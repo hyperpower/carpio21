@@ -51,8 +51,8 @@ int main(){
     plot_segment_location(fn, seg);
 
     fn = "t_intersection";
-    Point2 x2(0.1, 0.1);
-    Point2 y2(0.4, -0.4);
+    Point2 x2(0.7, 0.2);
+    Point2 y2(1.3, -0.4);
     Seg2 seg2(x2, y2);
     plot_intersection(fn, tri, seg2);
     
@@ -60,6 +60,7 @@ int main(){
 
 void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
     Gnuplot gnu;
+    GAM gam;
     gnu.set_xrange(Xlim[0], Xlim[1]+0.5);
     gnu.set_yrange(Ylim[0], Ylim[1]);
     gnu.set_equal_aspect_ratio();
@@ -71,6 +72,7 @@ void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
 
     Inter inter(t, s);
     inter.cal_intersect();
+    
 
     int l0 = inter.location_code(0);
     int l1 = inter.location_code(1);
@@ -88,6 +90,18 @@ void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
     plot_emphasis_by_segment_code(gnu, s, cs0);
     if(cs0 != cs1){
         plot_emphasis_by_segment_code(gnu, s, cs1);
+    }
+    if(inter.has_intersect_point(0)){
+        auto ip = inter.get_intersect_point(0);
+        GAM::spActor actor = gam.points(ip, -1);
+        actor->style() = "with points pt 2 ps 4 lc rgb \"red\"";
+        gnu.add(actor);
+    }
+    if(inter.has_intersect_point(1)){
+        auto ip = inter.get_intersect_point(1);
+        GAM::spActor actor = gam.points(ip, -1);
+        actor->style() = "with points pt 2 ps 4 lc rgb \"red\"";
+        gnu.add(actor);
     }
     gnu.set_label(1, "Location Code0 = " + ToString(l0), 1.1, 1.3, "front font \",10\"");
     gnu.set_label(2, "Location Code2 = " + ToString(l1), 1.1, 1.2, "front font \",10\"");
@@ -108,12 +122,12 @@ void plot_emphasis_by_segment_code(Gnuplot& gnu, const Seg2& s,
     switch(code){
         case 0:{
             GAM::spActor actor = gam.points(s[0], -1);
-            actor->style() = "with points pt 7 ps 3 lc rgb \"green\"";
+            actor->style() = "with points pt 7 ps 2 lc rgb \"green\"";
             gnu.add(actor);
         };break;
         case 1:{
             GAM::spActor actor = gam.points(s[1], -1);
-            actor->style() = "with points pt 7 ps 3 lc rgb \"green\"";
+            actor->style() = "with points pt 7 ps 2 lc rgb \"green\"";
             gnu.add(actor);
         };break;
         case 2:{
@@ -134,7 +148,7 @@ void plot_emphasis_by_triangle_code(Gnuplot& gnu, const Tri2& t,
     switch(code){
         case 0:{
             GAM::spActor actor = gam.points(t[0], -1);
-            actor->style() = "with points pt 7 ps 3 lc rgb \"blue\"";
+            actor->style() = "with points pt 6 ps 3 lc rgb \"blue\"";
             gnu.add(actor);
         };break;
         case 1:{
