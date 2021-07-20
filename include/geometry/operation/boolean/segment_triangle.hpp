@@ -178,27 +178,25 @@ protected:
     MatFun _matfun;
 
     // rebased results
-    std::array<Vec, 2> _res;
-    std::array<int, 2> _rfs;
+    std::array<Vec, 2> _res;  // results t0 base
+    std::array<int, 2> _rfs;  // valide flag 
+
+    double _predicate_precision;
 public:
     // Intitial from shared_ptr
-    IntersectionSegTri_(spTri spt, spSeg sps): _tri(spt), _seg(sps){
+    IntersectionSegTri_(spTri spt, spSeg sps): _tri(spt), _seg(sps), 
+        _predicate_precision(_SMALL_){
     }
     // Intitial from object
-    IntersectionSegTri_(const Triangle& t, const Segment& s){
+    IntersectionSegTri_(const Triangle& t, const Segment& s):
+        _predicate_precision(_SMALL_){
         this->_tri = std::make_shared<Triangle>(t);
         this->_seg = std::make_shared<Segment>(s);
-
+        _rebase(*_tri, *_seg);
+        _init_mat_fun();
         this->_inited = true;
 
-        _rebase(*_tri, *_seg);
-
-        _init_mat_fun();
-
-        _cal_location_code();
-        _cal_intersection_code();
-        _cal_intersection();
-
+        // _cal_intersection();
     }
     // Intitial from rebased objects
     IntersectionSegTri_(const Vec& e0, 
@@ -209,6 +207,8 @@ public:
         _atri[1] = e1;
         _aseg[0] = t0;
         _aseg[1] = t1;
+        _init_mat_fun();
+        this->_inited = true;
     }
 
     int triangle_intersection_code(int idx){
@@ -222,17 +222,32 @@ public:
         return _code[idx];
     }
 
-    void cal_intersect(){
-        // std::cout << "location code 0 = " << _code[0] << std::endl;
-        // std::cout << "location code 1 = " << _code[1] << std::endl;
-        MatIC& mat = this->_mat_ic;
-        mat.fill({-1,-1});
-        this->_matfun[this->_code[0]][this->_code[1]](
-            this->_atri, this->_aseg, 
-            this->_code[0], this->_code[1], mat);
-        // std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
-        // std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
+    void set_predicate_precision(const double& precision){
+        _predicate_precision = std::abs(precision);
     }
+
+    void cal_code(){
+        _cal_location_code();
+        _cal_intersection_code();
+        this->_called_intersect = true;
+    }
+
+    void cal_intersection(){
+        _cal_intersection();
+        this->_called_return = true;
+    }
+
+    // void cal_intersect(){
+    //     // std::cout << "location code 0 = " << _code[0] << std::endl;
+    //     // std::cout << "location code 1 = " << _code[1] << std::endl;
+    //     MatIC& mat = this->_mat_ic;
+    //     mat.fill({-1,-1});
+    //     this->_matfun[this->_code[0]][this->_code[1]](
+    //         this->_atri, this->_aseg, 
+    //         this->_code[0], this->_code[1], mat);
+    //     // std::cout << mat[0][0] << ",  " << mat[0][1] << std::endl;
+    //     // std::cout << mat[1][0] << ",  " << mat[1][1] << std::endl;
+    // }
     
     Point get_intersect_point(const St& idx){
         return _res[idx]+(*_tri)[0];
@@ -264,14 +279,14 @@ protected:
     // vectors must be rebased.
     void _cal_location_code(){
         SingletonIntersectionHelper* phelper = SingletonIntersectionHelper::GetInstance();
-        int side0 = WhichSide32D(_atri[0], _aseg[0]);
-        int side1 = WhichSide32D(_atri[1], _aseg[0]);
+        int side0 = WhichSide32D(_atri[0], _aseg[0], _predicate_precision);
+        int side1 = WhichSide32D(_atri[1], _aseg[0], _predicate_precision);
         // std::cout<< "s0 = " << side0 << std::endl;
         // std::cout<< "s1 = " << side1 << std::endl;
         _code[0] = phelper->point_location_in_coordinate(side0, side1);
         // std::cout << "location code 0 = " << _code[0] << std::endl;
-        side0 = WhichSide32D(_atri[0], _aseg[1]);
-        side1 = WhichSide32D(_atri[1], _aseg[1]);
+        side0 = WhichSide32D(_atri[0], _aseg[1], _predicate_precision);
+        side1 = WhichSide32D(_atri[1], _aseg[1], _predicate_precision);
         // std::cout<< "s0 = " << side0 << std::endl;
         // std::cout<< "s1 = " << side1 << std::endl;
         _code[1] = phelper->point_location_in_coordinate(side0, side1);
@@ -339,7 +354,6 @@ protected:
         return -1; // no point
     }
     
-
     void _cal_intersection(){
         // find intersetion point from mat_ic
         _rfs[0] = _cal_one_point(0);

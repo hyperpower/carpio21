@@ -31,15 +31,17 @@ inline Vt SquareSum(VEC& vec){
 }
 
 template<class VEC>
-inline short WhichSide32D(const VEC& p, const VEC& vec){
+inline short WhichSide32D(const VEC& p, 
+                          const VEC& vec,
+                          const double& precision = _SMALL_){
     // vec must be 0 base
     /// d1    = v1 - v3
     /// d2    = v2 - v3
     /// cross = d1x * d2y - d1y * d2x
     double res =  (p[0] * vec[1]) - (vec[0] * p[1]);
-    if (res < 0){
+    if (res < -precision){
         return 2;
-    }else if (res > 0){
+    }else if (res > precision){
         return 1;
     }else{
         return 0;

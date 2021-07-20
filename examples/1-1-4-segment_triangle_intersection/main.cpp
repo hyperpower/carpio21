@@ -35,6 +35,9 @@ void plot_emphasis_by_segment_code(Gnuplot& gnu, const Seg2& s,
                                  int code);
 
 int main(){
+    // std::cout << "-------------" << std::endl;
+    // std::cout << GetWorkingPath() << std::endl;
+    // std::cout << "-------------" << std::endl;
     std::string fn = "point_location_code";
     Point2 x{{0.0, 0.0, 3.0}};
     Point2 y(1.0, 1.0);
@@ -51,12 +54,12 @@ int main(){
     plot_segment_location(fn, seg);
 
     fn = "t_intersection";
-    Point2 y2( 0.11,  0.9);
-    Point2 x2( 0.5,  0.5);
+    Point2 y2(-0.4,  1.4);
+    Point2 x2( 1.3, -0.3);
     Seg2 seg2(x2, y2);
     plot_intersection(fn, tri, seg2);
-    
 }
+
 
 void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
     Gnuplot gnu;
@@ -70,8 +73,11 @@ void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
     plot_triangle(gnu, t); 
     plot_segment(gnu,  s);
 
+    std::cout << "here " << std::endl;
     Inter inter(t, s);
-    inter.cal_intersect();
+    // inter.set_predicate_precision(1e-3);
+    inter.cal_code();
+    inter.cal_intersection();
     
 
     int l0 = inter.location_code(0);
