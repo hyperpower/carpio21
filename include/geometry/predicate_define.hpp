@@ -35,11 +35,12 @@
 #include "type_define.hpp"
 
 #include <math.h>
+#include <mutex>          // std::mutex
 
 #define INEXACT                          /* Nothing */
 /* #define INEXACT volatile */
 
-#define REAL double                      /* float or double */
+// #define REAL double                      /* float or double */
 #define REALPRINT doubleprint
 #define REALRAND doublerand
 #define NARROWRAND narrowdoublerand
@@ -272,141 +273,6 @@ namespace carpio {
 
 /*****************************************************************************/
 /*                                                                           */
-/*  doublerand()   Generate a double with random 53-bit significand and a    */
-/*                 random exponent in [0, 511].                              */
-/*                                                                           */
-/*****************************************************************************/
-
-double doublerand()
-{
-  double result;
-  double expo;
-  long a, b, c;
-  long i;
-
-  a = random();
-  b = random();
-  c = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  for (i = 512, expo = 2; i <= 131072; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
-
-/*****************************************************************************/
-/*                                                                           */
-/*  narrowdoublerand()   Generate a double with random 53-bit significand    */
-/*                       and a random exponent in [0, 7].                    */
-/*                                                                           */
-/*****************************************************************************/
-
-double narrowdoublerand()
-{
-  double result;
-  double expo;
-  long a, b, c;
-  long i;
-
-  a = random();
-  b = random();
-  c = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
-
-/*****************************************************************************/
-/*                                                                           */
-/*  uniformdoublerand()   Generate a double with random 53-bit significand.  */
-/*                                                                           */
-/*****************************************************************************/
-
-double uniformdoublerand()
-{
-  double result;
-  long a, b;
-
-  a = random();
-  b = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  return result;
-}
-
-/*****************************************************************************/
-/*                                                                           */
-/*  floatrand()   Generate a float with random 24-bit significand and a      */
-/*                random exponent in [0, 63].                                */
-/*                                                                           */
-/*****************************************************************************/
-
-float floatrand()
-{
-  float result;
-  float expo;
-  long a, c;
-  long i;
-
-  a = random();
-  c = random();
-  result = (float) ((a - 1073741824) >> 6);
-  for (i = 512, expo = 2; i <= 16384; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
-
-/*****************************************************************************/
-/*                                                                           */
-/*  narrowfloatrand()   Generate a float with random 24-bit significand and  */
-/*                      a random exponent in [0, 7].                         */
-/*                                                                           */
-/*****************************************************************************/
-
-float narrowfloatrand()
-{
-  float result;
-  float expo;
-  long a, c;
-  long i;
-
-  a = random();
-  c = random();
-  result = (float) ((a - 1073741824) >> 6);
-  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
-
-/*****************************************************************************/
-/*                                                                           */
-/*  uniformfloatrand()   Generate a float with random 24-bit significand.    */
-/*                                                                           */
-/*****************************************************************************/
-
-float uniformfloatrand()
-{
-  float result;
-  long a;
-
-  a = random();
-  result = (float) ((a - 1073741824) >> 6);
-  return result;
-}
-
-/*****************************************************************************/
-/*                                                                           */
 /*  exactinit()   Initialize the variables used for exact arithmetic.        */
 /*                                                                           */
 /*  `epsilon' is the largest power of two such that 1.0 + epsilon = 1.0 in   */
@@ -423,8 +289,8 @@ float uniformfloatrand()
 /*  Don't change this routine unless you fully understand it.                */
 /*                                                                           */
 /*****************************************************************************/
-
-void exactinit()
+template<typename REAL>
+void exactinit(REAL half = 0.5)
 {
   REAL half;
   REAL check, lastcheck;
@@ -478,12 +344,8 @@ void exactinit()
 /*  will h.)                                                                 */
 /*                                                                           */
 /*****************************************************************************/
-
-int grow_expansion(elen, e, b, h)                /* e and h can be the same. */
-int elen;
-REAL *e;
-REAL b;
-REAL *h;
+template <typename REAL>
+int grow_expansion(int elen, REAL *e, REAL *b, REAL *h)                /* e and h can be the same. */
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -516,11 +378,8 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-int grow_expansion_zeroelim(elen, e, b, h)       /* e and h can be the same. */
-int elen;
-REAL *e;
-REAL b;
-REAL *h;
+template <typename REAL>
+int grow_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)       /* e and h can be the same. */
 {
   REAL Q, hh;
   INEXACT REAL Qnew;
@@ -558,13 +417,9 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-int expansion_sum(elen, e, flen, f, h)
+template <typename REAL>
+int expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /* e and h can be the same, but f and h cannot. */
-int elen;
-REAL *e;
-int flen;
-REAL *f;
-REAL *h;
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -607,13 +462,9 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-int expansion_sum_zeroelim1(elen, e, flen, f, h)
+template <typename REAL>
+int expansion_sum_zeroelim1(int elen,REAL *e, int flen,REAL *f, REAL *h)
 /* e and h can be the same, but f and h cannot. */
-int elen;
-REAL *e;
-int flen;
-REAL *f;
-REAL *h;
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -667,13 +518,9 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-int expansion_sum_zeroelim2(elen, e, flen, f, h)
+template <typename REAL>
+int expansion_sum_zeroelim2(int elen,REAL *e, int flen,REAL *f, REAL *h)
 /* e and h can be the same, but f and h cannot. */
-int elen;
-REAL *e;
-int flen;
-REAL *f;
-REAL *h;
 {
   REAL Q, hh;
   INEXACT REAL Qnew;
@@ -724,12 +571,8 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-int fast_expansion_sum(elen, e, flen, f, h)           /* h cannot be e or f. */
-int elen;
-REAL *e;
-int flen;
-REAL *f;
-REAL *h;
+template <typename REAL>
+int fast_expansion_sum(int elen,REAL *e, int flen, REAL *f, REAL *h)           /* h cannot be e or f. */
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -801,12 +644,8 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-int fast_expansion_sum_zeroelim(elen, e, flen, f, h)  /* h cannot be e or f. */
-int elen;
-REAL *e;
-int flen;
-REAL *f;
-REAL *h;
+template <typename REAL>
+int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)  /* h cannot be e or f. */
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -946,6 +785,7 @@ int linear_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)         
 /*                                                                           */
 /*****************************************************************************/
 
+template <typename REAL>
 int linear_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)/* h cannot be e or f. */
 {
   REAL Q, q, hh;
@@ -978,7 +818,7 @@ int linear_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)
     fnow = f[++findex];
   }
   Q = Qnew;
-  for (count = 2; count < elen + flen; count++) {
+  for (int count = 2; count < elen + flen; count++) {
     if ((eindex < elen) && ((findex >= flen)
                             || ((fnow > enow) == (fnow > -enow)))) {
       Fast_Two_Sum(enow, q, R, hh);
@@ -1015,11 +855,8 @@ int linear_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
-int scale_expansion(elen, e, b, h)            /* e and h cannot be the same. */
-int elen;
-REAL *e;
-REAL b;
-REAL *h;
+template <typename REAL>
+int scale_expansion(int elen, REAL *e, REAL *b, REAL *h)            /* e and h cannot be the same. */
 {
   INEXACT REAL Q;
   INEXACT REAL sum;
@@ -1064,11 +901,8 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-int scale_expansion_zeroelim(elen, e, b, h)   /* e and h cannot be the same. */
-int elen;
-REAL *e;
-REAL b;
-REAL *h;
+template <typename REAL>
+int scale_expansion_zeroelim(int elen, REAL *e, REAL *b, REAL *h)   /* e and h cannot be the same. */
 {
   INEXACT REAL Q, sum;
   REAL hh;
@@ -1089,7 +923,7 @@ REAL *h;
   if (hh != 0) {
     h[hindex++] = hh;
   }
-  for (eindex = 1; eindex < elen; eindex++) {
+  for (int eindex = 1; eindex < elen; eindex++) {
     enow = e[eindex];
     Two_Product_Presplit(enow, b, bhi, blo, product1, product0);
     Two_Sum(Q, product0, sum, hh);
@@ -1119,10 +953,8 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-int compress(elen, e, h)                         /* e and h may be the same. */
-int elen;
-REAL *e;
-REAL *h;
+template <typename REAL>
+int compress(int elen, REAL *e, REAL *h)                         /* e and h may be the same. */
 {
   REAL Q, q;
   INEXACT REAL Qnew;
@@ -1164,9 +996,8 @@ REAL *h;
 /*                                                                           */
 /*****************************************************************************/
 
-REAL estimate(elen, e)
-int elen;
-REAL *e;
+template <typename REAL>
+REAL estimate(int elen, REAL *e)
 {
   REAL Q;
   int eindex;
