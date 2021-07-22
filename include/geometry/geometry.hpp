@@ -3,6 +3,8 @@
 
 #include <array>
 #include "geometry_define.hpp"
+#include "predicate_define.hpp"
+#include "orient2d.hpp"
 
 #include "objects/analytic/line.hpp"
 

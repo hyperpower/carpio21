@@ -433,11 +433,11 @@ Point_<TYPE, DIM> Between(
     }
     Point_<TYPE, DIM> res;
     if (ratio < 0) {
-        for (St i = 0; i < DIM; i++) {
+        for (St i = 0; i < DIM; ++i) {
             res[i] = b[i] + (b[i] - a[i]) * ratio;
         }
     } else if (ratio > 0) {
-        for (St i = 0; i < DIM; i++) {
+        for (St i = 0; i < DIM; ++i) {
             res[i] = a[i] + (b[i] - a[i]) * ratio;
         }
     }
