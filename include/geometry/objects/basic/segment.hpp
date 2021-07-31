@@ -462,7 +462,7 @@ PointToSegmentPosition OnWhichSide7(
 		return _PS_ON_END_;
 	}
 	// 2 calculate cross
-	double tmp = Cross(ps, pe, p);
+	double tmp = Orient(ps, pe, p);
 	if (tmp > 0) {
 		return _PS_LEFT_;
 	} else if (tmp < 0) {

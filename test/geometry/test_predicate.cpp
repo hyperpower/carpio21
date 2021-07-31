@@ -48,7 +48,17 @@ Trinary _WhichSide3fast(const Point2& pa, const Point2& pb, const Point2& pc){
     }
 }
 Trinary _WhichSide3exact(const Point2& pa, const Point2& pb, const Point2& pc){
-	double tmp = exact::orient2d(pa.data(), pb.data(), pc.data());
+	double tmp = exact::orient2d<Point2::value_type>(pa.data(), pb.data(), pc.data());
+    if (tmp > 0) {
+        return _POSITIVE_;
+    } else if (tmp < 0) {
+        return _NEGATIVE_;
+    } else {
+        return _ZERO_;
+    }
+}
+Trinary _WhichSide3adptive(const Point2& pa, const Point2& pb, const Point2& pc){
+	double tmp = adaptive::orient2d<Point2::value_type>(pa.data(), pb.data(), pc.data());
     if (tmp > 0) {
         return _POSITIVE_;
     } else if (tmp < 0) {

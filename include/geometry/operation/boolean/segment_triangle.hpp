@@ -54,7 +54,6 @@ protected:
     }
 
     
-
 public:
     
     SingletonIntersectionHelper(SingletonIntersectionHelper &other) = delete;
@@ -179,30 +178,33 @@ protected:
 
     // rebased results
     std::array<Vec, 2> _res;  // results t0 base
-    std::array<int, 2> _rfs;  // valide flag 
+    std::array<int, 2> _rfs;  // valide flag
 
-    double _predicate_precision;
+    Point _vec0; 
 public:
     // Intitial from shared_ptr
-    IntersectionSegTri_(spTri spt, spSeg sps): _tri(spt), _seg(sps), 
-        _predicate_precision(_SMALL_){
+    IntersectionSegTri_(spTri spt, spSeg sps): _tri(spt), _seg(sps) {
+        _vec0[0] = 0.0;
+        _vec0[1] = 0.0;
     }
     // Intitial from object
-    IntersectionSegTri_(const Triangle& t, const Segment& s):
-        _predicate_precision(_SMALL_){
+    IntersectionSegTri_(const Triangle& t, const Segment& s){
+        _vec0[0] = 0.0;
+        _vec0[1] = 0.0;
         this->_tri = std::make_shared<Triangle>(t);
         this->_seg = std::make_shared<Segment>(s);
         _rebase(*_tri, *_seg);
         _init_mat_fun();
         this->_inited = true;
-
-        // _cal_intersection();
     }
     // Intitial from rebased objects
     IntersectionSegTri_(const Vec& e0, 
                         const Vec& e1, 
                         const Vec& t0, 
                         const Vec& t1){
+        _vec0[0] = 0.0;
+        _vec0[1] = 0.0;
+
         _atri[0] = e0;
         _atri[1] = e1;
         _aseg[0] = t0;
@@ -220,10 +222,6 @@ public:
 
     int location_code(int idx){
         return _code[idx];
-    }
-
-    void set_predicate_precision(const double& precision){
-        _predicate_precision = std::abs(precision);
     }
 
     void cal_code(){
@@ -279,14 +277,14 @@ protected:
     // vectors must be rebased.
     void _cal_location_code(){
         SingletonIntersectionHelper* phelper = SingletonIntersectionHelper::GetInstance();
-        int side0 = WhichSide32D(_atri[0], _aseg[0], _predicate_precision);
-        int side1 = WhichSide32D(_atri[1], _aseg[0], _predicate_precision);
+        int side0 = _on_which_side(_atri[0], _aseg[0]);
+        int side1 = _on_which_side(_atri[1], _aseg[0]);
         // std::cout<< "s0 = " << side0 << std::endl;
         // std::cout<< "s1 = " << side1 << std::endl;
         _code[0] = phelper->point_location_in_coordinate(side0, side1);
         // std::cout << "location code 0 = " << _code[0] << std::endl;
-        side0 = WhichSide32D(_atri[0], _aseg[1], _predicate_precision);
-        side1 = WhichSide32D(_atri[1], _aseg[1], _predicate_precision);
+        side0 = _on_which_side(_atri[0], _aseg[1]);
+        side1 = _on_which_side(_atri[1], _aseg[1]);
         // std::cout<< "s0 = " << side0 << std::endl;
         // std::cout<< "s1 = " << side1 << std::endl;
         _code[1] = phelper->point_location_in_coordinate(side0, side1);
@@ -445,6 +443,21 @@ protected:
     static const short SO = 3;
     static const short TO = 7;
     static const short TIN = 6;
+    
+    static int _on_which_side(const Vec&p1, const Vec&p2){
+        Vec p3(0,0);
+        return _on_which_side(p1, p2, p3);
+    }
+    static int _on_which_side(const Vec&p1, const Vec&p2, const Vec& p3){
+        auto tri = OnWhichSide3(p1, p2, p3);
+        switch(tri){
+            case _POSITIVE_:{return 1; break;}
+            case _ZERO_:    {return 0; break;}
+            case _NEGATIVE_:{return 2; break;}
+        } 
+        SHOULD_NOT_REACH;
+        return 0;
+    }
 
     static inline short _SideToLoc(
         short side, short pl, short ol, short nl){
@@ -480,7 +493,7 @@ protected:
         }
         int zero = c1>c0?0:1; 
         int one  = c1>c0?1:0; 
-        int rc = WhichSide32D(
+        int rc = _on_which_side(
             tri[1], seg[one], tri[0]);
         if(rc == _N_){
             ml[zero][0] = T1;
@@ -521,7 +534,7 @@ protected:
         short one  = c1>c0?1:0; 
         short _S1  = c1>c0?S1:S2; 
         short _S2  = c1>c0?S2:S1; 
-        int rc = WhichSide32D(
+        int rc = _on_which_side(
             tri[1], seg[one], tri[0]);
         if(rc == _N_){
             ml[zero][0] = 0;
@@ -553,9 +566,9 @@ protected:
         _S2  = c1>c0?S2:S1;
         short _TE1 = 3, _TE2 = 4; 
         short _TV1 = 1, _TV2 = 2; 
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[zero], tri[0]);
-        short rc1 = WhichSide32D(
+        short rc1 = _on_which_side(
             tri[1], seg[one], tri[0]);
         switch(rc0){
             case _P_:{
@@ -606,14 +619,14 @@ protected:
             EN = 3, EV = 1, EP = 5;
             IdxV  = 0;
         }
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[zero], tri[0]);
         short rc1;
         if(c[one] == 4){
-            rc1= WhichSide32D(
+            rc1= _on_which_side(
                 seg[one], tri[IdxV], seg[zero]);
         }else{
-            rc1 = WhichSide32D(
+            rc1 = _on_which_side(
                 seg[zero], tri[IdxV], seg[one]);
         }
         switch(rc0){
@@ -649,9 +662,9 @@ protected:
         one  = upper?1:0;
         _S1  = upper?S1:S2; 
         Vec p0(0.0,0.0);
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[zero], tri[0]);
-        short tc0 = WhichSide32D(
+        short tc0 = _on_which_side(
             seg[one], p0, seg[zero]);
         switch(rc0){
             case _P_:{
@@ -668,7 +681,7 @@ protected:
             };break;
             case _N_:{
                 if (tc0 == _P_){
-                    short tcv = WhichSide32D(
+                    short tcv = _on_which_side(
                         seg[one], tri[1], seg[zero]);
                     ml[zero][0] = _SideToLoc(tcv, TO, 2, 5); 
                     ml[zero][1] = _SideToLoc(tcv, SO, SE, SE); 
@@ -680,7 +693,7 @@ protected:
                     ml[one][0]  = 0; 
                     ml[one][1]  = SE; 
                 }else{
-                    short tcv = WhichSide32D(
+                    short tcv = _on_which_side(
                         seg[one], tri[0], seg[zero]);
                     ml[zero][0] = _SideToLoc(tcv, 5, 1, TO); 
                     ml[zero][1] = _SideToLoc(tcv, SE, SE, SO); 
@@ -703,9 +716,9 @@ protected:
         one  = upper?1:0;
         _S1  = upper?S1:S2; 
         Vec p0(0.0,0.0);
-        // short rc0 = WhichSide32D(
+        // short rc0 = _on_which_side(
             // tri[1], seg[zero], tri[0]);
-        short tc0 = WhichSide32D(
+        short tc0 = _on_which_side(
             seg[one], p0, seg[zero]);            
         switch(tc0){
             case _P_:{
@@ -721,9 +734,9 @@ protected:
                 ml[one][1]  = SE; 
             };break;
             case _N_:{
-                short tc1 = WhichSide32D(
+                short tc1 = _on_which_side(
                     seg[one], tri[0], seg[zero]);
-                short tc2 = WhichSide32D(
+                short tc2 = _on_which_side(
                     seg[one], tri[1], seg[zero]);
                 if(tc2 == _P_){
                     ml[zero][0] = 4; 
@@ -766,14 +779,14 @@ protected:
             EN = 3, EV = 1, EP = 5;
             IdxV  = 0;
         }
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[zero], tri[0]);
         short rc1;
         if(c[one] == 5){
-            rc1= WhichSide32D(
+            rc1= _on_which_side(
                 seg[one], tri[IdxV], seg[zero]);
         }else{
-            rc1 = WhichSide32D(
+            rc1 = _on_which_side(
                 seg[zero], tri[IdxV], seg[one]);
         }
         switch(rc0){
@@ -815,7 +828,7 @@ protected:
         }else{ // 1 
             BP = 3, BO = 1;
         }
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[zero], tri[0]);
         switch(rc0){
             case _P_:{
@@ -857,7 +870,7 @@ protected:
         }else{ // 5 
             BP = 4, BO = 2;
         }
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[zero], tri[0]);
         switch(rc0){
             case _P_:{
@@ -901,9 +914,9 @@ protected:
         if (c0 == 3 || c1 == 3) {
             T2 = 2, TE = 4;
         }
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[zero], tri[0]);
-        short rc1 = WhichSide32D(
+        short rc1 = _on_which_side(
             tri[1], seg[one], tri[0]);
         switch(rc0){
             case _P_:{
@@ -931,9 +944,9 @@ protected:
                         const int& c0, const int& c1,
                         MatIC& ml){
         short TE = 5;
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[0], tri[0]);
-        short rc1 = WhichSide32D(
+        short rc1 = _on_which_side(
             tri[1], seg[1], tri[0]);
         std::cout << "tc0 = " << rc0 << std::endl;
         std::cout << "tc1 = " << rc1 << std::endl;
@@ -962,9 +975,9 @@ protected:
         if(c0 == 3){
             T1 = 0, T2 = 2, TE = 4;
         }
-        short rc0 = WhichSide32D(
+        short rc0 = _on_which_side(
             tri[1], seg[0], tri[0]);
-        short rc1 = WhichSide32D(
+        short rc1 = _on_which_side(
             tri[1], seg[1], tri[0]);
         switch(rc0){
             case _P_:{

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <cmath>
 #include <string>
 #include "geometry/geometry.hpp"
 
@@ -34,6 +35,8 @@ void plot_emphasis_by_triangle_code(Gnuplot& gnu, const Tri2& t,
 void plot_emphasis_by_segment_code(Gnuplot& gnu, const Seg2& s, 
                                  int code);
 
+void test_on_t12(const Tri2& t);
+
 int main(){
     // std::cout << "-------------" << std::endl;
     // std::cout << GetWorkingPath() << std::endl;
@@ -53,13 +56,29 @@ int main(){
     fn = "segment_location";
     plot_segment_location(fn, seg);
 
-    fn = "t_intersection";
-    Point2 y2(-0.4,  1.4);
-    Point2 x2( 1.3, -0.3);
-    Seg2 seg2(x2, y2);
-    plot_intersection(fn, tri, seg2);
+    // fn = "t_intersection";
+    // Point2 y2(-0.3,  1.3);
+    // Point2 x2( 1.3, -0.3);
+    // Seg2 seg2(x2, y2);
+    // plot_intersection(fn, tri, seg2);
+    test_on_t12(tri);
 }
 
+void test_on_t12(const Tri2& t){
+    Seg2 segt(t[1], t[2]);
+    int n = 51;
+    double rmin = 0.2;
+    double rmax = 1.5;
+    double dr = (rmax - rmin)/(n);
+    for(int i = 0; i < n+1; i++){
+        // double r = rmin + i * dr;
+        double r = std::fma(i, dr, rmin);
+        Seg2 sn(segt);
+        sn.scale(sn.mid(), r, r);
+        std::string fn = "ont12_" + ToString(i);
+        plot_intersection(fn, t, sn);
+    }
+}
 
 void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
     Gnuplot gnu;
@@ -73,7 +92,6 @@ void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
     plot_triangle(gnu, t); 
     plot_segment(gnu,  s);
 
-    std::cout << "here " << std::endl;
     Inter inter(t, s);
     // inter.set_predicate_precision(1e-3);
     inter.cal_code();
@@ -112,9 +130,9 @@ void plot_intersection(const std::string& fname, const Tri2& t, const Seg2& s){
     gnu.set_label(1, "Location Code1 = " + ToString(l0), 1.1, 1.3, "front font \",10\"");
     gnu.set_label(2, "Location Code2 = " + ToString(l1), 1.1, 1.2, "front font \",10\"");
 
-    gnu.set_label(3, "Code Triangle = " + ToString(ct0) + ", " + ToString(ct1),
+    gnu.set_label(3, "Code Triangle  = " + ToString(ct0) + ", " + ToString(ct1),
                      1.1, 1.1, "front font \",10\"");
-    gnu.set_label(4, "Code Segment  = " + ToString(cs0) + ", " + ToString(cs1),
+    gnu.set_label(4, "Code Segment   = " + ToString(cs0) + ", " + ToString(cs1),
                      1.1, 1.0, "front font \",10\"");
     if(inter.is_same_intersect_point()){
         gnu.set_label(5, "Same point",1.1, 0.9, "front font \",10\"");

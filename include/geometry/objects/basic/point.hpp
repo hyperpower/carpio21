@@ -2,6 +2,7 @@
 #define _POINT_HPP_
 
 #include "geometry/geometry_define.hpp"
+#include "geometry/predicate.hpp"
 #include <array>
 #include <sstream>
 #include <iostream>
@@ -454,7 +455,7 @@ Point_<TYPE, DIM> Between(
 //              (also called the mixed product, box product)
 //-----------------------------------------------
 template<typename TYPE, St DIM>
-double Cross(
+double Orient(
         const Point_<TYPE, DIM>&v1,
         const Point_<TYPE, DIM>&v2,
         const Point_<TYPE, DIM>&v3,
@@ -463,21 +464,11 @@ double Cross(
         /// d1    = v1 - v3
         /// d2    = v2 - v3
         /// cross = d1x * d2y - d1y * d2x
-        return ((v1.x() - v3.x()) * (v2.y() - v3.y())
-                - (v2.x() - v3.x()) * (v1.y() - v3.y()));
+        return exact::orient2d(v1.data(), v2.data(), v3.data());
     }
 
     if (DIM == 3) {
-        double a[3][3];
-        for (short i = 0; i != 3; ++i) {
-            a[0][i] = v1[i] - v4[i];
-            a[1][i] = v2[i] - v4[i];
-            a[2][i] = v3[i] - v4[i];
-        }
-
-        return a[0][0] * a[1][1] * a[2][2] + a[0][1] * a[1][2] * a[2][0]
-                + a[0][2] * a[1][0] * a[2][1] - a[0][2] * a[1][1] * a[2][0]
-                - a[0][1] * a[1][0] * a[2][2] - a[0][0] * a[1][2] * a[2][1];
+        return exact::orient3d(v1.data(), v2.data(), v3.data(), v4.data());
     }
     SHOULD_NOT_REACH;
     return 0.0;
@@ -503,7 +494,7 @@ Trinary OnWhichSide3(
         const Point_<TYPE, 2>& p0,
         const Point_<TYPE, 2>& p1,
         const Point_<TYPE, 2>& p2) {
-    double tmp = Cross(p0, p1, p2);
+    double tmp = Orient(p0, p1, p2);
     if (tmp > 0) {
         return _POSITIVE_;
     } else if (tmp < 0) {
@@ -519,7 +510,7 @@ Trinary OnWhichSide3(
         const Point_<TYPE, 3>& p1,
         const Point_<TYPE, 3>& p2,
         const Point_<TYPE, 3>& p3) {
-    double tmp = Cross(p0, p1, p2, p3);
+    double tmp = Orient(p0, p1, p2, p3);
     if (tmp > 0) {
         return _POSITIVE_;
     } else if (tmp < 0) {

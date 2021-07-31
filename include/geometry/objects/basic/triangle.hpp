@@ -221,10 +221,15 @@ public:
 
     void scale(vt xfactor, vt yfactor, vt zfactor = 1) {
         auto pc = this->center();
+        this->scale(pc, xfactor, yfactor, zfactor); 
+    }
+
+    void scale(const Point& pabout, 
+                     vt xfactor, vt yfactor, vt zfactor = 1){
         std::vector<vt> fvec = {{xfactor, yfactor, zfactor}};
         for(auto& p : (*this)){
-            for(int i=0; i<Dim; ++i){
-                p[i] = fvec[i] * (p[i] - pc[i]) + pc[i];
+            for(int i=0; i < Dim; ++i){
+                p[i] = fvec[i] * (p[i] - pabout[i]) + pabout[i];
             }
         }
     }

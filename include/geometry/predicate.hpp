@@ -30,8 +30,8 @@
  *                                                                                 *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef PREDICATES_H_INCLUDED
-#define PREDICATES_H_INCLUDED
+#ifndef _PREDICATES_HPP_
+#define _PREDICATES_HPP_
 
 //@reference: https://www.cs.cmu.edu/~quake/robust.html
 #include <cmath>//abs, fma
@@ -104,7 +104,10 @@ namespace  carpio {
 		//@param pc: pointer to c as {x, y}
 		//@return  : determinant of {{ax - cx, ay - cy}, {bx - cx, by - cy}}
 		//@note    : positive, 0, negative result for c above, on, or below the line defined by a -> b
-		template <typename T> T orient2d(T const*const pa, T const*const pb, T const*const pc);
+		template <typename T> 
+		T orient2d(T const*const pa, 
+		           T const*const pb, 
+				   T const*const pc);
 
 		//@brief   : determine if the 2d point d is inside, on, or outside the circle defined by a, b, and c
 		//@param pa: pointer to a as {x, y}
@@ -140,7 +143,12 @@ namespace  carpio {
 		//@param pe: pointer to e as {x, y, z}
 		//@return  : determinant of {{ax - ex, ay - ey, az - ez, (ax - ex)^2 + (ay - ey)^2 + (az - ez)^2}, {bx - ex, by - ey, bz - ez, (bx - ex)^2 + (by - ey)^2 + (bz - ez)^2}, {cx - ex, cy - ey, cz - ez, (cx - ex)^2 + (cy - ey)^2 + (cz - ez)^2}, {dx - ex, dy - ey, dz - ez, (dx - ex)^2 + (dy - ey)^2 + (dz - ez)^2}}
 		//@note    : positive, 0, negative result for d inside, on, or outside the circle defined by a, b, and c
-		template <typename T> T insphere(T const*const pa, T const*const pb, T const*const pc, T const*const pd, T const*const pe);
+		template <typename T>
+		T insphere(T const*const pa,
+		           T const*const pb, 
+				   T const*const pc, 
+				   T const*const pd, 
+				   T const*const pe);
 	}
 
 	//@brief: geometric predicates using normal floating point arithmetic but falling back to arbitrary precision when needed
