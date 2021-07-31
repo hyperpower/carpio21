@@ -78,7 +78,8 @@ void one_test(const Tri2& t,const Seg2& s,
     short act0, short act1, short acs0, short acs1, 
     bool plot = false){
     Inter inter(t, s);
-    inter.cal_intersect();
+    inter.cal_code();
+    inter.cal_intersection();
 
     int l0 = inter.location_code(0);
     int l1 = inter.location_code(1);
@@ -116,7 +117,8 @@ void one_test_reverse_seg(const Tri2& t,const Seg2& s,
     bool plot = false){
     Seg2 sr(s[1],s[0]);
     Inter inter(t, sr);
-    inter.cal_intersect();
+    inter.cal_code();
+    inter.cal_intersection();
 
     int l0 = inter.location_code(0);
     int l1 = inter.location_code(1);
@@ -338,7 +340,7 @@ TEST(segtri, DISABLED_segment_rotate){
     for(auto& s2 : lp){
         Seg2 s(s1, s2);
         Inter inter(tri, s);
-        inter.cal_intersect();
+        inter.cal_intersection();
 
         int l0 = inter.location_code(0);
         int l1 = inter.location_code(1);
