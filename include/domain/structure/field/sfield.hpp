@@ -187,14 +187,14 @@ inline SField_<DIM, VT, GRID, GHOST, ORDER> operator-(
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 inline SField_<DIM, VT, GRID, GHOST, ORDER> operator-(
-    SField_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
+        SField_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
     lhs -= rhs;
     return lhs;
 }
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 inline SField_<DIM, VT, GRID, GHOST, ORDER> operator-(
-    const Vt& lhs, SField_<DIM, VT, GRID, GHOST, ORDER> rhs){
+        const Vt& lhs, SField_<DIM, VT, GRID, GHOST, ORDER> rhs){
     rhs = -rhs + lhs;
     return rhs;
 }
@@ -209,15 +209,16 @@ inline SField_<DIM, VT, GRID, GHOST, ORDER> operator*(
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 inline SField_<DIM, VT, GRID, GHOST, ORDER> operator*(
-    SField_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
+        SField_<DIM, VT, GRID, GHOST, ORDER> lhs,
+        const Vt& rhs){
     lhs *= rhs;
     return lhs;
 }
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 inline SField_<DIM, VT, GRID, GHOST, ORDER> operator*(
-    const Vt& lhs, 
-    SField_<DIM, VT, GRID, GHOST, ORDER> rhs){
+        const Vt& lhs, 
+        SField_<DIM, VT, GRID, GHOST, ORDER> rhs){
     rhs *= lhs;
     return rhs;
 }
@@ -305,11 +306,6 @@ SField_<DIM, VT, GRID, GHOST, ORDER> Sqrt(const SField_<DIM, VT, GRID, GHOST, OR
     return res;
 }
 
-
-
-
 }
-
-
 
 #endif

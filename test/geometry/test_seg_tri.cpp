@@ -15,6 +15,12 @@ typedef Triangle_<double, 2> Tri2;
 typedef Segment_<double, 2> Seg2;
 typedef IntersectionSegTri_<double, 2> Inter;
 
+TEST(segtri, orientation){
+    int o = 0;
+    std::cout <<ToString( ToOrientation(o)) << std::endl;
+}
+
+
 void plot_triangle_by_code(Gnuplot& gnu, const Tri2& t, int code0, int code1){
     // input location code
     GAM gam;
@@ -148,7 +154,7 @@ void one_test_reverse_seg(const Tri2& t,const Seg2& s,
 
     ASSERT_EQ(ct0, act1);	
     ASSERT_EQ(ct1, act0);
-    	
+        
     short racs0 = (acs1 == 1)? 0 : acs1;
     short racs1 = (acs0 == 0)? 1 : acs0;
     ASSERT_EQ(cs0, racs0);	

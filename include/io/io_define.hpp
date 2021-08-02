@@ -119,14 +119,12 @@ inline std::string ToString(const Axes& a) {
     }
     return "_Z_";
 }
-inline std::string ToString(const Orientation& a) {
-    if (a == _M_) {
-        return "_M_";
-    }
-    if (a == _P_) {
-        return "_P_";
-    }
-    return "_C_";
+inline std::string ToString(const Orientation& o) {
+    switch(o){
+		case _M_: {return "M"; break;}
+		case _P_: {return "P"; break;}
+		case _C_: {return "C"; break;}
+	}
 }
 
 inline std::string GetWorkingPath()

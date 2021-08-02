@@ -4,6 +4,7 @@
 #include "stddef.h"
 #include <assert.h>
 #include <math.h>
+#include <string>
 #ifdef OPENMP
 #include <omp.h>
 #endif
@@ -97,19 +98,15 @@ enum Orientation {
 inline Orientation ToOrientation(const St& i) {
 	ASSERT(i >= 0 && i < 3);
 	switch (i) {
-	case 0:
-		return _M_;
-	case 1:
-		return _P_;
-	case 2:
-		return _C_;
+	case 0: {return _M_;}
+	case 1: {return _P_;}
+	case 2: {return _C_;}
 	default:
 		ASSERT_MSG(false, "Error input Orientation");
 	}
 	SHOULD_NOT_REACH;
 	return _M_;
 }
-
 
 enum Plane {
 	_XY_ = 24,
