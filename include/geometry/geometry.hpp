@@ -3,6 +3,7 @@
 
 #include <array>
 #include "geometry_define.hpp"
+#include "predicate.hpp"
 
 #include "objects/analytic/line.hpp"
 

@@ -191,17 +191,25 @@ public:
     }
 
     spActor lines(const Line& l,
-                         Vt xmin = 0.0,
-                         Vt xmax = 1.0, int color_idx = -1){
+                        Vt xmin = 0.0,
+                        Vt xmax = 1.0, int color_idx = -1){
         ASSERT(Dim == 2);
         int color = color_idx > 0? color_idx : 0;
         int n     = 10;   // number of segment
         Vt dx     = (xmax - xmin) / n;
         std::list<Point> listp;
-        for(int i = 0; i < n + 1; i++){
-            Vt x = xmin + i * dx;
-            Vt y = l.cal_y(x);
-            listp.push_back(Point(x, y));
+        if(std::abs(l.slope())<1){
+            for(int i = 0; i < n + 1; i++){
+                Vt x = xmin + i * dx;
+                Vt y = l.cal_y(x);
+                listp.push_back(Point(x, y));
+            }
+        }else{
+            for(int i = 0; i < n + 1; i++){
+                Vt y = xmin + i * dx;
+                Vt x = l.cal_x(y);
+                listp.push_back(Point(x, y));
+            }
         }
         spActor actor = spActor(new Gnuplot_actor());
         actor->command() = "using 1:2:3 title \"\" ";

@@ -536,20 +536,16 @@ public:
 	        const POINTS&      container,
 	        const std::string& append = ""){
 	    ASSERT(tag > 0);
-		std::ostringstream cmdstr;
-		cmdstr << "set object " << tag << " polygon from \\\n" ;
-		for(auto iter = container.begin(); iter != container.end(); iter++){
-		    auto p = *(iter);
-		    auto iternext = std::next(iter, 1);
-		    if (iternext != container.end()){
-		        cmdstr << p[0] << "," << p[1] << " to \\\n";
-		    }else{
-		        cmdstr << p[0] << "," << p[1] << " \\\n";
-		    }
-		}
-		cmdstr << append;
-		cmd(cmdstr.str());
-		return *this;
+        std::ostringstream cmdstr;
+        cmdstr << "set object " << tag << " polygon from \\\n";
+        for (auto& p : container) {
+            cmdstr << p[0] << "," << p[1] << " to \\\n";
+        }
+        auto first = container.front();
+        cmdstr << first[0] << "," << first[1] << "\\\n";
+        cmdstr << append;
+        cmd(cmdstr.str());
+        return *this;
 	}
 
 	template<class POINTS>

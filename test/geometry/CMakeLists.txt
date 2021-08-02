@@ -12,6 +12,7 @@ set(Sources
     # test_ts.cpp
     # test_tri_tri.cpp
     test_seg_tri.cpp
+    # test_predicate.cpp
 )
 
 add_executable(${This} ${Sources})

@@ -94,10 +94,12 @@ public:
     const_ref_Point pc() const {
         return this->at(2);
     }
-    Point pcenter() const {
-        ASSERT(false);
-        return Point((pbx() + pax()) * 0.5, (pby() + pay()) * 0.5,
-                (Dim == 3) ? ((pbz() + paz()) * 0.5) : 0);
+    Point center() const {
+        Point res;
+        for (int i = 0; i <Dim; ++i){
+            res[i] = ((*this)[0][i] + (*this)[1][i] + (*this)[2][i]) / 3.0;
+        }
+        return res;
     }
 
     const_ref_vt p(const St& idx, const Axes& a) const {
@@ -218,18 +220,17 @@ public:
 //	}
 
     void scale(vt xfactor, vt yfactor, vt zfactor = 1) {
-        this->pa().x() = pax() * xfactor;
-        this->pa().y() = pay() * yfactor;
-        if (Dim == 3) {
-            paz() = paz() * zfactor;
-        }
-        pbx() = pbx() * xfactor;
-        pby() = pby() * yfactor;
-        if (Dim == 3) {
-            pbz() = pbz() * zfactor;
-        }
-        if (pb() == pa()) {
-            _set_empty();
+        auto pc = this->center();
+        this->scale(pc, xfactor, yfactor, zfactor); 
+    }
+
+    void scale(const Point& pabout, 
+                     vt xfactor, vt yfactor, vt zfactor = 1){
+        std::vector<vt> fvec = {{xfactor, yfactor, zfactor}};
+        for(auto& p : (*this)){
+            for(int i=0; i < Dim; ++i){
+                p[i] = fvec[i] * (p[i] - pabout[i]) + pabout[i];
+            }
         }
     }
     void transfer(vt dx, vt dy, vt dz = 0.0) {

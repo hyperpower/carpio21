@@ -107,7 +107,7 @@ IntersectLinePositiveBox(const NUM& xmin,const NUM& ymin,                 // Poi
     auto ori = *(res.front());
     auto fun = [&ori](const std::shared_ptr<Point_<NUM, 2> >& sp1,
                       const std::shared_ptr<Point_<NUM, 2> >& sp2){
-         auto  rv  = Cross(*sp2, *sp1, ori);
+         auto  rv  = Orient(*sp2, *sp1, ori);
          return rv > 0 ? true : false;
     };
     res.sort(fun);
@@ -137,7 +137,7 @@ IntersectLineNegativeBox(const NUM& xmin,const NUM& ymin,                 // Poi
     auto ori = *(res.front());
     auto fun = [&ori](const std::shared_ptr<Point_<NUM, 2> >& sp1,
                       const std::shared_ptr<Point_<NUM, 2> >& sp2){
-         auto  rv  = Cross(*sp2, *sp1, ori);
+         auto  rv  = Orient(*sp2, *sp1, ori);
          return rv > 0 ? true : false;
     };
     res.sort(fun);

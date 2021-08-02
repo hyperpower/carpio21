@@ -5,6 +5,7 @@
 #include "point.hpp"
 //#include "box.hpp"
 #include <array>
+#include <vector>
 #include <type_traits>
 #include <typeinfo>
 #include "math.h"
@@ -177,18 +178,30 @@ public:
 		Point max = Max(ps(), pe());
 		return Box(min, max);
 	}
+	Point mid() const {
+        Point res;
+        for (int i = 0; i <Dim; ++i){
+            res[i] = ((*this)[0][i] + (*this)[1][i]) * 0.5;
+        }
+        return res;
+    }
+
+	void scale(const Point& pc, Vt xfactor, Vt yfactor, Vt zfactor = 1) {
+        std::vector<Vt> fvec = {{xfactor, yfactor, zfactor}};
+        for(auto& p : (*this)){
+            for(int i=0; i<Dim; ++i){
+                p[i] = fvec[i] * (p[i] - pc[i]) + pc[i];
+            }
+        }
+    }
 
 	void scale(Vt xfactor, Vt yfactor, Vt zfactor = 1) {
-		this->ps().x() = psx() * xfactor;
-		this->ps().y() = psy() * yfactor;
-		if (Dim == 3) {
-			psz() = psz() * zfactor;
-		}
-		pex() = pex() * xfactor;
-		pey() = pey() * yfactor;
-		if (Dim == 3) {
-			pez() = pez() * zfactor;
-		}
+		std::vector<Vt> fvec = {{xfactor, yfactor, zfactor}};
+        for(auto& p : (*this)){
+            for(int i=0; i<Dim; ++i){
+                p[i] = fvec[i] * p[i];
+            }
+        }
 		if (pe() == ps()) {
 			_set_empty();
 		}
@@ -449,7 +462,7 @@ PointToSegmentPosition OnWhichSide7(
 		return _PS_ON_END_;
 	}
 	// 2 calculate cross
-	double tmp = Cross(ps, pe, p);
+	double tmp = Orient(ps, pe, p);
 	if (tmp > 0) {
 		return _PS_LEFT_;
 	} else if (tmp < 0) {

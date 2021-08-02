@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory> 
 #include <string>
+#include <algorithm>
 #include "geometry/geometry.hpp"
 
 using namespace carpio;
@@ -18,7 +19,7 @@ std::string a_case(const Point& p1, const Point& p2, const Point& p3){
 	// Plot
 	Gnuplot gnu;
 	gnu.set_terminal_png(
-			"./fig/" + str_res + ".png" //const std::string& filename,
+			"./fig/" + str_res //const std::string& filename,
 			//           double  x         = 800,
 			//           double  y         = 600,
 			//const std::string& font      = "Helvetica",
@@ -27,6 +28,7 @@ std::string a_case(const Point& p1, const Point& p2, const Point& p3){
 	gnu.set_xrange(-0.5, 1.5);
 	gnu.set_yrange(-0.5, 1.5);
 
+	std::replace( str_res.begin(), str_res.end(), '_', ' ');
 	gnu.set_label(1, str_res, 0.0, 1.0);
 
 	auto a1 = GA::LinesPoints(seg, 3);

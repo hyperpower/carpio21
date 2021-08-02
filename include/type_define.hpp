@@ -34,6 +34,7 @@
 
 #define _PI_ (3.1415926)
 
+
 namespace carpio {
 // value type
 typedef unsigned int  St;    //size type
@@ -154,6 +155,14 @@ enum Trinary {
 	_ZERO_     = 0,  //
 	_NEGATIVE_ = -1, //
 };
+
+std::string ToString(const Trinary& t){
+	switch(t){
+		case _POSITIVE_: {return "POSITIVE";break;}
+		case _ZERO_:     {return "ZERO";    break;}
+		case _NEGATIVE_: {return "NEGATIVE";break;}
+	}
+}
 
 template <class TYPE>
 inline int Heaviside(const TYPE& v){
