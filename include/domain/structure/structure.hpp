@@ -10,6 +10,7 @@
 
 #include "ghost/sghost.hpp"
 #include "ghost/regular.hpp"
+#include "ghost/regular_subdivision.hpp"
 
 #include "order/sorder.hpp"
 #include "order/xyz.hpp"
