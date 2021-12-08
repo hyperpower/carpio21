@@ -39,6 +39,7 @@ public:
         _spgrid(spg), _spghost(spgh){
         // Initall a default order_xyz
         _sporder = spOrder(new Order(spg, spgh));
+        // make data by order
         _arr.reconstruct(_sporder->size());
     }
     SField_(spGrid spg, spGhost spgh, spOrder spo):
