@@ -10,18 +10,17 @@ namespace carpio{
 
 template<class FIELD, class BDYIDX>
 FIELD Laplacian(const FIELD& field, const BDYIDX bi, const std::string& method){
-    LaplacianImplement_<FIELD::Dim,
+    LaplacianImplement_<FIELD,   FIELD::Dim,
                         typename FIELD::ValueType,
                         typename FIELD::Grid, 
                         typename FIELD::Ghost,
                         typename FIELD::Order,
                         typename FIELD::TraitType
                         > imp;
+    std::cout << "Laplacian----<" << std::endl;
     imp.set_method(method);
     imp.set_boundary_index(bi);
-
-    std::cout << "Laplacian----<" << std::endl;
-    return field;
+    return imp.execute(field);
 }
 template<class FIELD, class BDYIDX>
 FIELD Laplacian(const FIELD& field, const BDYIDX bi){

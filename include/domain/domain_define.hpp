@@ -76,7 +76,7 @@ public:
 // - OCTUREE
 // - TRIANGLE
 // - POLY
-template<St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
+template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
 class LaplacianImplement_{
 public:
     LaplacianImplement_(){
@@ -91,6 +91,10 @@ public:
 
     int set_method(const std::string& method){
         return 0;
+    }
+
+    int execute(const FIELD&){
+        std::cout<< "Template Class Do Nothing" << std::endl;
     }
 
     // void set(const int& other){std::cout << "int" << std::endl;}

@@ -5,7 +5,7 @@
 
 namespace carpio{
 
-template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER>
 class SOperatorCommon_{
 public:
     SOperatorCommon_(){
