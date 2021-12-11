@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(segments_intersection)
+project(segment_vs_box)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 

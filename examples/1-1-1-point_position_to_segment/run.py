@@ -14,9 +14,6 @@ PATH_PYTOOLS  = os.path.abspath(os.path.join(__file__, "../../pytools"))
 
 sys.path.append(PATH_PYTOOLS)
 import runtool as RT
-from runtool import Path
-
-# import reporttool as REPORT
 
 def build(path):
     runtime = []
@@ -45,17 +42,12 @@ def build(path):
     # os.system("python3 plot.py")
     return runtime
 
-def main():
-    path = Path(__file__)
-    RT.clean(path.this, FILE_ORIGINAL)
-    rt = build(path)
-
-    # print(rt)
 
 if __name__ == '__main__':
     runer = RT.Runer(__file__, FILE_ORIGINAL)
-    runer.clean()
-    # runer.mkdir()
-    # runer.cmake()
-    # runer.build()
+    # runer.clean()
+    runer.mkdir()
+    runer.cmake()
+    runer.build()
+    runer.execute()
     

@@ -36,8 +36,6 @@ TEST(order, initial){
 	typename Grid::Index idx1(1,1);
 	std::cout << idx1 << " order = " << sporder->get_order(idx1) << std::endl;
 	ASSERT_EQ(sporder->get_order(idx1), 11);
-	
-	
-
-
 }
+
+

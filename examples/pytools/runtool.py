@@ -32,19 +32,22 @@ def clean(path, original_files):
             dfs.append(f)
     for df in dfs:
         print("Remove file -> ", df)
-        os.remove(df)
+        os.remove(os.path.join(path,df))
 
     dirs = [f for f in os.listdir(path) if os.path.isdir(os.path.join(path, f))]
     for d in dirs:
         print("Remove dir -> ", d)
-        shutil.rmtree(d)
+        shutil.rmtree(os.path.join(path, d))
 
 
 class Path:
     def __init__(self, run_file):
-        self._pfile    = run_file;
+        self._pfile    = run_file
+        # example case dir
         self._pthis    = os.path.abspath(os.path.join(run_file,   "../"))
+        # example dir
         self._pcases   = os.path.abspath(os.path.join(run_file,   "../.."))
+        # carpio dir
         self._pproject = os.path.abspath(os.path.join(self._pcases, "../"))
         self._pdata    = os.path.abspath(os.path.join(self._pthis,  "data"))
         self._pfig     = os.path.abspath(os.path.join(self._pthis,  "fig"))
@@ -97,19 +100,24 @@ class Runer:
 
     def mkdir(self):
         # creat the last level of folder
-        os.mkdir(self._path.fig)
-        os.mkdir(self._path.data)
+        if not os.path.isdir(self._path.fig):
+            os.mkdir(self._path.fig)
+        if not os.path.isdir(self._path.data):
+            os.mkdir(self._path.data)
 
     def clean(self):
         clean(self._path.this, self._orifiles)
 
     def cmake(self):
-        os.system("cmake .")
+        os.system("cmake -S " + self._path.this + " -B" + self._path.this + "/build")
 
     def build(self):
         project_name = self._info["name"]
-        os.system("msbuild "+ project_name + ".sln")
+        os.system("MSBuild "+ os.path.join(self._path.this, "build/" + project_name + ".sln"))
 
-    def run(self):
-        
+    def execute(self):
+        current = os.getcwd()
+        os.chdir(self._path.this)
+        os.system(self._path.this + "/build/Debug/main.exe")
+        os.chdir(current)
         pass
