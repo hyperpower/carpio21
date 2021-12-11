@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.22)
 
 # Testing
 ################################
@@ -35,6 +35,6 @@ cmake_minimum_required(VERSION 2.8)
   # add_subdirectory(utility)
   # add_subdirectory(substance)
   # add_subdirectory(geometry)
-  # add_subdirectory(structure)
+  add_subdirectory(structure)
   # add_subdirectory(equation)
-  add_subdirectory(domain)
+  # add_subdirectory(domain)

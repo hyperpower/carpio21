@@ -11,7 +11,7 @@ const int fig_width  = 900;
 const int fig_height = 900;
 
 
-TEST(structure, initial){
+TEST(sgrid, initial){
 	typedef std::shared_ptr<SGrid_<2> > spGrid;
 	typedef SGridUniform_<2> GridUniform;
 	typedef std::shared_ptr<GridUniform> spGridUniform;
@@ -31,7 +31,7 @@ TEST(structure, initial){
 
 }
 
-TEST(structure, initial1){
+TEST(sgrid, initial1){
 	typedef std::shared_ptr<SGrid_<1> > spGrid;
 	typedef SGridUniform_<1> GridUniform;
 	typedef std::shared_ptr<GridUniform> spGridUniform;

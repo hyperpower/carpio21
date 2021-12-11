@@ -75,7 +75,9 @@ public:
     const ValueType& operator()(const Index& index) const {
         return _arr[sporder->get_order(index)];
     }
-
+    // ===========================================
+    // arithmatic operator
+    // ===========================================
     Self operator-() const{
         Self res(*this);
         res._arr = -res._arr;
