@@ -63,8 +63,19 @@ public:
     typedef VT    ValueType;
     typedef typename Grid::Index Index;
     typedef BaseType TraitType;
+
+    typedef std::shared_ptr<Grid>  spGrid;
+    typedef std::shared_ptr<Ghost> spGhost;
+    typedef std::shared_ptr<Order> spOrder;
+protected:
+    spGrid  _spgrid;
+    spGhost _spghost;
+    spOrder _sporder;
 public:
     FieldBase_(){};
+    FieldBase_(spGrid spg,spGhost spgh):_spgrid(spg), _spghost(spgh){};
+    FieldBase_(spGrid spg,spGhost spgh, spOrder spo):
+        _spgrid(spg), _spghost(spgh), _sporder(spo){};
 
     virtual ~FieldBase_(){};
 
@@ -75,10 +86,9 @@ public:
     virtual const ValueType& operator()(const Index&) const = 0;
     virtual       ValueType& operator()(const Index&)       = 0;
 
-    virtual Grid&  grid() = 0;
-    // virtual Ghost& ghost(){};
-    // virtual Order& order(){};
-
+    virtual Grid&  grid(){return *_spgrid;};
+    virtual Ghost& ghost(){return *_spghost;};
+    virtual Order& order(){return *_sporder;};
 };
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>

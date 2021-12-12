@@ -21,6 +21,7 @@ public:
     typedef ORDER Order;
     typedef VT    ValueType;
     typedef StructureType TraitType;
+    typedef FieldBase_<DIM, VT, GRID, GHOST, ORDER> Base;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
 
@@ -30,21 +31,18 @@ public:
 
     typedef ArrayListV_<ValueType> Arr; 
 protected:
-    spGrid  _spgrid;
-    spGhost _spghost;
-    spOrder _sporder;
     // for saving data
     Arr _arr;
 public:
     SField_(spGrid spg, spGhost spgh):
         _spgrid(spg), _spghost(spgh){
         // Initall a default order_xyz
-        _sporder = spOrder(new Order(spg, spgh));
+        this->_sporder = spOrder(new Order(spg, spgh));
         // make data by order
         _arr.reconstruct(_sporder->size());
     }
-    SField_(spGrid spg, spGhost spgh, spOrder spo):
-        _spgrid(spg), _spghost(spgh), _sporder(spo), _arr(spo->size()){
+    SField_(spGrid spg, spGhost spgh, spOrder spo):Base(spg, spgh, spo),
+        _arr(spo->size()){
     }
     SField_(const Self& other):
         _spgrid(other._spgrid), 
@@ -62,11 +60,11 @@ public:
     }
 
     ValueType&      operator()(St i, St j = 0, St k = 0){
-        return _arr[sporder->get_order(i,j,k)];
+        return _arr[_sporder->get_order(i,j,k)];
     }
 
     const ValueType& operator()(St i, St j = 0, St k = 0) const{
-        return _arr[sporder->get_order(i,j,k)];
+        return _arr[_sporder->get_order(i,j,k)];
     }
 
     ValueType& operator()(const Index& index) {
@@ -153,9 +151,6 @@ public:
 
     virtual ~SField_(){}
 
-    virtual Grid&  grid(){return *_spgrid;};
-    virtual Ghost& ghost(){return *_spghost;};
-    virtual Order& order(){return *_sporder;};
 
 };
 
@@ -310,6 +305,54 @@ SField_<DIM, VT, GRID, GHOST, ORDER> Sqrt(const SField_<DIM, VT, GRID, GHOST, OR
     return res;
 }
 
+template<St DIM, 
+         class VT,
+         class GRID,  
+         class ORDER>
+class SField_<DIM, VT, GRID, SGhostRegular_<DIM, GRID>, ORDER>: public FieldBase_<DIM, VT, GRID, SGhostRegular_<DIM, GRID>, ORDER>{
+public:
+    static const St Dim = DIM;
+
+    typedef GRID  Grid;
+    typedef SGhostRegular_<DIM, GRID> Ghost;
+    typedef ORDER Order;
+    typedef VT    ValueType;
+    typedef StructureType TraitType;
+    typedef SField_<Dim, VT, GRID, Ghost, ORDER> Self;
+    typedef typename Grid::Index Index;
+
+    typedef std::shared_ptr<Grid>  spGrid;
+    typedef std::shared_ptr<Ghost> spGhost;
+    typedef std::shared_ptr<Order> spOrder;
+
+    typedef ArrayListV_<ValueType> Arr; 
+protected:
+    spGrid  _spgrid;
+    spGhost _spghost;
+    spOrder _sporder;
+    // for saving data
+    Arr _arr;
+public:
+    SField_(spGrid spg, spGhost spgh):
+        _spgrid(spg), _spghost(spgh){
+        std::cout <<"Regular__" << std::endl;
+        // Initall a default order_xyz
+        _sporder = spOrder(new Order(spg, spgh));
+        // make data by order
+        _arr.reconstruct(_sporder->size());
+    }
+    SField_(spGrid spg, spGhost spgh, spOrder spo):
+        _spgrid(spg), _spghost(spgh), _sporder(spo), _arr(spo->size()){
+        std::cout <<"Regular__" << std::endl;
+    }
+    ValueType& operator()(const Index& index) {
+        return _arr[_sporder->get_order(index)];
+    }
+
+    const ValueType& operator()(const Index& index) const {
+        return _arr[_sporder->get_order(index)];
+    }
+};
 }
 
 #endif
