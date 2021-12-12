@@ -3,6 +3,7 @@
 
 #include "domain/domain_define.hpp"
 #include "algebra/algebra.hpp"
+#include "domain/structure/structure_define.hpp"
 
 namespace carpio{
 
@@ -73,7 +74,7 @@ public:
     }
 
     const ValueType& operator()(const Index& index) const {
-        return _arr[sporder->get_order(index)];
+        return _arr[_sporder->get_order(index)];
     }
     // ===========================================
     // arithmatic operator

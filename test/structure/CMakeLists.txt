@@ -5,9 +5,9 @@ set(This Structure)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 set(Sources
-    test_sgrid.cpp
+    # test_sgrid.cpp
     # test_sorder.cpp
-    # test_sfield.cpp
+    test_sfield.cpp
 )
 
 add_executable(${This} ${Sources})

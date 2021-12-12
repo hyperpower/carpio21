@@ -6,6 +6,17 @@
 
 namespace carpio{
 
+// cell type
+enum CellType{
+    _Inner_ = 1,
+    _BoundaryIn_  = 2,
+    _BoundaryOut_ = 3,
+    _Ghost_       = 4,
+    _Virtual_     = 5,
+    _Cut_         = 6,
+    _Leaf_        = 7,
+};
+
 
 template<St DIM>
 class GridBase_{
@@ -37,7 +48,11 @@ public:
 
 struct BaseType;
 
-template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+template<St DIM, 
+         class VT, 
+         class GRID, 
+         class GHOST, 
+         class ORDER>
 class FieldBase_ {
 public:
     static const St Dim = DIM;
@@ -46,15 +61,23 @@ public:
     typedef GHOST Ghost;
     typedef ORDER Order;
     typedef VT    ValueType;
+    typedef typename Grid::Index Index;
     typedef BaseType TraitType;
 public:
-    FieldBase_(){}
+    FieldBase_(){};
 
-    virtual ~FieldBase_(){}
+    virtual ~FieldBase_(){};
 
-    // virtual Grid&  grid(){return Grid();};
-    // virtual Ghost& ghost(){return Ghost();};
-    // virtual Order& order(){return Order();};
+    virtual St dim(){
+        return DIM;
+    };
+
+    virtual const ValueType& operator()(const Index&) const = 0;
+    virtual       ValueType& operator()(const Index&)       = 0;
+
+    virtual Grid&  grid() = 0;
+    // virtual Ghost& ghost(){};
+    // virtual Order& order(){};
 
 };
 

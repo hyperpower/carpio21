@@ -42,13 +42,13 @@ public:
     virtual inline Vt s_(St, Index) const{return 0;};
 
     // half size
-    virtual inline Vt hs_(St dim, Idx i) const {return 0;};
-    virtual inline Vt hs_(St dim, Index idx) const {return 0;};
+    virtual inline Vt hs_(St, Idx) const {return 0;};
+    virtual inline Vt hs_(St, Index) const {return 0;};
     // volume ==================================
-    virtual inline Vt volume(Index idx) const {return 0;};
+    virtual inline Vt volume(Index) const {return 0;};
     // center ==================================
     virtual Poi c (Idx i, Idx j = 0, Idx k = 0)     const {return Poi();}
-    virtual Poi c (const Index& index)              const {return Poi();}
+    virtual Poi c (const Index&)              const {return Poi();}
     virtual Vt  c_(const St& dim, const Idx& idx)   const {return 0;}
     virtual Vt  c_(const St& dim, const Index& idx) const {return 0;}
 
