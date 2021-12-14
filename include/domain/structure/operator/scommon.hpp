@@ -1,6 +1,7 @@
 #ifndef _SCOMMON_HPP
 #define _SCOMMON_HPP
 
+#include "domain/base/base_operator.hpp"
 #include "domain/structure/structure_define.hpp"
 
 namespace carpio{
