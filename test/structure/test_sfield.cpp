@@ -32,13 +32,13 @@ TEST(field, initial){
 
     Field a(spgrid, spghost, sporder);
 
-	// typename Grid::Index idx(1,2);
-	// std::cout << "Access value " << idx << "  = " << a(idx) << std::endl; 
+	typename Grid::Index idx(1,2);
+	std::cout << "Access value " << idx << "  = " << a(idx) << std::endl; 
 
-	// a += 1;
-	// std::cout << "a += 1 Access value " << idx << "  = " << a(idx) << std::endl; 
+	a += 1;
+	std::cout << "a += 1 Access value " << idx << "  = " << a(idx) << std::endl; 
 	
-	// a = -a + 3 + a;
-	// std::cout << "a = -a + 3 + a Access value " << idx << "  = " << a(idx) << std::endl; 
+	a = -a + 3 + a;
+	std::cout << "a = -a + 3 + a Access value " << idx << "  = " << a(idx) << std::endl; 
 
 }

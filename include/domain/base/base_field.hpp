@@ -51,6 +51,7 @@ public:
     typedef VT    ValueType;
     typedef typename Grid::Index Index;
     typedef BaseType TraitType;
+    typedef FieldBase_<Dim, VT, Grid, Ghost, Order> Self;
 
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
@@ -77,6 +78,13 @@ public:
     virtual Grid&  grid(){return *_spgrid;};
     virtual Ghost& ghost(){return *_spghost;};
     virtual Order& order(){return *_sporder;};
+
+    //----------------------------------------------------------------
+    bool is_compatible(const Self& other) const{
+        return (  this->_spgrid  == other._spgrid
+                &&this->_spghost == other._spghost
+                &&this->_sporder == other._sporder);
+    }
 };
 }
 
