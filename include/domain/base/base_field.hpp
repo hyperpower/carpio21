@@ -52,6 +52,8 @@ public:
     typedef typename Grid::Index Index;
     typedef BaseType TraitType;
 
+    typedef FieldBase_<Dim, ValueType, Grid, Ghost, Order> Self;
+
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
     typedef std::shared_ptr<Order> spOrder;
@@ -74,9 +76,22 @@ public:
     virtual const ValueType& operator()(const Index&) const = 0;
     virtual       ValueType& operator()(const Index&)       = 0;
 
-    virtual Grid&  grid(){return *_spgrid;};
+    virtual Grid&  grid() {return *_spgrid;};
     virtual Ghost& ghost(){return *_spghost;};
     virtual Order& order(){return *_sporder;};
+
+protected:
+    void _copy(const Self& other){
+        this->_spgrid  = other._spgrid;
+        this->_spghost = other._spghost;
+        this->_sporder = other._sporder; 
+    }
+
+    bool _is_equal(const Self& other) const{
+        return (this->_spgrid  == other._spgrid) &&
+               (this->_spghost == other._spghost) &&
+               (this->_sporder == other._sporder);
+    }
 };
 }
 
