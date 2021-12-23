@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include "domain/domain_define.hpp"
+#include "base/base_operator.hpp"
 #include "structure/structure.hpp"
+
 
 namespace carpio{
 
@@ -26,6 +28,14 @@ template<class FIELD, class BDYIDX>
 FIELD Laplacian(const FIELD& field, const BDYIDX bi){
     std::cout << "Laplacian" << std::endl;
     return field;
+}
+
+
+// Interpolate
+template<class FIELD, class BDYIDX>
+typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){
+    std::cout << "Interpolate" << std::endl;
+    return 0;
 }
 
 }

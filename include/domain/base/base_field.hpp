@@ -51,6 +51,7 @@ public:
     typedef VT    ValueType;
     typedef typename Grid::Index Index;
     typedef BaseType TraitType;
+    typedef FieldBase_<Dim, VT, Grid, Ghost, Order> Self;
 
     typedef FieldBase_<Dim, ValueType, Grid, Ghost, Order> Self;
 
@@ -86,8 +87,8 @@ protected:
         this->_spghost = other._spghost;
         this->_sporder = other._sporder; 
     }
-
-    bool _is_equal(const Self& other) const{
+public:
+    bool is_compatible(const Self& other) const{
         return (this->_spgrid  == other._spgrid) &&
                (this->_spghost == other._spghost) &&
                (this->_sporder == other._sporder);

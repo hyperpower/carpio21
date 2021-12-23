@@ -20,7 +20,7 @@ TEST(field, initial){
 	typedef SOrderXYZ_<2, Grid, Ghost> Order;
 	typedef std::shared_ptr<Order> spOrder;
 
-    typedef SField_<2, double, Grid, Ghost, Order> Field;
+    typedef SFieldCenter_<2, double, Grid, Ghost, Order> Field;
 
 	Point_<Vt, 2> pmin(0, 0, 0);
 	Point_<Vt, 2> pmax(1, 1, 1);
@@ -32,13 +32,13 @@ TEST(field, initial){
 
     Field a(spgrid, spghost, sporder);
 
-	// typename Grid::Index idx(1,2);
-	// std::cout << "Access value " << idx << "  = " << a(idx) << std::endl; 
+	typename Grid::Index idx(1,2);
+	std::cout << "Access value    " << idx << "  = " << a(idx) << std::endl; 
 
-	// a += 1;
-	// std::cout << "a += 1 Access value " << idx << "  = " << a(idx) << std::endl; 
+	a += 1;
+	std::cout << "a += 1 Access value " << idx << "  = " << a(idx) << std::endl; 
 	
-	// a = -a + 3 + a;
-	// std::cout << "a = -a + 3 + a Access value " << idx << "  = " << a(idx) << std::endl; 
+	a = -a;
+	std::cout << "a = -a Access value " << idx << "  = " << a(idx) << std::endl; 
 
 }

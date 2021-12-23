@@ -22,9 +22,7 @@ public:
     template<class ANY>
     void set(const ANY& other){}
 
-    void Loop(Field& f){
-        
-    }
+    void Loop(Field& f){}
 
 
 };

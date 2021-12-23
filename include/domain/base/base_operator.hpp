@@ -31,6 +31,8 @@ public:
     int execute(const FIELD&){
         std::cout<< "Template Class Do Nothing" << std::endl;
     }
+    template<class BDYIDX>
+    int execute(const FIELD&, const BDYIDX&){};
 
     // void set(const int& other){std::cout << "int" << std::endl;}
         
