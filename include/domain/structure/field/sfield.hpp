@@ -44,16 +44,26 @@ public:
     SField_(spGrid spg, spGhost spgh, spOrder spo):Base(spg, spgh, spo),
         _arr(spo->size()){
     }
-    SField_(const Self& other): Base(other) ,_arr(other._arr){
-    }
+    SField_(const Self& other): Base(other) , _arr(other._arr){}
+    SField_(Self&& other): 
+        Base(std::move(other)), _arr(std::move(other._arr)){
+        }
 
     Self& operator=(const Self& other) {
-         if (this == &other) {
+        if (this == &other) {
             return *this;
         }
         ASSERT(this->is_compatible(other));
         this->_arr = other._arr;
-        
+        return *this;
+    }
+
+    Self& operator=(Self&& other){
+        if (this == &other){
+            return *this;
+        }
+        ASSERT(this->is_compatible(other));
+        this->_arr = std::move(other._arr);
         return *this;
     }
 
@@ -71,6 +81,10 @@ public:
 
     const ValueType& operator()(const Index& index) const {
         return _arr[_sporder->get_order(index)];
+    }
+    
+    void assign(const Vt& v){
+        _arr.assign(v);
     }
     // ===========================================
     // arithmatic operator
@@ -219,7 +233,8 @@ inline SField_<DIM, VT, GRID, GHOST, ORDER> operator/(
           SField_<DIM, VT, GRID, GHOST, ORDER> lhs, 
     const SField_<DIM, VT, GRID, GHOST, ORDER>& rhs){
     lhs /= rhs;
-      return lhs;
+    return lhs;
+
 }
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>

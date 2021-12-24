@@ -67,6 +67,15 @@ public:
     FieldBase_(spGrid spg,spGhost spgh):_spgrid(spg), _spghost(spgh){};
     FieldBase_(spGrid spg,spGhost spgh, spOrder spo):
         _spgrid(spg), _spghost(spgh), _sporder(spo){};
+    FieldBase_(const Self& other):
+        _spgrid(other._spgrid), 
+        _spghost(other._spghost), 
+        _sporder(other._sporder){};
+    FieldBase_(Self&& other):
+        _spgrid(std::move(other._spgrid)), 
+        _spghost(std::move(other._spghost)), 
+        _sporder(std::move(other._sporder)){
+        };
 
     virtual ~FieldBase_(){};
 

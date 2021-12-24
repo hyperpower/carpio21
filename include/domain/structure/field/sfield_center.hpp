@@ -38,20 +38,32 @@ public:
     SFieldCenter_(spGrid spg, spGhost spgh, spOrder spo)
         :Base(spg, spgh, spo){
     }
-    SFieldCenter_(const Self& other): Base(other){
+    SFieldCenter_(const Self&  other): Base(other){
     }
-    SFieldCenter_(const Base& b) :Base(b) {}
-    SFieldCenter_(Base&& b) :Base(b) {}
+    SFieldCenter_(      Self&& other): Base(std::move(other)){
+    }
+    SFieldCenter_(const Base& b) :Base(b) {
+    }
+    SFieldCenter_(Base&& b) :Base(std::move(b)) {
+    }
 
     Self& operator=(const Self& other) {
-         if (this == &other) {
+        if (this == &other) {
             return *this;
         }
         ASSERT(this->is_compatible(other));
         this->_arr = other._arr;
-        
         return *this;
     }
+    Self& operator=(Self&& other) {
+        if (this == &other) {
+            return *this;
+        }
+        ASSERT(this->is_compatible(other));
+        this->_arr = std::move(other._arr);
+        return *this;
+    }
+
 
     // ===========================================
     // arithmatic operator
@@ -59,12 +71,69 @@ public:
     Self operator-() const{
         return Self(-Base(*this));
     }
+    Self& operator+=(const Self& rhs){
+        Base::operator+=(Base(rhs));
+        return *this;
+    }
+    Self& operator+=(const Vt& rhs){
+        Base::operator+=(rhs);
+        return *this;
+    }
+    Self& operator-=(const Self& rhs){
+        Base::operator-=(Base(rhs));
+        return *this;
+    }
+    Self& operator-=(const Vt& rhs){
+        Base::operator-=(rhs);
+        return *this;
+    }
+    Self& operator*=(const Self& rhs){
+        Base::operator*=(Base(rhs));
+        return *this;
+    }
+    Self& operator*=(const Vt& rhs){
+        Base::operator*=(rhs);
+        return *this;
+    }
+    Self& operator/=(const Self& rhs){
+        Base::operator/=(Base(rhs));
+        return *this;
+    }
+    Self& operator/=(const Vt& rhs){
+        Base::operator/=(rhs);
+        return *this;
+    }
 protected:
     void _initial_arr(){
         // make data by order
         _arr.reconstruct(_sporder->size());
     }
 };
+
+// template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+// inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+// operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+//           const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+//     lhs += rhs;
+//     return lhs;
+// }
+// template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+// inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> 
+// operator+(
+//     SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+//     const Vt& rhs){
+//     lhs += rhs;
+//     return lhs;
+// }
+
+// template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+// inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> 
+// operator+(
+//     const Vt& lhs, 
+//     SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> rhs){
+//     rhs += lhs;
+//     return rhs;
+// }
 
 }
 

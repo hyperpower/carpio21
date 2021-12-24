@@ -36,9 +36,29 @@ TEST(field, initial){
 	std::cout << "Access value    " << idx << "  = " << a(idx) << std::endl; 
 
 	a += 1;
-	std::cout << "a += 1 Access value " << idx << "  = " << a(idx) << std::endl; 
+	EXPECT_EQ (1.0, a(idx));
 	
-	a = -a;
-	std::cout << "a = -a Access value " << idx << "  = " << a(idx) << std::endl; 
+	a += a;
+	EXPECT_EQ (2.0, a(idx));
 
+	a -= 1;
+	EXPECT_EQ (1.0, a(idx));
+
+	a = a + a;
+	EXPECT_EQ (2.0, a(idx));
+	
+	a = a * a;
+	EXPECT_EQ (4.0, a(idx));
+
+	a = a / 2.0;
+	EXPECT_EQ (2.0, a(idx));
+
+	a = 20 / a;
+	EXPECT_EQ (10, a(idx));
+
+	Field b(spgrid, spghost, sporder);
+	b +=2;
+
+	Field c(a + b);
+	EXPECT_EQ (12.0, c(idx));
 }
