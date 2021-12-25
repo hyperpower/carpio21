@@ -34,20 +34,16 @@ protected:
     // for saving data
     Arr _arr;
 public:
-    SField_(spGrid spg, spGhost spgh):
-        _spgrid(spg), _spghost(spgh){
-        // Initall a default order_xyz
-        this->_sporder = spOrder(new Order(spg, spgh));
-        // make data by order
-        _arr.reconstruct(_sporder->size());
+    SField_(spGrid spg, spGhost spgh, spOrder spo):
+        Base(spg, spgh, spo){
     }
-    SField_(spGrid spg, spGhost spgh, spOrder spo):Base(spg, spgh, spo),
-        _arr(spo->size()){
-    }
-    SField_(const Self& other): Base(other) , _arr(other._arr){}
+    SField_(const Self& other): 
+        Base(other) , 
+        _arr(other._arr){}
+    
     SField_(Self&& other): 
-        Base(std::move(other)), _arr(std::move(other._arr)){
-        }
+        Base(std::move(other)), 
+        _arr(std::move(other._arr)){}
 
     Self& operator=(const Self& other) {
         if (this == &other) {
@@ -155,9 +151,7 @@ public:
 
     SField_():Base(){}
 
-    virtual ~SField_(){}
-
-
+    ~SField_(){}
 };
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>

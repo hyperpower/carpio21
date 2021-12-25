@@ -1,8 +1,10 @@
 #ifndef _S_BOUNDARY_CONDITION_FUNXYZ_HPP_
 #define _S_BOUNDARY_CONDITION_FUNXYZ_HPP_
 
-#include "domain/domian_define.hpp"
+#include "domain/domain_define.hpp"
 #include "boundary_condition.hpp"
+
+#include <functional>
 
 namespace carpio{
 

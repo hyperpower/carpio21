@@ -24,14 +24,19 @@
 namespace carpio{
 
 
-// template<St DIM>
-// class StructureDomain_{
-// public:
-//     static const St Dim = DIM;
+template<St DIM, 
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class StructureDomain_{
+public:
+    static const St Dim = DIM;
+    typedef GRID  Grid;
+    typedef GHOST Ghost;
+    typedef ORDER Order;
+    typedef SFieldCenter_<Dim, Vt, Grid, Ghost, Order> FieldCenter;
 
-//     typedef SIndex_<Dim> Index;
-
-// };
+};
 
 
 

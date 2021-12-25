@@ -37,6 +37,7 @@ public:
     }
     SFieldCenter_(spGrid spg, spGhost spgh, spOrder spo)
         :Base(spg, spgh, spo){
+        _initial_arr();
     }
     SFieldCenter_(const Self&  other): Base(other){
     }
@@ -105,9 +106,10 @@ public:
 protected:
     void _initial_arr(){
         // make data by order
-        _arr.reconstruct(_sporder->size());
+        this->_arr.reconstruct(_sporder->size());
     }
 };
+
 
 
 }

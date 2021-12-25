@@ -5,7 +5,6 @@
 #include <utility>
 #include <map>
 
-
 namespace carpio {
 
 template<class T>
@@ -209,7 +208,6 @@ operator+(const TERM& a,
 	return x;
 }
 
-
 template<class COE, class TERM,
 		 class IS_ZERO = IsZero_<COE>,
          class COMPARE_TERM = std::less<TERM> >
@@ -292,8 +290,6 @@ operator/(LinearPolynomial_<COE, TERM, IS_ZERO, COMPARE_TERM> x,
 	return x;
 }
 
-
-
 template<class COE, class TERM,
          class COMPARE_TERM = std::less<TERM> >
 std::ostream& operator<<(
@@ -307,8 +303,6 @@ std::ostream& operator<<(
 	stream << " <<--";
 	return stream;
 }
-
-
 
 }
 

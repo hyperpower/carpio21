@@ -1,7 +1,7 @@
 #ifndef _S_BOUNDARY_CONDITION_HPP_
 #define _S_BOUNDARY_CONDITION_HPP_
 
-#include "domain/domian_define.hpp"
+#include "domain/domain_define.hpp"
 
 namespace carpio{
 

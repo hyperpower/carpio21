@@ -5,6 +5,8 @@
 #include "domain/domain_define.hpp"
 #include "base/base_operator.hpp"
 #include "structure/structure.hpp"
+#include "domain/boundary/boundary_index.hpp"
+// #include "domain/boundary/boundary_condition.hpp"
 
 
 namespace carpio{
