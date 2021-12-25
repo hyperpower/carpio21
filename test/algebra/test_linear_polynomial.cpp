@@ -14,21 +14,24 @@ TEST(linear_polynomial, lp){
 	pb = poly;
 
 	pb += 3;
-	std::cout << "pb += 3\n";
-	std::cout << pb << std::endl;
+	EXPECT_EQ(1, pb["a"]);
+	EXPECT_EQ(5, pb["b"]);
+	EXPECT_EQ(3, pb.value());
 
 	pb -= 5;
-	std::cout << "pb -= 5\n";
-	std::cout << pb << std::endl;
+	EXPECT_EQ(1,  pb["a"]);
+	EXPECT_EQ(5,  pb["b"]);
+	EXPECT_EQ(-2, pb.value());
 
 	pb *= 2;
-	std::cout << "pb *= 2\n";
-	std::cout << pb << std::endl;
+	EXPECT_EQ(2,  pb["a"]);
+	EXPECT_EQ(10,  pb["b"]);
+	EXPECT_EQ(-4, pb.value());
 
-	pb /= 3;
-	std::cout << "pb /= 3\n";
-	std::cout << pb << std::endl;
-
+	pb /= 2;
+	EXPECT_EQ(1,  pb["a"]);
+	EXPECT_EQ(5,  pb["b"]);
+	EXPECT_EQ(-2, pb.value());
 }
 
 

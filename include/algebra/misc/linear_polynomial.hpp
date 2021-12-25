@@ -1,7 +1,7 @@
 #ifndef _LINEAR_POLYNOMIAL_H_
 #define _LINEAR_POLYNOMIAL_H_
 
-#include <type_define.hpp>
+#include "type_define.hpp"
 #include <utility>
 #include <map>
 
