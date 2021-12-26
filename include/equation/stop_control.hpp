@@ -9,19 +9,17 @@
 
 namespace carpio {
 
-template<St DIM, class D> class EventCondition_;
+template<class EQU> class EventCondition_;
 
-template<St DIM, class D>
+template<class EQU>
 class StopControl_ {
 public:
-    static const St Dim = DIM;
-
-    typedef StopControl_<Dim, D> Self;
-    typedef StopControl_<Dim, D>& ref_Self;
-    typedef StopControl_<Dim, D>* pSelf;
+    typedef StopControl_<EQU> Self;
+    typedef StopControl_<EQU>& ref_Self;
+    typedef StopControl_<EQU>* pSelf;
     typedef std::shared_ptr<Self> spStopManager;
 
-    typedef EventCondition_<Dim, D> EventCondition;
+    typedef EventCondition_<EQU> EventCondition;
     typedef std::shared_ptr<EventCondition> spEventCondition;
 
     typedef std::list<spEventCondition> Container;

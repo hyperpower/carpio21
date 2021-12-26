@@ -4,13 +4,14 @@
 #include "type_define.hpp"
 #include "utility/any.hpp"
 #include "time_control.hpp"
+#include "stop_control.hpp"
 #include "domain/boundary/boundary_index.hpp"
 #include <memory>
 #include <map>
 
 namespace carpio {
 
-template<St DIM, class D> class Event_;
+template<class EQU> class Event_;
 
 template<St DIM, class D>
 class EquationBase_{
@@ -26,17 +27,23 @@ public:
     typedef typename Domain::spOrder     spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
 
-    typedef Event_<DIM, D>       Event;
+    typedef EquationBase_<DIM, D> Self;
+
+    typedef Event_<Self>                   Event;
     typedef std::shared_ptr<Event>       spEvent;
     typedef std::shared_ptr<FieldCenter> spFieldCenter;
     typedef std::shared_ptr<BoundaryIndex> spBoundaryIndex;
 
-    typedef std::map<std::string, Any>           Configures;
-    typedef std::map<std::string, spFieldCenter> Fields;
+    typedef std::map<std::string, Any>             Configures;
+    typedef std::map<std::string, spFieldCenter>   Fields;
     typedef std::map<std::string, spBoundaryIndex> BIs;
+    typedef std::map<std::string, spEvent>         Events;
 
     typedef TimeControl_<DIM> TimeControl;
     typedef std::shared_ptr<TimeControl> spTimeControl;
+
+    typedef StopControl_<Self> StopControl;
+    typedef std::shared_ptr<StopControl> spStopControl;
 
 protected:
     spGrid  _spgrid; 
@@ -45,37 +52,32 @@ protected:
 
     Configures _config;
     Fields     _fields;
-    BIs        _bis; 
+    BIs        _bis;
+    Events     _events; 
 
     spTimeControl _time;
-
+    spStopControl _stop;
 public:
-    EquationBase_():{
-    } 
+    EquationBase_():{} 
 
-    EquationBase_(spGrid spgrid, spGhost spghost, spOrder sporder):
-        _spgrid(spgrid), _spghost(spghost), _sporder(sporder), _time(nullptr){
+    EquationBase_(spGrid  spgrid, 
+                  spGhost spghost,
+                  spOrder sporder):
+        _spgrid(spgrid), 
+        _spghost(spghost),
+        _sporder(sporder), 
+        _time(nullptr){
     }
 
-    virtual int run_one_step(St step) {
-        std::cout << step << "  Equation: run one step \n";
-        return -1;
-    }
+    virtual ~EquationBase_(){};
 
-    virtual int initialize() {
-        std::cout << "  Equation: initial \n";
-        return -1;
-    }
+    virtual int run_one_step(St step) = 0;
 
-    virtual int finalize() {
-        std::cout << "  Equation: finalize \n";
-        return -1;
-    }
+    virtual int initialize() = 0; 
 
-    virtual int solve() {
-        std::cout << "  Equation: solve \n";
-        return -1;
-    }
+    virtual int finalize() =0; 
+
+    virtual int solve() = 0;
 
     void run() {
         // the equation don't have time
@@ -95,7 +97,7 @@ public:
                     this->_time->current_step(),    //
                     Event::START);
             // loop
-            while (!this->_time->is_end() && (!_stop_manager.is_stop())) {
+            while (!this->_time->is_end() && (!_stop.is_stop())) {
                 //
                 // events before each step
                 run_events(this->_time->current_step(),  //
@@ -113,9 +115,9 @@ public:
                 //
                 this->_time->advance();
             }
-            if(this->has_event("_STOP_")){
-                this->_events["_STOP_"]->show();
-            }
+            // if(this->has_event("_STOP_")){
+            //     this->_events["_STOP_"]->show();
+            // }
             // events after calculation
             run_events(this->_time->current_step(),    //
                     this->_time->current_time(),       //
@@ -124,13 +126,16 @@ public:
         }
     }
 
-    void run_events(St step, Vt t, int fob) {
-        for (auto& event : this->_events) {
-            if (event.second->do_execute(step, t, fob)) {
-                event.second->execute(step, t, fob, this);
-            }
-        }
-    }
+    // void run_events(St step, Vt t, int fob) {
+    //     for (auto& event : this->_events) {
+    //         if (event.second->do_execute(step, t, fob)) {
+    //             event.second->execute(step, t, fob, this);
+    //         }
+    //     }
+    // }
+
+    virtual void run_events(St step, Vt t, int fob) = 0; 
+    
 
     virtual Ghost& ghost() {
         return *(this->_spghost);
@@ -146,6 +151,10 @@ public:
 
     virtual const Grid& grid() const{
         return *(this->_spgrid);
+    }
+
+    virtual const TimeControl& time_control() const{
+        return *(this->_time);
     }
 };
 
