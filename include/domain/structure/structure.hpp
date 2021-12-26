@@ -21,21 +21,28 @@
 
 #include "operator/slaplacian.hpp"
 
+#include <memory>
+
 namespace carpio{
 
 
-template<St DIM, 
+template<St    DIM, 
          class GRID, 
          class GHOST, 
          class ORDER>
 class StructureDomain_{
 public:
     static const St Dim = DIM;
+    typedef Vt    ValueType;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
-    typedef SFieldCenter_<Dim, Vt, Grid, Ghost, Order> FieldCenter;
+    typedef typename Grid::Index   Index;
+    typedef SFieldCenter_<Dim, ValueType, Grid, Ghost, Order> FieldCenter;
 
+    typedef std::shared_ptr<Grid>  spGrid;
+    typedef std::shared_ptr<Ghost> spGhost;
+    typedef std::shared_ptr<Order> spOrder;
 };
 
 

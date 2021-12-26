@@ -4,6 +4,8 @@
 #include "equation_define.hpp"
 #include "equation_base.hpp"
 
+#include "event/event.hpp"
+
 namespace carpio {
 
 

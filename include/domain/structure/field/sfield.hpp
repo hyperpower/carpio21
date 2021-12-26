@@ -63,21 +63,7 @@ public:
         return *this;
     }
 
-    ValueType&      operator()(St i, St j = 0, St k = 0){
-        return _arr[_sporder->get_order(i,j,k)];
-    }
-
-    const ValueType& operator()(St i, St j = 0, St k = 0) const{
-        return _arr[_sporder->get_order(i,j,k)];
-    }
-
-    ValueType& operator()(const Index& index) {
-        return _arr[_sporder->get_order(index)];
-    }
-
-    const ValueType& operator()(const Index& index) const {
-        return _arr[_sporder->get_order(index)];
-    }
+  
     
     void assign(const Vt& v){
         _arr.assign(v);
