@@ -8,16 +8,14 @@
 
 namespace carpio{
 
-template<St DIM, class D> class Equation_;
+// template<St DIM, class D> class Equation_;
 
-template<St DIM, class D>
+template<class EQU>
 class Event_ {
 public:
-    static const St Dim         = DIM;
-    static const St NumFaces    = DIM + DIM;
-    static const St NumVertexes = (DIM == 3) ? 8 : (DIM + DIM);
+    // static const St Dim         = DIM;
 
-    typedef Equation_<Dim, D> Equ;
+    typedef EQU   Equ;
     typedef Equ* pEqu;
     typedef const Equ* const_pEqu;
 
@@ -117,12 +115,11 @@ public:
     }
 };
 
-// deprecate
-template<St DIM, class D>
-class EventCondition_ : public Event_<DIM, D>{
+template<class EQU>
+class EventCondition_ : public Event_<EQU>{
 public:
-    typedef Event_<DIM, D> Event;
-    typedef Equation_<DIM, D> Equ;
+    typedef Event_<EQU> Event;
+    typedef EQU Equ;
     typedef Equ* pEqu;
     typedef const Equ* const_pEqu;
 protected:

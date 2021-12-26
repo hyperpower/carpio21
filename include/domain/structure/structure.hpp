@@ -43,6 +43,10 @@ public:
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
     typedef std::shared_ptr<Order> spOrder;
+
+    typedef StructureDomain_<DIM, Grid, Ghost, Order> Self;
+
+    StructureDomain_(){};
 };
 
 

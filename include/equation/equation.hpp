@@ -3,6 +3,7 @@
 
 #include "equation_define.hpp"
 #include "equation_base.hpp"
+#include "poisson/laplace.hpp"
 
 #include "event/event.hpp"
 
