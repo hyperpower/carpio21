@@ -2,7 +2,7 @@
 #define _SINTERPOLATE_HPP
 
 #include "scommon.hpp"
-
+#include "algebra/algebra.hpp"
 
 namespace carpio{
 

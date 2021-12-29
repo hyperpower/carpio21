@@ -28,6 +28,8 @@ public:
     typedef std::shared_ptr<Order> spOrder;
 
     typedef ArrayListV_<ValueType> Arr; 
+
+    typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
 public:
     SFieldCenter_(spGrid spg, spGhost spgh):
         _spgrid(spg), _spghost(spgh){
@@ -122,6 +124,9 @@ protected:
     void _initial_arr(){
         // make data by order
         this->_arr.reconstruct(_sporder->size());
+        for(auto& idx : (*(this->_sporder))){
+            this->operator()(idx) = _DataInit::InitOne(idx);
+        }
     }
 };
 

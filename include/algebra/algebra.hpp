@@ -13,6 +13,8 @@
 #include "matrix/matrix_small.hpp"
 
 #include "algebra/misc/sort.hpp"
+#include "algebra/misc/interpolate.hpp"
+#include "algebra/misc/linear_polynomial.hpp"
 #include "algebra/io/mmio.hpp"
 
 #include "algebra/solver/direct.hpp"
@@ -27,7 +29,6 @@
 #include "algebra/solver/bicgstab.hpp"
 
 
-#include "misc/interpolate.hpp"
 
 namespace carpio {
 

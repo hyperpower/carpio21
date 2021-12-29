@@ -28,8 +28,10 @@ public:
         return 0;
     }
 
-    int execute(const FIELD&){
+    FIELD execute(const FIELD& a){
         std::cout<< "Template Class Do Nothing" << std::endl;
+        FIELD res(a);
+        return res;
     }
     template<class BDYIDX>
     int execute(const FIELD&, const BDYIDX&){};

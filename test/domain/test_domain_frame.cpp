@@ -17,10 +17,12 @@ TEST(domain, initial){
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
     std::shared_ptr<Order> sporder(new Order(spgrid, spghost));
 
-    typedef SField_<dim, Vt, Grid, Ghost, Order> Field;
+    typedef LinearPolynomial_<Vt, typename Grid::Index> Poly;
 
-    Field f;
+    typedef SFieldCenter_<dim, Poly, Grid, Ghost, Order> Field;
 
-    Laplacian(f, 3, "method");
+    Field f(spgrid, spghost, sporder);
+
+    Laplacian(f);
 
 }

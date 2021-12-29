@@ -4,7 +4,10 @@
 #include "domain/base/base_operator.hpp"
 #include "domain/structure/structure_define.hpp"
 
+#include "algebra/misc/linear_polynomial.hpp"
+
 namespace carpio{
+
 
 template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER>
 class SOperatorCommon_{

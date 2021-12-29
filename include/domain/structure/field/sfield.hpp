@@ -292,6 +292,50 @@ SField_<DIM, VT, GRID, GHOST, ORDER> Sqrt(const SField_<DIM, VT, GRID, GHOST, OR
     return res;
 }
 
+template<St DIM, 
+         class VT,
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_{
+public:
+    static void InitOne(){
+        std::cout << "Abstract" << std::endl;
+    }
+};
+
+template<St DIM, 
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_<DIM, Vt, GRID, GHOST, ORDER>{
+public:
+    typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
+    typedef typename GRID::Index  Index;
+
+    static void InitOne(const Index& index){
+        std::cout << "Vt" << std::endl;
+    }
+};
+
+template<St DIM, 
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_<DIM, 
+                    LinearPolynomial_<Vt, typename GRID::Index>,
+                    GRID, GHOST, ORDER>{
+public:
+    typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
+    typedef typename GRID::Index  Index;
+    static Poly InitOne(const Index& index){
+        // std::cout << "LinearPolynomial" << std::endl;
+        return Poly(index);
+    }
+};
+
+
+
 // template<St DIM, 
 //          class VT,
 //          class GRID,  

@@ -31,7 +31,19 @@ FIELD Laplacian(const FIELD& field, const BDYIDX bi){
     std::cout << "Laplacian" << std::endl;
     return field;
 }
-
+template<class FIELD>
+FIELD Laplacian(const FIELD& field){
+    LaplacianImplement_<FIELD,   FIELD::Dim,
+                        typename FIELD::ValueType,
+                        typename FIELD::Grid, 
+                        typename FIELD::Ghost,
+                        typename FIELD::Order,
+                        typename FIELD::TraitType
+                        > imp;
+    std::cout << "Laplacian----<" << std::endl;
+    return imp.execute(field);
+    return field;
+}
 
 // Interpolate
 template<class FIELD, class BDYIDX>
