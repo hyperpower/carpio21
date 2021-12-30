@@ -31,6 +31,8 @@ public:
     int execute(FIELD& f, const BI& bi, const Vt& time = 0.0) const{
         for(auto& idx : f.order()){
             f(idx) = execute_local(f, idx, bi, time);
+            std::cout << idx << "--------" <<std::endl;
+            std::cout << f(idx) << std::endl;
         }
         return 0;
     }
@@ -43,16 +45,19 @@ public:
         for (auto& t : exp) {
 		    auto idxg = t.first;
 		    if(f.ghost().is_ghost(idxg)){
+                // std::cout << idxg << std::endl;
                 auto axe  = GetDeltaAxe(idx, idxg);
+                // std::cout << "axe = " << axe << std::endl;
                 auto ori  = GetDeltaOrient(idx, idxg);
+                // std::cout << "ori = " << ToString(ori) << std::endl;
                 auto bid  = f.ghost().boundary_id(idx, idxg, axe, ori);
                 auto spbc = bi.find(bid);
                 if(spbc->type() == BC::_BC1_){
-                    std::cout << "Bc1" << std::endl;
-        //             return _value_type1(f, *spbc, idx, idxg, axe, ori, time);
+                    // std::cout << "Bc1" << std::endl;
+                    return _value_type1(f, *spbc, idx, idxg, axe, ori, time);
                 }else if(spbc->type() == BC::_BC2_){
-                    std::cout << "Bc2" << std::endl;
-        //             return _value_type2(f, *spbc, idx, idxg, axe, ori, time);
+                    // std::cout << "Bc2" << std::endl;
+                    return _value_type2(f, *spbc, idx, idxg, axe, ori, time);
                 }
             }
         }
@@ -67,7 +72,7 @@ protected:
                         const Index&       idxg,
                         const St&          axe,
                         const St&          ori,
-                        const Vt&          time = 0.0){
+                        const Vt&          time = 0.0) const{
         auto oori = Opposite(Orientation(ori));  // opposite orientation
         auto idxb = idxg.shift(axe, oori);
         int step = 0;
@@ -93,27 +98,43 @@ protected:
         Exp expx(idxb);
         return expx + (vbc - expx) * (dx + dg) / dx;
     }
-    // ValueType _get(
-    //         const Field&         fc,
-    //         const BoundaryIndex& bi,
-    //         const Index&         idxc,
-    //         const Index&         idxg,
-    //         const St&            axe,
-    //         const St&            ori,
-    //         const Vt&            time = 0.0){
-    //     if(fc.ghost().is_ghost(idxg)){
-    //         auto bid  = fc.ghost().boundary_id(idxc, idxg, axe, ori);
-    //         auto spbc = bi.find(bid);
-    //         if (spbc->type() == BC::_BC1_) {
-    //             return _value_type1_exp(fc, *spbc, idxc, idxg, axe, ori, time);
-    //         } else if (spbc->type() == BC::_BC2_) {
-    //             return _value_type2_exp(fc, *spbc, idxc, idxg, axe, ori, time);
-    //         }
-    //     } else {
-    //         return Exp(idxg);
-    //     }
-    // }
-    // void set(const int& other){std::cout << "int" << std::endl;}
+
+    Exp _value_type2(
+                        const Field&       fc,
+                        const BC&          bc,
+                        const Index&       idxc,
+                        const Index&       idxg,
+                        const St&          axe,
+                        const St&          ori,
+                        const Vt&          time = 0.0) const{
+        // boundary condition must be type 2
+        // walk back
+        auto oori = Opposite(Orientation(ori));
+        auto idxb = idxg.shift(axe, oori);
+        int step  = 0;
+        while (fc.ghost().is_ghost(idxb)) {
+            Shift(idxb, axe, oori);
+            step++;
+        }
+        auto fp = fc.grid().f(axe, ori, idxb);
+//        for (int i = 0; i < step; ++i) {
+//            Shift(idxb, axe, oori);
+//        }
+        ASSERT(fc.ghost().is_normal(idxb));
+        //  idxb   face  ghost
+        // ---x-----|-----g-----
+        //    +--dx-+--dg-+
+        // equation:
+        //  vx - vg
+        // --------- = vbc  ==> vx - vg = vbc * (dx + dg);
+        //  dx + dg                  vg = vx - vbc * (dx + dg);
+        Vt dx = std::abs(fc.grid().c_(axe, idxb) - fp[axe]);
+        Vt dg = std::abs(fc.grid().c_(axe, idxg) - fp[axe]);
+        Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
+        Exp expx(idxb);
+        return expx - vbc * (dx + dg);
+    } 
+
 };
 
     

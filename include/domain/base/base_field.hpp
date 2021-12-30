@@ -58,6 +58,7 @@ public:
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
     typedef std::shared_ptr<Order> spOrder;
+
 protected:
     spGrid  _spgrid;
     spGhost _spghost;
@@ -89,7 +90,9 @@ public:
     Grid&  grid() {return *(this->_spgrid);};
     const Grid&  grid() const{return *(this->_spgrid);};
     Ghost& ghost(){return *_spghost;};
+    const Ghost& ghost() const{return *_spghost;}
     Order& order(){return *_sporder;};
+    const Order& order() const{return *_sporder;};
 
 protected:
     void _copy(const Self& other){

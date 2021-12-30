@@ -231,7 +231,7 @@ template<St DIM>
 SIndex_<DIM> GetDeltaIndex(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     SIndex_<DIM> res(c);
     for (St d = 0; d < DIM; ++d) {
-        res[d] = c[d] - g[d];
+        res[d] = g[d] - c[d];
     }
     return res;
 }
