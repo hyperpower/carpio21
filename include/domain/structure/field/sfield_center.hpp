@@ -120,6 +120,10 @@ public:
         Base::operator/=(rhs);
         return *this;
     }
+    // Grid&  grid() {return *(this->_spgrid);};
+    // const Grid&  grid() const{return *(this->_spgrid);};
+    // Ghost& ghost(){return *_spghost;};
+    // Order& order(){return *_sporder;};
 protected:
     void _initial_arr(){
         // make data by order

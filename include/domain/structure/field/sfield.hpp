@@ -313,8 +313,8 @@ public:
     typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
     typedef typename GRID::Index  Index;
 
-    static void InitOne(const Index& index){
-        std::cout << "Vt" << std::endl;
+    static Vt InitOne(const Index& index){
+        return 0.0;
     }
 };
 

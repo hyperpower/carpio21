@@ -23,6 +23,12 @@ TEST(domain, initial){
 
     Field f(spgrid, spghost, sporder);
 
-    Laplacian(f);
+    // auto g = f.ghost();
+
+    BoundaryIndex bi;
+
+    bi.show();
+
+    Laplacian(f, bi);
 
 }

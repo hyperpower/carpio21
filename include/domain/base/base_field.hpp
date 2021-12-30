@@ -86,9 +86,10 @@ public:
     virtual const ValueType& operator()(const Index&) const = 0;
     virtual       ValueType& operator()(const Index&)       = 0;
 
-    virtual Grid&  grid() {return *_spgrid;};
-    virtual Ghost& ghost(){return *_spghost;};
-    virtual Order& order(){return *_sporder;};
+    Grid&  grid() {return *(this->_spgrid);};
+    const Grid&  grid() const{return *(this->_spgrid);};
+    Ghost& ghost(){return *_spghost;};
+    Order& order(){return *_sporder;};
 
 protected:
     void _copy(const Self& other){

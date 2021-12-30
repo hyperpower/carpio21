@@ -18,8 +18,8 @@ public:
 	virtual ~BoundaryCondition(){}
 
 	// get
-	virtual int type() const {}
-	virtual Vt value(Vt x, Vt y, Vt z, Vt t) const {}
+	virtual int type() const {return 1;}
+	virtual Vt value(Vt x, Vt y, Vt z, Vt t) const {return 0.0;}
 
 };
 

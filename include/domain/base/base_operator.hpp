@@ -18,9 +18,6 @@ public:
         std::cout << "Laplacian Implement" << std::endl;
     };
 
-    template<class BDYIDX>
-    void set_boundary_index(const BDYIDX& bi){};
-
     template<class ANY>
     void set(const ANY& other){}
 
@@ -38,6 +35,13 @@ public:
 
     // void set(const int& other){std::cout << "int" << std::endl;}
         
+};
+template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
+class ApplyBCImplement_{
+public:
+    ApplyBCImplement_(){
+        std::cout << "ApplyBC Implement Basic" << std::endl;
+    };
 };
 }
 

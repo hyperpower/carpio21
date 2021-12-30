@@ -227,7 +227,36 @@ void Shift(SIndex_<DIM>& index, St dim, St ori, St step = 1) {
     }
 }
 
-
+template<St DIM>
+SIndex_<DIM> GetDeltaIndex(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
+    SIndex_<DIM> res(c);
+    for (St d = 0; d < DIM; ++d) {
+        res[d] = c[d] - g[d];
+    }
+    return res;
+}
+template<St DIM>
+St GetDeltaAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
+    auto d = GetDeltaIndex(c, g);
+    for(int i = 0; i < DIM; ++i){
+        if(d[i] != 0){
+            return i;
+        }
+    }
+    SHOULD_NOT_REACH;
+    return 0;
+}
+template<St DIM>
+Orientation GetDeltaOrient(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
+    auto d = GetDeltaIndex(c, g);
+    for(int i = 0; i < DIM; ++i){
+        if(d[i] > 0)
+            return _P_;
+        else if(d[i] < 0)
+            return _M_;
+    }
+    return _C_;
+}
 }
 
 #endif

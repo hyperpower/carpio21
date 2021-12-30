@@ -12,8 +12,8 @@
 namespace carpio{
 
 
-template<class FIELD, class BDYIDX>
-FIELD Laplacian(const FIELD& field, const BDYIDX bi, const std::string& method){
+template<class FIELD, class BI>
+FIELD Laplacian(const FIELD& field, BI bi, const std::string& method){
     LaplacianImplement_<FIELD,   FIELD::Dim,
                         typename FIELD::ValueType,
                         typename FIELD::Grid, 
@@ -23,16 +23,11 @@ FIELD Laplacian(const FIELD& field, const BDYIDX bi, const std::string& method){
                         > imp;
     std::cout << "Laplacian----<" << std::endl;
     imp.set_method(method);
-    imp.set_boundary_index(bi);
-    return imp.execute(field);
+    return imp.execute(field, bi);
 }
-template<class FIELD, class BDYIDX>
-FIELD Laplacian(const FIELD& field, const BDYIDX bi){
-    std::cout << "Laplacian" << std::endl;
-    return field;
-}
-template<class FIELD>
-FIELD Laplacian(const FIELD& field){
+template<class FIELD, class BI>
+FIELD Laplacian(const FIELD& field, BI bi){
+    std::cout << "Laplacian field with bi" << std::endl;
     LaplacianImplement_<FIELD,   FIELD::Dim,
                         typename FIELD::ValueType,
                         typename FIELD::Grid, 
@@ -40,9 +35,19 @@ FIELD Laplacian(const FIELD& field){
                         typename FIELD::Order,
                         typename FIELD::TraitType
                         > imp;
-    std::cout << "Laplacian----<" << std::endl;
+    return imp.execute(field, bi);
+}
+template<class FIELD>
+FIELD Laplacian(const FIELD& field){
+    std::cout << "Laplacian field NO bi" << std::endl;
+    LaplacianImplement_<FIELD,   FIELD::Dim,
+                        typename FIELD::ValueType,
+                        typename FIELD::Grid, 
+                        typename FIELD::Ghost,
+                        typename FIELD::Order,
+                        typename FIELD::TraitType
+                        > imp;
     return imp.execute(field);
-    return field;
 }
 
 // Interpolate
