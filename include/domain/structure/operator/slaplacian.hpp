@@ -23,7 +23,7 @@ public:
     typedef typename GRID::Index Index;
 public:
     LaplacianImplement_(){
-        std::cout << "Laplacian Exp Structure" << std::endl;
+        // std::cout << "Laplacian Exp Structure" << std::endl;
     };
 
     template<class ANY>
@@ -69,6 +69,63 @@ public:
         return res;
     }
     // void set(const int& other){std::cout << "int" << std::endl;}
+};
+
+
+template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
+class LaplacianImplement_<
+    FIELD, DIM, Vt,
+    GRID, GHOST, ORDER, StructureType>: 
+    public SOperatorCommon_<FIELD, DIM, Vt, GRID, GHOST, ORDER>{     
+public:
+    typedef Vt ValueType;
+    typedef ApplyBCImplement_<FIELD, DIM, Vt, GRID, GHOST, ORDER, StructureType> ApplyBC;
+    typedef typename GRID::Index Index;
+public:
+    LaplacianImplement_(){
+        // std::cout << "Laplacian Exp Structure" << std::endl;
+    };
+
+    template<class ANY>
+    void set(const ANY& other){}
+
+    int set_method(const std::string& method){
+        return 0;
+    }
+    FIELD execute(const FIELD& phi, const BI& bi, const Vt& time = 0.0) const{
+        std::cout << "Laplace Vt " << std::endl;
+        ApplyBC abc;
+        Field res        = phi.new_compatible();
+        const Grid& grid = phi.grid();
+        for (auto& idx : phi.order()) {
+            std::array<Vt, DIM> arr;
+            arr.fill(0.0);
+
+            FOR_EACH_DIM
+            {
+                Index idxp = idx.p(d);
+                Index idxm = idx.m(d);
+
+                Vt dfdx_p, dfdx_m;
+                Vt phi_m = abc.value(phi, bi, idx, idxm, d, _M_, time);
+                Vt phi_p = abc.value(phi, bi, idx, idxp, d, _P_, time);
+                dfdx_m = (phi(idx) - phi_m)
+                        / (grid.c_(d, idx) - grid.c_(d, idxm));
+                dfdx_p = (phi_p - phi(idx))
+                        / (grid.c_(d, idxp) - grid.c_(d, idx));
+                arr[d] = (dfdx_p * grid.fa(d,_P_,idx) - dfdx_m * grid.fa(d, _M_, idx));
+            }
+
+            Vt sum = 0;
+            FOR_EACH_DIM
+            {
+                sum += arr[d];
+            }
+            res(idx) = sum;
+        }
+
+        return res;
+    }
 };
 
 }

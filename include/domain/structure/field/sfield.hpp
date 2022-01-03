@@ -129,12 +129,6 @@ public:
         return *this;
     }
 
-    // return a new scalar with compatible gird, ghost and order
-    Self new_compatible() const{
-        Self res(this->_grid, this->_ghost, this->_order);
-        return res;
-    }
-
     SField_():Base(){}
 
     ~SField_(){}

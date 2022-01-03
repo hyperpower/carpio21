@@ -35,7 +35,7 @@ public:
     }
 
     Exp value(
-            const Field&      fc,
+            const Field&         fc,
             const BoundaryIndex& bi,
             const Index&         idxc,
             const Index&         idxg,
@@ -84,14 +84,13 @@ protected:
         return exp;
     }
 
-    Exp _value_type1(
-                        const Field&       fc,
-                        const BC&          bc,
-                        const Index&       idxc,
-                        const Index&       idxg,
-                        const St&          axe,
-                        const St&          ori,
-                        const Vt&          time = 0.0) const{
+    Exp _value_type1(const Field&       fc,
+                     const BC&          bc,
+                     const Index&       idxc,
+                     const Index&       idxg,
+                     const St&          axe,
+                     const St&          ori,
+                     const Vt&          time = 0.0) const{
         auto oori = Opposite(Orientation(ori));  // opposite orientation
         auto idxb = idxg.shift(axe, oori);
         int step = 0;
@@ -155,6 +154,129 @@ protected:
     } 
 
 };
+
+// BC Implement 
+template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
+class ApplyBCImplement_<
+    FIELD, DIM, Vt, 
+    GRID, GHOST, ORDER, StructureType>{
+public:
+    typedef FIELD Field;
+
+    typedef BoundaryIndex BI;
+    typedef std::shared_ptr<BI> spBI;
+    typedef BoundaryCondition BC;
+    
+    typedef Vt ValueType;
+    typedef typename GRID::Index Index;
+public:
+    ApplyBCImplement_(){
+        std::cout << "Apply BC Vt construct" << std::endl;
+    };
+
+    Vt value(
+        const Field&         fc,
+        const BoundaryIndex& bi,
+        const Index&         idxc,
+        const Index&         idxg,
+        const St&            axe,
+        const St&            ori,
+        const Vt&            time = 0.0){
+        if(fc.ghost().is_ghost(idxg)){
+            auto bid  = fc.ghost().boundary_id(idxc, idxg, axe, ori);
+            auto spbc = bi.find(bid);
+            if(spbc->type() == BC::_BC1_){
+                return this->_value_type1(fc, *spbc, idxc, idxg, axe, ori, time);
+            }else if(spbc->type() == BC::_BC2_){
+                return this->_value_type2(fc, *spbc, idxc, idxg, axe, ori, time);
+            }
+        }else{
+            return fc(idxg);
+        }
+    }
+
+protected:
+    Vt _value_type1(
+                    const Field&       fc,
+                    const BC&          bc,
+                    const Index&       idxc,
+                    const Index&       idxg,
+                    const St&          axe,
+                    const St&          ori,
+                    const Vt&          time = 0.0){
+        // boundary condition must be type 1
+        // walk back
+        auto oori = Opposite(Orientation(ori));  // opposite oritation
+        auto idxb = idxg.shift(axe, oori);
+//        int  step = 0;
+        while(fc.ghost().is_ghost(idxb)){ // find nearest normal cell
+            Shift(idxb, axe, oori);
+//            step++;
+        }
+        auto fp = fc.grid().f(axe, ori, idxb);   // face point
+//        for(int i = 0; i < step; ++i){
+//            Shift(idxb, axe, oori);
+//        }
+        ASSERT(fc.ghost().is_normal(idxb));
+        //  idxb   face  ghost
+        // ---x-----|-----g-----
+        //    +--dx-+--dg-+
+        // equation:
+        //  vg - vx     vbc - vx
+        // --------- = ----------  ==> vg - vx = (vbc - vx) * (dx + dg) / dx;
+        //  dx + dg        dx          vg = vx + (vbc - vx) * (dx + dg) / dx;
+        Vt dx  = std::abs(fc.grid().c_(axe, idxb) - fp[axe]);
+        Vt dg  = std::abs(fc.grid().c_(axe, idxg) - fp[axe]);
+        Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
+        Vt vx  = fc(idxb);
+//        if(idxc == Index(0.0, 0.0)){
+//            std::cout << "idxb = " << idxb << std::endl;
+//            std::cout << "idxg = " << idxg << std::endl;
+//            std::cout << "dx     " << dx   << std::endl;
+//            std::cout << "dg     " << dg   << std::endl;
+//            std::cout << "vbc    " << vbc  << std::endl;
+//        }
+        return vx + (vbc - vx) * (dx + dg) / dx;
+    }
+
+    Vt _value_type2(
+                    const Field&       fc,
+                    const BC&          bc,
+                    const Index&       idxc,
+                    const Index&       idxg,
+                    const St&          axe,
+                    const St&          ori, // center --> ghost
+                    const Vt&          time = 0.0){
+        // boundary condition must be type 2
+        // walk back
+        auto oori = Opposite(Orientation(ori));
+        auto idxb = idxg.shift(axe, oori);
+        int step  = 0;
+        while(fc.ghost().is_ghost(idxb)){
+            Shift(idxb, axe, oori);
+            step++;
+        }
+        auto fp = fc.grid().f(axe, ori, idxb);
+//        for(int i = 0; i < step; ++i){
+//            Shift(idxb, axe, oori);
+//        }
+        ASSERT(fc.ghost().is_normal(idxb));
+        //  idxb   face  ghost
+        // ---x-----|-----g-----
+        //    +--dx-+--dg-+
+        // equation:
+        //  vx - vg
+        // --------- = vbc  ==> vx - vg = vbc * (dx + dg);
+        //  dx + dg                  vg = vx - vbc * (dx + dg);
+        Vt dx = std::abs(fc.grid().c_(axe, idxb) - fp[axe]);
+        Vt dg = std::abs(fc.grid().c_(axe, idxg) - fp[axe]);
+        Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
+        Vt vx = fc(idxb);
+        return vx - vbc * (dx + dg);
+    }
+
+};
+
 
     
 } // namespace carpio
