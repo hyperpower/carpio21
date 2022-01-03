@@ -25,19 +25,39 @@ public:
     ApplyBCImplement_(){
     };
 
-    int set_method(const std::string& method){
-        return 0;
-    }
     int execute(FIELD& f, const BI& bi, const Vt& time = 0.0) const{
         for(auto& idx : f.order()){
-            f(idx) = execute_local(f, idx, bi, time);
-            std::cout << idx << "--------" <<std::endl;
-            std::cout << f(idx) << std::endl;
+            f(idx) = _execute_local(f, idx, bi, time);
+            // std::cout << idx << "--------" <<std::endl;
+            // std::cout << f(idx) << std::endl;
         }
         return 0;
     }
+
+    Exp value(
+            const Field&      fc,
+            const BoundaryIndex& bi,
+            const Index&         idxc,
+            const Index&         idxg,
+            const St&            axe,
+            const St&            ori,
+            const Vt&            time = 0.0){
+        if(fc.ghost().is_ghost(idxg)){
+            auto bid  = fc.ghost().boundary_id(idxc, idxg, axe, ori);
+            auto spbc = bi.find(bid);
+            if (spbc->type() == BC::_BC1_) {
+                return _value_type1(fc, *spbc, idxc, idxg, axe, ori, time);
+            } else if (spbc->type() == BC::_BC2_) {
+                return _value_type2(fc, *spbc, idxc, idxg, axe, ori, time);
+            }
+        } else {
+            return Exp(idxg);
+        }
+    }
     
-    Exp execute_local(FIELD& f, 
+
+protected: 
+    Exp _execute_local(FIELD& f, 
                       const Index& idx, 
                       const BI& bi,
                       const Vt& time = 0.0) const{
@@ -64,7 +84,6 @@ public:
         return exp;
     }
 
-protected:
     Exp _value_type1(
                         const Field&       fc,
                         const BC&          bc,

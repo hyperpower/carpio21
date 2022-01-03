@@ -30,9 +30,9 @@ TEST(domain, initial){
     bi.show();
 
     auto lap = Laplacian(f, bi);
-    for(auto& idx : lap.order()){
-        std::cout << idx << " --------" << std::endl;
-        std::cout << lap(idx) << " --------" << std::endl;
-    }
+    // for(auto& idx : lap.order()){
+        // std::cout << idx << " --------" << std::endl;
+        // std::cout << lap(idx) << " --------" << std::endl;
+    // }
 
 }
