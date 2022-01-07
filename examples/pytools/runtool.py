@@ -109,11 +109,14 @@ class Runer:
         clean(self._path.this, self._orifiles)
 
     def cmake(self):
-        os.system("cmake -S " + self._path.this + " -B" + self._path.this + "/build")
+        cmd = "cmake -S \"" + self._path.this + "\" -B \"" + os.path.join(self._path.this, "build") + "\""
+        os.system(cmd)
 
     def build(self):
         project_name = self._info["name"]
-        os.system("MSBuild "+ os.path.join(self._path.this, "build/" + project_name + ".sln"))
+        cmd = "MSBuild \""+ os.path.join(self._path.this, "build/" + project_name + ".sln\"")
+        print(cmd)
+        os.system(cmd)
 
     def execute(self):
         current = os.getcwd()

@@ -45,7 +45,7 @@ def build(path):
 
 if __name__ == '__main__':
     runer = RT.Runer(__file__, FILE_ORIGINAL)
-    # runer.clean()
+    runer.clean()
     runer.mkdir()
     runer.cmake()
     runer.build()
