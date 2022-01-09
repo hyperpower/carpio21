@@ -60,7 +60,9 @@ public:
         return res;
     }
     
-    FIELD execute(const FIELD& f, const BI& bi, const Vt& time = 0.0) const{
+    FIELD execute(const FIELD& f, 
+                  const BI& bi, 
+                  const Vt& time = 0.0) const{
         FIELD res = this->execute(f); 
 
         ApplyBC applybc;
@@ -93,7 +95,7 @@ public:
         return 0;
     }
     FIELD execute(const FIELD& phi, const BI& bi, const Vt& time = 0.0) const{
-        std::cout << "Laplace Vt " << std::endl;
+        // std::cout << "Laplace Vt " << std::endl;
         ApplyBC abc;
         Field res        = phi.new_compatible();
         const Grid& grid = phi.grid();
