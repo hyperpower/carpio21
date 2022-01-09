@@ -20,6 +20,7 @@
 #include "io/sgnuplot_actor.hpp"
 
 #include "operator/slaplacian.hpp"
+#include "operator/sbuild_matrix.hpp"
 
 #include <memory>
 

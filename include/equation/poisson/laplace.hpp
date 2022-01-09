@@ -26,6 +26,8 @@ public:
     typedef typename Domain::Order       Order;
     typedef typename Domain::spOrder     spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
+
+    typedef std::shared_ptr<FieldCenter> spFieldCenter;
 public:
     Laplace_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
@@ -56,8 +58,16 @@ public:
             }
         }
     }
-        
 
+    void set_phi(spFieldCenter spphi){
+        this->_fields["phi"] = spphi;
+    }
+        
+protected:
+    spFieldCenter _new_phi() const{
+        spFieldCenter res( new FieldCenter(this->_spgrid, this->_spghost, this->_sporder));
+        return res;
+    }
 
 
 };

@@ -43,6 +43,13 @@ public:
         std::cout << "ApplyBC Implement Basic" << std::endl;
     };
 };
+template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
+class BuildMatrixImplement_{
+public:
+    BuildMatrixImplement_(){
+        std::cout << "BuildMatrix Implement Basic" << std::endl;
+    };
+};
 }
 
 #endif
