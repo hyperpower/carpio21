@@ -45,12 +45,19 @@ public:
     typedef StopControl_<Self> StopControl;
     typedef std::shared_ptr<StopControl> spStopControl;
 
+    typedef Solver_<Vt>       Solver;
+    typedef std::shared_ptr<Solver> spSolver;
+    typedef Jacobi_<Vt>       Solver_Jacobi;
+    typedef SOR_<Vt>          Solver_SOR;
+    typedef CG_<Vt>           Solver_CG;
+
+
 protected:
     spGrid  _spgrid; 
     spGhost _spghost; 
     spOrder _sporder;
 
-    Configures _config;
+    Configures _configs;
     Fields     _fields;
     BIs        _bis;
     Events     _events; 
@@ -155,6 +162,81 @@ public:
 
     virtual const TimeControl& time_control() const{
         return *(this->_time);
+    }
+
+    bool has_field(const std::string& key) const {
+        auto it = this->_fields.find(key);
+        if (it != this->_fields.end()) {
+            return true;
+        }
+        return false;
+    }
+
+    bool has_flag(const std::string& key) const {
+        auto it = this->_configs.find(key);
+        if (it != this->_configs.end()) {
+            return true;
+        }
+        return false;
+    }
+
+    void set_solver(const std::string&    name,
+                    const int& max_iter = 1000,
+                    const Vt&  tol      = 1e-4,
+                    const Any& any      = 1.0
+                    ) {
+        // name should be
+        ASSERT(name == "Jacobi" || name == "CG" || name == "SOR");
+        this->_configs["set_solver"]           = name;
+        this->_configs["set_solver_max_iter"]  = max_iter;
+        this->_configs["set_solver_tolerence"] = tol;
+        if (name == "SOR") {
+            this->_configs["SOR_omega"] = any;
+        }
+    }
+
+protected:
+    void new_field(const std::string& name){
+        if(!(this->has_field(name))){
+            this->_fields[name] = spFieldCenter(new FieldCenter(
+                    this->_spgrid,
+                    this->_spghost,
+                    this->_sporder));
+        }
+    }
+
+    template<class Container>
+    void new_fields(const Container& list){
+        auto isstring = std::is_same<typename Container::value_type,
+                                     std::string>::value;
+        ASSERT(isstring == true);
+        for(auto& str : list){
+            this->new_field(str);
+        }
+    }
+
+    virtual spSolver _init_solver() {
+        // initial solver
+        spSolver spsolver;
+        if (this->has_flag("set_solver")) {
+            std::string sn = any_cast<std::string>(
+                    this->_configs["set_solver"]);
+            Vt  tol      = any_cast<Vt>(this->_configs["set_solver_tolerence"]);
+            int max_iter = any_cast<int>(this->_configs["set_solver_max_iter"]);
+            if (sn == "Jacobi") {
+                spsolver = spSolver(new Solver_Jacobi(max_iter, tol));
+            } else if (sn == "CG") {
+                spsolver = spSolver(new Solver_CG(max_iter, tol));
+            } else if (sn == "SOR") {
+                ASSERT(this->has_flag("SOR_omega"));
+                Vt omega = any_cast<Vt>(this->_configs["SOR_omega"]);
+                spsolver = spSolver(new Solver_SOR(max_iter, tol, omega));
+            }
+        } else {
+            // default solver
+            spsolver = spSolver(new Solver_Jacobi(500, 1e-4));
+        }
+        return spsolver;
     }
 };
 

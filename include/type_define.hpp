@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <math.h>
 #include <string>
+#include <functional>
 #ifdef OPENMP
 #include <omp.h>
 #endif
@@ -45,6 +46,13 @@ typedef unsigned int uInt;
 typedef double        Float;
 typedef void*             utPointer;
 typedef const void* const_utPointer;
+
+
+typedef std::function<Vt(Vt, Vt, Vt, Vt)>   FunXYZT_V;
+typedef std::function<void(Vt, Vt, Vt, Vt)> FunXYZT;
+typedef std::function<Vt(Vt, Vt, Vt)>       FunXYZ_V;
+typedef std::function<void(Vt, Vt, Vt)>     FunXYZ;
+
 
 
 enum Axes {

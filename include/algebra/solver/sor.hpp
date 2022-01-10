@@ -63,7 +63,7 @@ public:
 
 		for (int i = 1; i <= this->_max_iter; ++i) {
 			//----
-#pragma omp parallel for
+// #pragma omp parallel for
 			for (St i = 0; i < M; ++i) {  //row
 				Vt sumkp = 0;
 				Vt sumk = 0;

@@ -31,6 +31,7 @@ public:
 public:
     Laplace_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
+            this->new_field("phi");
     }
 
     virtual ~Laplace_(){};
@@ -61,12 +62,6 @@ public:
 
     void set_phi(spFieldCenter spphi){
         this->_fields["phi"] = spphi;
-    }
-        
-protected:
-    spFieldCenter _new_phi() const{
-        spFieldCenter res( new FieldCenter(this->_spgrid, this->_spghost, this->_sporder));
-        return res;
     }
 
 
