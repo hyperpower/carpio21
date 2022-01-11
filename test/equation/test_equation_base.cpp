@@ -52,5 +52,7 @@ TEST(equation, laplace){
 
     Laplace equ(spgrid, spghost, sporder);
 
+    equ.run();
+
 
 }

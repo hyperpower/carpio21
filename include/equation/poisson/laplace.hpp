@@ -26,12 +26,15 @@ public:
     typedef typename Domain::Order       Order;
     typedef typename Domain::spOrder     spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
-
     typedef std::shared_ptr<FieldCenter> spFieldCenter;
+
+    typedef MatrixSCR_<Vt>    Mat;
+    typedef ArrayListV_<Vt>   Arr;
 public:
     Laplace_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
             this->new_field("phi");
+            this->_configs["solver"] = this->_init_solver();
     }
 
     virtual ~Laplace_(){};
@@ -49,8 +52,20 @@ public:
     }; 
 
     virtual int solve(){
+        FieldCenter&    phi  = *(this->_fields["phi"]);
+        auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        auto   expf    = this->new_field_exp();
+        Mat a;
+        Arr b;
+        BuildMatrix((*expf), a, b);
+        // prepare x
+        Arr x(phi.order().size());
+        // BuildMatrix::CopyToArray(phi, x);
+        // this->_aflags["solver_rcode"] = spsolver->solve(a, x, b);
+        // BuildMatrix::CopyToField(x, phi);
+//        x.show();
         return 0;
-    };
+    }
 
     virtual void run_events(St step, Vt t, int fob) {
         for (auto& event : this->_events) {

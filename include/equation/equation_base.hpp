@@ -26,12 +26,14 @@ public:
     typedef typename Domain::Order       Order;
     typedef typename Domain::spOrder     spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
+    typedef typename Domain::FieldCenterExp FieldCenterExp;
 
     typedef EquationBase_<DIM, D> Self;
 
     typedef Event_<Self>                   Event;
     typedef std::shared_ptr<Event>       spEvent;
-    typedef std::shared_ptr<FieldCenter> spFieldCenter;
+    typedef std::shared_ptr<FieldCenter>    spFieldCenter;
+    typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
     typedef std::shared_ptr<BoundaryIndex> spBoundaryIndex;
 
     typedef std::map<std::string, Any>             Configures;
@@ -45,11 +47,14 @@ public:
     typedef StopControl_<Self> StopControl;
     typedef std::shared_ptr<StopControl> spStopControl;
 
-    typedef Solver_<Vt>       Solver;
+    typedef MatrixSCR_<Vt>    Mat;
+    typedef ArrayListV_<Vt>   Arr;
+
+    typedef Solver_<Vt>             Solver;
     typedef std::shared_ptr<Solver> spSolver;
-    typedef Jacobi_<Vt>       Solver_Jacobi;
-    typedef SOR_<Vt>          Solver_SOR;
-    typedef CG_<Vt>           Solver_CG;
+    typedef Jacobi_<Vt> Solver_Jacobi;
+    typedef SOR_<Vt>    Solver_SOR;
+    typedef CG_<Vt>     Solver_CG;
 
 
 protected:
@@ -104,7 +109,7 @@ public:
                     this->_time->current_step(),    //
                     Event::START);
             // loop
-            while (!this->_time->is_end() && (!_stop.is_stop())) {
+            while (!this->_time->is_end() && (!_stop->is_stop())) {
                 //
                 // events before each step
                 run_events(this->_time->current_step(),  //
@@ -203,6 +208,13 @@ protected:
                     this->_spghost,
                     this->_sporder));
         }
+    }
+
+    spFieldCenterExp new_field_exp() const{
+        return spFieldCenterExp(new FieldCenterExp(
+                    this->_spgrid,
+                    this->_spghost,
+                    this->_sporder));
     }
 
     template<class Container>

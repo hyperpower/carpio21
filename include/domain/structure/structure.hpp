@@ -40,6 +40,8 @@ public:
     typedef ORDER Order;
     typedef typename Grid::Index   Index;
     typedef SFieldCenter_<Dim, ValueType, Grid, Ghost, Order> FieldCenter;
+    typedef LinearPolynomial_<Vt, typename GRID::Index> Exp;
+    typedef SFieldCenter_<Dim, Exp, Grid, Ghost, Order> FieldCenterExp;
 
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
