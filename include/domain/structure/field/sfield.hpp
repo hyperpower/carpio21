@@ -62,12 +62,20 @@ public:
         this->_arr = std::move(other._arr);
         return *this;
     }
-
-  
     
     void assign(const Vt& v){
         _arr.assign(v);
     }
+
+    void assign(const Arr& other){
+        ASSERT(this->_sporder->size() == other.size());
+        this->_arr = other;
+    }
+
+    Arr to_array() const{
+        return Arr(_arr);
+    }
+    
     // ===========================================
     // arithmatic operator
     // ===========================================
@@ -293,7 +301,7 @@ template<St DIM,
          class ORDER>
 class _DataInitial_{
 public:
-    static void InitOne(){
+    static void InitAValue(){
         std::cout << "Abstract" << std::endl;
     }
 };
@@ -307,7 +315,7 @@ public:
     typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
     typedef typename GRID::Index  Index;
 
-    static Vt InitOne(const Index& index){
+    static Vt InitAValue(const Index& index){
         return 0.0;
     }
 };
@@ -322,7 +330,7 @@ class _DataInitial_<DIM,
 public:
     typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
     typedef typename GRID::Index  Index;
-    static Poly InitOne(const Index& index){
+    static Poly InitAValue(const Index& index){
         // std::cout << "LinearPolynomial" << std::endl;
         return Poly(index);
     }

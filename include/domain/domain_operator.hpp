@@ -52,7 +52,6 @@ typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){
     return 0;
 }
 
-
 // BuildMatrix
 template<class FIELD, class MAT, class ARR>
 typename int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){

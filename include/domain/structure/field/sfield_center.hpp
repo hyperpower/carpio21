@@ -130,7 +130,7 @@ protected:
         // make data by order
         this->_arr.reconstruct(_sporder->size());
         for(auto& idx : (*(this->_sporder))){
-            this->operator()(idx) = _DataInit::InitOne(idx);
+            this->operator()(idx) = _DataInit::InitAValue(idx);
         }
     }
 };

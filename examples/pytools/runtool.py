@@ -1,5 +1,6 @@
 import os
 import shutil
+import platform
 import time
 
 def parse_name(name):
@@ -114,7 +115,8 @@ class Runer:
 
     def build(self):
         project_name = self._info["name"]
-        cmd = "MSBuild \""+ os.path.join(self._path.this, "build/" + project_name + ".sln\"")
+        if platform.system() == "Windows":
+            cmd = "MSBuild \""+ os.path.join(self._path.this, "build/" + project_name + ".sln\"")
         print(cmd)
         os.system(cmd)
 

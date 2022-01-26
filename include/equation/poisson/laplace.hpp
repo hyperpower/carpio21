@@ -59,10 +59,9 @@ public:
         Arr b;
         BuildMatrix((*expf), a, b);
         // prepare x
-        Arr x(phi.order().size());
-        // BuildMatrix::CopyToArray(phi, x);
-        // this->_aflags["solver_rcode"] = spsolver->solve(a, x, b);
-        // BuildMatrix::CopyToField(x, phi);
+        Arr x = phi.to_array();
+        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        phi.assign(x);
 //        x.show();
         return 0;
     }
