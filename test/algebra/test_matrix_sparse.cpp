@@ -42,7 +42,7 @@ TEST(matrxi_sparse, matrix_write){
     mm_read_array("./test/input_files/mm/cavity01_rhs1.mtx", arr);
     std::cout << "array size  = " << arr.size() << std::endl;
 
-    CreateDir("./test_output/");
+    MakeDir("./test_output/");
     mm_write_mtx_sparse("./test_output/mat.mtx", mat);
 }
 
@@ -78,7 +78,7 @@ TEST(matrxi_sparse, matrix_jacobi){
     std::cout << "tol      = " << solver.residual() << std::endl;
     //gnuplot_show_ylog(lr);
     // out put --------------------------------------------
-    CreateDir("./test_output/");
+    MakeDir("./test_output/");
     mm_write_array("./test_output/x.txt", x);
     Gnuplot gnu;
     gnu.set_ylogscale();

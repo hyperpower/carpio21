@@ -1,4 +1,4 @@
   ## key : value,
-  ##  dimension : v, ab,  bb ,;
+  ##  dimension : v, ab,  bb;
   123, 123, 32,
   123, 234, 55

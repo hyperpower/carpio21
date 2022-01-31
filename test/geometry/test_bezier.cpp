@@ -57,7 +57,7 @@ void add_bezier_curve(Gnuplot& gnu, std::shared_ptr<BC> spc){
     
 TEST(bezier, mkdir){
     // Do not disable this test
-    CreateDir("./test_output/");
+    MakeDir("./test_output/");
 }
 
 

@@ -12,7 +12,7 @@ const int fig_height = 900;
 
 TEST(atmosphere, mkdir){
     // Do not disable this test
-    CreateDir("./test_output/");
+    MakeDir("./test_output/");
 }
 
 TEST(atmosphere, test1) {

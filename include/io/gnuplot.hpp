@@ -1038,8 +1038,7 @@ public:
 		this->cmd("save \'" + filename + "\'");
 		return *this;
 	}
-}
-;
+};
 
 class GnuplotActorMaker{
 public:
