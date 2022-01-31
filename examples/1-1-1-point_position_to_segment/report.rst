@@ -39,7 +39,7 @@ Location 1 LEFT
 ------------------
 The point is on the left of the Segment
 
-.. figure:: ./fig/LEFT.png
+.. figure:: fig/LEFT.png
    :alt: Figure point loaction LEFT
    :align: center 
 

@@ -60,10 +60,7 @@ public:
     StructureDomain_(spGrid spgrid, spGhost spghost, spOrder sporder):
         _spgrid(spgrid), _spghost(spghost), _sporder(sporder){};
 
-
 };
-
-
 
 }
 

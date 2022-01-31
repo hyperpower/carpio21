@@ -1,7 +1,10 @@
 import os
 import shutil
 import platform
+import sys
 import time
+# sphinx should be installed
+from sphinx.cmd.build import main as sphinx_main
 
 def parse_name(name):
     sn = name.split("-")
@@ -99,18 +102,23 @@ class Runer:
     def project_name(self):
         return self._info["name"]
 
-    def mkdir(self):
+    def mkdir_all(self):
         # creat the last level of folder
-        if not os.path.isdir(self._path.fig):
-            os.mkdir(self._path.fig)
-        if not os.path.isdir(self._path.data):
-            os.mkdir(self._path.data)
+        self.mkdir(self._path.fig)
+        self.mkdir(self._path.data)
+    
+    def mkdir(self, abspath):
+        if not os.path.isdir(abspath):
+            os.mkdir(abspath)
 
     def clean(self):
         clean(self._path.this, self._orifiles)
 
     def cmake(self):
-        cmd = "cmake -S \"" + self._path.this + "\" -B \"" + os.path.join(self._path.this, "build") + "\""
+        path_build = os.path.join(self._path.this, "build")
+        cmd = f"cmake -S \"{self._path.this}\"" \
+              f" -B \"{path_build}\""
+        print(cmd)
         os.system(cmd)
 
     def build(self):
@@ -126,3 +134,22 @@ class Runer:
         os.system(self._path.this + "/build/Debug/main.exe")
         os.chdir(current)
         pass
+
+    def build_doc(self):
+        output_foldername   = 'build-doc'
+        build_doc = os.path.abspath(os.path.join(self._path.this,  output_foldername))
+        self.mkdir(build_doc)
+        
+        build_format  = 'html'  # singlehtml, ...
+        master_doc    = 'report'
+        source_suffix = '.rst'
+        html_theme    = 'alabaster'
+
+        args  = f". -b {build_format} -D extensions=sphinx.ext.autodoc " \
+                f"-D master_doc={master_doc} " \
+                f"-D source_suffix={source_suffix} " \
+                f"-D html_theme={html_theme} " \
+                f"-C {output_foldername} "
+
+        sys.path.append(os.path.abspath(self._path.this))
+        sphinx_main(args.split())

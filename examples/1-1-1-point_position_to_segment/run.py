@@ -13,12 +13,11 @@ FILE_ORIGINAL = [
     "report.rst"
 ]
 
-
 if __name__ == '__main__':
     runer = RT.Runer(__file__, FILE_ORIGINAL)
     runer.clean()
-    runer.mkdir()
+    runer.mkdir_all()
     runer.cmake()
     runer.build()
     runer.execute()
-    
+    runer.build_doc()
