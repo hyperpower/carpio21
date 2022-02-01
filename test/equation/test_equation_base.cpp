@@ -26,8 +26,16 @@ TEST(equation, equation_base){
     typedef EquationBase_<dim, Domain> EquationBase;
 
     // EquationBase equ(spgrid, spghost, sporder);
+    // auto s = Stringify(*spgrid);
+    // for(auto& row : s){
+        // std::cout << row << std::endl;
+    // }
+    OutputFile("./test_output/grid.txt", *spgrid);
 
-
+    TextFile f("./test_output/grid.txt");
+    f.read();
+    f.parse_config();
+    f.show_config();
 }
 
 TEST(equation, laplace){

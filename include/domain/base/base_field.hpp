@@ -34,7 +34,6 @@ public:
     virtual ~OrderBase_(){};
 };
 
-struct BaseType;
 
 template<St DIM, 
          class VT, 
@@ -50,7 +49,7 @@ public:
     typedef ORDER Order;
     typedef VT    ValueType;
     typedef typename Grid::Index Index;
-    typedef BaseType TraitType;
+    typedef DomainTag TraitTag;
     typedef FieldBase_<Dim, VT, Grid, Ghost, Order> Self;
 
     typedef FieldBase_<Dim, ValueType, Grid, Ghost, Order> Self;

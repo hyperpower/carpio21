@@ -10,10 +10,6 @@
 namespace carpio{
 
 
-
-struct StructureType{
-};
-
 }
 
 #endif

@@ -7,16 +7,18 @@
 #include "geometry/geometry.hpp"
 
 namespace carpio{
+    
+struct SGridTag:  public StructureTag{};
 
 template<St DIM>
 class SGrid_ {
 public:
     static const St Dim = DIM;
-    
+    typedef SGridTag Tag; 
     typedef SIndex_<Dim> Index;
 
     typedef ArrayListT_<Vt> Arr;
-    typedef Point_<Vt, Dim> Poi;
+    typedef Point_<Vt, Dim> Point;
     typedef St size_type;
     static const St NumVertex = DIM == 1 ? 2 : (DIM == 2 ? 4 : 8);
     static const St NumFace = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
@@ -29,6 +31,7 @@ public:
     virtual std::string type_name() const{
         return "SGrid";
     };
+    virtual St dim() const{return Dim;};
     // ghost layer ============================
     virtual Idx ghost_layer() const{return 0;};
     // index ==================================
@@ -47,8 +50,8 @@ public:
     // volume ==================================
     virtual inline Vt volume(Index) const {return 0;};
     // center ==================================
-    virtual Poi c (Idx i, Idx j = 0, Idx k = 0)     const {return Poi();}
-    virtual Poi c (const Index&)              const {return Poi();}
+    virtual Point c (Idx i, Idx j = 0, Idx k = 0)     const {return Point();}
+    virtual Point c (const Index&)              const {return Point();}
     virtual Vt  c_(const St& dim, const Idx& idx)   const {return 0;}
     virtual Vt  c_(const St& dim, const Index& idx) const {return 0;}
 
@@ -64,8 +67,8 @@ public:
     virtual Vt min_size(St) const {return 0;}
 
     // face  ===================================
-    virtual Poi f (St, int, const Index&) const {return Poi();}
-    virtual Poi f (St, int, Idx, Idx j = 0, Idx k = 0) const {return Poi();}
+    virtual Point f (St, int, const Index&) const {return Point();}
+    virtual Point f (St, int, Idx, Idx j = 0, Idx k = 0) const {return Point();}
     virtual Vt  f_(St, int, Idx) const {return 0;}
     // face area
     virtual Vt  fa(St, int, const Index&) const {return 0;}
@@ -73,15 +76,15 @@ public:
     // distance to face
     virtual Vt df_(St, Idx) const {return 0;}
     // vertex ================================
-    virtual Poi v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {return Poi();}
-    virtual Poi v(Idx order, Index index) const{return Poi();}
+    virtual Point v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {return Point();}
+    virtual Point v(Idx order, Index index) const{return Point();}
 
-    virtual Poi v(Idx i,     short oi,
+    virtual Point v(Idx i,     short oi,
                   Idx j = 0, short oj = 0,
-                  Idx k = 0, short ok = 0) const {return Poi();}
+                  Idx k = 0, short ok = 0) const {return Point();}
 
     // Point is in the range
-    virtual inline bool is_in_on(Poi p) {return false;}
+    virtual inline bool is_in_on(Point p) {return false;}
     //  find closest index on the negative direction
     //  for example:
     //
@@ -109,6 +112,7 @@ public:
     virtual Index to_INDEX(const Index&) const{return Index();}
 
     virtual void for_each(FunIndex){}
+    virtual void for_each(FunIndex) const{}
     virtual void for_each_INDEX(FunIndex){}
 
 

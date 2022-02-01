@@ -72,19 +72,26 @@ public:
     lines& content(){
         return this->_content;
     }
+    const lines& content() const{
+        return this->_content;
+    }
 
     void parse_config() {
-        for (auto& line : _content) {
-            parse_config_a_line(line);
+        for (auto it = _content.begin(); it != _content.end(); ) {
+            if (parse_config_a_line(*it)) {
+                it = _content.erase(it);
+            } else {
+                ++it;
+            }
         }
     }
 
-    void parse_config_a_line(const std::string& line){
+    bool parse_config_a_line(const std::string& line){
         // std::cout << line << std::endl;
         auto nl = Trim(line);
         // std::cout << nl<< std::endl;
         if(nl.find_first_of("##") != 0){
-            return; // not config line
+            return false; // not config line
         }
         std::vector<std::string> tokens;
         Tokenize(nl, tokens, "##");
@@ -95,6 +102,7 @@ public:
             Tokenize(t, kvtokens, ":");
             this->_config[Trim(kvtokens[0])] = Trim(kvtokens[1]);
         }
+        return true;
     }
 
     void show_config() {

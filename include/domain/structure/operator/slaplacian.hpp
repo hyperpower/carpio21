@@ -15,11 +15,11 @@ template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class LaplacianImplement_<
     FIELD, DIM, 
     LinearPolynomial_<Vt, typename GRID::Index>, 
-    GRID, GHOST, ORDER, StructureType>: 
+    GRID, GHOST, ORDER, StructureTag>: 
     public SOperatorCommon_<FIELD, DIM, LinearPolynomial_<Vt, typename GRID::Index>, GRID, GHOST, ORDER>{     
 public:
     typedef LinearPolynomial_<Vt, typename GRID::Index> Exp;
-    typedef ApplyBCImplement_<FIELD, DIM, Exp, GRID, GHOST, ORDER, StructureType> ApplyBC;
+    typedef ApplyBCImplement_<FIELD, DIM, Exp, GRID, GHOST, ORDER, StructureTag> ApplyBC;
     typedef typename GRID::Index Index;
 public:
     LaplacianImplement_(){
@@ -77,11 +77,11 @@ public:
 template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class LaplacianImplement_<
     FIELD, DIM, Vt,
-    GRID, GHOST, ORDER, StructureType>: 
+    GRID, GHOST, ORDER, StructureTag>: 
     public SOperatorCommon_<FIELD, DIM, Vt, GRID, GHOST, ORDER>{     
 public:
     typedef Vt ValueType;
-    typedef ApplyBCImplement_<FIELD, DIM, Vt, GRID, GHOST, ORDER, StructureType> ApplyBC;
+    typedef ApplyBCImplement_<FIELD, DIM, Vt, GRID, GHOST, ORDER, StructureTag> ApplyBC;
     typedef typename GRID::Index Index;
 public:
     LaplacianImplement_(){

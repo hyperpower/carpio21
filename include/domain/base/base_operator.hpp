@@ -1,55 +1,73 @@
 #ifndef _BASE_OPERATOR_HPP
 #define _BASE_OPERATOR_HPP
 
-#include "domain/domain_define.hpp"
+#include <iostream>
+#include "type_define.hpp"
+#include "base_operator_impl.hpp"
 
 namespace carpio{
-// Operator ============================
-//
-// TRAIT
-// - STURCTURE
-// - OCTUREE
-// - TRIANGLE
-// - POLY
-template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
-class LaplacianImplement_{
-public:
-    LaplacianImplement_(){
-        std::cout << "Laplacian Implement" << std::endl;
-    };
 
-    template<class ANY>
-    void set(const ANY& other){}
+template<class FIELD, class BI>
+FIELD Laplacian(const FIELD& field, BI bi, const std::string& method){
+    LaplacianImplement_<FIELD,   FIELD::Dim,
+                        typename FIELD::ValueType,
+                        typename FIELD::Grid, 
+                        typename FIELD::Ghost,
+                        typename FIELD::Order,
+                        typename FIELD::TraitTag
+                        > imp;
+    std::cout << "Laplacian----<" << std::endl;
+    imp.set_method(method);
+    return imp.execute(field, bi);
+}
+template<class FIELD, class BI>
+FIELD Laplacian(const FIELD& field, BI bi){
+    std::cout << "Laplacian field with bi" << std::endl;
+    LaplacianImplement_<FIELD,   FIELD::Dim,
+                        typename FIELD::ValueType,
+                        typename FIELD::Grid, 
+                        typename FIELD::Ghost,
+                        typename FIELD::Order,
+                        typename FIELD::TraitTag
+                        > imp;
+    return imp.execute(field, bi);
+}
+template<class FIELD>
+FIELD Laplacian(const FIELD& field){
+    std::cout << "Laplacian field NO bi" << std::endl;
+    LaplacianImplement_<FIELD,   FIELD::Dim,
+                        typename FIELD::ValueType,
+                        typename FIELD::Grid, 
+                        typename FIELD::Ghost,
+                        typename FIELD::Order,
+                        typename FIELD::TraitTag
+                        > imp;
+    return imp.execute(field);
+}
 
-    int set_method(const std::string& method){
-        return 0;
-    }
+// Interpolate
+template<class FIELD, class BDYIDX>
+typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){
+    std::cout << "Interpolate" << std::endl;
+    return 0;
+}
 
-    FIELD execute(const FIELD& a){
-        std::cout<< "Template Class Do Nothing" << std::endl;
-        FIELD res(a);
-        return res;
-    }
-    template<class BDYIDX>
-    int execute(const FIELD&, const BDYIDX&){};
+// BuildMatrix
+template<class FIELD, class MAT, class ARR>
+typename int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){
+    std::cout << "Build Matix" << std::endl;
+    BuildMatrixImplement_<FIELD, FIELD::Dim,
+                        typename FIELD::ValueType,
+                        typename FIELD::Grid, 
+                        typename FIELD::Ghost,
+                        typename FIELD::Order,
+                        typename FIELD::TraitTag
+                        > imp;
+    imp.execute(field, mat, b);
+    return 0;
+}
 
-    // void set(const int& other){std::cout << "int" << std::endl;}
-        
-};
-template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
-class ApplyBCImplement_{
-public:
-    ApplyBCImplement_(){
-        std::cout << "ApplyBC Implement Basic" << std::endl;
-    };
-};
-template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
-class BuildMatrixImplement_{
-public:
-    BuildMatrixImplement_(){
-        std::cout << "BuildMatrix Implement Basic" << std::endl;
-    };
-};
+
 }
 
 #endif

@@ -14,11 +14,11 @@ class SFieldCenter_: public SField_<DIM, VT, GRID, GHOST, ORDER>{
 public:
     static const St Dim = DIM;
 
+    typedef StructureTag TraitTag;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
     typedef VT    ValueType;
-    typedef StructureType TraitType;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Base;
     typedef SFieldCenter_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;

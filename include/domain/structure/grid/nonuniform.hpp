@@ -17,19 +17,19 @@ class SGridNonUniform_ :public SGrid_<DIM>{
 public:
     static const St Dim = DIM;
     typedef ArrayListV_<double> Arr;
-    typedef Point_<double, Dim> Poi;
+    typedef Point_<double, Dim> Point;
     typedef SIndex_<Dim> Index;
     static const St NumVertex = DIM == 1 ? 2 : (DIM == 2 ? 4 : 8);
     static const St NumFace = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
 protected:
-    Poi   _min, _max;
+    Point   _min, _max;
     Index _n, _ng;  // number of node and number of node and ghost
     St    _gl;        // ghost layer
     Arr   _cs[Dim];   // cell size
     Arr   _c[Dim];    // coordinate center
 public:
     SGridNonUniform_(
-            const Poi& min, const Poi& max,
+            const Point& min, const Point& max,
             const Index& n, const Idx& gl) {
         _min = min;
         _max = max;
@@ -40,7 +40,7 @@ public:
         }
         _set_uniform_grid();
     }
-    SGridNonUniform_(const Poi& min,           // mimun location
+    SGridNonUniform_(const Point& min,           // mimun location
             const Idx& gl,          // ghost layer
             const Arr& csx,         //
             const Arr& csy = Arr(), //
@@ -120,16 +120,16 @@ public:
         return res;
     }
     // center ==================================
-    Poi c(Idx i, Idx j = 0, Idx k = 0) const {
-        Poi res;
+    Point c(Idx i, Idx j = 0, Idx k = 0) const {
+        Point res;
         Idx ai[] = { i, j, k };
         for (St d = 0; d < Dim; ++d) {
             res[d] = _c[d][_IDX(ai[d])];
         }
         return std::move(res);
     }
-    Poi C(Idx i, Idx j = 0, Idx k = 0) const {
-        Poi res;
+    Point C(Idx i, Idx j = 0, Idx k = 0) const {
+        Point res;
         Idx ai[] = { i, j, k };
         for (St d = 0; d < Dim; ++d) {
             res[d] = _c[d][ai[d]];
@@ -146,10 +146,10 @@ public:
         return (dim < Dim) ? _c[dim][_IDX(idx[dim])] : 0;
     }
 
-    Poi c(const Index& index) const {
+    Point c(const Index& index) const {
         return c(index.i(), index.j(), index.k());
     }
-    Poi C(const Index& INDEX) const {
+    Point C(const Index& INDEX) const {
         return C(INDEX.i(), INDEX.j(), INDEX.k());
     }
 
@@ -195,12 +195,12 @@ public:
     }
 
     // face  ===================================
-    Poi f(St dim, int fb, const Index& index) const {
+    Point f(St dim, int fb, const Index& index) const {
         return f(dim, fb, index.i(), index.j(), index.k());
     }
 
-    Poi f(St dim, int fb, Idx i, Idx j = 0, Idx k = 0) const {
-        Poi pc = c(i, j, k);
+    Point f(St dim, int fb, Idx i, Idx j = 0, Idx k = 0) const {
+        Point pc = c(i, j, k);
         Idx ai[] = { i, j, k };
         Vt halfs = hs_(dim, ai[dim]);
         if (fb == _P_) { //right face
@@ -245,7 +245,7 @@ public:
         return std::abs(halfs - cen);
     }
     // vertex ================================
-    Poi v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {
+    Point v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {
         static const short VERTEX_IDX[][3] = {
             //     x    y    z
                 { _M_, _M_, _M_ }, //
@@ -261,14 +261,14 @@ public:
                  j, VERTEX_IDX[order][1],
                  k, VERTEX_IDX[order][2]);
     }
-    Poi v(Idx order, Index index) const{
+    Point v(Idx order, Index index) const{
         return v(order, index.i(), index.j(), index.k());
     }
 
-    Poi v(Idx i,     short oi,
+    Point v(Idx i,     short oi,
           Idx j = 0, short oj = 0,
           Idx k = 0, short ok = 0) const {
-        Poi res;
+        Point res;
         Idx ai[] = { i, j, k };
         short ao[] = { oi, oj, ok };
         for (St d = 0; d < Dim; ++d) {
@@ -293,7 +293,7 @@ public:
 
 
     // Point is in the range
-    inline bool is_in_on(Poi p) {
+    inline bool is_in_on(Point p) {
         bool res = true;
         FOR_EACH_DIM
         {

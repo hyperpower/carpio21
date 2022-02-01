@@ -10,7 +10,7 @@
 
 #include "geometry/objects/objects.hpp"
 #include "utility/tinyformat.hpp"
-#include "io/io_define.hpp"
+#include "io/text_file.hpp"
 #include <array>
 #include <memory>
 #include <cmath>

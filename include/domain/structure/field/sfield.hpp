@@ -7,6 +7,8 @@
 
 namespace carpio{
 
+struct SFieldTag: public StructureTag{};
+
 template<St DIM, 
          class VT,
          class GRID, 
@@ -20,7 +22,7 @@ public:
     typedef GHOST Ghost;
     typedef ORDER Order;
     typedef VT    ValueType;
-    typedef StructureType TraitType;
+    typedef StructureTag TraitTag;
     typedef FieldBase_<Dim, VT, GRID, GHOST, ORDER> Base;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
@@ -350,7 +352,7 @@ public:
 //     typedef SGhostRegular_<DIM, GRID> Ghost;
 //     typedef ORDER Order;
 //     typedef VT    ValueType;
-//     typedef StructureType TraitType;
+//     typedef StructureTag TraitTag;
 //     typedef SField_<Dim, VT, GRID, Ghost, ORDER> Self;
 //     typedef typename Grid::Index Index;
 

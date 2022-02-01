@@ -14,7 +14,7 @@ template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class BuildMatrixImplement_<
     FIELD, DIM, 
     LinearPolynomial_<Vt, typename GRID::Index>, 
-    GRID, GHOST, ORDER, StructureType>{
+    GRID, GHOST, ORDER, StructureTag>{
 public:
     typedef FIELD ExpField;
 

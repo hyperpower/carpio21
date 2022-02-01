@@ -25,7 +25,7 @@ public:
     // typedef ApplyBCImplement_<FIELD, 
     //                           DIM, ValueType,
     //                           GRID, GHOST, ORDER, 
-    //                           StructureType> ApplyBC;
+    //                           StructureTag> ApplyBC;
 protected:
     spBI _spbi;
 public:

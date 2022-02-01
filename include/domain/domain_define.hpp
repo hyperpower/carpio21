@@ -17,6 +17,11 @@ enum CellType{
     _Leaf_        = 7,
 };
 
+struct DomainTag{};
+
+struct StructureTag: public DomainTag{};
+struct OctreeTag:    public DomainTag{};
+
 
 
 

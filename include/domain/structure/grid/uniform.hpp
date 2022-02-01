@@ -8,24 +8,27 @@
 
 namespace carpio{
 
+class SGridUniformTag : public SGridTag{};
+
 template<St DIM>
 class SGridUniform_ :public SGrid_<DIM>{
 public:
     static const St Dim = DIM;
+    typedef SGridUniformTag Tag;
     typedef ArrayListV_<double> Arr;
-    typedef Point_<double, Dim> Poi;
+    typedef Point_<double, Dim> Point;
     typedef SIndex_<Dim> Index;
     static const St NumVertex = DIM == 1 ? 2 : (DIM == 2 ? 4 : 8);
     static const St NumFace   = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
     typedef std::function<void(const Index&)> FunIndex;
 protected:
-    Poi   _min;
+    Point   _min;
     Index _n, _ng;    // number of node and number of node and ghost
     St    _gl;        // ghost layer
     Vt    _cs;        // cell size
     Arr   _c[Dim];    // coordinate center
 public:
-    SGridUniform_(const Poi&   minp,
+    SGridUniform_(const Point&   minp,
                   const Index& n,
                   const Vt&    cellsize,
                   const St&    ghostlayer):
@@ -43,7 +46,7 @@ public:
     }
 
     SGridUniform_(
-            const Poi& minp,
+            const Point& minp,
             const Idx& nx,
             const Vt&  length_on_x,
             const St&  ghostlayer) :
@@ -111,15 +114,15 @@ public:
         return res;
     };
     // center ==================================
-    Poi c(Idx i, Idx j = 0, Idx k = 0) const {
-        Poi res;
+    Point c(Idx i, Idx j = 0, Idx k = 0) const {
+        Point res;
         Idx ai[] = { i, j, k };
         for (St d = 0; d < Dim; ++d) {
             res[d] = _c[d][_IDX(ai[d])];
         }
         return res;
     }
-    Poi c(const Index& index) const {
+    Point c(const Index& index) const {
         return c(index.i(), index.j(), index.k());
     }
     Vt  c_(const St& dim, const Idx& idx) const {
@@ -164,12 +167,12 @@ public:
 
 
     // face  ===================================
-    Poi f(St dim, int fb, const Index& index) const {
+    Point f(St dim, int fb, const Index& index) const {
         return f(dim, fb, index.i(), index.j(), index.k());
     }
 
-    Poi f(St dim, int fb, Idx i, Idx j = 0, Idx k = 0) const {
-        Poi pc   = c(i, j, k);
+    Point f(St dim, int fb, Idx i, Idx j = 0, Idx k = 0) const {
+        Point pc   = c(i, j, k);
         Vt halfs = _cs * 0.5;
         if (fb == _P_) { //right face
             pc[dim] += halfs;
@@ -212,7 +215,7 @@ public:
     }
 
     // vertex ================================
-    Poi v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {
+    Point v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {
         static const short VERTEX_IDX[][3] = {
                 // x    y    z
                 { _M_, _M_, _M_ }, // 0
@@ -228,15 +231,15 @@ public:
                  j, VERTEX_IDX[order][1],
                  k, VERTEX_IDX[order][2]);
     }
-    Poi v(Idx order, Index index) const{
+    Point v(Idx order, Index index) const{
         return v(order, index.i(), index.j(), index.k());
     }
 
 
-    Poi v(Idx i,     short oi,
-          Idx j = 0, short oj = 0,
-          Idx k = 0, short ok = 0) const {
-        Poi res;
+    Point v(Idx i,     short oi,
+            Idx j = 0, short oj = 0,
+            Idx k = 0, short ok = 0) const {
+        Point res;
         Idx ai[] = { i, j, k };
         short ao[] = { oi, oj, ok };
         for (St d = 0; d < Dim; ++d) {
@@ -255,7 +258,7 @@ public:
 
 
     // Point is in the range
-    inline bool is_in_on(Poi p) {
+    inline bool is_in_on(Point p) {
         bool res = true;
         FOR_EACH_DIM
         {
@@ -328,6 +331,19 @@ public:
     }
 
     void for_each(FunIndex fun){
+        St nx = this->n(_X_);
+        St ny = Dim > 1? this->n(_Y_):1;
+        St nz = Dim > 2? this->n(_Z_):1;
+        for (St i = 0; i < nx; i++) {
+            for (St j = 0; j < ny; j++) {
+                for (St k = 0; k < nz; k++){
+                    Index idx(i,j,k);
+                    fun(idx);
+                }
+            }
+        }
+    }
+    void for_each(FunIndex fun) const{
         St nx = this->n(_X_);
         St ny = Dim > 1? this->n(_Y_):1;
         St nz = Dim > 2? this->n(_Z_):1;

@@ -14,7 +14,7 @@ public:
     typedef GRID         Grid;
 
     typedef ArrayListT_<Vt> Arr;
-    typedef Point_<Vt, Dim> Poi;
+    typedef Point_<Vt, Dim> Point;
     
     typedef St size_type;
     static const St NumVertex = DIM == 1 ? 2 : (DIM == 2 ? 4 : 8);
