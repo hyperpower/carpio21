@@ -14,10 +14,12 @@ FILE_ORIGINAL = [
 ]
 
 if __name__ == '__main__':
+    args = RT.parse_args()
     runer = RT.Runer(__file__, FILE_ORIGINAL)
-    runer.clean()
-    runer.mkdir_all()
-    runer.cmake()
-    runer.build()
-    runer.execute()
-    runer.build_doc()
+    runer.run(args)
+    # runer.clean()
+    # runer.mkdir_all()
+    # runer.cmake()
+    # runer.build()
+    # runer.execute()
+    # runer.build_doc()

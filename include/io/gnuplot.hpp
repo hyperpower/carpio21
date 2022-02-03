@@ -1092,55 +1092,6 @@ protected:
 	}
 };
 
-//------------------------------------------------------------------------------
-//int GnuplotShow(const std::list<Gnuplot_actor>& lga);
-//int GnuplotShow(Gnuplot&, const std::list<Gnuplot_actor>& lga);
-// namespace GnuplotActor {
-
-// typedef std::shared_ptr<carpio::Gnuplot_actor> spActor;
-// typedef std::list<spActor> list_spActor;
-
-// template<typename X, typename Y>
-// spActor XY(const X& x, const Y& y,
-//         const std::string &pcmd = "using 1:2 title \"\" ",
-//         const std::string& scmd = "") {
-//     spActor actor = spActor(new Gnuplot_actor());
-//     actor->command() = pcmd;
-//     actor->style() = scmd;
-//     ASSERT(x.size() == y.size());
-//     typename X::const_iterator xiter = x.begin();
-//     typename X::const_iterator yiter = y.begin();
-//     for (; xiter != x.end();) {
-//         std::ostringstream sst;
-//         sst << (*xiter) << " " << (*yiter);
-//         actor->data().push_back(sst.str());
-//         xiter++;
-//         yiter++;
-//     }
-// //	actor->data().push_back("");
-//     return actor;
-// }
-
-// template<typename Container>
-// spActor XY(
-//         const Container& con, // matrix like data structure
-//         const St& c1, // column index
-//         const St& c2, // column index
-//         const std::string &pcmd = "using 1:2 title \"\" ",
-//         const std::string& scmd = "") {
-//     spActor actor = spActor(new Gnuplot_actor());
-//     actor->command() = pcmd;
-//     actor->style() = scmd;
-//     for (auto& row : con) {
-//         std::ostringstream sst;
-//         sst << row[c1] << " " << row[c2];
-//         actor->data().push_back(sst.str());
-//     }
-//     return actor;
-// }
-
-// }
-
 }
 
 #endif

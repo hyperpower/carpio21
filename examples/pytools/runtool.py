@@ -1,7 +1,10 @@
+import argparse
 import os
 import shutil
 import platform
 import sys
+import argparse
+import time
 from path import *
 # sphinx should be installed
 from sphinx.cmd.build import main as sphinx_main
@@ -44,6 +47,25 @@ def clean(path, original_files):
         shutil.rmtree(os.path.join(path, d))
 
 
+def parse_args():
+    parser=argparse.ArgumentParser(description="a script to do stuff")
+    parser.add_argument('-c', "--clean", 
+                        help="clean build files", 
+                        action="store_true")
+    parser.add_argument('-m', "--make", 
+                        help="make files", 
+                        action="store_true")
+    parser.add_argument("-b", "--build",
+                        help="build project" ,
+                        action="store_true")
+    parser.add_argument("-e", "--execute",
+                        help="execute main file" ,
+                        action="store_true")
+    parser.add_argument("-r", "--run",
+                        help="run project" ,
+                        action="store_true")
+    args=parser.parse_args()
+    return args
 
 
 
@@ -107,3 +129,59 @@ class Runer:
 
         sys.path.append(os.path.abspath(self._path.this))
         sphinx_main(args.split())
+
+    def _init_time_record(self):
+        names = [
+            "make_wall_time",
+            "build_wall_time",
+            "execute_wall_time",
+            "doc_wall_time",
+        ]
+        for n in names:
+            self._info[n] = 0.0
+
+    def _run_all(self):
+        self.clean()
+        print("make ===== ")
+        t  = time.perf_counter()
+        #
+        self.mkdir_all()
+        self.cmake()
+        #
+        self._info["make_wall_time"] = time.perf_counter() - t
+        print("build ===== ")
+        t  = time.perf_counter()
+        self.build()
+        self._info["build_wall_time"] = time.perf_counter() - t
+
+
+
+
+    def run(self, args):
+        record = {} 
+        if args.clean:
+            record["clean"] = True
+            self.clean()
+        if args.make:
+            print("make ===== ")
+            t  = time.perf_counter()
+            record["make"] = True
+            #
+            self.mkdir_all()
+            self.cmake()
+            #
+            self._info["make_wall_time"] = time.perf_counter() - t
+        if args.build:
+            t  = time.perf_counter()
+            record["build"] = True
+            self.build()
+            self._info["build_wall_time"] = time.perf_counter() - t
+        if args.execute:
+            record["execute"] = True
+            print("execute")
+        
+        if len(record) == 0:
+            record["run_all"] = True
+            print("run_all")
+        
+        print(self._info)
