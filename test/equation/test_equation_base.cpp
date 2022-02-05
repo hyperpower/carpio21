@@ -30,12 +30,12 @@ TEST(equation, equation_base){
     // for(auto& row : s){
         // std::cout << row << std::endl;
     // }
-    OutputFile("./test_output/grid.txt", *spgrid);
+    // OutputFile("./test_output/grid.txt", *spgrid);
 
-    TextFile f("./test_output/grid.txt");
-    f.read();
-    f.parse_config();
-    f.show_config();
+    // TextFile f("./test_output/grid.txt");
+    // f.read();
+    // f.parse_config();
+    // f.show_config();
 }
 
 TEST(equation, laplace){

@@ -19,7 +19,7 @@ public:
 
 	typedef OCellRect_<VALUE, DIM> Self;
 
-	typedef void (*pfunction)(Self *, utPointer);
+	// typedef void (*pfunction)(Self *, utPointer);
 
 protected:
 	vt _center[Dim];
@@ -228,9 +228,9 @@ public:
 		return false; // make complier happy;
 	}
 
-	void show(pfunction fun = nullptr, utPointer utp = nullptr) const {
-		fun(this, utp);
-	}
+	// void show(pfunction fun = nullptr, utPointer utp = nullptr) const {
+	// 	fun(this, utp);
+	// }
 
 	inline void transfer(vt dx, vt dy = 0.0, vt dz = 0.0) {
 		_center[0] += dx;

@@ -11,6 +11,7 @@
 #undef min
 
 namespace carpio{
+class SGridNonUniformTag : public SGridTag{};
 
 template<St DIM>
 class SGridNonUniform_ :public SGrid_<DIM>{
