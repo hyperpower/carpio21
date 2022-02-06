@@ -50,13 +50,9 @@ def build(path):
     return runtime
 
 def main():
+    args = RT.parse_args()
     runer = RT.Runer(__file__, FILE_ORIGINAL)
-    runer.clean()
-    runer.mkdir()
-    runer.cmake()
-    runer.build()
-    runer.execute()
-    # print(rt)
+    runer.run(args)
 
 if __name__ == '__main__':
     main()

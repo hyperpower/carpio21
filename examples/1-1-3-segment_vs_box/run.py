@@ -17,9 +17,6 @@ import runtool as RT
 # import reporttool as REPORT
 
 if __name__ == '__main__':
+    args = RT.parse_args()
     runer = RT.Runer(__file__, FILE_ORIGINAL)
-    runer.clean()
-    runer.mkdir()
-    runer.cmake()
-    runer.build()
-    runer.execute()
+    runer.run(args)

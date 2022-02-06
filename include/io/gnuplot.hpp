@@ -589,8 +589,8 @@ public:
 			const std::string& filename,
 			           double  x         = 800,
 			           double  y         = 600,
-			const std::string& font      = "Fira Code",
-			              int  fontsize  = 12) {
+			const std::string& font      = "arial",
+			              int  fontsize  = 8) {
 		this->terminal_std = "pngcairo";
 		std::stringstream sst;
 		sst << "set terminal " << this->terminal_std << " enhanced font '"
@@ -602,7 +602,7 @@ public:
 
 	Gnuplot& set_terminal_jpeg(
 			const std::string& filename,
-			double x = 400, double y = 300,
+			double x = 800, double y = 600,
 			const std::string& font = "Helvetica",
 			int fontsize = 12) {
 		this->terminal_std = "jpeg";

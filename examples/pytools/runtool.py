@@ -61,12 +61,14 @@ def parse_args():
     parser.add_argument("-e", "--execute",
                         help="execute main file" ,
                         action="store_true")
+    parser.add_argument("-d", "--document",
+                        help="generate document file" ,
+                        action="store_true")
     parser.add_argument("-r", "--run",
                         help="run project" ,
                         action="store_true")
     args=parser.parse_args()
     return args
-
 
 
 class Runer:
@@ -100,14 +102,15 @@ class Runer:
     def build(self):
         project_name = self._info["name"]
         if platform.system() == "Windows":
-            cmd = "MSBuild \""+ os.path.join(self._path.this, "build/" + project_name + ".sln\"")
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
         print(cmd)
         os.system(cmd)
 
     def execute(self):
         current = os.getcwd()
         os.chdir(self._path.this)
-        os.system(self._path.this + "/build/Debug/main.exe")
+        print(self._path.this + "/build/Release/main.exe")
+        os.system("\"" + self._path.this + "/build/Release/main.exe\"")
         os.chdir(current)
         pass
 
@@ -121,10 +124,12 @@ class Runer:
         source_suffix = '.rst'
         html_theme    = 'alabaster'
 
-        args  = f". -b {build_format} -D extensions=sphinx.ext.autodoc " \
+        args  = f". -b {build_format} -D extensions=sphinx.ext.autodoc,sphinx.ext.mathjax " \
                 f"-D master_doc={master_doc} " \
                 f"-D source_suffix={source_suffix} " \
                 f"-D html_theme={html_theme} " \
+                f"-D html_theme_options.font_size=18px " \
+                f"-D html_theme_options.body_max_width=1200px " \
                 f"-C {output_foldername} "
 
         sys.path.append(os.path.abspath(self._path.this))
@@ -135,7 +140,7 @@ class Runer:
             "make_wall_time",
             "build_wall_time",
             "execute_wall_time",
-            "doc_wall_time",
+            "documet_wall_time",
         ]
         for n in names:
             self._info[n] = 0.0
@@ -153,8 +158,10 @@ class Runer:
         t  = time.perf_counter()
         self.build()
         self._info["build_wall_time"] = time.perf_counter() - t
-
-
+        print("execute ===== ")
+        t  = time.perf_counter()
+        self.execute()
+        self._info["execute_wall_time"] = time.perf_counter() - t
 
 
     def run(self, args):
@@ -177,11 +184,23 @@ class Runer:
             self.build()
             self._info["build_wall_time"] = time.perf_counter() - t
         if args.execute:
+            print("execute ===== ")
+            t  = time.perf_counter()
             record["execute"] = True
-            print("execute")
+            self.execute()
+            self._info["execute_wall_time"] = time.perf_counter() - t
+        if args.document:
+            print(" build document ===== ")
+            t  = time.perf_counter()
+            record["document"] = True
+            self.build_doc()
+            self._info["document_wall_time"] = time.perf_counter() - t
+
         
         if len(record) == 0:
+            print("run_all ==== ")
             record["run_all"] = True
-            print("run_all")
+            self._run_all()
+            
         
-        print(self._info)
+        # print(self._info)
