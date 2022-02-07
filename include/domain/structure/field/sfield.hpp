@@ -95,46 +95,39 @@ public:
     }
 
     Self& operator+=(const Vt& rhs){
-        // actual addition of rhs to *this
         _arr += rhs;
         return *this;
     }
 
     Self& operator-=(const Self& rhs) {
-        // actual addition of rhs to *this
         ASSERT(is_compatible(rhs));
         _arr -= rhs._arr;
         return *this;
     }
 
     Self& operator-=(const Vt& rhs) {
-        // actual addition of rhs to *this
         _arr -= rhs;
         return *this;
     }
 
     Self& operator*=(const Self& rhs) {
-        // actual addition of rhs to *this
         ASSERT(is_compatible(rhs));
         _arr *= rhs._arr;
         return *this;
     }
 
     Self& operator*=(const Vt& rhs) {
-        // actual addition of rhs to *this
         _arr *= rhs;
         return *this;
     }
 
     Self& operator/=(const Self& rhs) {
-        // actual addition of rhs to *this
         ASSERT(is_compatible(rhs));
         _arr /= rhs._arr;
         return *this;
     }
 
     Self& operator/=(const Vt& rhs) {
-        // actual addition of rhs to *this
         _arr /= rhs;
         return *this;
     }
@@ -317,7 +310,7 @@ public:
     typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
     typedef typename GRID::Index  Index;
 
-    static Vt InitAValue(const Index& index){
+    static Vt InitAValue(const Index&){
         return 0.0;
     }
 };
@@ -333,61 +326,10 @@ public:
     typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
     typedef typename GRID::Index  Index;
     static Poly InitAValue(const Index& index){
-        // std::cout << "LinearPolynomial" << std::endl;
         return Poly(index);
     }
 };
 
-
-
-// template<St DIM, 
-//          class VT,
-//          class GRID,  
-//          class ORDER>
-// class SField_<DIM, VT, GRID, SGhostRegular_<DIM, GRID>, ORDER>: public FieldBase_<DIM, VT, GRID, SGhostRegular_<DIM, GRID>, ORDER>{
-// public:
-//     static const St Dim = DIM;
-
-//     typedef GRID  Grid;
-//     typedef SGhostRegular_<DIM, GRID> Ghost;
-//     typedef ORDER Order;
-//     typedef VT    ValueType;
-//     typedef StructureTag TraitTag;
-//     typedef SField_<Dim, VT, GRID, Ghost, ORDER> Self;
-//     typedef typename Grid::Index Index;
-
-//     typedef std::shared_ptr<Grid>  spGrid;
-//     typedef std::shared_ptr<Ghost> spGhost;
-//     typedef std::shared_ptr<Order> spOrder;
-
-//     typedef ArrayListV_<ValueType> Arr; 
-// protected:
-//     spGrid  _spgrid;
-//     spGhost _spghost;
-//     spOrder _sporder;
-//     // for saving data
-//     Arr _arr;
-// public:
-//     SField_(spGrid spg, spGhost spgh):
-//         _spgrid(spg), _spghost(spgh){
-//         std::cout <<"Regular__" << std::endl;
-//         // Initall a default order_xyz
-//         _sporder = spOrder(new Order(spg, spgh));
-//         // make data by order
-//         _arr.reconstruct(_sporder->size());
-//     }
-//     SField_(spGrid spg, spGhost spgh, spOrder spo):
-//         _spgrid(spg), _spghost(spgh), _sporder(spo), _arr(spo->size()){
-//         std::cout <<"Regular__" << std::endl;
-//     }
-//     ValueType& operator()(const Index& index) {
-//         return _arr[_sporder->get_order(index)];
-//     }
-
-//     const ValueType& operator()(const Index& index) const {
-//         return _arr[_sporder->get_order(index)];
-//     }
-// };
 }
 
 #endif
