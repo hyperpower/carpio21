@@ -52,8 +52,6 @@ public:
     typedef DomainTag TraitTag;
     typedef FieldBase_<Dim, VT, Grid, Ghost, Order> Self;
 
-    typedef FieldBase_<Dim, ValueType, Grid, Ghost, Order> Self;
-
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
     typedef std::shared_ptr<Order> spOrder;

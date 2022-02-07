@@ -2,6 +2,7 @@
 #define _DOMAIN_DEFINE_HPP
 
 #include <iostream>
+#include <memory>
 #include "type_define.hpp"
 
 namespace carpio{

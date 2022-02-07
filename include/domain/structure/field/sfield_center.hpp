@@ -31,8 +31,9 @@ public:
 
     typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
 public:
-    SFieldCenter_(spGrid spg, spGhost spgh):
-        _spgrid(spg), _spghost(spgh){
+    SFieldCenter_(spGrid spg, spGhost spgh){
+        this->_spgrid  = spg;
+        this->_spghost = spgh; 
         // Initall a default order_xyz
         this->_sporder = spOrder(new Order(spg, spgh));
         _initial_arr();
@@ -68,25 +69,25 @@ public:
     }
     
     ValueType&      operator()(St i, St j = 0, St k = 0){
-        return _arr[_sporder->get_order(i,j,k)];
+        return this->_arr[this->_sporder->get_order(i,j,k)];
     }
 
     const ValueType& operator()(St i, St j = 0, St k = 0) const{
-        return _arr[_sporder->get_order(i,j,k)];
+        return this->_arr[this->_sporder->get_order(i,j,k)];
     }
 
     ValueType& operator()(const Index& index) {
-        return _arr[_sporder->get_order(index)];
+        return this->_arr[this->_sporder->get_order(index)];
     }
 
     const ValueType& operator()(const Index& index) const {
-        return _arr[_sporder->get_order(index)];
+        return this->_arr[this->_sporder->get_order(index)];
     }
     // ===========================================
     // arithmatic operator
     // ===========================================
     Self operator-() const{
-        return Self(-Base(*this));
+        return Self(-(Base(*this)));
     }
     Self& operator+=(const Self& rhs){
         Base::operator+=(Base(rhs));
@@ -128,7 +129,7 @@ public:
 protected:
     void _initial_arr(){
         // make data by order
-        this->_arr.reconstruct(_sporder->size());
+        this->_arr.reconstruct(this->_sporder->size());
         for(auto& idx : (*(this->_sporder))){
             this->operator()(idx) = _DataInit::InitAValue(idx);
         }

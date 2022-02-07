@@ -30,6 +30,12 @@ public:
 
     typedef MatrixSCR_<Vt>    Mat;
     typedef ArrayListV_<Vt>   Arr;
+   
+    typedef Solver_<Vt>             Solver; 
+    typedef std::shared_ptr<Solver> spSolver;
+    typedef Jacobi_<Vt> Solver_Jacobi;
+    typedef SOR_<Vt>    Solver_SOR;
+    typedef CG_<Vt>     Solver_CG;
 public:
     Laplace_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){

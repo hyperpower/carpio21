@@ -70,7 +70,7 @@ protected:
     spTimeControl _time;
     spStopControl _stop;
 public:
-    EquationBase_():{} 
+    EquationBase_(){}; 
 
     EquationBase_(spGrid  spgrid, 
                   spGhost spghost,

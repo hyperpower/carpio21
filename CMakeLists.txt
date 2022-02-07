@@ -1,10 +1,11 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_NAME Carpio)
+project(${PROJECT_NAME} VERSION 0.1)
+
 if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)
-project(${PROJECT_NAME} VERSION 0.1)
 
 # window pre-define
 if(MSVC)

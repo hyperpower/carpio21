@@ -83,7 +83,7 @@ public:
     // ===========================================
     Self operator-() const{
         Self res(*this);
-        res._arr = -res._arr;
+        res._arr = -(res._arr);
         return res;
     }
 

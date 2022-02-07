@@ -21,6 +21,9 @@ public:
     typedef LinearPolynomial_<Vt, typename GRID::Index> Exp;
     typedef ApplyBCImplement_<FIELD, DIM, Exp, GRID, GHOST, ORDER, StructureTag> ApplyBC;
     typedef typename GRID::Index Index;
+
+    typedef BoundaryIndex BI;
+    typedef std::shared_ptr<BI> spBI;
 public:
     LaplacianImplement_(){
         // std::cout << "Laplacian Exp Structure" << std::endl;
@@ -83,6 +86,11 @@ public:
     typedef Vt ValueType;
     typedef ApplyBCImplement_<FIELD, DIM, Vt, GRID, GHOST, ORDER, StructureTag> ApplyBC;
     typedef typename GRID::Index Index;
+    typedef FIELD Field;
+    typedef GRID  Grid;
+    
+    typedef BoundaryIndex BI;
+    typedef std::shared_ptr<BI> spBI;
 public:
     LaplacianImplement_(){
         // std::cout << "Laplacian Exp Structure" << std::endl;
