@@ -1,5 +1,3 @@
-# python 3 check
-from site import abs_paths
 import sys
 import os
 
@@ -22,9 +20,9 @@ def check_python():
         print("Python 3.6 or higher is required.")
         sys.exit(1)
 
-def exeternal_check():
-    if not os.path.isdir("./external"):
-        os.mkdir("./external")
+def check_and_new_folder(foldername):
+    if not os.path.isdir("./" + foldername):
+        os.mkdir("./" + foldername)
 
 def download_googletest():
     print("git clone googletest")
@@ -32,11 +30,11 @@ def download_googletest():
     url = "https://github.com/google/googletest.git"
     os.system(" git clone --progress %s %s" % (url, d))
     
-
 def main():
     check_path()
     check_python()
-    exeternal_check()
+    check_and_new_folder("external")
+    check_and_new_folder("test_output")
     download_googletest()
     restore_path()    
 
