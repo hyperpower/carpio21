@@ -138,15 +138,15 @@ public:
         }
     }
 
-    // void run_events(St step, Vt t, int fob) {
-    //     for (auto& event : this->_events) {
-    //         if (event.second->do_execute(step, t, fob)) {
-    //             event.second->execute(step, t, fob, this);
-    //         }
-    //     }
-    // }
+    void run_events(St step, Vt t, int fob) {
+        for (auto& event : this->_events) {
+            if (event.second->do_execute(step, t, fob)) {
+                event.second->execute(step, t, fob, this);
+            }
+        }
+    }
 
-    virtual void run_events(St step, Vt t, int fob) = 0; 
+    // virtual void run_events(St step, Vt t, int fob) = 0; 
     
 
     virtual Ghost& ghost() {

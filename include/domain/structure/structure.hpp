@@ -18,7 +18,7 @@
 #include "field/sfield_center.hpp"
 
 #include "io/sgnuplot_actor.hpp"
-// #include "io/s_stringify.hpp"
+#include "io/s_stringify.hpp"
 
 #include "operator/slaplacian.hpp"
 #include "operator/sbuild_matrix.hpp"

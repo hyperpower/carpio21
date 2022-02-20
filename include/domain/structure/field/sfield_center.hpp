@@ -136,8 +136,44 @@ protected:
     }
 };
 
+template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+          const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+    lhs += rhs;
+    return lhs;
+}
+template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator*(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+          const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+    lhs += rhs;
+    return lhs;
+}
+template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
+          SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+    const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+    lhs /= rhs;
+    return lhs;
+}
 
+template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
+    SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
+    lhs /= rhs;
+    return lhs;
+}
 
+template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
+    const Vt& lhs, 
+    const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+    SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> res(rhs);
+    res.assign(lhs);
+    res /= rhs;
+    return res;
+}
 }
 
 #endif
