@@ -31,6 +31,7 @@ public:
     virtual std::string type_name() const{
         return "SGrid";
     };
+    virtual Point original() const{return Point();};
     virtual St dim() const{return Dim;};
     // ghost layer ============================
     virtual Idx ghost_layer() const{return 0;};

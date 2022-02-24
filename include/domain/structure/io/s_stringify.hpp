@@ -13,29 +13,38 @@ namespace carpio{
 typedef std::list<std::string> Strings;
 
 template<class ANY>
-Strings _Stringify(const ANY& a,  StructureTag){
+Strings _Stringify(const ANY& a,  StructureTag tag){
+    typedef typename ANY::Tag Tag;
+    auto res = _StringifyHead(a, Tag());
+    res.splice(res.end(), _StringifyData(a, Tag()));
+    return res;
 };
 
 template<class ANY>
 Strings _StringifyHead(const ANY& a, StructureTag){
     Strings res;
-    res.append("## TYPE_NAME : ", a.type_name());
-    res.append("## DIMENSION : ", ANY::Dim);
+    res.push_back("## TYPE_NAME : " + a.type_name());
+    res.push_back("## DIMENSION : " + ANY::Dim);
     return res;      
 };
 
 template<class ANY>
-Strings _StringifyHead(const ANY& a, SGridTag){
+Strings _StringifyHead(const ANY& a, SGridUniformTag){
     Strings res;
     res = _StringifyHead(a, StructureTag());
-    res.append("## TYPE_NAME : ", a.type_name());
-    res.append("## DIMENSION : ", ANY::Dim);
-    return res;
-      
+    auto po = a.original();
+    res.push_back(tfm::format("## ORIGINAL: %.5e, %.5e, %.5e", 
+        po.value(0), po.value(1), po.value(2)));
+    res.push_back(tfm::format("## SIZE : %d, %d, %d",
+        a.n(0), a.n(1), a.n(2)));
+    res.push_back(tfm::format("## GHOST_LAYER : %d",
+        a.ghost_layer()));
+    return res;      
 };
 
 template<class ANY>
-Strings _StringifyData(const ANY& a, const StructureTag& tag){
+Strings _StringifyData(const ANY& a, SGridUniformTag){
+    return Strings();
 };
 
 

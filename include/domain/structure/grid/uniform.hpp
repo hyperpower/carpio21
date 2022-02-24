@@ -72,6 +72,10 @@ public:
         return "SGridUniform";
     };
 
+    Point original() const{
+        return this->_min;
+    }
+
     // index ==================================
     Index n() const{
         return _n;
