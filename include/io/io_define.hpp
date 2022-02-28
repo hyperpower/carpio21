@@ -110,6 +110,17 @@ inline std::string Trim(const std::string &s) {
     return RTrim(LTrim(s));
 }
 
+inline std::string ToStringAsAxes(const St& d){
+    ASSERT(d < 3);
+    if (d == 0) {
+        return "X";
+    }
+    if (d == 1) {
+        return "Y";
+    }
+    return "Z";
+}
+
 inline std::string ToString(const Axes& a) {
     if (a == _X_) {
         return "_X_";

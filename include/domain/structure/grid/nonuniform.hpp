@@ -17,6 +17,7 @@ template<St DIM>
 class SGridNonUniform_ :public SGrid_<DIM>{
 public:
     static const St Dim = DIM;
+    typedef SGridNonUniformTag Tag;
     typedef ArrayListV_<double> Arr;
     typedef Point_<double, Dim> Point;
     typedef SIndex_<Dim> Index;

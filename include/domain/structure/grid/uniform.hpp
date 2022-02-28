@@ -22,7 +22,7 @@ public:
     static const St NumFace   = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
     typedef std::function<void(const Index&)> FunIndex;
 protected:
-    Point   _min;
+    Point _min;
     Index _n, _ng;    // number of node and number of node and ghost
     St    _gl;        // ghost layer
     Vt    _cs;        // cell size
@@ -98,6 +98,9 @@ public:
         return _cs;
     };
     inline Vt s_(St dim, Index idx) const{
+        return _cs;
+    };
+    inline Vt s_(Index idx, St dim) const{
         return _cs;
     };
 

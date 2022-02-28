@@ -21,7 +21,7 @@ public:
     typedef Point_<Vt, Dim> Point;
     typedef St size_type;
     static const St NumVertex = DIM == 1 ? 2 : (DIM == 2 ? 4 : 8);
-    static const St NumFace = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
+    static const St NumFace   = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
     typedef std::function<void(const Index&)> FunIndex;
 public:
     SGrid_(){}
@@ -42,8 +42,9 @@ public:
     virtual Idx N(St) const{return 0;};
 
     // size ===================================
-    virtual inline Vt s_(St, Idx) const{return 0;};
+    virtual inline Vt s_(St,   Idx) const{return 0;};
     virtual inline Vt s_(St, Index) const{return 0;};
+    virtual inline Vt s_(Index, St) const{return 0;};
 
     // half size
     virtual inline Vt hs_(St, Idx) const {return 0;};
