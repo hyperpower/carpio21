@@ -29,7 +29,7 @@ public:
 
 	typedef PointChain_<TYPE, DIM> PointChain;
 
-	typedef std::shared_ptr<Gnuplot_actor> spActor;
+	typedef std::shared_ptr<GnuplotActor> spActor;
 	typedef std::list<spActor> list_spActor;
 
 	typedef AABBox_<TYPE, DIM, Segment> AABBox;
@@ -41,7 +41,7 @@ public:
 			int color_idx = -1) {
 		ASSERT(Dim == 2);
 		int color = color_idx > 0 ? color_idx : 0;
-		spActor actor = spActor(new Gnuplot_actor());
+		spActor actor = spActor(new GnuplotActor());
 		actor->command() = "using 1:2:3 title \"\" ";
 		actor->style() = "with linespoints lc variable";
 
@@ -61,7 +61,7 @@ public:
 			int color_idx = -1) {
 		ASSERT(Dim == 2);
 		int color = color_idx > 0 ? color_idx : 0;
-		spActor actor = spActor(new Gnuplot_actor());
+		spActor actor = spActor(new GnuplotActor());
 		actor->command() = "using 1:2:3 title \"\" ";
 		actor->style() = "with lines lc variable";
 
@@ -91,7 +91,7 @@ public:
 			int color_idx = -1) {
 		ASSERT(Dim == 2);
 		int color = color_idx > 0 ? color_idx : 0;
-		spActor actor = spActor(new Gnuplot_actor());
+		spActor actor = spActor(new GnuplotActor());
 		actor->command() = "using 1:2:3 title \"\" ";
 		actor->style() = "with lines lc variable";
 

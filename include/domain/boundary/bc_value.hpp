@@ -34,7 +34,7 @@ public:
 		return _type;
 	}
 
-	Vt value(Vt x, Vt y, Vt z, Vt t) const {
+	Vt value(Vt, Vt, Vt, Vt) const {
 		return _value;
 	}
 

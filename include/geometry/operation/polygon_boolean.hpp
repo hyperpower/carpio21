@@ -1183,7 +1183,7 @@ protected:
 
         // GnuplotActor::spActor
         // actor_clip(Gnuplot& gnu, Vt ratio=0.1) {
-        // 	GnuplotActor::spActor actor = Gnuplot::spActor(new Gnuplot_actor());
+        // 	GnuplotActor::spActor actor = Gnuplot::spActor(new GnuplotActor());
         // 	actor->command() = "using 1:2:3:4:5 title \"\" ";
         // 	actor->style() = "with vectors lc variable";
 
@@ -1207,7 +1207,7 @@ protected:
 
         // GnuplotActor::spActor
         // actor_object(Gnuplot& gnu, Vt ratio = 0.1) {
-        // 	GnuplotActor::spActor actor = Gnuplot::spActor(new Gnuplot_actor());
+        // 	GnuplotActor::spActor actor = Gnuplot::spActor(new GnuplotActor());
         // 	actor->command() = "using 1:2:3:4:5 title \"\" ";
         // 	actor->style() = "with vectors lc variable";
 
@@ -1232,7 +1232,7 @@ protected:
         // GnuplotActor::spActor
         // actor_label(Gnuplot & gnu)
         // {
-        // 	GnuplotActor::spActor actor = Gnuplot::spActor(new Gnuplot_actor());
+        // 	GnuplotActor::spActor actor = Gnuplot::spActor(new GnuplotActor());
 
         // 	int count = 1;
         // 	FunN fun = [&actor, &count, &gnu, this](pNode pn) {

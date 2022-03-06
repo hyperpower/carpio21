@@ -65,14 +65,35 @@ Strings _StringifyHead(const ANY& a, SGridNonUniformTag){
 };
 
 template<class ANY>
-Strings _StringifyData(const ANY& a, SGridUniformTag){
-    return Strings();
+Strings _StringifyData(const ANY& grid, SGridTag){
+    Strings res;
+    auto dim = ANY::Dim;
+    Idx nk = (dim>2?grid.n(_Z_):1);
+    Idx nj = (dim>1?grid.n(_Y_):1);
+    short order[] = { 0, 1, 3, 2, 6, 4, 5, 7 };
+    for (Idx k = 0; k < nk; ++k) {
+        for (Idx j = 0; j < nj; ++j) {
+            for (Idx i = 0; i < grid.n(_X_); ++i) {
+            typename ANY::Index index(i, j, k);
+            for (short o = 0; o < grid.num_vertex(); ++o) {
+                auto p = grid.v(order[o], index);
+                res.push_back(ToString(p.value(_X_),
+                                       p.value(_Y_),
+                                       p.value(_Z_),
+                                       " "));
+            }
+            auto p = grid.v(0, index);
+            res.push_back(ToString(p.value(_X_), 
+                                   p.value(_Y_), 
+                                   p.value(_Z_),
+                                   " "));
+            res.push_back("");
+        }
+        }
+    }
+    return res;
 };
 
-template<class ANY>
-Strings _StringifyData(const ANY& a, SGridNonUniformTag){
-    return Strings();
-};
 
 template<class ANY>
 Strings _Stringify(const ANY& a,  StructureTag tag){

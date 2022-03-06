@@ -19,7 +19,7 @@ public:
 
 	// get
 	virtual int type() const {return 1;}
-	virtual Vt value(Vt x, Vt y, Vt z, Vt t) const {return 0.0;}
+	virtual Vt value(Vt , Vt, Vt , Vt) const {return 0.0;}
 
 };
 

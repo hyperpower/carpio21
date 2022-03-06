@@ -36,7 +36,7 @@ public:
 
     typedef PointChain_<TYPE, DIM> PointChain;
 
-    typedef std::shared_ptr<Gnuplot_actor> spActor;
+    typedef std::shared_ptr<GnuplotActor> spActor;
     typedef std::list<spActor> list_spActor;
 
 public:
@@ -47,7 +47,7 @@ public:
             int color_idx = -1) {
         ASSERT(Dim == 2);
         int color = color_idx > 0? color_idx : 0;
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         actor->command() = "using 1:2:3 title \"\" ";
         actor->style()   = "with points lc variable";
 
@@ -63,7 +63,7 @@ public:
             int color_idx      =-1) {
         ASSERT(Dim == 2);
         int color = color_idx > 0? color_idx : 0;
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         actor->command() = "using 1:2:3 title \"\" ";
         actor->style()   = "with points lc variable";
 
@@ -84,7 +84,7 @@ public:
                 bool close         = false) {
         ASSERT(Dim == 2);
         int color = color_idx > 0? color_idx : 0;
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         actor->command() = "using 1:2:3 title \"\" ";
         actor->style()   = "with linespoints lc variable";
 
@@ -119,7 +119,7 @@ public:
             Segment dummy      = typename ContainerSegments::value_type()) {
             ASSERT(Dim == 2);
             int color = color_idx > 0? color_idx : 0;
-            spActor actor = spActor(new Gnuplot_actor());
+            spActor actor = spActor(new GnuplotActor());
             actor->command() = "using 1:2:3 title \"\" ";
             actor->style()   = "with linespoints lc variable";
 
@@ -152,7 +152,7 @@ public:
                          bool close = false) {
         ASSERT(Dim == 2);
         int color = color_idx > 0? color_idx : 0;
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         actor->command() = "using 1:2:3 title \"\" ";
         actor->style()   = "with lines lc variable";
 
@@ -211,7 +211,7 @@ public:
                 listp.push_back(Point(x, y));
             }
         }
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         actor->command() = "using 1:2:3 title \"\" ";
         actor->style()   = "with lines lc variable";
         for(auto& p : listp){
@@ -224,7 +224,7 @@ public:
     spActor lines_points(
             const Segment& seg,
             int color_idx = -1) {
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         int color = color_idx > 0? color_idx : 0;
         actor->command() = "using 1:2:3 title \"\" ";
         actor->style()   = "with linespoints lc variable";
@@ -242,7 +242,7 @@ public:
     spActor lines_points(
             const PointChain& pc,
             int color_idx = -1) {
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         int color = color_idx > 0? color_idx : 0;
         actor->command() = "using 1:2:3 title \"\" ";
         actor->style() = "with linespoints lc variable";
@@ -265,7 +265,7 @@ public:
     }
 
     spActor arrows(const Point& p1, const Point& p2, int color_idx = -1) {
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         int color = color_idx > 0 ? color_idx : 0;
         actor->command() = "using 1:2:3:4:5 title \"\" ";
         actor->style()   = "with vectors lc variable";
@@ -278,7 +278,7 @@ public:
     spActor arrows(
             const PointChain& pc,
             int color_idx = -1) {
-        spActor actor = spActor(new Gnuplot_actor());
+        spActor actor = spActor(new GnuplotActor());
         int color = color_idx > 0? color_idx : 0;
         actor->command() = "using 1:2:3:4:5 title \"\" ";
         actor->style()   = "with vectors lc variable";

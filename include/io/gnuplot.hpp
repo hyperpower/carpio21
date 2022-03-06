@@ -31,7 +31,7 @@
 namespace carpio {
 
 //
-class Gnuplot_actor {
+class GnuplotActor {
 protected:
 	std::string _scmd;  //style comand
 	std::string _pcmd;  //plot command
@@ -41,17 +41,17 @@ public:
 	/*
 	 *  Constructor
 	 */
-	Gnuplot_actor() :
+	GnuplotActor() :
 			_scmd(""), _pcmd(""), _data() {
 	}
-	Gnuplot_actor(const std::string& pcmd, const std::list<std::string>& data) :
+	GnuplotActor(const std::string& pcmd, const std::list<std::string>& data) :
 			_scmd(""), _pcmd(pcmd), _data(data) {
 	}
-	Gnuplot_actor(const std::string& pcmd, const std::string& scmd,
+	GnuplotActor(const std::string& pcmd, const std::string& scmd,
 			const std::list<std::string>& data) :
 			_scmd(scmd), _pcmd(pcmd), _data(data) {
 	}
-	Gnuplot_actor(const Gnuplot_actor& ga) :
+	GnuplotActor(const GnuplotActor& ga) :
 			_scmd(ga._scmd), _pcmd(ga._pcmd), _data(ga._data) {
 	}
 	/*
@@ -103,8 +103,9 @@ public:
 			std::cout << (*ci) << std::endl;
 		}
 	}
-
 };
+
+typedef std::shared_ptr<GnuplotActor> spGnuplotActor;
 
 // A string tokenizer taken from http://www.sunsite.ualberta.ca/Documentation/
 // /Gnu/libstdc++-2.90.8/html/21_strings/stringtok_std_h.txt
@@ -139,8 +140,8 @@ void stringtok(Container &container, std::string const &in,
 
 class Gnuplot {
 public:
-	typedef std::shared_ptr<Gnuplot_actor> spActor;
-	typedef std::list<std::shared_ptr<Gnuplot_actor> > list_spActor;
+	typedef std::shared_ptr<GnuplotActor> spActor;
+	typedef std::list<std::shared_ptr<GnuplotActor> > list_spActor;
 protected:
 	/*
 	 * \brief pointer to the stream that can be used to write to the pipe
@@ -839,7 +840,7 @@ public:
 		return *this;
 	}
 
-	Gnuplot& plot(const Gnuplot_actor& actor) {
+	Gnuplot& plot(const GnuplotActor& actor) {
 		if (actor.empty()) {
 			std::cerr << " >Warning! The Gnuplot actor is empty! \n";
 			return *this;
@@ -862,16 +863,16 @@ public:
 		return *this;
 	}
 
-	Gnuplot& plot(const std::list<std::shared_ptr<Gnuplot_actor> >& lga) {
+	Gnuplot& plot(const std::list<std::shared_ptr<GnuplotActor> >& lga) {
 		if (lga.empty()) {
 			std::cerr << " >Warning! The Gnuplot actor is empty! \n";
 			return *this;
 		}
 		std::ostringstream ss;
 		ss << "plot ";
-		for (std::list<std::shared_ptr<Gnuplot_actor> >::const_iterator iter =
+		for (std::list<std::shared_ptr<GnuplotActor> >::const_iterator iter =
 				lga.begin(); iter != lga.end(); ++iter) {
-			const std::shared_ptr<Gnuplot_actor> spa = (*iter);
+			const std::shared_ptr<GnuplotActor> spa = (*iter);
 			if (spa->empty_style()) {
 				ss << "\"-\" " << spa->command() << "with lines lw 1";
 			} else {
@@ -884,22 +885,22 @@ public:
 		}
 		cmd(ss.str() + "\n");
 		ss.str("");
-		for (std::list<std::shared_ptr<Gnuplot_actor> >::const_iterator iter =
+		for (std::list<std::shared_ptr<GnuplotActor> >::const_iterator iter =
 				lga.begin(); iter != lga.end(); ++iter) {
-			const std::shared_ptr<Gnuplot_actor> spa = (*iter);
+			const std::shared_ptr<GnuplotActor> spa = (*iter);
 			output_inline_data((*spa));
 		}
 		return *this;
 	}
 
-	Gnuplot& plot(const std::list<Gnuplot_actor>& lga) {
+	Gnuplot& plot(const std::list<GnuplotActor>& lga) {
 		if (lga.empty()) {
 			std::cerr << " >Warning! The Gnuplot actor is empty! \n";
 			return *this;
 		}
 		std::ostringstream ss;
 		ss << "plot ";
-		for (std::list<Gnuplot_actor>::const_iterator iter = lga.begin();
+		for (std::list<GnuplotActor>::const_iterator iter = lga.begin();
 				iter != lga.end(); ++iter) {
 			if (iter->empty_style()) {
 				ss << "\"-\" " << iter->command() << "with lines lw 1";
@@ -913,21 +914,21 @@ public:
 		}
 		cmd(ss.str() + "\n");
 		ss.str("");
-		for (std::list<Gnuplot_actor>::const_iterator iter = lga.begin();
+		for (std::list<GnuplotActor>::const_iterator iter = lga.begin();
 				iter != lga.end(); ++iter) {
 			output_inline_data((*iter));
 		}
 		return *this;
 	}
 
-	Gnuplot& splot(const std::list<Gnuplot_actor>& lga) {
+	Gnuplot& splot(const std::list<GnuplotActor>& lga) {
 		if (lga.empty()) {
 			std::cerr << " >Warning! The Gnuplot actor is empty! \n";
 			return *this;
 		}
 		std::ostringstream ss;
 		ss << "splot ";
-		for (std::list<Gnuplot_actor>::const_iterator iter = lga.begin();
+		for (std::list<GnuplotActor>::const_iterator iter = lga.begin();
 				iter != lga.end(); ++iter) {
 			if (iter->empty_style()) {
 				ss << "\"-\" " << iter->command() << "with lines lw 1";
@@ -941,13 +942,13 @@ public:
 		}
 		cmd(ss.str() + "\n");
 		ss.str("");
-		for (std::list<Gnuplot_actor>::const_iterator iter = lga.begin();
+		for (std::list<GnuplotActor>::const_iterator iter = lga.begin();
 				iter != lga.end(); ++iter) {
 			output_inline_data((*iter));
 		}
 		return *this;
 	}
-	Gnuplot& splot(const Gnuplot_actor& actor) {
+	Gnuplot& splot(const GnuplotActor& actor) {
 		if (actor.empty()) {
 			std::cerr << " >Warning! The Gnuplot actor is empty! \n";
 			return *this;
@@ -970,16 +971,16 @@ public:
 		return *this;
 	}
 
-	Gnuplot& splot(const std::list<std::shared_ptr<Gnuplot_actor> >& lga) {
+	Gnuplot& splot(const std::list<std::shared_ptr<GnuplotActor> >& lga) {
 		if (lga.empty()) {
 			std::cerr << " >Warning! The Gnuplot actor is empty! \n";
 			return *this;
 		}
 		std::ostringstream ss;
 		ss << "splot ";
-		for (std::list<std::shared_ptr<Gnuplot_actor> >::const_iterator iter =
+		for (std::list<std::shared_ptr<GnuplotActor> >::const_iterator iter =
 				lga.begin(); iter != lga.end(); ++iter) {
-			const std::shared_ptr<Gnuplot_actor> spa = (*iter);
+			const std::shared_ptr<GnuplotActor> spa = (*iter);
 			if (spa->empty_style()) {
 				ss << "\"-\" " << spa->command() << "with lines lw 1";
 			} else {
@@ -992,15 +993,15 @@ public:
 		}
 		cmd(ss.str() + "\n");
 		ss.str("");
-		for (std::list<std::shared_ptr<Gnuplot_actor> >::const_iterator iter =
+		for (std::list<std::shared_ptr<GnuplotActor> >::const_iterator iter =
 				lga.begin(); iter != lga.end(); ++iter) {
-			const std::shared_ptr<Gnuplot_actor> spa = (*iter);
+			const std::shared_ptr<GnuplotActor> spa = (*iter);
 			output_inline_data((*spa));
 		}
 		return *this;
 	}
 
-	Gnuplot& output_inline_data(const Gnuplot_actor& actor) {
+	Gnuplot& output_inline_data(const GnuplotActor& actor) {
 		std::ostringstream sst;
 		for (std::list<std::string>::const_iterator iter = actor._data.begin();
 				iter != actor._data.end(); ++iter) {
@@ -1042,7 +1043,7 @@ public:
 
 class GnuplotActorMaker{
 public:
-    typedef std::shared_ptr<carpio::Gnuplot_actor> spActor;
+    typedef std::shared_ptr<carpio::GnuplotActor> spActor;
 
 public:
     GnuplotActorMaker(){};
@@ -1085,7 +1086,7 @@ protected:
 	spActor _make_spactor(
 	    const std::string &pcmd = "using 1:2 title \"\" ",
         const std::string& scmd = ""){
-	    spActor actor    = spActor(new Gnuplot_actor());
+	    spActor actor    = spActor(new GnuplotActor());
 	    actor->command() = pcmd;
 	    actor->style()   = scmd;
 	    return actor;

@@ -53,7 +53,23 @@ typedef std::function<void(Vt, Vt, Vt, Vt)> FunXYZT;
 typedef std::function<Vt(Vt, Vt, Vt)>       FunXYZ_V;
 typedef std::function<void(Vt, Vt, Vt)>     FunXYZ;
 
+// Dim tag
+struct DimTag{};
+struct Dim1Tag:public DimTag{};
+struct Dim2Tag:public DimTag{};
+struct Dim3Tag:public DimTag{};
 
+template<St DIM>
+struct DimTagTraits_ {using Type = DimTag;};
+
+template<>
+struct DimTagTraits_<1> {using Type = Dim1Tag;};
+
+template<>
+struct DimTagTraits_<2> {using Type = Dim2Tag;};
+
+template<>
+struct DimTagTraits_<3> {using Type = Dim3Tag;};
 
 enum Axes {
 	_X_ = 0, //

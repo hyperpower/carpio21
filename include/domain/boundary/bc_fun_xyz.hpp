@@ -43,7 +43,7 @@ public:
 		return _type;
 	}
 
-	Vt value(Vt x, Vt y, Vt z, Vt t) const {
+	Vt value(Vt x, Vt y, Vt z, Vt) const {
 		// t will not be used
 		return _fun(x, y, z);
 	}

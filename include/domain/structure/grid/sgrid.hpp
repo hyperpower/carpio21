@@ -14,6 +14,7 @@ template<St DIM>
 class SGrid_ {
 public:
     static const St Dim = DIM;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef SGridTag Tag; 
     typedef SIndex_<Dim> Index;
 

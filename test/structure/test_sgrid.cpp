@@ -21,11 +21,10 @@ TEST(sgrid, initial){
 	spGridUniform spsg(new GridUniform(pmin, {10, 10}, 0.3, 2));
 
 	Gnuplot gnu;
-	GAMStructure_<2> maker;
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 3.5);
 	gnu.set_equal_ratio();
-	gnu.add(maker.wire_frame(*spsg));
+	gnu.add(ToGnuplotActorLines(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid", fig_width, fig_height);
 	gnu.plot();
 
@@ -41,11 +40,10 @@ TEST(sgrid, initial1){
 	spGridUniform spsg(new GridUniform(pmin, {10, 10}, 0.3, 2));
 
 	Gnuplot gnu;
-	GAMStructure_<1> maker;
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 0.5);
 	gnu.set_equal_ratio();
-	gnu.add(maker.wire_frame(*spsg));
+	gnu.add(ToGnuplotActorLines(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid1", fig_width, fig_height);
 	gnu.plot();
 
@@ -61,11 +59,10 @@ TEST(structure, nonuniform){
 	spGridUniform spsg(new GridNonUniform(pmin, pmax, {10, 15}, 2));
 
 	Gnuplot gnu;
-	GAMStructure_<2> maker;
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 3.5);
 	gnu.set_equal_ratio();
-	gnu.add(maker.wire_frame(*spsg));
+	gnu.add(ToGnuplotActorLines(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "NonUniformSturctureGrid", fig_width, fig_height);
 	gnu.plot();
 

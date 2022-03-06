@@ -14,6 +14,7 @@ template<St DIM>
 class SGridUniform_ :public SGrid_<DIM>{
 public:
     static const St Dim = DIM;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef SGridUniformTag Tag;
     typedef ArrayListV_<double> Arr;
     typedef Point_<double, Dim> Point;

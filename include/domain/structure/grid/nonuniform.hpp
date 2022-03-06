@@ -17,6 +17,7 @@ template<St DIM>
 class SGridNonUniform_ :public SGrid_<DIM>{
 public:
     static const St Dim = DIM;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef SGridNonUniformTag Tag;
     typedef ArrayListV_<double> Arr;
     typedef Point_<double, Dim> Point;
@@ -155,7 +156,7 @@ public:
         return C(INDEX.i(), INDEX.j(), INDEX.k());
     }
 
-    Vt cx(Idx i, Idx j = 0, Idx k = 0) const {
+    Vt cx(Idx i, Idx  = 0, Idx  = 0) const {
         return _c[0][_IDX(i)];
     }
 

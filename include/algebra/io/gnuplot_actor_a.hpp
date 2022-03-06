@@ -14,7 +14,7 @@ spActor TwoArrayList(
                const ArrayListT_<T>& arry,
                int   color_idx = -1,
                const std::string& style  = "with points lc variable"){
-    spActor actor    = spActor(new Gnuplot_actor());
+    spActor actor    = spActor(new GnuplotActor());
     actor->command() = "using 1:2:3 title \"\" ";
     actor->style()   = style;
     ASSERT(arrx.size() == arry.size());
@@ -49,7 +49,7 @@ spActor OneArrayList(
                const ArrayListT_<T>& arrx,
                int   color_idx = -1,
                const std::string& style = "with points lc variable"){
-    spActor actor    = spActor(new Gnuplot_actor());
+    spActor actor    = spActor(new GnuplotActor());
     actor->command() = "using 1:2:3 title \"\" ";
     actor->style()   = style;
     for(St i = 0; i < arrx.size(); ++i){

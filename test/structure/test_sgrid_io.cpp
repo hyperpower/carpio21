@@ -22,9 +22,14 @@ TEST(sgrid, initial){
     spGridUniform spsg(new GridUniform(pmin, {10, 10}, 0.3, 2));
 
     auto out = Stringify(*spsg);
-    for(auto& s : out){
-        std::cout << s << std::endl;
-    }
+    // for(auto& s : out){
+        // std::cout << s << std::endl;
+    // }
+	Gnuplot gnu;
+    auto actor = ToGnuplotActorLines(*spsg);
+	gnu.add(actor);
+    gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid", fig_width, fig_height);
+	gnu.plot();
 }
 
 TEST(sgrid, nonuniform){
@@ -40,8 +45,8 @@ TEST(sgrid, nonuniform){
         new GridNonUniform(pmin, pmax, {10, 10}, 2));
 
     auto out = Stringify(*spsg);
-    for(auto& s : out){
-        std::cout << s << std::endl;
-    }
+    // for(auto& s : out){
+        // std::cout << s << std::endl;
+    // }
 
 }
