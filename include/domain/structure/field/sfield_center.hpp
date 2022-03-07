@@ -5,6 +5,8 @@
 
 namespace carpio{
 
+struct SFieldCenterTag: public SFieldTag{};
+
 template<St DIM, 
          class VT,
          class GRID, 
@@ -14,7 +16,7 @@ class SFieldCenter_: public SField_<DIM, VT, GRID, GHOST, ORDER>{
 public:
     static const St Dim = DIM;
 
-    typedef StructureTag TraitTag;
+    typedef SFieldCenterTag Tag;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;

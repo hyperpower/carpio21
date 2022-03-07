@@ -74,21 +74,11 @@ Strings _StringifyData(const ANY& grid, SGridTag){
     for (Idx k = 0; k < nk; ++k) {
         for (Idx j = 0; j < nj; ++j) {
             for (Idx i = 0; i < grid.n(_X_); ++i) {
-            typename ANY::Index index(i, j, k);
-            for (short o = 0; o < grid.num_vertex(); ++o) {
-                auto p = grid.v(order[o], index);
-                res.push_back(ToString(p.value(_X_),
-                                       p.value(_Y_),
-                                       p.value(_Z_),
-                                       " "));
+                typename ANY::Index index(i, j, k);
+                res.splice(res.end(), 
+                           _StringifyCell(grid, index, SGridTag(), ANY::DimTag()));
+                res.push_back("");
             }
-            auto p = grid.v(0, index);
-            res.push_back(ToString(p.value(_X_), 
-                                   p.value(_Y_), 
-                                   p.value(_Z_),
-                                   " "));
-            res.push_back("");
-        }
         }
     }
     return res;
@@ -101,6 +91,58 @@ Strings _Stringify(const ANY& a,  StructureTag tag){
     auto res = _StringifyHead(a, Tag());
     res.splice(res.end(), _StringifyData(a, Tag()));
     return res;
+}
+template<class ANY, class INDEX>
+Strings _StringifyCell(const ANY& grid, const INDEX& index, SGridTag, Dim3Tag){
+    Strings res;
+    short order[] = { 0, 1, 3, 2, 6, 4, 5, 7 };
+    for (short o = 0; o < grid.num_vertex(); ++o){
+        auto p = grid.v(order[o], index);
+        res.push_back(ToString(p.value(_X_),
+                               p.value(_Y_),
+                               p.value(_Z_),
+                               " "));
+    }
+    auto p = grid.v(0, index);
+    res.push_back(ToString(p.value(_X_),
+                           p.value(_Y_),
+                           p.value(_Z_),
+                           " "));
+    return res;
+}
+template<class ANY, class INDEX>
+Strings _StringifyCell(const ANY& grid, const INDEX& index, SGridTag, Dim2Tag){
+    Strings res;
+    short order[] = { 0, 1, 3, 2 };
+    for (short o = 0; o < grid.num_vertex(); ++o){
+        auto p = grid.v(order[o], index);
+        res.push_back(ToString(p.value(_X_),
+                               p.value(_Y_),
+                               " "));
+    }
+    auto p = grid.v(0, index);
+    res.push_back(ToString(p.value(_X_),
+                           p.value(_Y_),
+                           " "));
+    return res;
+}
+template<class ANY, class INDEX>
+Strings _StringifyCell(const ANY& grid, const INDEX& index, SGridTag, Dim1Tag){
+    Strings res;
+    short order[] = { 0, 1 };
+    for (short o = 0; o < grid.num_vertex(); ++o){
+        auto p = grid.v(order[o], index);
+        res.push_back(ToString(p.value(_X_),
+                               0.0,
+                               " "));
+    }
+    return res;
+}
+template<class ANY, class INDEX>
+Strings _StringifyCell(const ANY& a, const INDEX& index, StructureTag tag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _StringifyCell(a, index, Tag(), DimTag());    
 }
 
 }

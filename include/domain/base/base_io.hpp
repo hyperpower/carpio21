@@ -26,7 +26,16 @@ void OutputFile(const std::string& filename, const ANY& a){
     file.write();
 }
 
+template<class ANY, class INDEX>
+Strings _StringifyCell(const ANY& a, const INDEX& index, const DomainTag& tag){
+}
 
+template<class ANY, class INDEX>
+Strings StringifyCell(const ANY& a, const INDEX& index){
+    typedef typename ANY::Tag Tag;
+    Tag t;
+    return _StringifyCell(a, index, t);
+}
 
 
 

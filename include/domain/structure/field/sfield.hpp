@@ -22,7 +22,7 @@ public:
     typedef GHOST Ghost;
     typedef ORDER Order;
     typedef VT    ValueType;
-    typedef StructureTag TraitTag;
+    typedef SFieldTag Tag;
     typedef FieldBase_<Dim, VT, GRID, GHOST, ORDER> Base;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;

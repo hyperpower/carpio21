@@ -5,6 +5,7 @@
 #include "domain/structure/grid/sgrid.hpp"
 #include "domain/structure/grid/uniform.hpp"
 #include "io/gnuplot.hpp"
+#include "s_stringify.hpp"
 
 namespace carpio{
 
@@ -22,7 +23,6 @@ spGnuplotActor _ToGnuplotActorLinesDim(const ANY& grid, SGridTag, Dim1Tag){
         auto p = grid.f(_X_, _M_, index);
         actor->data().push_back(
             ToString(p.value(_X_), -0.0,  " "));
-        std::cout << ToString(p.value(_X_), -0.0, " ") << std::endl;
         actor->data().push_back(
             ToString(p.value(_X_), tik, " "));
         actor->data().push_back("");
@@ -51,24 +51,16 @@ spGnuplotActor _ToGnuplotActorLinesDim(const ANY& grid, SGridTag, Dim2Tag){
     actor->command() = "using 1:2 title \"\" ";
     actor->style()   = "with line lc 0";
 
-    short order[] = { 0, 1, 3, 2, 6, 4, 5, 7 };
-        for (St j = 0; j < grid.n(_Y_); j++) {
-            for (St i = 0; i < grid.n(_X_); i++) {
-                typename ANY::Index index(i, j);
-                for (short o = 0; o < grid.num_vertex(); ++o) {
-                    auto p = grid.v(order[o], index);
-                    actor->data().push_back(
-                                ToString(p.value(_X_),
-                                         p.value(_Y_),
-                                         " "));
-                }
-                auto p = grid.v(0, index);
-                actor->data().push_back(
-                            ToString(p.value(_X_), p.value(_Y_),
-                                    " "));
-                actor->data().push_back("");
-            }
+    for (St j = 0; j < grid.n(_Y_); j++) {
+        for (St i = 0; i < grid.n(_X_); i++) {
+            typename ANY::Index index(i, j);
+                
+            actor->data().splice(actor->data().end(), 
+                        _StringifyCell(grid, index, SGridTag(), Dim2Tag()));
+
+            actor->data().push_back("");
         }
+    }
     return actor;
 }
 
