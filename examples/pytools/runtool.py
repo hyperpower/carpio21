@@ -71,6 +71,9 @@ def parse_args():
     return args
 
 
+# pytools dir
+_RUNTOOL_DIR_   = os.path.abspath(os.path.join(__file__, "../"))
+
 class Runer:
     def __init__(self, run_file, original_files):
         self._orifiles = original_files
@@ -115,7 +118,8 @@ class Runer:
         pass
 
     def build_doc(self):
-        output_foldername   = 'build-doc'
+        input_foldername  = os.path.abspath(self._path.this)
+        output_foldername = 'build-doc'
         build_doc = os.path.abspath(os.path.join(self._path.this,  output_foldername))
         self.mkdir(build_doc)
         
@@ -124,15 +128,22 @@ class Runer:
         source_suffix = '.rst'
         html_theme    = 'alabaster'
 
-        args  = f". -b {build_format} -D extensions=sphinx.ext.autodoc,sphinx.ext.mathjax " \
-                f"-D master_doc={master_doc} " \
-                f"-D source_suffix={source_suffix} " \
-                f"-D html_theme={html_theme} " \
-                f"-D html_theme_options.font_size=18px " \
-                f"-D html_theme_options.body_max_width=1200px " \
-                f"-C {output_foldername} "
+        # args  = f"-b {build_format} -D extensions=sphinx.ext.autodoc,sphinx.ext.mathjax " \
+        #         f"-D master_doc={master_doc} " \
+        #         f"-D source_suffix={source_suffix} " \
+        #         f"-D html_theme={html_theme} " \
+        #         f"-D html_theme_options.font_size=18px " \
+        #         f"-D html_theme_options.body_max_width=1200px " \
+        #         f"-C {input_foldername} {output_foldername} "
+        confpy = os.path.join(_RUNTOOL_DIR_, "sphinx_singlehtml_conf.py")
 
-        sys.path.append(os.path.abspath(self._path.this))
+        #coyp file to source dir
+        shutil.copy(confpy, os.path.join(input_foldername, "conf.py"))
+
+        args = f"-b {build_format} " \
+               f"{input_foldername} {output_foldername}"
+
+        # sys.path.append(os.path.abspath(self._path.this))
         sphinx_main(args.split())
 
     def _init_time_record(self):
