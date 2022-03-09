@@ -4,19 +4,23 @@ import datetime
 import runtool as RT
 
 
-def text_runing_time():
+def text_runing_time(info):
     text = """
 
 Run time infomation:
 .. table:: Summary of Running Time.
-   :widths: auto
-   :align: center 
+    :widths: auto
+    :align: center 
 
-   ============= =====================
-    Functions      Wall Time (s)            
-   ============= ====================="""
+    ============= =====================
+     Steps         Wall Time (s)            
+    ============= ====================="""
 
-    return text
+    tstr = """
+     make          %s
+    """ % float_sec_to_str(info["make_wall_time"]) 
+
+    return text + tstr
 
 def float_sec_to_str(sec):
     # sec in seconds
@@ -28,6 +32,95 @@ def float_sec_to_str(sec):
         return "%.2e s" % sec
     else:
         return "%.2e ms" % (sec * 1000)
+
+
+def revise_report_rst(dir_in, info, dir_out):
+    fullname = os.path.join(dir_in, "report.rst")
+    if not os.path.exists(fullname):
+        print(" >! report.rst is not in " + path)
+        return 0
+
+    f = open(fullname, "r")
+    
+    fstr = f.read()
+    f.close()
+
+    # order is important !!!
+    fstr = add_hidden_toc(info, fstr)
+    fstr = add_title(info, fstr)
+    
+    fstr = append_wall_time_table(info, fstr)
+
+    outname = os.path.join(dir_out, "report.rst")
+    fout = open(outname, "w")
+    fout.write(fstr)
+    fout.close 
+
+
+def add_title(info, fstr):
+    # Capital first letter in a string
+    cn = " ".join(map(lambda d: d.capitalize(), info["name"].split('_')))
+    sl = "=" * (len(cn) + 3)
+    text = """
+%s
+%s
+%s
+
+""" % (sl, cn, sl)
+
+    return text + fstr
+
+
+def add_hidden_toc(info, fstr):
+    text = """
+.. toctree::
+    :hidden:
+
+    report
+
+"""
+    return text + fstr
+
+
+def append_wall_time_table(info, fstr):
+    text = """
+
+Run time infomation
+=====================
+
+.. table:: Summary of Running Time.
+    :widths: auto
+    :align: center 
+
+    ============= =====================
+     Steps         Wall Time (s)            
+    ============= ====================="""
+
+    keys = [
+        ["make_wall_time",    "make"],
+        ["build_wall_time",   "build"],
+        ["execute_wall_time", "execute"],
+    ]
+
+    textrow ="""
+    %14s %s
+""" 
+
+    for row in keys:
+        k = row[0] # key
+        n = row[1] # name
+        tstr = float_sec_to_str(info[k])
+        row.append(tstr)
+        
+        textrow ="""
+    %-14s %s""" % (n, tstr)
+        text += textrow
+
+    text +="""
+    ============= ====================="""
+
+    return fstr + text
+
 
 if __name__ == '__main__':
     print(float_sec_to_str(2))

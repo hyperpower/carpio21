@@ -19,11 +19,11 @@ std::string a_case(const Point& p1, const Point& p2, const Point& p3){
 	// Plot
 	Gnuplot gnu;
 	gnu.set_terminal_png(
-			"./fig/" + str_res //const std::string& filename,
-			//           double  x         = 800,
-			//           double  y         = 600,
-			//const std::string& font      = "Helvetica",
-			//             int  fontsize  = 12))
+			"./fig/" + str_res, // const std::string& filename,
+			800,                // double  x         = 800,
+			600,                // double  y         = 600,
+			"Sans",        // const std::string& font     = "Helvetica",
+			13                  // int  fontsize  = 12);
 			);
 	gnu.set_xrange(-0.5, 1.5);
 	gnu.set_yrange(-0.5, 1.5);

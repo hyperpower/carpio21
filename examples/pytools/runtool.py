@@ -9,6 +9,9 @@ from path import *
 # sphinx should be installed
 from sphinx.cmd.build import main as sphinx_main
 
+# 
+from rst_supplement import *
+
 def parse_name(name):
     sn = name.split("-")
     # delete underscore in name 
@@ -80,8 +83,14 @@ class Runer:
         self._path     = Path(run_file)
         self._info     = case_info(self._path.this, original_files)
 
+        self._init_time_record()
+
     def project_name(self):
         return self._info["name"]
+
+    def show_info(self):
+        for k, v in self._info.items():
+            print("%10s : " % k, v)
 
     def mkdir_all(self):
         # creat the last level of folder
@@ -118,32 +127,30 @@ class Runer:
         pass
 
     def build_doc(self):
-        input_foldername  = os.path.abspath(self._path.this)
-        output_foldername = 'build-doc'
-        build_doc = os.path.abspath(os.path.join(self._path.this,  output_foldername))
-        self.mkdir(build_doc)
-        
-        build_format  = 'html'  # singlehtml, ...
-        master_doc    = 'report'
-        source_suffix = '.rst'
-        html_theme    = 'alabaster'
-
-        # args  = f"-b {build_format} -D extensions=sphinx.ext.autodoc,sphinx.ext.mathjax " \
-        #         f"-D master_doc={master_doc} " \
-        #         f"-D source_suffix={source_suffix} " \
-        #         f"-D html_theme={html_theme} " \
-        #         f"-D html_theme_options.font_size=18px " \
-        #         f"-D html_theme_options.body_max_width=1200px " \
-        #         f"-C {input_foldername} {output_foldername} "
+        # 
+        doc_dir        = os.path.abspath(os.path.join(self._path.this, "doc"))
+        doc_source_dir = os.path.abspath(os.path.join(self._path.this, "doc/source"))
+        doc_build_dir  = os.path.abspath(os.path.join(self._path.this,  "doc/build"))
+        self.mkdir(doc_dir)
+        self.mkdir(doc_source_dir)
+        self.mkdir(doc_build_dir)
+        # doc_source prepare
+        this_dir  = os.path.abspath(self._path.this)
+        # copy file
+        # copy conf file to source dir
         confpy = os.path.join(_RUNTOOL_DIR_, "sphinx_singlehtml_conf.py")
+        shutil.copy(confpy, os.path.join(doc_source_dir, "conf.py"))
+        # copy fig folder
+        if os.path.isdir(os.path.join(this_dir, "fig")):
+            shutil.move(os.path.join(this_dir, "fig"), 
+                        os.path.join(doc_source_dir, "fig"))
+        # revise rst
+        revise_report_rst(this_dir, self._info, doc_source_dir)
 
-        #coyp file to source dir
-        shutil.copy(confpy, os.path.join(input_foldername, "conf.py"))
-
+        # command
+        build_format  = 'html'  # singlehtml
         args = f"-b {build_format} " \
-               f"{input_foldername} {output_foldername}"
-
-        # sys.path.append(os.path.abspath(self._path.this))
+               f"{doc_source_dir} {doc_build_dir}"
         sphinx_main(args.split())
 
     def _init_time_record(self):
@@ -151,7 +158,6 @@ class Runer:
             "make_wall_time",
             "build_wall_time",
             "execute_wall_time",
-            "documet_wall_time",
         ]
         for n in names:
             self._info[n] = 0.0
@@ -165,14 +171,18 @@ class Runer:
         self.cmake()
         #
         self._info["make_wall_time"] = time.perf_counter() - t
-        print("build ===== ")
+        print("build ======== ")
         t  = time.perf_counter()
         self.build()
         self._info["build_wall_time"] = time.perf_counter() - t
-        print("execute ===== ")
+        print("execute ====== ")
         t  = time.perf_counter()
         self.execute()
         self._info["execute_wall_time"] = time.perf_counter() - t
+        print("build doc ====")
+        # t  = time.perf_counter()
+        self.build_doc()
+        # self._info["document_wall_time"] = time.perf_counter() - t
 
 
     def run(self, args):

@@ -591,7 +591,7 @@ public:
 			           double  x         = 800,
 			           double  y         = 600,
 			const std::string& font      = "arial",
-			              int  fontsize  = 8) {
+			              int  fontsize  = 14) {
 		this->terminal_std = "pngcairo";
 		std::stringstream sst;
 		sst << "set terminal " << this->terminal_std << " enhanced font '"

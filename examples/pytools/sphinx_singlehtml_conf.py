@@ -7,8 +7,9 @@ extensions = ['sphinx.ext.autodoc',
 
 todo_include_todos = True
 # templates_path = ['_templates']
+master_doc    = 'report'
 source_suffix = '.rst'
-master_doc = 'report'
+
 exclude_patterns = []
 # add_function_parentheses = True
 #add_module_names = True
@@ -36,6 +37,7 @@ html_theme_options = {
     # "globaltoc_maxdepth": -1,
     # "sidebar_collapse" : False,
 }
+page_width = 800
 # html_theme_path = ['themes']
 # html_title = "Music for Geeks and Nerds"
 #html_short_title = None

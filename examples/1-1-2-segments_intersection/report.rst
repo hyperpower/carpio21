@@ -26,7 +26,7 @@ Location 0 NO
 --------------
 Two segments are seperated. There are no intersection between the two segments. But function of finding the intersection point is still working. The intersection point is on neither of the segments.
 
-.. figure:: _static/{{folder_name}}/NO.png
+.. figure:: fig/NO.png
    :alt: Figure intersection NO
    :align: center 
 
@@ -36,7 +36,7 @@ Location 1 CONNET
 ------------------
 Two segments are connected. 
 
-.. figure:: _static/{{folder_name}}/CONNECT.png
+.. figure:: fig/CONNECT.png
    :alt: Figure intersection CONNECT
    :align: center 
 
@@ -47,7 +47,7 @@ Location 2 TOUCH
 ------------------
 Two segments are touched.
 
-.. figure:: _static/{{folder_name}}/TOUCH.png
+.. figure:: fig/TOUCH.png
    :alt: Figure intersection TOUCH
    :align: center 
 
@@ -61,7 +61,7 @@ Two segments are overlap each other.
 .. warning::
     The intersection point can't be found. The point is (0,0) 
 
-.. figure:: _static/{{folder_name}}/OVERLAP.png
+.. figure:: fig/OVERLAP.png
    :alt: Figure intersection overlap
    :align: center 
 
@@ -75,7 +75,7 @@ Two segments are the same.
 .. warning::
     The intersection point can't be found. The point is (0,0)
 
-.. figure:: _static/{{folder_name}}/SAME.png
+.. figure:: fig/SAME.png
    :alt: Figure intersection SAME
    :align: center 
 
@@ -85,7 +85,7 @@ Location 4 INTERSECT
 ---------------------
 Two segments are intersect.
 
-.. figure:: _static/{{folder_name}}/INTERSECT.png
+.. figure:: fig/INTERSECT.png
    :alt: Figure intersection INTERSECT
    :align: center 
 
