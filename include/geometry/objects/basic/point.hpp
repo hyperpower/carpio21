@@ -10,8 +10,8 @@
 
 namespace carpio {
 
-struct TagPoint: public TagGeometry {
-    TagPoint() {
+struct PointTag: public GeometryTag {
+    PointTag() {
     }
 };
 
@@ -20,10 +20,11 @@ template<typename TYPE, St DIM>
 class Point_: public std::array<TYPE, DIM> {
 public:
     static const St Dim = DIM;
-    typedef TagPoint Tag;
+    typedef PointTag Tag;
     typedef Point_<TYPE, DIM> Point;
     typedef St size_type;
     typedef TYPE Vt;
+    typedef TYPE value_type;
     typedef TYPE& reference;
     typedef TYPE* pointer;
     typedef const TYPE* const_pointer;
@@ -106,15 +107,27 @@ public:
     }
 
     void reconstruct(const Vt& a, const Vt& b = 0, const Vt& c = 0) {
-        this->at(0) = a;
-        if (Dim >= 2) {
-            this->at(1) = b;
-        }
-        if (Dim >= 3) {
-            this->at(2) = c;
-        }
+        _reconstruct<DIM>(a, b, c);
     }
-
+protected:
+    template<St DIM>
+    void _reconstruct(const Vt& a, const Vt& b, const Vt& c ){ SHOULD_NOT_REACH; }
+    template<>
+    void _reconstruct<1>(const Vt& a, const Vt& b, const Vt& c){
+        this->at(0) = a;
+    }
+    template<>
+    void _reconstruct<2>(const Vt& a, const Vt& b, const Vt& c){
+        this->at(0) = a;
+        this->at(1) = b;
+    }
+    template<>
+    void _reconstruct<3>(const Vt& a, const Vt& b, const Vt& c){
+        this->at(0) = a;
+        this->at(1) = b;
+        this->at(2) = c;
+    }
+public:    
     bool operator<(const Point_<Vt, Dim>& a) const {
         for (St i = 0; i < Dim; i++) {
             if (this->at(i) < a[i]) {

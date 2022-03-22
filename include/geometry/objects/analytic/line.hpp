@@ -84,6 +84,8 @@ std::array<NUM, 3> Construct(const NUM& ax, const NUM& ay,
         return res;
     }
 
+struct LineTag: public GeometryTag {};
+
 template<typename TYPE>
 class Line_: public std::array<TYPE, 3> {
 	//The Line function defined as ax+by=alpha

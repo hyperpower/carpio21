@@ -14,7 +14,7 @@
 
 namespace carpio {
 
-struct TagTriFace: public TagGeometry {
+struct TagTriFace: public GeometryTag {
 	TagTriFace() {
 	}
 	;

@@ -9,7 +9,7 @@ import operator
 import multiprocessing
 from multiprocessing import Pool
 
-matplotlib.rcParams['text.usetex']        = True
+# matplotlib.rcParams['text.usetex']        = True
 matplotlib.rcParams['font.family']        = 'serif'
 matplotlib.rcParams['font.size']          = 14
 
@@ -20,8 +20,8 @@ PATH_FIG      = os.path.abspath(os.path.join(PATH_THIS, "fig"))
 PATH_PROJECT  = os.path.abspath(os.path.join(PATH_CASES, "../"))
 PATH_PYTOOLS  = os.path.abspath(os.path.join(PATH_CASES, "pytools"))
 
-sys.path.append(PATH_PYTOOLS)
-import filetool as FT
+# sys.path.append(PATH_PYTOOLS)
+# import filetool as FT
 
 # plot figure for illustration
 def figure_1():
@@ -47,7 +47,6 @@ line = np.array([[0.2,1.2],[0.8,-0.3]])
 
 
 def plot_box_line(ax, box, line):
-    print(box[:, 0])
     ax.plot(box[:,0], box[:,1],"-")
     ax.plot(line[:,0], line[:,1])
     
@@ -68,7 +67,8 @@ def plot_annotation(plt):
 
 def make_gif(fn_prefix, filename):
     # make gif
-    os.system("convert -delay 5 -loop 0 ./fig/%s_*.png ./fig/%s.gif" % (fn_prefix, filename))
+    print("making gif ...")
+    # os.system("convert -delay 5 -loop 0 ./fig/%s_*.png ./fig/%s.gif" % (fn_prefix, filename))
 
     # delete files
     files = FT.select_files1(PATH_FIG, fn_prefix)
@@ -77,7 +77,7 @@ def make_gif(fn_prefix, filename):
 
 def main():
     figure_1()
-    make_gif("lb", "lb")
+    # make_gif("lb", "lb")
 
 if __name__ == '__main__':
     main()

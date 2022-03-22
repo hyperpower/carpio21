@@ -9,8 +9,8 @@ namespace carpio {
 
 
 
-struct TagGeometry{
-	TagGeometry(){};
+struct GeometryTag{
+	GeometryTag(){};
 };
 
 enum IntersectionTypeSS {

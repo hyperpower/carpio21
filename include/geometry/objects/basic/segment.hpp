@@ -11,8 +11,8 @@
 #include "math.h"
 
 namespace carpio {
-struct TagSegment: public TagGeometry {
-	TagSegment() {
+struct SegmentTag: public GeometryTag {
+	SegmentTag() {
 	};
 };
 
@@ -22,7 +22,7 @@ template<typename TYPE, St DIM>
 class Segment_: public std::array< Point_<TYPE, DIM>, 2> {
 public:
 	static const St Dim = DIM;
-	typedef TagSegment Tag;
+	typedef SegmentTag Tag;
     typedef TYPE ValueType;
 	typedef TYPE Vt;
 	typedef Vt& ref_Vt;

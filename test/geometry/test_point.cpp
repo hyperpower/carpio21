@@ -29,6 +29,7 @@ TEST(point, point_initial){
 	ASSERT_EQ(x(0), 1);
 	ASSERT_EQ(y(1), 1);
 
+	Translate(x, y);
 }
 
 TEST(point, distance){

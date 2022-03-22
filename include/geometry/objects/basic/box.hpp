@@ -19,8 +19,8 @@ class Operation_;
 template<typename TYPE, St DIM>
 class Segment_;
 
-struct TagBox: public TagGeometry {
-	TagBox() {
+struct BoxTag: public GeometryTag {
+	BoxTag() {
 	}
 };
 
@@ -32,7 +32,7 @@ public:
 	typedef Box_<TYPE, DIM> Self;
 	typedef St size_type;
 	typedef TYPE Vt;
-	typedef TagBox Tag;
+	typedef BoxTag Tag;
 	typedef TYPE& reference;
 	typedef TYPE* pointer;
 	typedef const TYPE* const_pointer;

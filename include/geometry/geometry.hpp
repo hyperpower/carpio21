@@ -28,6 +28,7 @@
 #include "geometry/operation/boolean/triangle_triangle.hpp"
 #include "geometry/operation/polygon_boolean.hpp"
 #include "geometry/operation/distance/distance.hpp"
+#include "geometry/operation/affine.hpp"
 
 #include "geometry/io/ggnuplot_actor.hpp"
 #include "geometry/io/ggnuplot_actor_maker.hpp"

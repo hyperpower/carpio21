@@ -9,7 +9,7 @@
 #include "math.h"
 
 namespace carpio {
-struct TagRay: public TagGeometry {
+struct TagRay: public GeometryTag {
 	TagRay() {
 	};
 };
