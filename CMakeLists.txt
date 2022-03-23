@@ -36,7 +36,7 @@ ENDIF(ENABLE_OPENMP)
 find_package ( PythonInterp ${REQUIRED_PYTHON_VERSION} REQUIRED)
 find_package ( PythonLibs ${REQUIRED_PYTHON_VERSION} REQUIRED)
 
-set(cmake_cxx_standard 11)
+set(cmake_cxx_standard 20)
 # external project download form github
 #######################################
 # Prevent overriding the parent project's compiler/linker
