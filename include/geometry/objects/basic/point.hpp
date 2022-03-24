@@ -10,10 +10,7 @@
 
 namespace carpio {
 
-struct PointTag: public GeometryTag {
-    PointTag() {
-    }
-};
+struct PointTag: public GeometryTag {};
 
 //Point T ====================================
 template<typename TYPE, St DIM>
@@ -22,7 +19,8 @@ public:
     static const St Dim = DIM;
     typedef PointTag Tag;
     typedef Point_<TYPE, DIM> Point;
-    typedef St size_type;
+    typedef std::array<TYPE, DIM> Base;
+    typedef typename Base::size_type size_type;
     typedef TYPE Vt;
     typedef TYPE value_type;
     typedef TYPE& reference;

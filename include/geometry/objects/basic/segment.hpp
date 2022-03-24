@@ -11,10 +11,7 @@
 #include "math.h"
 
 namespace carpio {
-struct SegmentTag: public GeometryTag {
-	SegmentTag() {
-	};
-};
+struct SegmentTag: public GeometryTag {};
 
 template<typename TYPE, St DIM> class Box_;
 
@@ -23,7 +20,7 @@ class Segment_: public std::array< Point_<TYPE, DIM>, 2> {
 public:
 	static const St Dim = DIM;
 	typedef SegmentTag Tag;
-    typedef TYPE ValueType;
+    typedef TYPE value_type;
 	typedef TYPE Vt;
 	typedef Vt& ref_Vt;
 	typedef const Vt& const_ref_Vt;

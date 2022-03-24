@@ -7,7 +7,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 set(Sources
     # test_bezier.cpp
     # test_box.cpp
-    test_point.cpp
+    # test_point.cpp
+    test_affine.cpp
     # test_point_chain.cpp
     # test_ts.cpp
     # test_tri_tri.cpp
