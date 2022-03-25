@@ -307,6 +307,25 @@ public:
     }
 };
 
+
+// Function version
+template<typename TYPE, St DIM>
+auto ToGnuplotActor(const Point_<TYPE, DIM>& p, int color_idx = -1){
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    typedef Point_<TYPE, DIM> Point;
+    spActor actor = spActor(new GnuplotActor());
+    int color = color_idx > 0? color_idx : 0;
+    actor->command() = "using 1:2:3 title \"\" ";
+    actor->set_using(Point::Dim + 1);
+    actor->style()   = "with points lc " + ToString(color);
+
+    actor->data().push_back(ToString(p, " ") + " " + ToString(color));
+
+    actor->data().push_back("");
+    return actor;
+}
+
+
 }
 
 #endif /* _ACTOR_GNUPLOT_HPP_ */

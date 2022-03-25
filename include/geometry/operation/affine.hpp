@@ -13,8 +13,6 @@ template<class GEO, class CONTAINER,
 void _Translate(      GEO&       point, 
                 const CONTAINER& container,
                 PointTag){
-    // expand container, container support std operation
-    // container has equal size of point
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     _Translate(point, container, PointTag(), DimTag()); 
 }
@@ -109,6 +107,8 @@ template<class GEO, class CONTAINER>
 void Translate(GEO& geo, const CONTAINER& container){
     typedef typename GEO::Tag Tag;
     std::array<typename GEO::value_type, GEO::Dim> arr;
+    // expand container, container support std operation
+    // container has equal dim of geo 
     _RegularContainerByDim(container, arr);
     _Translate(geo, arr, Tag());
 }

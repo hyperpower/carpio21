@@ -110,6 +110,45 @@ struct IsIterable
     enum { value = sizeof(is_beg_iterable<C>(0)) == sizeof(true_type) };
 };
 
+template<typename T>
+struct HasConstIterator
+{
+private:
+    typedef char                      yes;
+    typedef struct { char array[2]; } no;
+
+    template<typename C> static yes test(typename C::const_iterator*);
+    template<typename C> static no  test(...);
+public:
+    static const bool value = sizeof(test<T>(0)) == sizeof(yes);
+    typedef T type;
+};
+
+template <typename T>
+struct HasBeginEnd
+{
+    template<typename C> static char (&f(typename std::enable_if<
+      std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
+      typename C::const_iterator(C::*)() const>::value, void>::type*))[1];
+
+    template<typename C> static char (&f(...))[2];
+
+    template<typename C> static char (&g(typename std::enable_if<
+      std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end)),
+      typename C::const_iterator(C::*)() const>::value, void>::type*))[1];
+
+    template<typename C> static char (&g(...))[2];
+
+    static bool const beg_value = sizeof(f<T>(0)) == 1;
+    static bool const end_value = sizeof(g<T>(0)) == 1;
+};
+
+template<typename T> 
+struct IsContainer : std::integral_constant<bool, 
+	HasConstIterator<T>::value && HasBeginEnd<T>::beg_value && HasBeginEnd<T>::end_value> 
+{ };
+
+
 /*
  * geometry
  */

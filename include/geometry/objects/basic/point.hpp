@@ -167,12 +167,26 @@ public:
         std::stringstream sstr;
         sstr.precision(4);
         sstr << std::scientific << "( " << this->at(0);
-        if (Dim >= 2) {
+        if constexpr (Dim >= 2) {
             sstr << " , " << this->at(1);
-        } else if (Dim == 3) {
-            sstr << " , " << this->at(2) << " )\n";
+        }
+        if constexpr (Dim == 3) {
+            sstr << " , " << this->at(2) << " )";
         } else {
-            sstr << " )\n";
+            sstr << " )";
+        }
+        return sstr.str();
+    }
+    
+    std::string to_string(const std::string& sep) const {
+        std::stringstream sstr;
+        sstr.precision(4);
+        sstr << std::scientific << this->at(0);
+        if constexpr (Dim >= 2) {
+            sstr << sep << this->at(1);
+        }
+        if constexpr (Dim == 3) {
+            sstr << sep << this->at(2);
         }
         return sstr.str();
     }
@@ -329,6 +343,15 @@ std::ostream& operator<<(std::ostream& stream, const Point_<TYPE, DIM>& point) {
     }
     stream << ")";
     return stream;
+}
+
+template<typename TYPE, St DIM>
+std::string ToString(const Point_<TYPE, DIM>& p){
+    return p.to_string();
+}
+template<typename TYPE, St DIM>
+std::string ToString(const Point_<TYPE, DIM>& p, const std::string& sep){
+    return p.to_string(sep);
 }
 
 template <typename NUM>

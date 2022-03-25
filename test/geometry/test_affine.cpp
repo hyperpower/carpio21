@@ -1,4 +1,5 @@
 #include "geometry/geometry.hpp"
+#include "io/io_define.hpp"
 #include "gtest/gtest.h"
 
 using namespace carpio;
@@ -42,7 +43,14 @@ TEST(affine, point_initial){
 	arr = {1.5, 1.5};
 	Scale(x, arr);
 	ASSERT_EQ(x[0], 4.5);
+
+	std::cout << ToString(x, " ") << std::endl;
 	
+	Gnuplot gnu;
+	auto actor = ToGnuplotActor(x);
+	actor->show_command();
+	gnu.add(ToGnuplotActor(x));
+	gnu.add(ToGnuplotActor(y));
 }
 
 TEST(affine, segment){
@@ -55,6 +63,20 @@ TEST(affine, segment){
 	std::cout << seg[0] << std::endl;
 	std::cout << seg[1] << std::endl;
 	ASSERT_EQ(seg[0][0], 3);
+
+	Gnuplot gnu;
+	auto actor = ToGnuplotActor(x);
+	actor->show_command();
+	gnu.add(ToGnuplotActor(x));
+	gnu.add(ToGnuplotActor(y));
+
+	// std::string atest = "abchenb  bd aa";
+	// std::list<std::string> res;
+	// Tokenize(atest, res, "bh");
+	// for(auto& r : res){
+		// std::cout << r << std::endl;
+	// }
+	gnu.plot();
 
 
 }
