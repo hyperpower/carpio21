@@ -27,7 +27,6 @@ public:
     typedef POINT& ref_Point;
     typedef const POINT& const_ref_Point;
 
-    typedef Operation_<TYPE, DIM> Op;
 public:
     Triangle_() :
             std::array<Point_<TYPE, DIM>, 3>() {

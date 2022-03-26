@@ -14,9 +14,6 @@
 namespace carpio {
 
 template<typename TYPE, St DIM>
-class Operation_;
-
-template<typename TYPE, St DIM>
 class Segment_;
 
 struct BoxTag: public GeometryTag {
@@ -31,14 +28,15 @@ public:
 	typedef Point_<TYPE, DIM> Point;
 	typedef Box_<TYPE, DIM> Self;
 	typedef St size_type;
-	typedef TYPE Vt;
+	typedef TYPE CoordinateValue;
+	typedef TYPE CV;
 	typedef BoxTag Tag;
+	
+	// std like 
 	typedef TYPE& reference;
 	typedef TYPE* pointer;
 	typedef const TYPE* const_pointer;
 	typedef const TYPE& const_reference;
-
-	typedef Operation_<TYPE, DIM> Op;
 
 protected:
 	Point _min, _max;
@@ -46,7 +44,7 @@ protected:
 public:
 	Box_() {
 	}
-	Box_(Vt min, Vt max) {
+	Box_(CV min, CV max) {
 		for (St i = 0; i < Dim; i++) {
 			_min[i] = min;
 			_max[i] = max;
@@ -56,7 +54,7 @@ public:
 		_min = o._min;
 		_max = o._max;
 	}
-	Box_(Vt x_min, Vt y_min, Vt x_max, Vt y_max) {
+	Box_(CV x_min, CV y_min, CV x_max, CV y_max) {
 		ASSERT(Dim == 2);
 		_min[0] = x_min;
 		_min[1] = y_min;
@@ -84,11 +82,11 @@ public:
 		return _min == _max;
 	}
 
-	Vt min(int a) const {
+	CV min(int a) const {
 		ASSERT(a < Dim);
 		return _min[a];
 	}
-	Vt max(int a) const {
+	CV max(int a) const {
 		ASSERT(a < Dim);
 		return _max[a];
 	}
@@ -105,20 +103,20 @@ public:
 		return _max;
 	}
 
-	Vt xmin() const {
+	CV xmin() const {
 		return _min[_X_];
 	}
-	Vt xmax() const {
+	CV xmax() const {
 		return _max[_X_];;
 	}
-	Vt ymin() const {
+	CV ymin() const {
 		return _min[_Y_];;
 	}
-	Vt ymax() const {
+	CV ymax() const {
 		return _max[_Y_];;
 	}
 
-	Vt center(int a) const {
+	CV center(int a) const {
 		ASSERT(a < Dim);
 		return (_min[a] + _max[a]) * 0.5;
 	}
@@ -170,16 +168,16 @@ public:
 	}
 
 	Self operator+(const Self& b) const {
-		Point min = Op::Min(_min, b._min);
-		Point max = Op::Max(_max, b._max);
+		Point min = Min(_min, b._min);
+		Point max = Max(_max, b._max);
 		return Self(min, max);
 	}
 
-	Vt get(Axes aix, Orientation loc) const {
+	CV get(Axes aix, Orientation loc) const {
 		if (aix == _Z_ && DIM == 2) {
 			return 0;
 		}
-		Vt xv = 0;
+		CV xv = 0;
 		const Self& self = (*this);
 		switch (loc) {
 		case _M_: {
@@ -201,7 +199,7 @@ public:
 		return xv;
 	}
 
-	Vt get(Orientation loc, Axes aix) const {
+	CV get(Orientation loc, Axes aix) const {
 		return get(aix, loc);
 	}
 
@@ -213,17 +211,19 @@ public:
 		return res;
 	}
 
-	Vt get_d(Axes aix) const {
+	CV get_d(Axes aix) const {
 		const Self& self = (*this);
 		return _max[aix] - _min[aix];
 	}
 
-	Vt get_dh(Axes aix) const {
+	CV get_dh(Axes aix) const {
 		const Self& self = (*this);
 		return (_max[aix] - _min[aix]) / 2.0;
 	}
 
-	Point get_point(Orientation lx, Orientation ly, Orientation lz) const {
+	Point get_point(Orientation lx, 
+	                Orientation ly = _M_, 
+					Orientation lz = _M_  ) const {
 		return Point(get(_X_, lx), get(_Y_, ly), get(_Z_, lz));
 	}
 

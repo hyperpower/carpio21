@@ -45,8 +45,6 @@ public:
 	typedef std::list<pSur> list_pSur;
 	typedef std::list<pFac> list_pFac;
 
-	typedef Operation_<TYPE, DIM> Op;
-
 public:
 	pEdg e1;
 	pEdg e2;

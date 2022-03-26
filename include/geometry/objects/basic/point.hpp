@@ -19,32 +19,32 @@ public:
     static const St Dim = DIM;
     typedef PointTag Tag;
     typedef Point_<TYPE, DIM> Point;
+    typedef Point_<TYPE, DIM> Self;
+    typedef TYPE CoordinateValue;
+    typedef TYPE CV;  // short for CoordinateValue  
+    // std like
     typedef std::array<TYPE, DIM> Base;
-    typedef typename Base::size_type size_type;
-    typedef TYPE Vt;
-    typedef TYPE value_type;
-    typedef TYPE& reference;
-    typedef TYPE* pointer;
-    typedef const TYPE* const_pointer;
-    typedef const TYPE& const_reference;
+    typedef typename Base::value_type value_type;
+    typedef typename Base::size_type  size_type;
+    typedef typename Base::difference_type  difference_type;
+    typedef typename Base::reference  reference;
+    typedef typename Base::const_reference  const_reference;
+    typedef typename Base::pointer  pointer;
+    typedef typename Base::const_pointer  const_pointer;
 
-    typedef const Point& const_ref_Self;
+    typedef const Self& const_ref_Self;
+    typedef       Self& ref_Self;
 
     //constructor
     Point_() :
-            std::array<TYPE, Dim>() {
+            std::array<CV, Dim>() {
         reconstruct(0, 0, 0);
     }
 
-    Point_(const Vt& a, const Vt& b = 0, const Vt& c = 0) :
-            std::array<Vt, Dim>() {
-        this->at(0) = a;
-        if (Dim >= 2) {
-            this->at(1) = b;
-        }
-        if (Dim == 3) {
-            this->at(2) = c;
-        }
+    Point_(const CV& a, 
+           const CV& b = 0, 
+           const CV& c = 0) :std::array<CV, Dim>() {
+        reconstruct(a, b, c);
     }
 
     Point_(std::initializer_list<TYPE> l) {
@@ -67,8 +67,8 @@ public:
         return this->at(idx);
     }
 
-    Vt value(St idx) const {
-        Vt res;
+    CV value(St idx) const {
+        CV res;
         if (idx < Dim) {
             return this->operator ()(idx);
         } else {
@@ -104,29 +104,29 @@ public:
         return this->at(2);
     }
 
-    void reconstruct(const Vt& a, const Vt& b = 0, const Vt& c = 0) {
+    void reconstruct(const CV& a, const CV& b = 0, const CV& c = 0) {
         _reconstruct<DIM>(a, b, c);
     }
 protected:
     template<St DIM>
-    void _reconstruct(const Vt& a, const Vt& b, const Vt& c ){ SHOULD_NOT_REACH; }
+    void _reconstruct(const CV& a, const CV& b, const CV& c ){ SHOULD_NOT_REACH; }
     template<>
-    void _reconstruct<1>(const Vt& a, const Vt& b, const Vt& c){
+    void _reconstruct<1>(const CV& a, const CV& b, const CV& c){
         this->at(0) = a;
     }
     template<>
-    void _reconstruct<2>(const Vt& a, const Vt& b, const Vt& c){
+    void _reconstruct<2>(const CV& a, const CV& b, const CV& c){
         this->at(0) = a;
         this->at(1) = b;
     }
     template<>
-    void _reconstruct<3>(const Vt& a, const Vt& b, const Vt& c){
+    void _reconstruct<3>(const CV& a, const CV& b, const CV& c){
         this->at(0) = a;
         this->at(1) = b;
         this->at(2) = c;
     }
 public:    
-    bool operator<(const Point_<Vt, Dim>& a) const {
+    bool operator<(const Point_<CV, Dim>& a) const {
         for (St i = 0; i < Dim; i++) {
             if (this->at(i) < a[i]) {
                 return true;
@@ -135,7 +135,7 @@ public:
         return false;
     }
 
-    bool operator==(const Point_<Vt, Dim> &a) const {
+    bool operator==(const Point_<CV, Dim> &a) const {
         if (Dim == 2) {
             return (this->at(0) == a[0] && this->at(1) == a[1]) ? true : false;
         } else {
@@ -143,8 +143,8 @@ public:
                     && this->at(2) == a[2]) ? true : false;
         }
     }
-    bool operator!=(const Point_<Vt, Dim> &a) const {
-        if (Dim == 2) {
+    bool operator!=(const Point_<CV, Dim> &a) const {
+        if constexpr (Dim == 2) {
             return !((this->at(0) == a[0] && this->at(1) == a[1]) ? true : false);
         } else {
             return !(
@@ -192,18 +192,18 @@ public:
     }
     template<typename T>
     void transfer(const T&dx, const T& dy = 0, const T& dz = 0) {
-        this->at(0) = this->at(0) + Vt(dx);
-        this->at(1) = this->at(1) + Vt(dy);
+        this->at(0) = this->at(0) + CV(dx);
+        this->at(1) = this->at(1) + CV(dy);
         if (Dim == 3) {
-            this->at(2) = this->at(2) + Vt(dz);
+            this->at(2) = this->at(2) + CV(dz);
         }
     }
     template<typename T>
     void scale(const T&dx, const T&dy = 1, const T&dz = 1) {
-        this->at(0) = this->at(0) * Vt(dx);
-        this->at(1) = this->at(1) * Vt(dy);
+        this->at(0) = this->at(0) * CV(dx);
+        this->at(1) = this->at(1) * CV(dy);
         if (Dim == 3) {
-            this->at(2) = this->at(2) * Vt(dz);
+            this->at(2) = this->at(2) * CV(dz);
         }
     }
     /**
@@ -216,7 +216,7 @@ public:
      *
      *  \return Vt - an distance from to this point
      */
-    Vt dist(const Point& p) const {
+    CV dist(const Point& p) const {
         double dx = x() - p.x();
         double dy = y() - p.y();
         return sqrt(dx * dx + dy * dy);
@@ -256,7 +256,7 @@ public:
         }
         return *this;
     }
-    Point& operator+=(const Vt& val) {
+    Point& operator+=(const CV& val) {
         for (St i = 0; i < Dim; i++) {
             this->at(i) += val;
         }
@@ -268,7 +268,7 @@ public:
         }
         return *this;
     }
-    Point& operator-=(const Vt& val) {
+    Point& operator-=(const CV& val) {
         for (St i = 0; i < Dim; i++) {
             this->at(i) -= val;
         }
@@ -280,7 +280,7 @@ public:
         }
         return *this;
     }
-    Point& operator*=(const Vt& val) {
+    Point& operator*=(const CV& val) {
         for (St i = 0; i < Dim; i++) {
             this->at(i) *= val;
         }
@@ -292,7 +292,7 @@ public:
         }
         return *this;
     }
-    Point& operator/=(const Vt& val) {
+    Point& operator/=(const CV& val) {
         for (St i = 0; i < Dim; i++) {
             this->at(i) /= val;
         }

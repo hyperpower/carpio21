@@ -26,10 +26,13 @@ namespace carpio {
 template<typename TYPE, St DIM>
 class IntersectionPairSS_;
 
+struct PointChainTag: public GeometryTag {};
+
 template<class TYPE, St DIM>
 class PointChain_ {
 public:
     static const St Dim = DIM;
+    typedef PointChainTag Tag;
     typedef Point_<TYPE, DIM> Point;
     typedef Point_<TYPE, DIM>& ref_Point;
     typedef const Point_<TYPE, DIM>& const_ref_Point;
@@ -44,8 +47,8 @@ public:
     typedef typename std::list<Point>::const_iterator const_iterator;
     typedef typename std::list<Point>::reference reference;
     typedef typename std::list<Point>::const_reference const_reference;
-    typedef Operation_<TYPE, DIM> Op;
-    typedef Point value_type;
+    typedef TYPE value_type;
+    typedef TYPE CV;
 
 protected:
     /** Linked point chain */

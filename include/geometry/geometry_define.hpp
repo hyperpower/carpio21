@@ -13,6 +13,22 @@ struct GeometryTag{
 	GeometryTag(){};
 };
 
+template<class ANY>
+struct IsGeometry{
+private:
+	typedef char yes;
+    typedef long no;
+
+    template<class T>
+    static yes  test(int i, typename T::Tag = typename T::Tag());
+    template<class T>
+    static no test(...);
+public:
+    static const bool value = sizeof(test<ANY>(0)) == sizeof(yes);
+
+	typedef typename std::integral_constant<bool, value>::type type;
+};
+
 enum IntersectionTypeSS {
 	_SS_NO_       = 0,  //
 	_SS_CONNECT_  = 1,  //

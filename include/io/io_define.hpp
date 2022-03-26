@@ -35,7 +35,7 @@ template<class CONTAINER,
 std::string ToString(const CONTAINER& a, const std::string& sep) {
     std::ostringstream sst;
     for(auto iter = a.cbegin(); iter != a.cend(); ++iter){
-        sst << *iter;
+        sst << ToString(*iter);
         if ( std::next(iter, 1) != a.cend()){
             sst << sep;
         }

@@ -309,22 +309,97 @@ public:
 
 
 // Function version
-template<typename TYPE, St DIM>
-auto ToGnuplotActor(const Point_<TYPE, DIM>& p, int color_idx = -1){
+// Geometry objects entry
+template<typename ANY,
+        typename std::enable_if<
+            IsGeometry<ANY>::value,
+        bool>::type = true>
+auto ToGnuplotActor(const ANY& geo){
     typedef std::shared_ptr<GnuplotActor> spActor;
-    typedef Point_<TYPE, DIM> Point;
     spActor actor = spActor(new GnuplotActor());
-    int color = color_idx > 0? color_idx : 0;
-    actor->command() = "using 1:2:3 title \"\" ";
-    actor->set_using(Point::Dim + 1);
-    actor->style()   = "with points lc " + ToString(color);
-
-    actor->data().push_back(ToString(p, " ") + " " + ToString(color));
-
-    actor->data().push_back("");
+    MakeGnuplotActor(*actor, geo, ANY::Tag());    
     return actor;
 }
 
+template<class ANY, class VALUE,
+        typename std::enable_if<
+            IsGeometry<ANY>::value,
+        bool>::type = true>
+auto ToGnuplotActor(const ANY& geo, const VALUE& value){
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    spActor actor = spActor(new GnuplotActor());
+    MakeGnuplotActor(*actor, geo, value, ANY::Tag());    
+    return actor;
+}
+
+template<typename ANY>
+void MakeGnuplotActor(GnuplotActor& actor, const ANY& point, PointTag){
+    actor.command() = "using 1:2 title \"\" ";
+    actor.set_using(ANY::Dim);
+    actor.style()   = "with points lc 1"; // default color is 1
+
+    actor.data().push_back(ToString(point, " ") );
+
+    actor.data().push_back("");
+}
+
+template<typename ANY>
+void MakeGnuplotActor(GnuplotActor& actor, const ANY& seg, SegmentTag){
+    actor.command() = "using 1:2 title \"\" ";
+    actor.set_using(ANY::Dim);
+    actor.style()   = "with lines lc 1"; // default color is 1
+    if (seg.empty()) {
+        actor->data().push_back("");
+        return;
+    }
+    actor.data().push_back(ToString(seg[0], " "));
+    actor.data().push_back(ToString(seg[1], " "));
+
+    actor.data().push_back("");
+}
+template<typename ANY>
+void MakeGnuplotActor(GnuplotActor& actor, const ANY& box, BoxTag){
+    actor.command() = "using 1:2 title \"\" ";
+    actor.set_using(ANY::Dim);
+    actor.style()   = "with lines lc 1"; // default color is 1
+
+    actor.data().push_back(ToString(box.get_point(_M_, _M_, _M_), " "));
+    actor.data().push_back(ToString(box.get_point(_P_, _M_, _M_), " "));
+    actor.data().push_back(ToString(box.get_point(_P_, _P_, _M_), " "));
+    actor.data().push_back(ToString(box.get_point(_M_, _P_, _M_), " "));
+    actor.data().push_back(ToString(box.get_point(_M_, _M_, _M_), " "));
+    actor.data().push_back("");
+}
+template<typename ANY>
+void MakeGnuplotActor(GnuplotActor& actor, const ANY& pc, PointChainTag){
+    actor.command() = "using 1:2 title \"\" ";
+    actor.set_using(ANY::Dim);
+    actor.style()   = "with lines lc 1"; // default color is 1
+    
+    if (pc.empty()) {
+		actor.data().push_back("");
+		return;
+	}
+
+	for (auto& p : pc) {
+    	actor.data().push_back(ToString(p, " "));
+	}
+
+	actor.data().push_back(ToString(pc.front(), " "));
+    
+    actor.data().push_back("");
+}
+// Geomentry objects in container entry
+template<class ANY, 
+        typename std::enable_if<
+            std::integral_constant< bool, 
+                   IsContainer<ANY>::value 
+                && IsGeometry<typename ANY::value_type>::value
+            >::value, 
+        bool>::type = true>
+auto ToGnuplotActor(const ANY& any, int color_idx = -1) {
+    std::cout << "Test container < Geo >" << std::endl;
+}
 
 }
 

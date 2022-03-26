@@ -83,6 +83,10 @@ public:
     const std::string& style() const {
         return _scmd;
     }
+    std::string& style(const std::string& input) {
+        this->_scmd = input;
+        return _scmd;
+    }
     std::list<std::string>& data() {
         return _data;
     }
@@ -116,6 +120,10 @@ public:
 
     void set_title(const std::string& title){
         this->_set_cmd(this->_pcmd, "title", title);
+    }
+
+    void set_point_size(const int& size){
+        this->_set_cmd(this->_scmd, "pointsize", ToString(size));
     }
 
 
@@ -612,7 +620,7 @@ public:
                           int  fontsize  = 14) {
         this->terminal_std = "pngcairo";
         std::stringstream sst;
-        sst << "set terminal " << this->terminal_std << " enhanced font '"
+        sst << "set terminal " << this->terminal_std << " dashed enhanced font '"
                 << font << "," << fontsize << "'" << "size " << x << ", " << y;
         cmd(sst.str());
         cmd("set output '" + filename + ".png'");

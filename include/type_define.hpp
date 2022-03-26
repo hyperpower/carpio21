@@ -97,17 +97,17 @@ inline Axes ToAxes(const St& i) {
 template<typename C>
 struct IsIterable
 {
-    typedef char true_type;
-    typedef long false_type;
+    typedef char yes;
+    typedef long no;
 
     template<class T>
-    static true_type  is_beg_iterable(
+    static yes  is_beg_iterable(
     		int i,
             typename T::const_iterator = C().begin());
     template<class T>
-    static false_type is_beg_iterable(...);
+    static no is_beg_iterable(...);
 
-    enum { value = sizeof(is_beg_iterable<C>(0)) == sizeof(true_type) };
+    enum { value = sizeof(is_beg_iterable<C>(0)) == sizeof(yes) };
 };
 
 template<typename T>
@@ -127,9 +127,11 @@ public:
 template <typename T>
 struct HasBeginEnd
 {
-    template<typename C> static char (&f(typename std::enable_if<
-      std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
-      typename C::const_iterator(C::*)() const>::value, void>::type*))[1];
+    template<typename C> 
+	static char (&f(typename std::enable_if<
+                            std::is_same<
+							    decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
+                                typename C::const_iterator(C::*)() const>::value, void>::type*))[1];
 
     template<typename C> static char (&f(...))[2];
 
