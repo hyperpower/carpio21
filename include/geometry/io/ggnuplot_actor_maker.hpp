@@ -112,7 +112,7 @@ public:
     }
 
     template<class ContainerSegments>
-     spActor lines_points(
+    spActor lines_points(
             ContainerSegments con,
             int color_idx      = -1,
             bool close         = false,
@@ -320,7 +320,16 @@ auto ToGnuplotActor(const ANY& geo){
     MakeGnuplotActor(*actor, geo, ANY::Tag());    
     return actor;
 }
-
+template<typename ANY,
+        typename std::enable_if<
+            IsGeometry<ANY>::value,
+        bool>::type = true>
+auto ToGnuplotActorAsVector(const ANY& geo){
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    spActor actor = spActor(new GnuplotActor());
+    MakeGnuplotActorAsVector(*actor, geo, ANY::Tag());    
+    return actor;
+}
 template<class ANY, class VALUE,
         typename std::enable_if<
             IsGeometry<ANY>::value,
@@ -349,11 +358,24 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& seg, SegmentTag){
     actor.set_using(ANY::Dim);
     actor.style()   = "with lines lc 1"; // default color is 1
     if (seg.empty()) {
-        actor->data().push_back("");
+        actor.data().push_back("");
         return;
     }
     actor.data().push_back(ToString(seg[0], " "));
     actor.data().push_back(ToString(seg[1], " "));
+
+    actor.data().push_back("");
+}
+template<typename ANY>
+void MakeGnuplotActorAsVector(GnuplotActor& actor, const ANY& seg, SegmentTag){
+    actor.command() = "using 1:2 title \"\" ";
+    actor.set_using(ANY::Dim * 2);
+    actor.style()   = "with vectors lc 1"; // default color is 1
+    if (seg.empty()) {
+        actor.data().push_back("");
+        return;
+    }
+    actor.data().push_back(ToString(seg[0], " ") + " " + ToString(seg[1], " "));
 
     actor.data().push_back("");
 }
@@ -386,7 +408,6 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& pc, PointChainTag){
 	}
 
 	actor.data().push_back(ToString(pc.front(), " "));
-    
     actor.data().push_back("");
 }
 // Geomentry objects in container entry

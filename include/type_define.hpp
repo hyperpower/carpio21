@@ -76,6 +76,23 @@ enum Axes {
 	_Y_ = 1, //
 	_Z_ = 2, //
 };
+// Dim tag
+struct AxesTag{};
+struct XTag:public AxesTag{};
+struct YTag:public AxesTag{};
+struct ZTag:public AxesTag{};
+
+template<int AXES>
+struct AxesTagTraits_ {using Type = AxesTag;};
+
+template<>
+struct AxesTagTraits_<0> {using Type = XTag;};
+
+template<>
+struct AxesTagTraits_<1> {using Type = YTag;};
+
+template<>
+struct AxesTagTraits_<2> {using Type = ZTag;};
 
 
 inline Axes ToAxes(const St& i) {

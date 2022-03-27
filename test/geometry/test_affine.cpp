@@ -11,6 +11,8 @@ typedef Point_<double, 3> Point3;
 typedef Point_<double, 2> Point2;
 typedef GGnuplotActor_<double, 2> GA;
 typedef Segment_<double, 2> Seg2;
+typedef Box_<double, 2> Box;
+typedef PointChain_<double, 2> PointChain;
 
 TEST(bezier, mkdir){
     // Do not disable this test
@@ -66,63 +68,91 @@ TEST(affine, segment){
 	std::cout << seg[0] << std::endl;
 	std::cout << seg[1] << std::endl;
 	ASSERT_EQ(seg[0][0], 3);
-
-	Gnuplot gnu;
-	auto actor = ToGnuplotActor(x);
-	actor->show_command();
-	gnu.add(ToGnuplotActor(x));
-	gnu.add(ToGnuplotActor(y));
-
-	// std::string atest = "abchenb  bd aa";
-	// std::list<std::string> res;
-	// Tokenize(atest, res, "bh");
-	// for(auto& r : res){
-		// std::cout << r << std::endl;
-	// }
-	// gnu.plot();
 }
 
-TEST(box, gnuplot){
-	typedef Box_<double, 2> Box;
-	typedef Point_<double, 2> Point;
-	Box box(0.0, 1.0);
-
+auto MakeFShape(){
 	typedef PointChain_<double, 2> PointChain;
+	typedef Point_<double, 2> Point;
 	PointChain pc;
-
 	pc.set_close();
-	pc.push_back(Point(0.3,0.2));
-	pc.push_back(Point(0.4,0.2));
-	pc.push_back(Point(0.4,0.5));
-	pc.push_back(Point(0.7,0.5));
-	pc.push_back(Point(0.7,0.6));
-	pc.push_back(Point(0.4,0.6));
+	pc.push_back(Point(0.3,0.1));
+	pc.push_back(Point(0.4,0.1));
+	pc.push_back(Point(0.4,0.45));
+	pc.push_back(Point(0.7,0.45));
+	pc.push_back(Point(0.7,0.55));
+	pc.push_back(Point(0.4,0.55));
 	pc.push_back(Point(0.4,0.8));
 	pc.push_back(Point(0.8,0.8));
 	pc.push_back(Point(0.8,0.9));
 	pc.push_back(Point(0.3,0.9));
+	return pc;
+}
+auto MakeBox(){
+	typedef PointChain_<double, 2> PointChain;
+	typedef Point_<double, 2> Point;
+	PointChain pc;
+	pc.set_close();
+	pc.push_back(Point(0.0,0.0));
+	pc.push_back(Point(1.0,0.0));
+	pc.push_back(Point(1.0,1.0));
+	pc.push_back(Point(0.0,1.0));
+	return pc;
+}
 
-	Gnuplot gnu;
-    gnu.set_terminal_png("./test_output/affine_first");
-    gnu.set_xrange(-0.5, 1.5);
-    gnu.set_yrange(-0.5, 1.5);
-	auto actor_pori = ToGnuplotActor(box.get_point(_M_, _M_));
+auto AddActorsOriginal(Gnuplot& gnu, const PointChain& box, const PointChain& pc){
+	auto actor_pori = ToGnuplotActor(box.get(0));
 	actor_pori->style("with points pt 7 ps 2 lc rgb \"#7FBA00\"");
 	gnu.add(actor_pori);
-	auto actor_px = ToGnuplotActor(box.get_point(_P_, _M_));
+	auto actor_px = ToGnuplotActor(box.get(1));
 	actor_px->style("with points pt 7 ps 2 lc rgb \"#00A4EF\"");
 	gnu.add(actor_px);
-	auto actor_py = ToGnuplotActor(box.get_point(_M_, _P_));
+	auto actor_py = ToGnuplotActor(box.get(3));
 	actor_py->style("with points pt 7 ps 2 lc rgb \"#F25022\"");
 	gnu.add(actor_py);
 	auto actor_box = ToGnuplotActor(box);
 	actor_box->style("with lines lt 1 dashtype 2 lw 2 lc \"black\"");
 	gnu.add(actor_box);
 	auto actor_pc  = ToGnuplotActor(pc);
+	actor_pc->style("with lines lt 1 dashtype 2 lw 2 lc rgb \"#FFB900\"");
+	gnu.add(actor_pc);
+}
+auto AddActorsTransformed(Gnuplot& gnu, const PointChain& box, const PointChain& pc){
+	auto actor_pori = ToGnuplotActor(box.get(0));
+	actor_pori->style("with points pt 7 ps 2 lc rgb \"#7FBA00\"");
+	gnu.add(actor_pori);
+	auto actor_px = ToGnuplotActor(box.get(1));
+	actor_px->style("with points pt 7 ps 2 lc rgb \"#00A4EF\"");
+	gnu.add(actor_px);
+	auto actor_py = ToGnuplotActor(box.get(3));
+	actor_py->style("with points pt 7 ps 2 lc rgb \"#F25022\"");
+	gnu.add(actor_py);
+	auto actor_box = ToGnuplotActor(box);
+	actor_box->style("with lines lt 1 lw 2 lc \"black\"");
+	gnu.add(actor_box);
+	auto actor_pc  = ToGnuplotActor(pc);
 	actor_pc->style("with lines lt 1 lw 2 lc rgb \"#FFB900\"");
 	gnu.add(actor_pc);
-	gnu.set_equal_aspect_ratio();
+}
+TEST(box, gnuplot){
+	typedef Box_<double, 2> Box;
+	typedef Point_<double, 2> Point;
+	// Box box(0.0, 1.0);
+	Point about(0.5, 0.5);
 
+	auto pc  = MakeFShape();
+	auto box = MakeBox();
+
+	Gnuplot gnu;
+    gnu.set_terminal_png("./test_output/affine_first");
+    gnu.set_xrange(-0.5, 1.5);
+    gnu.set_yrange(-0.5, 1.5);
+	gnu.set_equal_aspect_ratio();
+	std::cout << box.size() << std::endl;
+	AddActorsOriginal(gnu, box, pc);
+	std::vector<double> trans_vec{0.25,0.37};
+	Reflect(box, about);
+	Reflect(pc , about);
+	AddActorsTransformed(gnu, box, pc);
 	gnu.plot();
 }
 

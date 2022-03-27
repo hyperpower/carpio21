@@ -43,11 +43,14 @@ public:
     typedef PointChain                 Self;
     typedef PointChain_<TYPE, DIM>& refPointChain;
     typedef TYPE vt;
+    // std iter like
+    typedef typename std::list<Point> ListPoint;
     typedef typename std::list<Point>::iterator iterator;
     typedef typename std::list<Point>::const_iterator const_iterator;
     typedef typename std::list<Point>::reference reference;
     typedef typename std::list<Point>::const_reference const_reference;
-    typedef TYPE value_type;
+    typedef TYPE value_type;  // < except for this one 
+
     typedef TYPE CV;
 
 protected:
@@ -94,6 +97,30 @@ public:
         _lpoints.push_back(s.pe());
     }
 
+    const Point& get(const St& idx) const {
+        assert(idx < this->size());
+        auto iter = _lpoints.begin();
+        for(St i = 0; iter != _lpoints.end(); ++i){
+            if( i == idx ){
+                return (*iter);
+            }
+            std::advance(iter, 1);
+        }
+        SHOULD_NOT_REACH;
+        return (*iter);
+    }
+    Point& get(const St& idx) {
+        assert(idx < this->size());
+        auto iter = _lpoints.begin();
+        for(St i = 0; iter != _lpoints.end(); ++i){
+            if( i == idx ){
+                return (*iter);
+            }
+            std::advance(iter, 1);
+        }
+        SHOULD_NOT_REACH;
+        return (*iter);
+    }
     void set_close() {
         _closed = true;
     }

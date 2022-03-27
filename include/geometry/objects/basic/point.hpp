@@ -57,7 +57,23 @@ public:
             }
         }
     }
-
+    template<class CONTAINER,
+        typename std::enable_if<
+            std::integral_constant< bool, 
+                   IsContainer<CONTAINER>::value 
+                && std::is_arithmetic<typename CONTAINER::value_type>::value
+            >::value, 
+        bool>::type = true>
+    Point_(const CONTAINER& con) {
+        St i = 0;
+        for(auto& v : con){
+            (*this)[i] = v;
+            ++i;
+            if(i >= Dim){
+                break;
+            }
+        }
+    }
     const_reference operator()(St idx) const {
         ASSERT(idx < Dim);
         return this->at(idx);
@@ -125,7 +141,18 @@ protected:
         this->at(1) = b;
         this->at(2) = c;
     }
-public:    
+public:   
+    Point operator-() {
+        Point res;
+        res[0] = -(this->at(0));
+        if constexpr (Dim >= 2) {
+            res[1] = -(this->at(1));
+        }
+        if constexpr (Dim >= 3) {
+            res[2] = -(this->at(2));
+        }
+        return res;
+    } 
     bool operator<(const Point_<CV, Dim>& a) const {
         for (St i = 0; i < Dim; i++) {
             if (this->at(i) < a[i]) {
