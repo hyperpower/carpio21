@@ -1,72 +1,250 @@
 Problem Description
 ===================
 
-We want to find intersection results of a line vs box. 
+We want to performe Affine Transformation.
 
-.. figure:: _static/{{folder_name}}/illustration.png
-   :align: center 
+An affine transformation is any transformation that preserves collinearity (i.e., all points lying on a line initially still lie on a line after transformation) and ratios of distances (e.g., the midpoint of a line segment remains the midpoint after transformation). In this sense, following functions are considered as affine transformations:
 
-   A line intersects with box.
+- Translate
+- Scale
+- Rotate
+- Shear Matrix
+- Reflect
 
-Results
+Any transformation can be defined in a single affine transformation matrix :math:`\mathbf{M}` (3 by 3 in 2D, 4 by 4 in 3D).
+
+.. math::
+   \mathbf{M}_{2D} = 
+   \begin{pmatrix}
+     a_0 & a_1 & b_0 \\ 
+     a_3 & a_4 & b_1 \\
+     0   & 0   & 1
+   \end{pmatrix} \quad \quad
+   \mathbf{M}_{3D} = 
+   \begin{pmatrix}
+     a_0 & a_1 & a_3 & b_0 \\ 
+     a_4 & a_5 & a_6 & b_1 \\
+     a_7 & a_8 & a_9 & b_2 \\
+     0   & 0   & 0   & 1
+   \end{pmatrix}
+
+Such a matrix :math:`\mathbf{M}` corresponds to a affine transformation **T()** that transforms point (or vector) :math:`\mathbf{x}` to point (or vector) :math:`\mathbf{y}`
+
+Translate
 ===================
 
-Line vs Box - Normal
----------------------
-The box is fixed at (0,0) to (1,1). A line passes through the box. Two intersect points can be found.
-
-.. figure:: _static/{{folder_name}}/line_box_normal.png
-   :align: center 
-
-   A line intersects with box (Normal).
-
-Line vs Box - Corner
----------------------
-The box is fixed at (0,0) to (1,1). A corner of the box is on the line.
-
-.. figure:: _static/{{folder_name}}/line_box_corner.png
-   :align: center 
-
-   A line intersects with box (Corner).
-
-Line vs Box - Edge
---------------------
-The box is fixed at (0,0) to (1,1). The line is on one edge of the box. 
-
-.. figure:: _static/{{folder_name}}/line_box_edge.png
-   :align: center 
-
-   A line intersects with box (Edge).
-
-Line vs Box - Positive Side
------------------------------
-A line cuts a box into two sides. Here, we get a positive side as a ploygon.
-
-We want to construct a line rotate about a point, say p1: :math:`(x1, y1)`. p1 is the rotational center. And, we have another point p2: math:`(x2, y2)`. A line can be constructed in two points form.
-
-Given two different points :math:`(x1, y1)` and :math:`(x2, y2)`, there is exactly one line that passes through them. There are several ways to write a linear equation of this line.
-
-If :math:`x1 ≠ x2`, the slope of the line is :math:`\frac{y_{2}-y_{1}}{x_{2}-x_{1}}` Thus, a point-slope form is
+A translation matrix simply moves an object along one or more of the three axes. A transformation matrix representing only translations has the simple form:
 
 .. math::
+   \mathbf{M}_{2D} = 
+   \begin{pmatrix}
+     1 & 0 & t_x \\ 
+     0 & 1 & t_y \\
+     0   & 0   & 1
+   \end{pmatrix} \quad \quad
+   \mathbf{M}_{3D} = 
+   \begin{pmatrix}
+     1 & 0 & 0 & t_x \\ 
+     0 & 1 & 0 & t_y \\
+     0 & 0 & 1 & t_z \\
+     0 & 0 & 0 & 1
+   \end{pmatrix}
 
-   y - y_{1} &= \frac{y_2 - y_1}{x_2 - x_1} (x - x_1) \\
-   (x_2 - x_1)(y - y_1) &= (y_2 - y_1)(x - x_1)
+The box (dashed line) locates at (0,0) to (1,1). It can be translated by a vector :math:`\mathbf{t} = (t_x, t_y)` .
 
-finally, the line equation will be
-
-.. math::
-
-   (y_1 - y_2) x + (x_2 - x_1) y + (x_1 y_2 - x_2 y_1) = 0
-
-p2 is also a point on a circle. The center of the circle is p1. Radius of this circle is r. Thus, p2 can be obtained by 
-
-.. math::
-
-   x_2 &= x_1 + r \cos \theta \\
-   y_2 &= y_1 + r \sin \theta
-
-.. figure:: _static/{{folder_name}}/lb.gif
+.. figure:: fig/affine_trans.png
    :align: center 
 
-   A line intersects with box and its positive side.
+   Translate a box.
+
+
+Scale
+===================
+A scaling transform changes the size of an object by expanding or contracting all voxels or vertices along the three axes by three scalar values specified in the matrix. 
+A scaling matrix has the following form:
+
+.. math::
+   \mathbf{S}_{2D} = 
+   \begin{pmatrix}
+     s_x & 0 & 0 \\ 
+     0 & s_y & 0 \\
+     0   & 0 & 1
+   \end{pmatrix} \quad \quad
+   \mathbf{S}_{3D} = 
+   \begin{pmatrix}
+     s_x & 0 & 0 & 0 \\ 
+     0 & s_y & 0 & 0 \\
+     0 & 0 & s_z & 0 \\
+     0 & 0 & 0   & 1
+   \end{pmatrix}
+
+
+.. figure:: fig/affine_scale.png
+   :align: center 
+
+   Scale a box.
+
+A scaling about a piont is a combination of transform and scaling operations. 
+
+.. figure:: fig/affine_scale_about.png
+   :align: center 
+
+   Scale a box about a point.
+
+Rotate
+===================
+A rotation matrix rotates an object about one of the three coordinate axes, or any arbitrary vector.
+
+.. math::
+   \mathbf{R}_{2D} = 
+   \begin{pmatrix}
+     \text{cos}(\theta) & -\text{sin}(\theta) & 0 \\ 
+     \text{sin}(\theta) &  \text{cos}(\theta) & 0 \\
+     0   & 0 & 1
+   \end{pmatrix}
+
+.. math::
+   \mathbf{R}_{x} = 
+   \begin{pmatrix}
+     1 & 0 & 0 & 0 \\
+     0 & \text{cos}(\theta) &  \text{sin}(\theta)  & 0 \\ 
+     0 &-\text{sin}(\theta) &  \text{cos}(\theta)  & 0 \\
+     0 & 0 & 0 & 1
+   \end{pmatrix}
+
+.. math::
+   \mathbf{R}_{y} = 
+   \begin{pmatrix}
+     \text{cos}(\theta) & -\text{sin}(\theta) & 0 & 0 \\ 
+     0 & 1 & 0 & 0 \\
+     \text{sin}(\theta) &  \text{cos}(\theta) & 1 & 0 \\
+     0 & 0 & 0 & 1
+   \end{pmatrix}
+
+
+.. math::
+   \mathbf{R}_{z} = 
+   \begin{pmatrix}
+     \text{cos}(\theta) & -\text{sin}(\theta) & 0 & 0 \\ 
+     \text{sin}(\theta) &  \text{cos}(\theta) & 0 & 0 \\
+     0 & 0 & 1 & 0 \\
+     0 & 0 & 0 & 1
+   \end{pmatrix}
+
+
+.. figure:: fig/affine_rotate.png
+   :align: center 
+
+   Rotate a box about origin. (2D)
+
+
+.. figure:: fig/affine_rotate_about.png
+   :align: center 
+
+   Rotate a box about a point. (2D)
+
+
+Shear
+===================
+
+Shear operations "tilt" objects. 
+
+.. math::
+   \mathbf{S}_{x} = 
+   \begin{pmatrix}
+     1 & \text{tan}(\theta) & 0 \\ 
+     0 & 1 & 0 \\
+     0   & 0 & 1
+   \end{pmatrix} \quad
+   \mathbf{S}_{y} = 
+   \begin{pmatrix}
+     1 & 0 & 0 \\ 
+     \text{tan}(\theta) & 1 & 0 \\
+     0   & 0 & 1
+   \end{pmatrix}
+
+.. figure:: fig/affine_shear_X.png
+   :align: center 
+
+   Rotate a box in X. (2D)
+
+
+.. figure:: fig/affine_shear_Y.png
+   :align: center 
+
+   Rotate a box in Y. (2D)
+
+
+.. figure:: fig/affine_shear_about_in_X.png
+   :align: center 
+
+   Rotate a box about a point in X. (2D)
+
+
+.. figure:: fig/affine_shear_about_in_Y.png
+   :align: center 
+
+   Rotate a box about a point in Y. (2D)
+
+
+Reflect
+=========================
+
+Reflect objects about an origin.
+
+.. math::
+   \mathbf{M}_{\text{origin}} = 
+   \begin{pmatrix}
+    -1 & 0 &  0 & 0 \\ 
+     0 & -1 &  0 & 0 \\
+     0 &  0 & -1 & 0 \\
+     0 &  0 &  0 & 1
+   \end{pmatrix}
+
+Reflect objects about an aix.
+
+.. math::
+   \mathbf{M}_{x} = 
+   \begin{pmatrix}
+     1 &  0 &  0 & 0 \\ 
+     0 & -1 &  0 & 0 \\
+     0 &  0 & -1 & 0 \\
+     0 &  0 &  0 & 1
+   \end{pmatrix}
+   \mathbf{M}_{y} = 
+   \begin{pmatrix}
+     1 &  0 &  0 & 0 \\ 
+     0 & -1 &  0 & 0 \\
+     0 &  0 &  1 & 0 \\
+     0 &  0 &  0 & 1
+   \end{pmatrix}
+   \mathbf{M}_{z} = 
+   \begin{pmatrix}
+     1 &  0 &  0 & 0 \\ 
+     0 &  1 &  0 & 0 \\
+     0 &  0 & -1 & 0 \\
+     0 &  0 &  0 & 1
+   \end{pmatrix}
+
+.. figure:: fig/affine_reflect_about_X.png
+   :align: center 
+
+   Reflect a box about x. (2D)
+
+
+.. figure:: fig/affine_reflect_about_Y.png
+   :align: center 
+
+   Reflect a box about y. (2D)
+
+
+.. figure:: fig/affine_reflect_about_o.png
+   :align: center 
+
+   Reflect a box about origin. (2D)
+
+
+.. figure:: fig/affine_reflect_about_point.png
+   :align: center 
+
+   Reflect a box about a point. (2D)

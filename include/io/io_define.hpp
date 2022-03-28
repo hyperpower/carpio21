@@ -135,12 +135,12 @@ inline std::string ToStringAsAxes(const St& d){
 
 inline std::string ToString(const Axes& a) {
     if (a == _X_) {
-        return "_X_";
+        return "X";
     }
     if (a == _Y_) {
-        return "_Y_";
+        return "Y";
     }
-    return "_Z_";
+    return "Z";
 }
 inline std::string ToString(const Orientation& o) {
     switch(o){

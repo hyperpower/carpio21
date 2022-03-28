@@ -130,7 +130,7 @@ class Runer:
         # 
         doc_dir        = os.path.abspath(os.path.join(self._path.this, "doc"))
         doc_source_dir = os.path.abspath(os.path.join(self._path.this, "doc/source"))
-        doc_build_dir  = os.path.abspath(os.path.join(self._path.this,  "doc/build"))
+        doc_build_dir  = os.path.abspath(os.path.join(self._path.this, "doc/build"))
         self.mkdir(doc_dir)
         self.mkdir(doc_source_dir)
         self.mkdir(doc_build_dir)
@@ -142,8 +142,10 @@ class Runer:
         shutil.copy(confpy, os.path.join(doc_source_dir, "conf.py"))
         # copy fig folder
         if os.path.isdir(os.path.join(this_dir, "fig")):
-            shutil.move(os.path.join(this_dir, "fig"), 
-                        os.path.join(doc_source_dir, "fig"))
+            # delete fig in doc
+            shutil.rmtree(os.path.join(doc_source_dir, "fig"))
+            shutil.copytree(os.path.join(this_dir, "fig"), 
+                    os.path.join(doc_source_dir, "fig"))
         # revise rst
         revise_report_rst(this_dir, self._info, doc_source_dir)
 

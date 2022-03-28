@@ -310,7 +310,6 @@ void Reflect(GEO& geo, const POINT& about){
     _Translate(geo, arr, Tag());     // translate back 
 }
 
-
 }
 
 #endif

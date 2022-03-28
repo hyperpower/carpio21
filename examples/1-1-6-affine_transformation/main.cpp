@@ -18,6 +18,10 @@ void TestScale();
 void TestScaleAbout();
 void TestRotate();
 void TestRotateAbout();
+void TestReflectAboutAxes(Axes);
+void TestReflectAboutPoint();
+void TestShearIn(Axes, double);
+void TestShearAbout(Axes, double, Poi);
 
 // main 
 int main(){
@@ -27,6 +31,15 @@ int main(){
     TestScaleAbout();
     TestRotate();
     TestRotateAbout();
+    TestReflectAboutAxes(_X_);
+    TestReflectAboutAxes(_Y_);
+    TestReflectAboutPoint();
+    TestShearIn(_X_, 0.2);
+    TestShearIn(_Y_, 0.2);
+
+    Poi about = {0.4, 0.5};
+    TestShearAbout(_X_, 0.2, about);
+    TestShearAbout(_Y_, 0.2, about);
 }
 
 auto MakeBox(){
@@ -126,7 +139,7 @@ void TestTranslate(){
     AddAxes(gnu);
     AddActorsOriginal(gnu, box, pc);
     Translate(box, trans_vec);
-    Translate(pc, trans_vec);
+    Translate(pc,  trans_vec);
     AddActorsTransformed(gnu, box, pc);
 
     gnu.plot();
@@ -182,7 +195,6 @@ void TestScaleAbout(){
     Scale(pc,  vec, about);
     AddActorsTransformed(gnu, box, pc);
     
-
     gnu.plot();
 }
 
@@ -233,6 +245,115 @@ void TestRotateAbout(){
     Rotate(box, theta, about);
     Rotate(pc,  theta, about);
     AddActorsTransformed(gnu, box, pc);
+
+    gnu.plot();
+}
+
+void TestReflectAboutAxes(Axes axe){
+    PointChain box = MakeBox();
+    PointChain pc  = MakeFShape();
+
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/affine_reflect_about_" + ToString(axe));
+    if (axe == _X_){
+        gnu.set_xrange(-0.5, 1.5);
+        gnu.set_yrange(-1.5, 1.5);
+    }else if (axe == _Y_){
+        gnu.set_xrange(-1.5, 1.5);
+        gnu.set_yrange(-0.5, 1.5);
+    }
+    gnu.set_equal_aspect_ratio();
+
+    AddAxes(gnu);
+    AddActorsOriginal(gnu, box, pc);
+    Reflect(box, axe);
+    Reflect(pc,  axe);
+    AddActorsTransformed(gnu, box, pc);
+
+    gnu.plot();
+}
+
+void TestReflectAboutPoint(){
+    PointChain box = MakeBox();
+    PointChain pc  = MakeFShape();
+    // about origin 
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/affine_reflect_about_o");
+    gnu.set_xrange(-1.5, 1.5);
+    gnu.set_yrange(-1.5, 1.5);
+    gnu.set_equal_aspect_ratio();
+
+    AddAxes(gnu);
+    AddActorsOriginal(gnu, box, pc);
+    Reflect(box);
+    Reflect(pc);
+    AddActorsTransformed(gnu, box, pc);
+
+    gnu.plot();
+
+    // about a point
+    gnu.set_terminal_png("./fig/affine_reflect_about_point");
+    gnu.set_equal_aspect_ratio();
+    gnu.set_xrange(-.5, 2.0);
+    gnu.set_yrange(-.5, 2.0);
+
+    Poi about = {0.7, 0.8};
+    auto actor_about = ToGnuplotActor(about);
+    actor_about->style("with points pt 7 ps 2 lc \"black\"");
+    gnu.add(actor_about);
+    gnu.set_label(3, "Reflect Center",   about[0], about[1]-0.1, "center textcolor \"black\"");
+
+    box = MakeBox();
+    pc  = MakeFShape();
+
+    AddAxes(gnu);
+    AddActorsOriginal(gnu, box, pc);
+    Reflect(box, about);
+    Reflect(pc,  about);
+    AddActorsTransformed(gnu, box, pc);
+
+    gnu.plot();
+}
+
+void TestShearIn(Axes axe, double theta){
+    PointChain box = MakeBox();
+    PointChain pc  = MakeFShape();
+    // about origin 
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/affine_shear_" + ToStringAsAxes(axe));
+    gnu.set_xrange(-0.5, 1.5);
+    gnu.set_yrange(-0.5, 1.5);
+    gnu.set_equal_aspect_ratio();
+
+    AddAxes(gnu);
+    AddActorsOriginal(gnu, box, pc);
+    Shear(box, theta, axe);
+    Shear(pc,  theta, axe);
+    AddActorsTransformed(gnu, box, pc);
+
+    gnu.plot();
+}
+
+void TestShearAbout(Axes axe, double theta, Poi about){
+    PointChain box = MakeBox();
+    PointChain pc  = MakeFShape();
+    // about origin 
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/affine_shear_about_in_" + ToStringAsAxes(axe));
+    gnu.set_xrange(-0.5, 1.5);
+    gnu.set_yrange(-0.5, 1.5);
+    gnu.set_equal_aspect_ratio();
+
+    AddAxes(gnu);
+    AddActorsOriginal(gnu, box, pc);
+    Shear(box, theta, about, axe);
+    Shear(pc,  theta, about, axe);
+    AddActorsTransformed(gnu, box, pc);
+
+    auto actor_about = ToGnuplotActor(about);
+    actor_about->style("with points pt 7 ps 2 lc \"black\"");
+    gnu.add(actor_about);
+    gnu.set_label(3, "Shear Center",   about[0], about[1]-0.1, "center textcolor \"black\"");
 
     gnu.plot();
 }
