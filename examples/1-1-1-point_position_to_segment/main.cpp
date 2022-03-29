@@ -22,20 +22,21 @@ std::string a_case(const Point& p1, const Point& p2, const Point& p3){
 			"./fig/" + str_res, // const std::string& filename,
 			800,                // double  x         = 800,
 			600,                // double  y         = 600,
-			"Sans",        // const std::string& font     = "Helvetica",
+			"Sans",             // const std::string& font     = "Helvetica",
 			13                  // int  fontsize  = 12);
 			);
 	gnu.set_xrange(-0.5, 1.5);
 	gnu.set_yrange(-0.5, 1.5);
 
 	std::replace( str_res.begin(), str_res.end(), '_', ' ');
-	gnu.set_label(1, str_res, 0.0, 1.0);
+	str_res = "Location status = " + str_res;
+	gnu.set_label(1, str_res, -0.3, 1.2);
 
-	auto a1 = GA::LinesPoints(seg, 3);
-	a1->style() = "with linespoints pointtype 7 pointsize 3 lw 2 lc variable";
+	auto a1 = ToGnuplotActor(seg);
+	a1->style() = "with linespoints pointtype 7 pointsize 3 lw 2 lc black";
 
-	auto a2 = GA::Points(p3);
-	a2->style() = "with points pointtype 5 pointsize 3 lc variable";
+	auto a2 = ToGnuplotActor(p3);
+	a2->style() = "with points pointtype 5 pointsize 3 lc rgb \"#00A4EF\"";
 	
 	gnu.add(a1);
 	gnu.add(a2);

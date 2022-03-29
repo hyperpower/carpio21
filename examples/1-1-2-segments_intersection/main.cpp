@@ -29,14 +29,14 @@ int a_case(const Point2& p1,
     gnu.set_yrange(-5, 5);
     gnu.set_label(1, strtype, -4.5, 4);
 
-    auto a1 = GA::LinesPoints(seg1, 3);
-    a1->style() = "with linespoints pointtype 7 pointsize 3 lw 3 lc variable";
+    auto a1 = ToGnuplotActor(seg1);
+    a1->style() = "with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"";
 
-    auto a2 = GA::LinesPoints(seg2, 2);
-    a2->style() = "with linespoints pointtype 7 pointsize 3 lw 3 lc variable";
+    auto a2 = ToGnuplotActor(seg2);
+    a2->style() = "with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#F25022\"";
 
-    auto a3 = GA::Points(np, 1);
-    a3->style() = "with linespoints pointtype 1 pointsize 3 lw 3 lc variable";
+    auto a3 = ToGnuplotActor(np);
+    a3->style() = "with linespoints pointtype 1 pointsize 3 lw 3 lc black";
 
     gnu.add(a1);
     gnu.add(a2);

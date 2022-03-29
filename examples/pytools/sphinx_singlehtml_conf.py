@@ -3,7 +3,8 @@ import sys, os
 sys.path.insert(0, os.path.abspath('extensions'))
 
 extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.mathjax']
+              'sphinx.ext.mathjax',
+              'sphinx.ext.graphviz']
 
 todo_include_todos = True
 # templates_path = ['_templates']

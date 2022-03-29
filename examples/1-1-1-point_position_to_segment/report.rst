@@ -22,6 +22,26 @@ loctions, as shown below,
     =====  ============
 
 
+.. graphviz::
+    :align: center
+
+    digraph location {
+       node [fontname="Helvetica,Arial,sans-serif"]
+       node [shape = ellipse]
+       Start [shape = ellipse, color="red", label = "Locations"]
+
+       Start -> "LEFT";
+       Start -> "ON";
+       Start -> "RIGHT";
+
+       "ON" -> "OUT START"
+       "ON" -> "ON START"
+       "ON" -> "IN"
+       "ON" -> "ON END"
+       "ON" -> "OUT END"
+     }
+
+
 Result
 ===================
 

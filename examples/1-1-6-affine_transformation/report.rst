@@ -11,7 +11,7 @@ An affine transformation is any transformation that preserves collinearity (i.e.
 - Shear Matrix
 - Reflect
 
-Any transformation can be defined in a single affine transformation matrix :math:`\mathbf{M}` (3 by 3 in 2D, 4 by 4 in 3D).
+Any transformation can be defined in a single affine transformation matrix :math:`\mathbf{M}` (3 by 3 in 2D, 4 by 4 in 3D) dhfei.
 
 .. math::
    \mathbf{M}_{2D} = 

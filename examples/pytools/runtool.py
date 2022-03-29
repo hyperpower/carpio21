@@ -143,7 +143,8 @@ class Runer:
         # copy fig folder
         if os.path.isdir(os.path.join(this_dir, "fig")):
             # delete fig in doc
-            shutil.rmtree(os.path.join(doc_source_dir, "fig"))
+            if os.path.isdir(os.path.join(doc_source_dir, "fig")):
+                shutil.rmtree(os.path.join(doc_source_dir, "fig"))
             shutil.copytree(os.path.join(this_dir, "fig"), 
                     os.path.join(doc_source_dir, "fig"))
         # revise rst
