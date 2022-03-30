@@ -309,7 +309,27 @@ void Reflect(GEO& geo, const POINT& about){
     _Reflect(geo, Tag());
     _Translate(geo, arr, Tag());     // translate back 
 }
-
+template<class GEO> // Line: ax + by = alpha
+void _Reflect(GEO& point, double a, double b, double alpha, PointTag, Dim2Tag){
+    double c = -alpha;
+    double spab = a * a + b * b;
+    double smab = a * a - b * b;
+    auto po = point;
+    point[0] = (       - smab * po[0] - 2.0 * a * b * po[1]  - 2.0 * a * c)/spab;  
+    point[1] = (- 2.0 * a * b * po[0]        + smab * po[1]  - 2.0 * b * c)/spab;  
+}
+template<class GEO> // Line: ax + by = alpha
+void _Reflect(GEO& pointchain, double a, double b, double alpha, PointChainTag, Dim2Tag){
+    for(auto& p : pointchain ){
+        _Reflect(p, a, b, alpha, PointTag(), Dim2Tag());
+    }
+}
+template<class GEO> // Line: ax + by = alpha
+void Reflect(GEO& geo, double a, double b, double alpha){
+    typedef typename GEO::Tag Tag;
+    typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
+    _Reflect(geo, a, b, alpha, Tag(), DimTag());
+}
 }
 
 #endif

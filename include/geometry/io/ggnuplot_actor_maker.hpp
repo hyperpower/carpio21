@@ -320,6 +320,17 @@ auto ToGnuplotActor(const ANY& geo){
     MakeGnuplotActor(*actor, geo, ANY::Tag());    
     return actor;
 }
+template<typename ANY, typename CONTAINER,
+        typename std::enable_if<
+            IsGeometry<ANY>::value
+         && IsContainer<CONTAINER>::value, 
+        bool>::type = true>
+auto ToGnuplotActor(const ANY& geo, const CONTAINER& con){
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    spActor actor = spActor(new GnuplotActor());
+    MakeGnuplotActor(*actor, geo, con,ANY::Tag());    
+    return actor;
+}
 template<typename ANY,
         typename std::enable_if<
             IsGeometry<ANY>::value,
@@ -330,16 +341,16 @@ auto ToGnuplotActorAsVector(const ANY& geo){
     MakeGnuplotActorAsVector(*actor, geo, ANY::Tag());    
     return actor;
 }
-template<class ANY, class VALUE,
-        typename std::enable_if<
-            IsGeometry<ANY>::value,
-        bool>::type = true>
-auto ToGnuplotActor(const ANY& geo, const VALUE& value){
-    typedef std::shared_ptr<GnuplotActor> spActor;
-    spActor actor = spActor(new GnuplotActor());
-    MakeGnuplotActor(*actor, geo, value, ANY::Tag());    
-    return actor;
-}
+// template<class ANY, class VALUE,
+//         typename std::enable_if<
+//             IsGeometry<ANY>::value,
+//         bool>::type = true>
+// auto ToGnuplotActor(const ANY& geo, const VALUE& value){
+//     typedef std::shared_ptr<GnuplotActor> spActor;
+//     spActor actor = spActor(new GnuplotActor());
+//     MakeGnuplotActor(*actor, geo, value, ANY::Tag());    
+//     return actor;
+// }
 
 template<typename ANY>
 void MakeGnuplotActor(GnuplotActor& actor, const ANY& point, PointTag){
@@ -351,7 +362,39 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& point, PointTag){
 
     actor.data().push_back("");
 }
-
+template<typename ANY, typename CONTAINER, 
+          typename std::enable_if<std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
+void MakeGnuplotActor(GnuplotActor& actor, const ANY& line, const CONTAINER& con, LineTag){
+    assert(con.size() == 2);
+    typedef Point_<double, 2> Point;
+    int n = 10; // number of segment
+    double xmax = *(con.begin());
+    double xmin = *(std::next(con.begin())); 
+    double dx = (xmax - xmin) / n;
+    
+    std::list<Point> listp;
+    if (std::abs(line.slope()) < 1){
+        for (int i = 0; i < n + 1; i++){
+            Vt x = xmin + i * dx;
+            Vt y = line.cal_y(x);
+            listp.push_back(Point(x, y));
+        }
+    }
+    else{
+        for (int i = 0; i < n + 1; i++){
+            Vt y = xmin + i * dx;
+            Vt x = line.cal_x(y);
+            listp.push_back(Point(x, y));
+        }
+    } 
+    actor.command() = "using 1:2 title \"\" ";
+    actor.style() = "with lines";
+    for (auto &p : listp)
+    {
+        actor.data().push_back(ToString(p, " "));
+    }
+    actor.data().push_back("");
+}
 template<typename ANY>
 void MakeGnuplotActor(GnuplotActor& actor, const ANY& seg, SegmentTag){
     actor.command() = "using 1:2 title \"\" ";
@@ -407,7 +450,9 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& pc, PointChainTag){
     	actor.data().push_back(ToString(p, " "));
 	}
 
-	actor.data().push_back(ToString(pc.front(), " "));
+    if(pc.closed()){
+	    actor.data().push_back(ToString(pc.front(), " "));
+    }
     actor.data().push_back("");
 }
 // Geomentry objects in container entry
@@ -418,8 +463,8 @@ template<class ANY,
                 && IsGeometry<typename ANY::value_type>::value
             >::value, 
         bool>::type = true>
-auto ToGnuplotActor(const ANY& any, int color_idx = -1) {
-    std::cout << "Test container < Geo >" << std::endl;
+auto ToGnuplotActor(const ANY& any) {
+    
 }
 
 }

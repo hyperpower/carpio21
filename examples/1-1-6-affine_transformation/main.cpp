@@ -22,6 +22,7 @@ void TestReflectAboutAxes(Axes);
 void TestReflectAboutPoint();
 void TestShearIn(Axes, double);
 void TestShearAbout(Axes, double, Poi);
+void TestReflectAboutLine(const Line&);
 
 // main 
 int main(){
@@ -34,6 +35,9 @@ int main(){
     TestReflectAboutAxes(_X_);
     TestReflectAboutAxes(_Y_);
     TestReflectAboutPoint();
+
+    TestReflectAboutLine({1.0,1.0,1.5});
+
     TestShearIn(_X_, 0.2);
     TestShearIn(_Y_, 0.2);
 
@@ -310,6 +314,33 @@ void TestReflectAboutPoint(){
     AddActorsOriginal(gnu, box, pc);
     Reflect(box, about);
     Reflect(pc,  about);
+    AddActorsTransformed(gnu, box, pc);
+
+    gnu.plot();
+}
+
+void TestReflectAboutLine(const Line& line){
+    PointChain box = MakeBox();
+    PointChain pc  = MakeFShape();
+    // about origin 
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/affine_reflect_about_line");
+    gnu.set_xrange(-0.5, 2.0);
+    gnu.set_yrange(-0.5, 2.0);
+    gnu.set_equal_aspect_ratio();
+    
+
+    std::array<double,2> range = {-0.5,2.0};
+    std::cout << "Line : " <<line << std::endl;
+    auto actor_line = ToGnuplotActor(line, range);
+    actor_line->style("with lines lt 1 lw 1 lc \"black\"");
+    gnu.add(actor_line);
+    gnu.set_label(3, "Line : " + ToString(line),  0.0, 1.8, "textcolor \"black\"");
+
+    AddAxes(gnu);
+    AddActorsOriginal(gnu, box, pc);
+    Reflect(box, line[0], line[1], line[2]);
+    Reflect(pc, line[0], line[1], line[2]);
     AddActorsTransformed(gnu, box, pc);
 
     gnu.plot();

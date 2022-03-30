@@ -95,20 +95,23 @@ public:
 	typedef TYPE& reference;
 	typedef const TYPE& const_reference;
 	typedef Line_<TYPE> Line;
+	typedef LineTag Tag;
 
 	typedef Point_<Vt, 2> Point;
+	// std like
+	typedef TYPE value_type;
 public:
 	Line_() :
 			std::array<Vt, 3>() {
 	}
-	Line_(const Vt& a, const Vt& b, const Vt& c) {
+	Line_(const Vt& a, const Vt& b, const Vt& alpha) {
 		this->at(0) = a;
 		this->at(1) = b;
-		this->at(2) = c;
+		this->at(2) = alpha;
 	}
 	Line_(Vt ax, Vt ay, Vt bx, Vt by) {
 		//assert(!isEqual(ax, bx) || !isEqual(ay,by));
-		auto arr = Line::Construct(ax, ay, bx, by);
+		auto arr = Construct(ax, ay, bx, by);
 		this->at(0) = arr[0];
 		this->at(1) = arr[1];
 		this->at(2) = arr[2];
@@ -124,7 +127,17 @@ public:
 		this->at(1) = l[1];
 		this->at(2) = l[2];
 	}
-
+	Line_(std::initializer_list<TYPE> l) {
+		auto b = l.begin();
+		if(l.size() == 3){
+			this->reconstruct(*b, *(std::next(b)), *(std::next(b,2)));
+		}else if(l.size() == 4){
+			auto arr = Construct(*b, *(std::next(b)), *(std::next(b,2)), *(std::next(b, 3)));
+			this->at(0) = arr[0];
+			this->at(1) = arr[1];
+			this->at(2) = arr[2];
+		}
+    }
 	void reconstruct(Vt a, Vt b, Vt c) {
 		if (a == 0.0 && b == 0.0) {
 			a = _SMALL_;

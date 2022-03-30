@@ -190,7 +190,8 @@ Shear operations "tilt" objects.
 Reflect
 =========================
 
-Reflect objects about an origin.
+Reflect objects about origin.
+
 
 .. math::
    \mathbf{M}_{\text{origin}} = 
@@ -226,6 +227,26 @@ Reflect objects about an aix.
      0 &  0 &  0 & 1
    \end{pmatrix}
 
+
+Reflect about point
+-------------------------
+.. figure:: fig/affine_reflect_about_o.png
+   :align: center 
+
+   Reflect a box about origin. (2D)
+
+
+.. figure:: fig/affine_reflect_about_point.png
+   :align: center 
+
+   Reflect a box about a point. (2D)
+
+Reflect about line
+-------------------------
+
+Reflect about aix
+^^^^^^^^^^^^^^^^^^^^^^^
+
 .. figure:: fig/affine_reflect_about_X.png
    :align: center 
 
@@ -237,14 +258,64 @@ Reflect objects about an aix.
 
    Reflect a box about y. (2D)
 
+Reflect about a line (2D)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. figure:: fig/affine_reflect_about_o.png
-   :align: center 
+A line :math:`L` defined as:
 
-   Reflect a box about origin. (2D)
+.. math::
+   L: \quad a x + b y + c = 0
+
+A point :math:`\mathbf{P_0} = (x_0, y_0)` is reflected by the line :math:`L`. The new point is :math:`\mathbf{P_n} = (x_n, y_n)`. The middle point :math:`\mathbf{P_m}` of :math:`\mathbf{P_0}` and  :math:`\mathbf{P_1}` can be obtained:
+
+.. math::
+   \mathbf{P_m} = (x_m, y_m)=  (\frac{x_n + x_0}{2}, \frac{y_n + y_0}{2})
+
+The middle point is on line, 
+
+.. math::
+   a x_m + b y_m + c = 0 \\
+
+   a \frac{x_n + x_0}{2} + b \frac{y_n + y_0}{2} + c = 0 \\
+
+   a (x_n + x_0) + b (y_n + y_0) + 2 c = 0 \\
+
+a new line constructed by :math:`\mathbf{P_0}` and  :math:`\mathbf{P_1}` is normal to  :math:`L`. 
+
+.. math::
+   \frac{y_n - y_0}{x_n - x_0} = \frac{b}{a} \\
+   a (y_n - y_0) = b(x_n - x_0) \\
+   a (y_n - y_0) - b(x_n - x_0) = 0
+
+So,
+
+.. math::
+   \begin{equation}
+    \begin{cases}
+      a (x_n + x_0) + b (y_n + y_0) + 2 c = 0 \\
+      a (y_n - y_0) - b (x_n - x_0) = 0\\
+    \end{cases}       
+   \end{equation}
+
+:math:`\mathbf{P_n} = (x_n, y_n)` can be expressed by :math:`\mathbf{P_0} = (x_0, y_0)`,
+
+.. math::
+   (x_n, y_n) = (-\frac{(a^2 -b^2)x_0 + 2aby_0 + 2ac}{a^2 + b^2}, 
+                 -\frac{(b^2 -a^2)y_0 + 2abx_0 + 2bc}{a^2 + b^2})
+
+In matrix form,
+
+.. math::
+   \mathbf{M}_{L} = \frac{1}{a^2 + b^2}
+   \begin{pmatrix}
+    b^2 - a^2 & -2ab     & -2ac \\ 
+    -2ab       & a^2-b^2 & -2bc \\
+     0        &  0       &  1  \\
+   \end{pmatrix}
 
 
-.. figure:: fig/affine_reflect_about_point.png
-   :align: center 
 
-   Reflect a box about a point. (2D)
+
+
+
+
