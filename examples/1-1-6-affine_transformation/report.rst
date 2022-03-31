@@ -309,11 +309,16 @@ In matrix form,
    \mathbf{M}_{L} = \frac{1}{a^2 + b^2}
    \begin{pmatrix}
     b^2 - a^2 & -2ab     & -2ac \\ 
-    -2ab       & a^2-b^2 & -2bc \\
+    -2ab      & a^2-b^2  & -2bc \\
      0        &  0       &  1  \\
    \end{pmatrix}
 
+Example:
 
+.. figure:: fig/affine_reflect_about_line.png
+   :align: center 
+
+   Reflect a box about a line. (2D)
 
 
 

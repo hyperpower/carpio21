@@ -6,6 +6,7 @@
 #include "geometry/objects/basic/segment.hpp"
 #include "geometry/objects/analytic/line.hpp"
 #include "geometry/objects/basic/point_chain.hpp"
+#include "geometry/operation/affine.hpp"
 
 #include "algebra/algebra.hpp"
 
@@ -16,34 +17,6 @@ namespace carpio {
 
 // Line : ax + by = alpha
 // Box  : Pmin Pmax
-
-template<class NUM>
-void _SortPointsAlongTheLine(
-        std::list<std::shared_ptr<Point_<NUM, 2> > >& listp,
-        const NUM& a,   const NUM& b){
-    // Direction vector (b, -a)
-
-    // Lambda for comparing spPoints
-    auto fun = [&a, &b](const std::shared_ptr<Point_<NUM, 2> >& sp1,
-                        const std::shared_ptr<Point_<NUM, 2> >& sp2){
-        auto pv = *sp2 - *sp1;
-        auto d  = Dot(b, -a, pv[0], pv[1]);
-        return d > 0 ? true : false;
-    };
-
-    listp.sort(fun);
-}
-template<class NUM>
-int _RemoveSamePoints(std::list<std::shared_ptr<Point_<NUM, 2> > >& listp,
-                      NUM s){
-    // list must be sorted !!!
-    // Binary Predicate
-    auto fun = [s](const std::shared_ptr<Point_<NUM, 2> >& sp1,
-                        const std::shared_ptr<Point_<NUM, 2> >& sp2){
-        return IsSame(*sp1, *sp2, s);
-    };
-    listp.unique(fun);
-}
 
 // Point min is (0, 0)
 template<class NUM>
@@ -201,8 +174,73 @@ IntersectLineNegativeBox(const Box_<NUM,2>&  box,           // Box
                          const Line_<NUM>&   line){         // Line
     return IntersectLineNegativeBox(box.min(), box.max(), line);
 }
+// new
+// Point:min is (0, 0)
+//       max is (1, 1)
+// Line : a >= b
+inline std::list<Point_<double, 2>>
+_IntersectOrientLineUnitBox(const double& a, const double& b, const double& alpha,// Point max=(1,1)
+                            const double& tol = 1e-10){     
+    typedef Point_<double, 2> Poi;             
+    std::list<Point_<double, 2> > res;
+    // trivial case 1
+    if ((a + b - alpha < 0) || (-alpha > 0)){
+        return res;
+    }
+    // trivial case 2. line pass origin
+    if (std::abs(alpha) <= 1e-14){
+        res.emplace_back(Poi(0.0, 0.0));
+        return res;
+    }
+    // point on Y, that is X = 0
+    double on_y = alpha/(b+tol);
+    if (on_y <= 1.0 && on_y > 0){
+        res.emplace_back(Poi(0.0, on_y));
+    }else if (on_y > 1.0){
+        double on_y1 = (alpha - b)/(a + tol);
+        res.emplace_back(Poi(on_y1, 1.0)); 
+    }
+    // point on X, Y = 0
+    double on_x = alpha/(a+tol);
+    if (on_x <= 1.0 && on_x > 0){
+        res.emplace_back(Poi(on_x, 0.0));
+    }else if (on_x > 1.0){
+        double on_x1 = (alpha - a)/(b + tol);
+        res.emplace_back(Poi(1.0, on_x1));
+    }
+    return res;
+}
 
+inline std::list<Point_<double, 2>>
+_IntersectLineUnitBox(const double& a, const double& b, const double& alpha,// Point max=(1,1)
+                      const double& tol = 1e-10){     
+    double na = std::min(std::abs(a), std::abs(b));
+    double nb = std::max(std::abs(a), std::abs(b));
+    double nalpha = alpha;
+    if (a == -na){
+        nalpha = alpha - 0.5 * a;
+    }
+    if (b == -nb){
+        nalpha = alpha - 0.5 * b;
+    }
+    auto res = _IntersectOrientLineUnitBox(na, nb, nalpha);
 
+    if (a == -na){
+        for(auto& p : res){
+            Reflect(p, _X_, 0.5);
+        }
+    }
+    if (b == -nb){
+        for(auto& p : res){
+            Reflect(p, _Y_, 0.5);
+        }
+    }
+    if (na != std::abs(a)){
+        Reflect(res, 1, -1, 0.0);
+    }
+    
+    return res;
+}
 }
 
 #endif

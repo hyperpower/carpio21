@@ -65,14 +65,14 @@ TEST(box, box_vs_line){
 	Box2 box1(min1, max1);
 	std::cout << "The box 1 is " << box1 << std::endl;
 
-	Line line(0.0, 1.0, 1.0);
+	Line line(-1.1, 1.5, -0.3);
 //	Line line(9.0000001, 1e-11, 1.0);
 	std::cout << "Line is " << line << std::endl;
 
-	auto lspp = IntersectLineBox(box1, line);
+	auto lspp = _IntersectLineUnitBox(line.a(), line.b(), line.alpha());
 	std::cout << "Result points : " << lspp.size() << std::endl;
 	for(auto& sp : lspp){
-		std::cout << "   " << *sp << std::endl;
+		std::cout << "   " << sp << std::endl;
 	}
 
 	Gnuplot gnu;
@@ -80,7 +80,7 @@ TEST(box, box_vs_line){
 	gnu.set_xrange(-0.5, 1.5);
 	gnu.set_yrange(-0.5, 1.5);
 	gnu.set_equal_aspect_ratio();
-	gnu.set_terminal_png("./plot/line_box_normal.png");
+	gnu.set_terminal_png("./fig/line_box_normal.png");
 	auto spbox1 = gam.lines(box1);
 	spbox1->style() = "with lines lw 2 lc 8";
 	gnu.add(spbox1);
@@ -90,10 +90,10 @@ TEST(box, box_vs_line){
 	// add intersection points
 	int numlabel = 30;
 	for(auto& sp : lspp){
-		auto sppoint = gam.points(*sp);
+		auto sppoint = gam.points(sp);
 		sppoint->style() = "with points pt 7 ps 2 lc 7";
-		gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", sp->x(), sp->y()),
-				     sp->x(), sp->y()+ 0.05, "left font \",16\"");
+		gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", sp.x(), sp.y()),
+				     sp.x(), sp.y()+ 0.05, "left font \",16\"");
 		gnu.add(sppoint);
 		numlabel++;
 	}
@@ -126,7 +126,7 @@ void BoxLinePositiveCase(int num_case,
     gnu.set_xrange(-0.5, 1.5);
     gnu.set_yrange(-0.5, 1.5);
     gnu.set_equal_aspect_ratio();
-    gnu.set_terminal_png(tfm::format("./plot/lb_positve_%d.png", num_case));
+    gnu.set_terminal_png(tfm::format("./fig/lb_positve_%d.png", num_case));
     auto spbox1 = gam.lines(box1);
     spbox1->style() = "with lines lw 2 lc 8";
     gnu.add(spbox1);
@@ -158,7 +158,7 @@ void BoxLinePositiveCase(int num_case,
 }
 
 
-TEST(box, box_vs_line_positive){
+TEST(DISABLED_box, box_vs_line_positive){
     int n = 100;
     Vt dt = 3.1415926 / double(n);
     for(int i = 0; i<n; i++){

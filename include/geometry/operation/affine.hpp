@@ -257,11 +257,19 @@ void Shear(GEO& geo, const VT& theta, const POINT& about, const int& axe = _X_){
 // Reflect about axe
 // ========================
 template<class GEO> 
-void _Reflect(GEO& point, const Axes& axe, PointTag){
+void _Reflect(GEO& point, const Axes& axe,  PointTag){
     if (axe == _X_){
         point[1] = -point[1];
     }else if (axe ==_Y_){
         point[0] = -point[0];
+    }
+}
+template<class GEO> 
+void _Reflect(GEO& point, const Axes& axe, const double& v, PointTag){
+    if (axe == _X_){
+        point[0] = -(point[0] - v);
+    }else if (axe == _Y_){
+        point[1] = -(point[1] - v);
     }
 }
 template<class GEO> 
@@ -280,10 +288,10 @@ void _Reflect(GEO& pointchain, PointChainTag){
         _Reflect(p, PointTag());
     }
 }
-template<class GEO>
-void _Reflect(GEO& geo, const Axes& axe){
-    _Reflect(geo, axe, Tag());
-}
+// template<class GEO>
+// void _Reflect(GEO& geo, const Axes& axe){
+//     _Reflect(geo, axe, Tag());
+// }
 template<class GEO>
 void Reflect(GEO& geo, const Axes& axe){
     typedef typename GEO::Tag Tag;
@@ -291,7 +299,13 @@ void Reflect(GEO& geo, const Axes& axe){
     assert(GEO::Dim == 2);
     _Reflect(geo, axe, Tag());
 }
-
+template<class GEO>  // X = vt or Y = vt
+void Reflect(GEO& geo, const Axes& axe, const double& vt){
+    typedef typename GEO::Tag Tag;
+    typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
+    assert(GEO::Dim == 2);
+    _Reflect(geo, axe, vt, Tag());
+}
 template<class GEO>
 void Reflect(GEO& geo){  // Reflect about original points
     typedef typename GEO::Tag Tag;
@@ -324,11 +338,23 @@ void _Reflect(GEO& pointchain, double a, double b, double alpha, PointChainTag, 
         _Reflect(p, a, b, alpha, PointTag(), Dim2Tag());
     }
 }
-template<class GEO> // Line: ax + by = alpha
+template<class GEO, 
+         typename std::enable_if<IsGeometry<GEO>::value, bool>::type = true> // Line: ax + by = alpha
 void Reflect(GEO& geo, double a, double b, double alpha){
     typedef typename GEO::Tag Tag;
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     _Reflect(geo, a, b, alpha, Tag(), DimTag());
+}
+template<class CONTAINER,
+        typename std::enable_if<
+            std::integral_constant< bool, 
+                   IsContainer<CONTAINER>::value 
+                && IsGeometry<typename CONTAINER::value_type>::value
+            >::value, bool>::type = true> // Line: ax + by = alpha
+void Reflect(CONTAINER& con_geo, double a, double b, double alpha){
+    for (auto& geo : con_geo){
+        Reflect(geo, a, b, alpha);
+    }
 }
 }
 
