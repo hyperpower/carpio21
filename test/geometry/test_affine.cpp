@@ -172,3 +172,37 @@ TEST(Reflect, AboutPoint){
     gnu.plot();
 }
 
+TEST(Scale, Line){
+    PointChain box = MakeBox();
+    PointChain pc  = MakeFShape();
+    // about origin 
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/affine_scale_a_line");
+    gnu.set_xrange(-0.0, 1.2);
+    gnu.set_yrange(-0.0, 1.2);
+    gnu.set_equal_aspect_ratio();
+    // line
+	Line_<double> line({1, 1, 1.0});
+	std::array<double,2> range = {-2.5,2.5};
+	auto actor_lineo = ToGnuplotActor(line, range);
+    actor_lineo->style("with lines lt 1 lw 2 lc \"black\"");
+	gnu.add(actor_lineo);
+    gnu.set_label(3, "Line : " + ToString(line),  0.2, 1.15, "textcolor \"black\"");
+
+    AddActorsOriginal(gnu, box, pc);
+    AddAxes(gnu);
+    // Scale ===================
+    std::array<double,2> sarr{0.5,0.8};
+    Scale(line, sarr);
+    // 
+    Scale(box, sarr);
+    Scale(pc, sarr);
+	auto actor_linen = ToGnuplotActor(line, range);
+    actor_linen->style("with lines lt 1 lw 2 lc \"red\"");
+	gnu.add(actor_linen);
+    gnu.set_label(4, "Scaled Line : " + ToString(line),  0.2, 1.05, "textcolor \"red\"");
+
+    AddActorsTransformed(gnu, box, pc);
+
+    gnu.plot();
+}

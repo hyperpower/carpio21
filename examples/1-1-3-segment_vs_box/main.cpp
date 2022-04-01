@@ -15,20 +15,38 @@ typedef GGnuplotActorMaker_<double, 2> GAM;
 
 
 // Forware Declare
-int  line_box_case(double a, double b, double alpha, std::string name);
+int  LineBox(double a, double b, double alpha, const std::string& name);
 void BoxLinePositiveCase(int num_case, 
+                         double x, double y,
+                         double a, double b, double alpha);
+void BoxLinePNCase(int num_case, 
                          double x, double y,
                          double a, double b, double alpha);
 void RotateLineCutBox();
 
 int main(){
-    int r = line_box_case(1.5, 1.0, 1.3, "line_box_normal");
-    line_box_case(1.5, 1.0, 0.0, "line_box_corner");
-    line_box_case(0.0, 1.0, 1.0, "line_box_edge");
+    int r = LineBox(1.5, 1.0, 1.3, "line_box_normal");
+    LineBox(1.5, 1.0, 0.0, "line_box_corner");
+    LineBox(0.0, 1.0, 1.0, "line_box_edge");
     RotateLineCutBox();
+    BoxLinePNCase(1, 1.3, 0.9,  1.5, 1.0, 1.1);
+    BoxLinePNCase(2, 1.3, 0.9, -1.5, -1.0, -1.5);
+
 }
 
-int line_box_case(double a, double b, double alpha, std::string name){
+auto AddAxes(Gnuplot& gnu){
+    gnu.set_label(10, "x",  0.45, -0.08, "textcolor rgb \"#00A4EF\"");
+    auto actor_x = ToGnuplotActorAsVector(Seg2(Point2(0.0,0.0), Point2(0.5,0.0)));
+    actor_x->style("with vectors lt 1 lw 3 lc rgb \"#00A4EF\"");
+    gnu.add(actor_x);
+
+    gnu.set_label(11, "y", -0.08, 0.45, "textcolor rgb \"#F25022\"");
+    auto actor_y = ToGnuplotActorAsVector(Seg2(Point2(0.0,0.0), Point2(0.0,0.5)));
+    actor_y->style("with vectors lt 1 lw 3 lc rgb \"#F25022\"");
+    gnu.add(actor_y);
+}
+
+int LineBox(double a, double b, double alpha, const std::string& name){
     std::cout << "Initial box " << " >>>>>>> " << std::endl;
     Point2 min1(0, 0);
     Point2 max1(1, 1);
@@ -38,10 +56,10 @@ int line_box_case(double a, double b, double alpha, std::string name){
     Line line(a, b, alpha);
     std::cout << "Line is " << line << std::endl;
 
-    auto lspp = IntersectLineBox(max1, line);
+    auto lspp = IntersectLineBox(min1, max1, line.a(), line.b(), line.alpha());
     std::cout << "Result points : " << lspp.size() << std::endl;
     for(auto& sp : lspp){
-        std::cout << "   " << *sp << std::endl;
+        std::cout << "   " << sp << std::endl;
     }
     
     Gnuplot gnu;
@@ -49,27 +67,31 @@ int line_box_case(double a, double b, double alpha, std::string name){
     gnu.set_yrange(-0.5, 1.5);
     gnu.set_equal_aspect_ratio();
     gnu.set_terminal_png("./fig/" + name);
-    auto spbox1 = GA::Lines(box1);
+    AddAxes(gnu);
+    auto spbox1 = ToGnuplotActor(box1);
     spbox1->style() = "with lines lw 2 lc 8";
     gnu.add(spbox1);
-    auto spline = GA::Lines(line, -0.5, 1.5);
+    std::array<double,2> line_range{-0.5, 1.5};
+    auto spline = ToGnuplotActor(line, line_range);
     spline->style() = "with lines lw 3 lc 6";
     gnu.add(spline);
     // add intersection points
     int numlabel = 30;
     for(auto& sp : lspp){
-        auto sppoint = GA::Points(*sp);
+        auto sppoint = ToGnuplotActor(sp);
         sppoint->style() = "with points pt 7 ps 2 lc 7";
-        gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", sp->x(), sp->y()),
-                     sp->x(), sp->y()+ 0.05, "left font \",16\"");
+        gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", sp.x(), sp.y()),
+                     sp.x(), sp.y()+ 0.05, "left font \",13\"");
         gnu.add(sppoint);
         numlabel++;
     }
-    gnu.set_label(1,"(1.0, 1.0)", 1.0, 1.05, "center font \",16\"");
-    gnu.set_label(2,"(0.0, 0.0)", 0.0, -0.05, "center font \",16\"");
+    // gnu.set_label(1,"(1.0, 1.0)", 1.0, 1.05, "textcolor rgb \"#7FBA00\" center font \",13\"");
+    // gnu.set_label(2,"(0.0, 0.0)", 0.0, -0.05, "textcolor rgb \"#7FBA00\" center font \",13\"");
 
     gnu.set_label(4,tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(), line.alpha()),
-                    0.1, 1.3, "left font \",16\"");
+                    0.1, 1.3, "left font \",13\"");
+
+
     gnu.plot();
 
     std::cout << "End of Case " << name << " <<<<<<<< "<< std::endl;
@@ -89,44 +111,47 @@ void RotateLineCutBox(){
         Vt b = x2 - x1;
         Vt alpha = x2 * y1 - x1 * y2;
 
-        BoxLinePositiveCase(i, 1, 1, a, b, alpha);
+        BoxLinePositiveCase(i, 1.1, 0.8, a, b, alpha);
     }
 }
 
 void BoxLinePositiveCase(int num_case,
         double x, double y,
         double a, double b, double alpha) {
-    Point2 min1(0.0, 0.0);
-    Point2 max1(y, y);
+    Point2 min1(-0.1, -0.2);
+    Point2 max1(x, y);
     Box2 box1(min1, max1);
 
     Line line(a, b, alpha);
 
-    auto lspp = IntersectLineNegativeBox(box1, line);
+    auto lspp = PositiveLineBox(min1, max1, line.a(), line.b(), line.alpha());
 
     Gnuplot gnu;
     GAM gam;
     gnu.set_xrange(-0.5, 1.5);
     gnu.set_yrange(-0.5, 1.5);
     gnu.set_equal_aspect_ratio();
-    gnu.set_terminal_png(tfm::format("./fig/lb_%02d.png", num_case));
-    auto spbox1 = gam.lines(box1);
+    gnu.set_terminal_png(tfm::format("./fig/lb_%02d", num_case));
+    AddAxes(gnu);
+    auto spbox1 = ToGnuplotActor(box1);
     spbox1->style() = "with lines lw 2 lc 8";
     gnu.add(spbox1);
-    auto spline = gam.lines(line, -0.5, 1.5);
+    std::array<double,2> line_range{-0.5, 1.5};
+    auto spline = ToGnuplotActor(line, line_range);
     spline->style() = "with lines lw 3 lc 6";
     gnu.add(spline);
     // add intersection points
     int numlabel = 30;
     for (auto& sp : lspp) {
-        auto sppoint = gam.points(*sp);
+        auto sppoint = ToGnuplotActor(sp);
         sppoint->style() = "with points pt 7 ps 2 lc 7";
-        gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", sp->x(), sp->y()),
-                sp->x(), sp->y() + 0.05, "left font \",16\"");
+        gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", 
+                      sp.x(), sp.y()),
+                      sp.x(), sp.y() + 0.05, "left font \",13\"");
         gnu.add(sppoint);
         numlabel++;
     }
-    gnu.set_object2dp(5, lspp,
+    gnu.set_object2d(5, lspp,
             "fillstyle transparent solid 0.3 fc rgb \"blue\"");
 
 //    gnu.set_label(1, tfm::format("(%.1f, %.1f)", min1.x(), min1.y()), min1.x(),
@@ -136,6 +161,61 @@ void BoxLinePositiveCase(int num_case,
 
     gnu.set_label(4,
             tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(),
-                    line.alpha()), 0.1, 1.3, "left font \",16\"");
+                    line.alpha()), -0.1, 1.3, "left font \",16\"");
+    std::cout << "Line : " << line << std::endl;
+    gnu.plot();
+}
+
+void BoxLinePNCase(int num_case,
+        double x, double y,
+        double a, double b, double alpha) {
+    Point2 min1(-0.1, -0.2);
+    Point2 max1(x, y);
+    Box2 box1(min1, max1);
+
+    Line line(a, b, alpha);
+
+    auto lspp = PositiveLineBox(min1, max1, line.a(), line.b(), line.alpha());
+    auto lspn = NegativeLineBox(min1, max1, line.a(), line.b(), line.alpha());
+
+    Gnuplot gnu;
+    GAM gam;
+    gnu.set_xrange(-0.5, 1.5);
+    gnu.set_yrange(-0.5, 1.5);
+    gnu.set_equal_aspect_ratio();
+    gnu.set_terminal_png(tfm::format("./fig/pn_%02d", num_case));
+    AddAxes(gnu);
+    auto spbox1 = ToGnuplotActor(box1);
+    spbox1->style() = "with lines lw 2 lc 8";
+    gnu.add(spbox1);
+    std::array<double,2> line_range{-0.5, 1.5};
+    auto spline = ToGnuplotActor(line, line_range);
+    spline->style() = "with lines lw 3 lc 6";
+    gnu.add(spline);
+    // add intersection points
+    int numlabel = 30;
+    for (auto& sp : lspp) {
+        auto sppoint = ToGnuplotActor(sp);
+        sppoint->style() = "with points pt 7 ps 2 lc 7";
+        gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", 
+                      sp.x(), sp.y()),
+                      sp.x(), sp.y() + 0.05, "left font \",13\"");
+        gnu.add(sppoint);
+        numlabel++;
+    }
+    gnu.set_object2d(5, lspp,
+            "fillstyle transparent solid 0.3 fc rgb \"blue\"");
+    gnu.set_object2d(6, lspn,
+            "fillstyle transparent solid 0.3 fc rgb \"green\"");
+
+//    gnu.set_label(1, tfm::format("(%.1f, %.1f)", min1.x(), min1.y()), min1.x(),
+//            min1.y() + 0.06, "center font \",16\"");
+//    gnu.set_label(2, tfm::format("(%.1f, %.1f)", max1.x(), max1.y()), max1.x(),
+//            max1.y() + 0.06, "center font \",16\"");
+
+    gnu.set_label(4,
+            tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(),
+                    line.alpha()), -0.1, 1.3, "left font \",16\"");
+    std::cout << "Line : " << line << std::endl;
     gnu.plot();
 }

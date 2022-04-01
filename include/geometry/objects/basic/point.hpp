@@ -142,6 +142,13 @@ protected:
         this->at(2) = c;
     }
 public:   
+    Point operator-() const{
+        Point res(*this);
+        for(auto& v : res){
+            v = -v;
+        }
+        return res;
+    }
     Point operator-() {
         Point res;
         res[0] = -(this->at(0));

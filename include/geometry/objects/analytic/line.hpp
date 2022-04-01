@@ -90,6 +90,7 @@ template<typename TYPE>
 class Line_: public std::array<TYPE, 3> {
 	//The Line function defined as ax+by=alpha
 public:
+    static const St Dim = 2;
 	typedef St size_type;
 	typedef TYPE Vt;
 	typedef TYPE& reference;
@@ -267,12 +268,12 @@ public:
 
 template<typename TYPE>
 std::ostream& operator<<(std::ostream& stream, const Line_<TYPE>& line) {
-	stream << line.a() << " X + "
+	stream << std::setprecision(4) 
+	       << line.a() << " X + "
 		   << line.b() << " Y = "
 		   << line.alpha();
 	return stream;
 }
-
 
 }
 

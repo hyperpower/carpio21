@@ -54,7 +54,11 @@ void _Translate(      GEO&       pointchain, const VEC& arr,
         _Translate(p, arr, PointTag(), DimTag()); 
     }
 }
-
+template<class GEO, class VEC>
+void _Translate(      GEO&       line, const VEC& arr,
+                LineTag){ 
+    line.alpha() = line.alpha() + line.a() * arr[0] + line.b() * arr[1]; 
+}
 // arr has same length as the Dim  
 template<class CONTAINER, class ARR,
          typename std::enable_if<std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
@@ -77,12 +81,24 @@ void _NegativeContainer(CONTAINER& container){
     }
 }
 
-template<class GEO, class CONTAINER> 
-void Translate(GEO& geo, const CONTAINER& container){
+template<class GEO, class VEC,
+        typename std::enable_if<IsGeometry<GEO>::value, bool>::type = true> 
+void Translate(GEO& geo, const VEC& container){
     typedef typename GEO::Tag Tag;
-    std::array<typename CONTAINER::value_type, GEO::Dim> arr;
+    std::array<typename VEC::value_type, GEO::Dim> arr;
     _RegularVectorByDim(container, arr);
     _Translate(geo, arr, Tag());
+}
+template<class CONTAINER, class VEC, 
+        typename std::enable_if<
+            std::integral_constant< bool, 
+                   IsContainer<CONTAINER>::value 
+                && IsGeometry<typename CONTAINER::value_type>::value
+            >::value, bool>::type = true> // Line: ax + by = alpha
+void Translate(CONTAINER& con_geo, const VEC& vec){
+    for (auto& geo : con_geo){
+        Translate(geo, vec);
+    }
 }
 // ==================================================
 // Scale
@@ -114,13 +130,20 @@ void _Scale(GEO& box, const VEC& arr, BoxTag){
     _Scale(box.max(), arr, PointTag(), DimTag()); 
 }
 template<class GEO, class VEC>
+void _Scale(GEO& line, const VEC& arr, LineTag){
+    typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
+    line.a() = line.a() / arr[0];
+    line.b() = line.b() / arr[1];
+}
+template<class GEO, class VEC>
 void _Scale(GEO& pointchain, const VEC& arr, PointChainTag){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     for(auto& p : pointchain ){
         _Scale(p, arr, PointTag(), DimTag()); 
     }
 }
-template<class GEO, class VEC, class POINT>
+template<class GEO, class VEC, class POINT,
+         typename std::enable_if<IsGeometry<GEO>::value, bool>::type = true>
 void Scale(GEO& geo, const VEC& vec, const POINT& about){
     typedef typename GEO::Tag Tag;
     std::array<typename VEC::value_type, GEO::Dim> arr_n;
@@ -131,12 +154,35 @@ void Scale(GEO& geo, const VEC& vec, const POINT& about){
     _NegativeContainer(arr_n);
     _Translate(geo, arr_n, Tag()); // translate back 
 }
-template<class GEO, class VEC>
+template<class GEO, class VEC,
+         typename std::enable_if<IsGeometry<GEO>::value, bool>::type = true>
 void Scale(GEO& geo, const VEC& vec){
     typedef typename GEO::Tag Tag;
     std::array<typename VEC::value_type, GEO::Dim> arr;
     _RegularVectorByDim(vec, arr, 1);
     _Scale(geo, arr, Tag());
+}
+template<class CONTAINER, class VEC, class POINT,
+        typename std::enable_if<
+            std::integral_constant< bool, 
+                   IsContainer<CONTAINER>::value 
+                && IsGeometry<typename CONTAINER::value_type>::value
+            >::value, bool>::type = true> // Line: ax + by = alpha
+void Scale(CONTAINER& con_geo, const VEC& vec, const POINT& about){
+    for (auto& geo : con_geo){
+        Scale(geo, vec, about);
+    }
+}
+template<class CONTAINER, class VEC, 
+        typename std::enable_if<
+            std::integral_constant< bool, 
+                   IsContainer<CONTAINER>::value 
+                && IsGeometry<typename CONTAINER::value_type>::value
+            >::value, bool>::type = true> // Line: ax + by = alpha
+void Scale(CONTAINER& con_geo, const VEC& vec){
+    for (auto& geo : con_geo){
+        Scale(geo, vec);
+    }
 }
 // ==================================================
 //   Rotate 

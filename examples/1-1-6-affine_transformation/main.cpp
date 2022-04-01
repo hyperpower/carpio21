@@ -155,22 +155,36 @@ void TestScale(){
 
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/affine_scale");
-    gnu.set_xrange(-0.5, 1.5);
-    gnu.set_yrange(-0.5, 1.5);
+    gnu.set_xrange(-0.5, 2.0);
+    gnu.set_yrange(-0.5, 2.0);
     gnu.set_equal_aspect_ratio();
 
-    Poi vec = {1.2, 1.3}; 
+    Poi vec = {1.5, 1.2}; 
     auto actor_tv = ToGnuplotActorAsVector(Seg(Poi(0.0,0.0), Poi(vec)));
     actor_tv->style("with vectors lt 1 lw 3 lc rgb \"#7FBA00\"");
     gnu.add(actor_tv);
     Poi mid = Mid(vec, {0.0,0.0});
     gnu.set_label(3, "Scale Vetor",  mid[0]+0.05, mid[1], "textcolor rgb \"#7FBA00\"");
 
+    // line
+    Line line({1, 1, 1.0});
+    std::array<double,2> range = {-2.5,2.5};
+    auto actor_lineo = ToGnuplotActor(line, range);
+    actor_lineo->style("with lines lt 1 lw 2 lc \"black\"");
+    gnu.add(actor_lineo);
+    gnu.set_label(4, "Line : " + ToString(line),  -0.2, 1.75, "textcolor \"black\"");
+
     AddAxes(gnu);
     AddActorsOriginal(gnu, box, pc);
     Scale(box, vec);
     Scale(pc,  vec);
+    Scale(line, vec);
     AddActorsTransformed(gnu, box, pc);
+
+    auto actor_linen = ToGnuplotActor(line, range);
+    actor_linen->style("with lines lt 1 lw 2 lc \"red\"");
+    gnu.add(actor_linen);
+    gnu.set_label(5, "Scaled Line : " + ToString(line),  -0.2, 1.65, "textcolor \"red\"");
 
     gnu.plot();
 }
@@ -193,11 +207,25 @@ void TestScaleAbout(){
     Poi vec   = {1.2, 1.3}; 
     gnu.set_label(3, "Scale Center",  about[0], about[1]-0.1, "center textcolor rgb \"black\"");
 
+    // line
+    Line line({1, 1, 1.0});
+    std::array<double,2> range = {-2.5,2.5};
+    auto actor_lineo = ToGnuplotActor(line, range);
+    actor_lineo->style("with lines lt 1 lw 2 lc \"black\"");
+    gnu.add(actor_lineo);
+    gnu.set_label(4, "Line : " + ToString(line),  -0.2, 1.45, "textcolor \"black\"");
+
     AddAxes(gnu);
     AddActorsOriginal(gnu, box, pc);
     Scale(box, vec, about);
     Scale(pc,  vec, about);
+    Scale(line, vec, about);
     AddActorsTransformed(gnu, box, pc);
+
+    auto actor_linen = ToGnuplotActor(line, range);
+    actor_linen->style("with lines lt 1 lw 2 lc \"red\"");
+    gnu.add(actor_linen);
+    gnu.set_label(5, "Scaled Line : " + ToString(line),  -0.2, 1.35, "textcolor \"red\"");
     
     gnu.plot();
 }

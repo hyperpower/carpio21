@@ -64,6 +64,9 @@ def parse_args():
     parser.add_argument("-e", "--execute",
                         help="execute main file" ,
                         action="store_true")
+    parser.add_argument("-p", "--plot",
+                        help="plot by python" ,
+                        action="store_true")
     parser.add_argument("-d", "--document",
                         help="generate document file" ,
                         action="store_true")
@@ -126,6 +129,14 @@ class Runer:
         os.chdir(current)
         pass
 
+    def plot(self):
+        current = os.getcwd()
+        os.chdir(self._path.this)
+        if os.path.isfile("./plot.py"):
+            os.system("python ./plot.py")
+        os.chdir(current)
+        pass
+
     def build_doc(self):
         # 
         doc_dir        = os.path.abspath(os.path.join(self._path.this, "doc"))
@@ -146,7 +157,7 @@ class Runer:
             if os.path.isdir(os.path.join(doc_source_dir, "fig")):
                 shutil.rmtree(os.path.join(doc_source_dir, "fig"))
             shutil.copytree(os.path.join(this_dir, "fig"), 
-                    os.path.join(doc_source_dir, "fig"))
+                            os.path.join(doc_source_dir, "fig"))
         # revise rst
         revise_report_rst(this_dir, self._info, doc_source_dir)
 
@@ -182,10 +193,12 @@ class Runer:
         t  = time.perf_counter()
         self.execute()
         self._info["execute_wall_time"] = time.perf_counter() - t
+        print("plot ====== ")
+        t  = time.perf_counter()
+        self.plot()
+        self._info["plot_wall_time"] = time.perf_counter() - t
         print("build doc ====")
-        # t  = time.perf_counter()
         self.build_doc()
-        # self._info["document_wall_time"] = time.perf_counter() - t
 
 
     def run(self, args):
@@ -213,6 +226,12 @@ class Runer:
             record["execute"] = True
             self.execute()
             self._info["execute_wall_time"] = time.perf_counter() - t
+        if args.plot:
+            print("plot ======== ")
+            t  = time.perf_counter()
+            record["plot"] = True
+            self.plot()
+            self._info["plot_wall_time"] = time.perf_counter() - t
         if args.document:
             print(" build document ===== ")
             t  = time.perf_counter()

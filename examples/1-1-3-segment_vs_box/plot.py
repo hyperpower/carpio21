@@ -68,16 +68,26 @@ def plot_annotation(plt):
 def make_gif(fn_prefix, filename):
     # make gif
     print("making gif ...")
-    # os.system("convert -delay 5 -loop 0 ./fig/%s_*.png ./fig/%s.gif" % (fn_prefix, filename))
+    cmd = "{} {} {}".format(
+            "ffmpeg -i ./fig/{}_%02d.png".format(fn_prefix),
+            "-vf \"fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\"",
+            "-y -loop 0 ./fig/%s.gif" % filename
+        )
+    os.system(cmd)
+    # os.system("ffmpeg -i ./fig/lb_%02d.png -vf \"fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 ./fig/%s.gif" % (fn_prefix, filename))
 
     # delete files
-    files = FT.select_files1(PATH_FIG, fn_prefix)
-    for file in files:
-        os.system("rm " + PATH_FIG + "/" + file)
+    for file_name in os.listdir("./fig"):
+        if file_name.endswith('.png') and file_name.startswith("%s_" % fn_prefix):
+            # print("./fig/" + file_name)
+            os.remove("./fig/" + file_name)
+    # files = FT.select_files1(PATH_FIG, fn_prefix)
+    # for file in files:
+    #     os.system("rm " + PATH_FIG + "/" + file)
 
 def main():
     figure_1()
-    # make_gif("lb", "lb")
+    make_gif("lb", "lb")
 
 if __name__ == '__main__':
     main()
