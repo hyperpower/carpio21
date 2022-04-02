@@ -235,12 +235,13 @@ enum Trinary {
 	_NEGATIVE_ = -1, //
 };
 
-std::string ToString(const Trinary& t){
+inline std::string ToString(const Trinary& t){
 	switch(t){
 		case _POSITIVE_: {return "POSITIVE";break;}
 		case _ZERO_:     {return "ZERO";    break;}
 		case _NEGATIVE_: {return "NEGATIVE";break;}
 	}
+	return "ERROR";
 }
 
 template <class TYPE>

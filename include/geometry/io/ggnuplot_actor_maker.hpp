@@ -428,11 +428,33 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& box, BoxTag){
     actor.set_using(ANY::Dim);
     actor.style()   = "with lines lc 1"; // default color is 1
 
-    actor.data().push_back(ToString(box.get_point(_M_, _M_, _M_), " "));
-    actor.data().push_back(ToString(box.get_point(_P_, _M_, _M_), " "));
-    actor.data().push_back(ToString(box.get_point(_P_, _P_, _M_), " "));
-    actor.data().push_back(ToString(box.get_point(_M_, _P_, _M_), " "));
-    actor.data().push_back(ToString(box.get_point(_M_, _M_, _M_), " "));
+    if constexpr (ANY::Dim >= 2){
+        actor.data().push_back(ToString(box.get_point(_M_, _M_, _M_), " "));
+        actor.data().push_back(ToString(box.get_point(_P_, _M_, _M_), " "));
+        actor.data().push_back(ToString(box.get_point(_P_, _P_, _M_), " "));
+        actor.data().push_back(ToString(box.get_point(_M_, _P_, _M_), " "));
+        actor.data().push_back(ToString(box.get_point(_M_, _M_, _M_), " "));
+    } 
+    if constexpr (ANY::Dim == 3){
+        actor.data().push_back("");
+        actor.data().push_back(ToString(box.get_point(_M_, _M_, _P_), " "));
+        actor.data().push_back(ToString(box.get_point(_P_, _M_, _P_), " "));
+        actor.data().push_back(ToString(box.get_point(_P_, _P_, _P_), " "));
+        actor.data().push_back(ToString(box.get_point(_M_, _P_, _P_), " "));
+        actor.data().push_back(ToString(box.get_point(_M_, _M_, _P_), " "));
+        actor.data().push_back("");
+        actor.data().push_back(ToString(box.get_point(_M_, _M_, _M_), " "));
+        actor.data().push_back(ToString(box.get_point(_M_, _M_, _P_), " "));
+        actor.data().push_back("");
+        actor.data().push_back(ToString(box.get_point(_P_, _M_, _M_), " "));
+        actor.data().push_back(ToString(box.get_point(_P_, _M_, _P_), " "));
+        actor.data().push_back("");
+        actor.data().push_back(ToString(box.get_point(_P_, _P_, _M_), " "));
+        actor.data().push_back(ToString(box.get_point(_P_, _P_, _P_), " "));
+        actor.data().push_back("");
+        actor.data().push_back(ToString(box.get_point(_M_, _P_, _M_), " "));
+        actor.data().push_back(ToString(box.get_point(_M_, _P_, _P_), " "));
+    }
     actor.data().push_back("");
 }
 template<typename ANY>

@@ -402,8 +402,8 @@ public:
         cmd("unset grid");
         return *this;
     }
-    inline Gnuplot& set_view(int rot_x, int rot_z, double scale,
-            double scale_z) {
+    inline Gnuplot& set_view(int rot_x, int rot_z, double scale = 1.0,
+            double scale_z = 1.0) {
         std::ostringstream sst;
         sst << "set view " << rot_x << ", " << rot_z << ", " << scale << ", "
                 << scale_z;
@@ -537,13 +537,13 @@ public:
         return *this;
     }
 
-    Gnuplot& set_equal_ratio() {
-        std::ostringstream cmdstr;
-        cmdstr << "set size ratio -1";
-        cmd(cmdstr.str());
+    // Gnuplot& set_equal_ratio() {
+    //     std::ostringstream cmdstr;
+    //     cmdstr << "set size ratio -1";
+    //     cmd(cmdstr.str());
 
-        return *this;
-    }
+    //     return *this;
+    // }
 
     Gnuplot& set_label(
             int tag,

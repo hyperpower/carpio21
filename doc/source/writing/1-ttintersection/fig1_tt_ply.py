@@ -129,4 +129,5 @@ fig.update_layout(
     ),
 )
 
+# fig.write_image("fig1.png")
 fig.show()

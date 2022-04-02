@@ -31,10 +31,6 @@ IF(ENABLE_OPENMP)
 	endif()
 ENDIF(ENABLE_OPENMP)
 
-# python
-# set(REQUIRED_PYTHON_VERSION 3.4)
-find_package ( PythonInterp ${REQUIRED_PYTHON_VERSION} REQUIRED)
-find_package ( PythonLibs ${REQUIRED_PYTHON_VERSION} REQUIRED)
 
 set(cmake_cxx_standard 20)
 # external project download form github

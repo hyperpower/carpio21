@@ -20,6 +20,9 @@
 #include <iostream>
 #include <functional>
 
+#undef max
+#undef min
+
 namespace carpio {
 
 /**
@@ -533,7 +536,7 @@ public:
         Self operator/(const Self &a);
         Self operator/(const V &a);
 
-    //other functions==============================
+    // other functions==============================
     void abs();
     V sum() const;
     V min() const;

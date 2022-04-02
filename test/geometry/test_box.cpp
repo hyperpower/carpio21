@@ -14,6 +14,7 @@ typedef Point_<double, 3>   Point3;
 typedef Point_<double, 2>   Point2;
 typedef Segment_<double, 2> Seg2;
 typedef Box_<double, 2>     Box2;
+typedef Box_<double, 3>     Box3;
 typedef Line_<double>       Line;
 
 //typedef GGnuplotActor_<double, 2> GA;
@@ -107,5 +108,28 @@ TEST(box, box_vs_line){
 	gnu.set_label(4,tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(), line.alpha()),
 			        0.1, 1.3, "left font \",16\"");
 	gnu.plot();
+}
+
+TEST(box, box3_vs_plane){
+	std::cout << "Initial box3d" << std::endl;
+	Point3 min1(0.0, 0.0, 0.0);
+	Point3 max1(1.0, 1.0, 1.0);
+	Box3 box1(min1, max1);
+	std::cout << "The box 1 is " << box1 << std::endl;
+
+	Gnuplot gnu;
+	gnu.set_xrange(-0.25, 1.25);
+	gnu.set_yrange(-0.25, 1.25);
+	gnu.set_zrange(-0.25, 1.25);
+	gnu.set_view(65,55,1.1);
+	// gnu.set_equal_aspect_ratio();
+	gnu.set("set view equal xyz");
+	gnu.set_ticslevel();
+	// gnu.set_terminal_png("./fig/line_box_normal3");
+	auto spbox1 = ToGnuplotActor(box1);
+	spbox1->style() = "with lines lw 2 lc 8";
+	gnu.add(spbox1);
+
+	gnu.splot();
 }
 

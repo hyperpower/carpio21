@@ -265,6 +265,8 @@ PositiveLineBox(const POINT& min, const POINT& max,
     return _OpLineBox<POINT, Functor>(min, max, a, b, alpha, tol);
 }
 
+// Tools for VOF
+
 }
 
 #endif
