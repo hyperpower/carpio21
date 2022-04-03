@@ -79,8 +79,10 @@ traces["T2"]  = go.Scatter3d(x = t2xyz[0],
 traces["T2Surface"] = go.Mesh3d(x = t2xyz[0], 
                                 y = t2xyz[1],
                                 z = t2xyz[2],
-                                opacity=0.5,
+                                opacity=0.8,
                                 color  = "#FBBD0C")
+
+print(type(traces["T2Surface"].x))
 
 data=list(traces.values())
 
@@ -129,5 +131,10 @@ fig.update_layout(
     ),
 )
 
+
+ttry = go.Mesh3d()
+ttry.name = "aa"
+print(ttry.name)
 # fig.write_image("fig1.png")
-fig.show()
+# fig.write_html("out.html")
+# fig.show()

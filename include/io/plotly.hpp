@@ -20,6 +20,10 @@
 
 namespace carpio {
 
+
+
+
+
 class Plotly_actor {
 public:
     typedef PyObject* pPO;
@@ -98,7 +102,7 @@ protected:
     }
 
     pPO _to_list_list(const Listd& arr,
-            const typename Listd::size_type& ndim1) {
+                      const typename Listd::size_type& ndim1) {
         ASSERT(ndim1 > 0);
         pPO pl = PyList_New(0);
         int i = 0;
@@ -488,18 +492,201 @@ protected:
 };
 
 
-namespace PlotlyActor{
+// namespace PlotlyActor{
 
-typedef std::shared_ptr<carpio::Plotly_actor> spPA;
-typedef std::shared_ptr<carpio::Plotly_actor_scatter> spPA_scatter;
-typedef std::shared_ptr<carpio::Plotly_actor_scatter3d> spPA_scatter3d;
-typedef std::shared_ptr<carpio::Plotly_actor_mesh3d> spPA_mesh3d;
-typedef std::shared_ptr<carpio::Plotly_actor_heatmap> spPA_heatmap;
+// typedef std::shared_ptr<carpio::Plotly_actor> spPA;
+// typedef std::shared_ptr<carpio::Plotly_actor_scatter> spPA_scatter;
+// typedef std::shared_ptr<carpio::Plotly_actor_scatter3d> spPA_scatter3d;
+// typedef std::shared_ptr<carpio::Plotly_actor_mesh3d> spPA_mesh3d;
+// typedef std::shared_ptr<carpio::Plotly_actor_heatmap> spPA_heatmap;
+// }
+class PlotlyActor {
+public:
+    typedef PyObject* pPO;
+    // typedef std::map<std::string, pPO> Map;
+    typedef ArrayListV_<double> Arrd;
+    typedef std::list<double> Listd;
+
+protected:
+    // Map _map;
+    PythonInterpreter* _py;
+    std::string _trace_type;
+    PyObject*   _trace;
+    PyObject*   _go;
+
+public:
+    PlotlyActor(const std::string& trace_type){
+        this->_py = PythonInterpreter::Get();
+        this->_go = this->_py->import("plotly.graph_objects");
+        _new_trace(trace_type);
+    }
+    PlotlyActor(const PlotlyActor& other):
+        _trace_type(other._trace_type),_trace(other._trace),_go(other._go){
+        this->_py = PythonInterpreter::Get();
+    }
+    PlotlyActor& operator=(const PlotlyActor &other) {
+    if (this == &other) {
+        return *this;
+    }
+    this->_trace_type = other._trace_type; 
+    this->_trace = other._trace;
+    this->_go = other._go;
+    this->_py = other._py;
+    return *this;
 }
+    void name(const std::string& name){
+        _py->set_attr(this->_trace, "name", name);
+    }
+    std::string name() const{
+        return _py->get_attr_as_string(this->_trace, "name");
+    }
+    void opacity(const double& op){
+        _py->set_attr(this->_trace, "opacity", op);
+    }
+    double opacity() const{
+        return _py->get_attr_as_float(this->_trace, "opacity");
+    }
+    template<class CONTAINER, ENABLE_IF_1D_ARITHMATIC(CONTAINER)> 
+    void data_x(const CONTAINER& con, int jump = 0){
+        PyObject* l = _py->to_list(con, jump);
+        PyObject_SetAttrString(this->_trace, "x", l);
+    }
+
+    PyObject* trace() const{
+        return _trace;
+    }
+
+    template<class CONTAINER, ENABLE_IF_2D_ARITHMATIC(CONTAINER) > 
+    void data_xy(const CONTAINER& con, int jump = 0){
+        typedef typename CONTAINER::value_type::value_type value_type;
+        std::list<value_type> colx, coly; 
+        for(auto& row : con){
+            auto iter = row.begin();
+            colx.push_back(*iter);
+            std::advance(iter, 1);
+            coly.push_back(*iter);
+        }
+        PyObject* lx = _py->to_list(colx, jump);
+        PyObject* ly = _py->to_list(coly, jump);
+        PyObject_SetAttrString(this->_trace, "x", lx);
+        PyObject_SetAttrString(this->_trace, "y", ly);
+    }
+    template<class CONTAINER, ENABLE_IF_2D_ARITHMATIC(CONTAINER) > 
+    void data_xyz(const CONTAINER& con, int jump = 0){
+        typedef typename CONTAINER::value_type::value_type value_type;
+        std::list<value_type> colx, coly, colz; 
+        for(auto& row : con){
+            auto iter = row.begin();
+            colx.push_back(*iter);
+            std::advance(iter, 1);
+            coly.push_back(*iter);
+            std::advance(iter, 1);
+            colz.push_back(*iter);
+        }
+        PyObject* lx = _py->to_list(colx, jump);
+        PyObject* ly = _py->to_list(coly, jump);
+        PyObject* lz = _py->to_list(colz, jump);
+        PyObject_SetAttrString(this->_trace, "x", lx);
+        PyObject_SetAttrString(this->_trace, "y", ly);
+        PyObject_SetAttrString(this->_trace, "z", lz);
+    }
+    virtual ~PlotlyActor(){};
+protected:
+//  trace name should be one of: 
+//  [‘bar’, ‘barpolar’, ‘box’, ‘candlestick’, ’carpet’, 
+//   ‘choropleth’, ‘choroplethmapbox’, ‘cone’, ‘contour’,
+//   ‘contourcarpet’, ‘densitymapbox’, ‘funnel’, ‘funnelarea’,
+//   ‘heatmap’, ‘heatmapgl’, ‘histogram’, ‘histogram2d’,
+//   ‘histogram2dcontour’, ‘icicle’, ‘image’, ‘indicator’,
+//   ‘isosurface’, ‘mesh3d’, ‘ohlc’, ‘parcats’, ‘parcoords’,
+//   ‘pie’, ‘pointcloud’, ‘sankey’, ‘scatter’, ‘scatter3d’,
+//   ‘scattercarpet’, ‘scattergeo’, ‘scattergl’, ‘scattermapbox’,
+//   ‘scatterpolar’, ‘scatterpolargl’, ‘scattersmith’, ‘scatterternary’,
+//   ‘splom’, ‘streamtube’, ‘sunburst’, ‘surface’, ‘table’,
+//   ‘treemap’, ‘violin’, ‘volume’, ‘waterfall’]
+    void _new_trace(const std::string& trace_type){
+        pPO c_trace  = _py->import_sub(this->_go, trace_type);
+        this->_trace = PyObject_CallObject(c_trace, nullptr);
+        Py_DECREF(c_trace); 
+    }
+};
 
 
+class Plotly_ {
+public:
+    typedef PyObject* pPO;
+    typedef std::shared_ptr<Plotly_actor> spPA;
+    typedef std::map<std::string, pPO> Map;
+protected:
+    PythonInterpreter* _py ;
 
+    pPO _plotly;
+    pPO _plotly_go;
 
+    pPO _clase_figure;
+
+    pPO _figure;
+    pPO _layout;
+
+public:
+    Plotly_() {
+        this->_py = PythonInterpreter::Get();
+        _init();
+    }
+
+    ~Plotly_() {
+        Py_DECREF(this->_plotly);
+        Py_DECREF(this->_plotly_go);
+        Py_DECREF(this->_figure);
+        // Py_DECREF(this->_layout);
+    }
+
+    std::string version() const {
+        pPO version = PyObject_GetAttrString(_plotly, "__version__");
+        pPO repr    = PyObject_Repr(version);
+        pPO cstr    = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+        const char *bytes = PyBytes_AS_STRING(cstr);
+        ASSERT(cstr != nullptr);
+        std::string str(bytes);
+        str.erase(0, str.find_first_not_of('\''));     //prefixing '\''
+        str.erase(str.find_last_not_of('\'')+1);
+        Py_DECREF(version);
+        Py_DECREF(repr);
+        Py_DECREF(cstr);
+        return str;
+    }
+
+    void add(const PlotlyActor& actor){
+        // pPO class_Figure = _py->import_sub(this->_plotly_go, "Figure");
+        auto pt = _py->import_sub(this->_figure, "add_trace");
+        auto trace = actor.trace();
+        if(!trace){
+            throw std::invalid_argument("Trace in actor is null");
+        }
+        pPO args = Py_BuildValue("(O)", trace);
+        PyObject_Call(pt, args, nullptr);
+        
+        Py_DecRef(args); 
+        Py_DecRef(pt);
+    }
+
+    void show(){
+        _py->call_method(this->_figure, "show");
+    }
+
+protected:
+
+    void _init() {    
+        this->_plotly    = _py->import("plotly");
+        this->_plotly_go = _py->import("plotly.graph_objects");
+
+        // new empty figure
+        pPO class_figure = _py->import_sub(this->_plotly_go, "Figure");
+        this->_figure  = PyObject_CallObject(class_figure, nullptr);
+        Py_DECREF(class_figure);
+    }
+
+};
 
 
 

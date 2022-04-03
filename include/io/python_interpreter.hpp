@@ -51,15 +51,16 @@ protected:
     ~PythonInterpreter() {
         Py_Finalize();
     }
-
+public:
     PyObject* import(const std::string& name) const{
-        PyObject* po_name = PyUnicode_FromString("name");
+        PyObject* po_name = PyUnicode_FromString(name.c_str());
         PyObject* pkg     = PyImport_Import(po_name);
         Py_DECREF(po_name);
         if (!pkg) {
             PyErr_Print();
             throw std::runtime_error("Error loading module " + name + "!");
         }
+        return pkg;
     }
 
     PyObject* import_sub(PyObject* module, const std::string& fname) {
@@ -68,12 +69,98 @@ protected:
         if (!fn)
             throw std::runtime_error(std::string("Couldn't find required function/module: ") + fname);
 
-        if (!PyFunction_Check(fn))
-            throw std::runtime_error(fname + std::string(" is unexpectedly not a PyFunction."));
+        if (!PyCallable_Check(fn))
+            throw std::runtime_error(fname + std::string(" is not Callable."));
 
         return fn;
     }
+    PyObject* call_method(PyObject* module, const std::string& fname) {
+        PyObject* fn = PyObject_CallMethod(module, fname.c_str(), nullptr);
 
+        return fn;
+    }
+    void set_attr(PyObject* module, const std::string& attr_name, const std::string& str) {
+        PyObject* s = Py_BuildValue("s", str.c_str()); 
+
+        auto rc = PyObject_SetAttrString(module, attr_name.c_str(), s);
+
+        if (rc != 0){
+            throw std::runtime_error("Attribute " + attr_name + std::string("not set."));
+        } 
+    }
+    template<class FLOAT, 
+            typename std::enable_if<
+                std::is_floating_point<FLOAT>::value, 
+            bool>::type = true>
+    void set_attr(PyObject* module, const std::string& attr_fname, const FLOAT& f) {
+        PyObject* s = Py_BuildValue("d", f); 
+
+        auto rc = PyObject_SetAttrString(module, attr_fname.c_str(), s);
+
+        if (rc != 0){
+            throw std::runtime_error("Attribute " + attr_fname + std::string("not set."));
+        } 
+    }
+    PyObject* get_attr(PyObject* obj, const std::string& attr_name){
+        PyObject* res = PyObject_GetAttrString(obj, attr_name.c_str());
+        if (!res)
+            throw std::runtime_error(std::string("Couldn't find required attribute/function: ") + attr_name);
+        return res;
+    }
+    
+    std::string get_attr_as_string(PyObject* obj, const std::string& attr_name){
+        PyObject* p = this->get_attr(obj, attr_name);
+        PyObject* repr = PyObject_Repr(p);
+        PyObject* str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+        std::string res(PyBytes_AS_STRING(str));
+        Py_DECREF(p);
+        Py_DECREF(repr);
+        Py_DECREF(str);
+        return res;
+    }
+
+    int get_attr_as_int(PyObject* obj, const std::string& attr_name){
+        PyObject* p = this->get_attr(obj, attr_name);
+        auto l = PyLong_AsLong(p);
+        Py_DECREF(p);
+        return int(l);
+    }
+
+    double get_attr_as_float(PyObject* obj, const std::string& attr_name){
+        PyObject* p = this->get_attr(obj, attr_name);
+        auto v =  PyFloat_AS_DOUBLE(p);
+        Py_DECREF(p);
+        return v;
+    }
+
+    std::string& to_string(PyObject* obj) const{
+        // pPO to string
+        PyObject* repr = PyObject_Repr(obj);
+        PyObject* cstr = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+        const char *bytes = PyBytes_AS_STRING(cstr);
+        ASSERT(cstr != nullptr);
+        std::string str(bytes);
+        str.erase(0, str.find_first_not_of('\''));     //prefixing '\''
+        str.erase(str.find_last_not_of('\'')+1);
+        return str;
+    }
+    
+    template<class CONTAINER, ENABLE_IF_1D_ARITHMATIC(CONTAINER) > 
+    PyObject* to_list(const CONTAINER& arr, int jump = 0) const {
+        PyObject* pl = PyList_New(0);
+        int i = 0;
+        for (auto& v : arr) {
+            PyObject* p = Py_BuildValue("d", v);
+            if (jump > 0) {
+                if (i % jump == 0 && i > 0) {
+                    PyList_Append(pl, Py_None);
+                }
+            }
+            PyList_Append(pl, p);
+            i++;
+        }
+        return pl;
+    } 
     
 public:
     

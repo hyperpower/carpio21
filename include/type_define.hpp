@@ -36,6 +36,25 @@
 
 #define _PI_ (3.1415926)
 
+#define ENABLE_IF(__T1, __CONDITION1, __T2, __CONDITION2)  typename std::enable_if< \
+                std::integral_constant< bool, \
+                   __CONDITION1<__T1>::value  \
+                && __CONDITION2<__T2>::value  \
+            >::value, bool>::type = true 
+
+#define ENABLE_IF_1D_ARITHMATIC(__T) typename std::enable_if< \
+                std::integral_constant< bool,                 \
+                   IsContainer<__T>::value              \
+                && std::is_arithmetic<typename __T::value_type>::value \
+            >::value, bool>::type = true
+
+#define ENABLE_IF_2D_ARITHMATIC(__T) typename std::enable_if<     \
+                std::integral_constant< bool,                     \
+                   IsContainer<__T>::value                        \
+				&& IsContainer<typename __T::value_type>::value   \
+                && std::is_arithmetic<typename __T::value_type::value_type>::value \
+            >::value, bool>::type = true
+
 
 namespace carpio {
 // value type
