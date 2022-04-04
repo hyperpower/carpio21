@@ -25,22 +25,30 @@
 #define _WARNING   2
 
 #define _RETURN_VAL_IF_FAIL(expr,val)  {       \
-		if (!(expr))                           \
-			return (val);                      \
-	    }
+        if (!(expr))                           \
+            return (val);                      \
+        }
 
 #define _RETURN_IF_FAIL(expr)  {               \
-		if (!(expr))                           \
-			return ;                           \
-	    }
+        if (!(expr))                           \
+            return ;                           \
+        }
 
 #define _PI_ (3.1415926)
-
-#define ENABLE_IF(__T1, __CONDITION1, __T2, __CONDITION2)  typename std::enable_if< \
-                std::integral_constant< bool, \
-                   __CONDITION1<__T1>::value  \
-                && __CONDITION2<__T2>::value  \
+#define ENABLE_IF(__T, __CONDITION)  typename std::enable_if< __CONDITION<__T>::value , bool>::type = true
+                 
+             
+#define ENABLE_IF_CONTAINS(__T, __CONDITION)  typename std::enable_if< \
+                  std::integral_constant< bool, \
+                   IsContainer<__T>::value  \
+                && __CONDITION<typename __T::value_type>::value  \
             >::value, bool>::type = true 
+
+// #define ENABLE_IF(__T1, __CONDITION1, __T2, __CONDITION2)  typename std::enable_if< \
+//                 std::integral_constant< bool, \
+//                    __CONDITION1<__T1>::value  \
+//                 && __CONDITION2<__T2>::value  \
+//             >::value, bool>::type = true 
 
 #define ENABLE_IF_1D_ARITHMATIC(__T) typename std::enable_if< \
                 std::integral_constant< bool,                 \
@@ -51,7 +59,7 @@
 #define ENABLE_IF_2D_ARITHMATIC(__T) typename std::enable_if<     \
                 std::integral_constant< bool,                     \
                    IsContainer<__T>::value                        \
-				&& IsContainer<typename __T::value_type>::value   \
+                && IsContainer<typename __T::value_type>::value   \
                 && std::is_arithmetic<typename __T::value_type::value_type>::value \
             >::value, bool>::type = true
 
@@ -91,9 +99,9 @@ template<>
 struct DimTagTraits_<3> {using Type = Dim3Tag;};
 
 enum Axes {
-	_X_ = 0, //
-	_Y_ = 1, //
-	_Z_ = 2, //
+    _X_ = 0, //
+    _Y_ = 1, //
+    _Z_ = 2, //
 };
 // Dim tag
 struct AxesTag{};
@@ -115,19 +123,19 @@ struct AxesTagTraits_<2> {using Type = ZTag;};
 
 
 inline Axes ToAxes(const St& i) {
-	ASSERT(i >= 0 && i < 3);
-	switch (i) {
-	case 0:
-		return _X_;
-	case 1:
-		return _Y_;
-	case 2:
-		return _Z_;
-	default:
-		ASSERT_MSG(false, "Error input i");
-	}
-	SHOULD_NOT_REACH;
-	return _X_;
+    ASSERT(i >= 0 && i < 3);
+    switch (i) {
+    case 0:
+        return _X_;
+    case 1:
+        return _Y_;
+    case 2:
+        return _Z_;
+    default:
+        ASSERT_MSG(false, "Error input i");
+    }
+    SHOULD_NOT_REACH;
+    return _X_;
 }
 
 template<typename C>
@@ -138,7 +146,7 @@ struct IsIterable
 
     template<class T>
     static yes  is_beg_iterable(
-    		int i,
+            int i,
             typename T::const_iterator = C().begin());
     template<class T>
     static no is_beg_iterable(...);
@@ -164,9 +172,9 @@ template <typename T>
 struct HasBeginEnd
 {
     template<typename C> 
-	static char (&f(typename std::enable_if<
+    static char (&f(typename std::enable_if<
                             std::is_same<
-							    decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
+                                decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
                                 typename C::const_iterator(C::*)() const>::value, void>::type*))[1];
 
     template<typename C> static char (&f(...))[2];
@@ -183,7 +191,7 @@ struct HasBeginEnd
 
 template<typename T> 
 struct IsContainer : std::integral_constant<bool, 
-	HasConstIterator<T>::value && HasBeginEnd<T>::beg_value && HasBeginEnd<T>::end_value> 
+    HasConstIterator<T>::value && HasBeginEnd<T>::beg_value && HasBeginEnd<T>::end_value> 
 { };
 
 
@@ -191,107 +199,107 @@ struct IsContainer : std::integral_constant<bool,
  * geometry
  */
 enum Orientation {
-	_M_ = 0, //
-	_P_ = 1, //
-	_C_ = 2, //
+    _M_ = 0, //
+    _P_ = 1, //
+    _C_ = 2, //
 };
 
 inline Orientation ToOrientation(const St& i) {
-	ASSERT(i >= 0 && i < 3);
-	switch (i) {
-	case 0: {return _M_;}
-	case 1: {return _P_;}
-	case 2: {return _C_;}
-	default:
-		ASSERT_MSG(false, "Error input Orientation");
-	}
-	SHOULD_NOT_REACH;
-	return _M_;
+    ASSERT(i >= 0 && i < 3);
+    switch (i) {
+    case 0: {return _M_;}
+    case 1: {return _P_;}
+    case 2: {return _C_;}
+    default:
+        ASSERT_MSG(false, "Error input Orientation");
+    }
+    SHOULD_NOT_REACH;
+    return _M_;
 }
 
 enum Plane {
-	_XY_ = 24,
-	_YZ_ = 48,
-	_ZX_ = 40,
+    _XY_ = 24,
+    _YZ_ = 48,
+    _ZX_ = 40,
 };
 
 
 inline Orientation Opposite(const Orientation& ori){
-	if(ori == _M_){
-		return _P_;
-	}else if(ori == _P_){
-		return _M_;
-	}else{
-		return _C_;
-	}
+    if(ori == _M_){
+        return _P_;
+    }else if(ori == _P_){
+        return _M_;
+    }else{
+        return _C_;
+    }
 }
 
 inline void NormalPlane(const St&d, St& d1, St& d2){
-	if(d == _X_){
-		d1 = _Y_;
-		d2 = _Z_;
-	}else if(d == _Y_){
-		d1 = _Z_;
-		d2 = _X_;
-	}else if(d == _Z_){
-		d1 = _X_;
-		d2 = _Y_;
-	}else{
-		SHOULD_NOT_REACH;
-	}
+    if(d == _X_){
+        d1 = _Y_;
+        d2 = _Z_;
+    }else if(d == _Y_){
+        d1 = _Z_;
+        d2 = _X_;
+    }else if(d == _Z_){
+        d1 = _X_;
+        d2 = _Y_;
+    }else{
+        SHOULD_NOT_REACH;
+    }
 }
 
 inline St Normal(const St&d1, const St& d2){
-	ASSERT(0 <= d1 && d1 <=2);
-	ASSERT(0 <= d2 && d2 <=2);
-	ASSERT(d1 != d2);
-	return ToAxes(3 - d1 - d2);
+    ASSERT(0 <= d1 && d1 <=2);
+    ASSERT(0 <= d2 && d2 <=2);
+    ASSERT(d1 != d2);
+    return ToAxes(3 - d1 - d2);
 }
 
 enum Trinary {
-	_POSITIVE_ = 1,  //
-	_ZERO_     = 0,  //
-	_NEGATIVE_ = -1, //
+    _POSITIVE_ = 1,  //
+    _ZERO_     = 0,  //
+    _NEGATIVE_ = -1, //
 };
 
 inline std::string ToString(const Trinary& t){
-	switch(t){
-		case _POSITIVE_: {return "POSITIVE";break;}
-		case _ZERO_:     {return "ZERO";    break;}
-		case _NEGATIVE_: {return "NEGATIVE";break;}
-	}
-	return "ERROR";
+    switch(t){
+        case _POSITIVE_: {return "POSITIVE";break;}
+        case _ZERO_:     {return "ZERO";    break;}
+        case _NEGATIVE_: {return "NEGATIVE";break;}
+    }
+    return "ERROR";
 }
 
 template <class TYPE>
 inline int Heaviside(const TYPE& v){
-	return v<=0?0:1;
+    return v<=0?0:1;
 }
 template<class TYPE>
 inline int Sign(const TYPE& x) {
-	if (x < 0.0) {
-		return -1;
-	} else if (x > 0.0) {
-		return 1;
-	} else {
-		return 0;
-	}
+    if (x < 0.0) {
+        return -1;
+    } else if (x > 0.0) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 template <class TYPE>
 inline bool IsCloseTo(const TYPE& v, const TYPE& dst, const Vt tol = 1e-12){
-	return std::abs(v - dst) < tol;
+    return std::abs(v - dst) < tol;
 }
 template <class TYPE>
 inline bool IsCloseToZero(const TYPE& v, const Vt tol = 1e-12){
-	return std::abs(v - 0.0) < tol;
+    return std::abs(v - 0.0) < tol;
 }
 
 
 inline int LoopNext(const int& bgn, const int& end, const int& cur){
-	return (cur == end) ? bgn : cur + 1;
+    return (cur == end) ? bgn : cur + 1;
 }
 inline int LoopPrev(const int& bgn, const int& end, const int& cur){
-	return (cur == bgn) ? end : cur - 1;
+    return (cur == bgn) ? end : cur - 1;
 }
 
 }

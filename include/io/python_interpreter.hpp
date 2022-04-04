@@ -76,8 +76,68 @@ public:
     }
     PyObject* call_method(PyObject* module, const std::string& fname) {
         PyObject* fn = PyObject_CallMethod(module, fname.c_str(), nullptr);
-
         return fn;
+    }
+    PyObject* call_method(PyObject* module, const std::string& method, PyObject* obj) {
+        PyObject* args = Py_BuildValue("(O)",  obj);
+        PyObject* fun = this->import_sub(module, method);
+        PyObject* ret = PyObject_CallObject(fun, args);
+        Py_DecRef(fun);
+        Py_DecRef(args);
+        return ret;
+    }
+    PyObject* call_method(PyObject* module, const std::string& method, const double& args_d) {
+        PyObject* pod    = Py_BuildValue("d", args_d); 
+        PyObject* ret = this->call_method(module, method, pod); 
+        Py_DecRef(pod);
+        return ret;
+    }
+    PyObject* dict_set(PyObject* dict, const std::string& key, PyObject* obj){
+        PyObject* pok    = Py_BuildValue("s", key.c_str()); 
+        PyObject* pov    = Py_BuildValue("O", obj);
+        PyDict_SetItem(dict, pok, pov);
+        Py_DecRef(pok); 
+        // Py_DecRef(pov); 
+        return dict;
+    }
+    PyObject* dict_set(PyObject* dict, const std::string& key, const double& val){
+        PyObject* pok    = Py_BuildValue("s", key.c_str()); 
+        PyObject* pov    = Py_BuildValue("d", val);
+        PyDict_SetItem(dict, pok, pov);
+        Py_DecRef(pok); 
+        // Py_DecRef(pov); 
+        return dict;
+    }
+    PyObject* dict_set(PyObject* dict, const std::string& key, const std::string& val){
+        PyObject* pok    = Py_BuildValue("s", key.c_str()); 
+        PyObject* pov    = Py_BuildValue("s", val.c_str());
+        PyDict_SetItem(dict, pok, pov);
+        Py_DecRef(pok); 
+        return dict;
+    }
+    PyObject* dict_set(PyObject* dict, const std::string& key, const double& val1, const double& val2){
+        PyObject* pok     = Py_BuildValue("s", key.c_str()); 
+        PyObject* pov1    = Py_BuildValue("d", val1);
+        PyObject* pov2    = Py_BuildValue("d", val2);
+        
+        PyObject* l   = PyList_New(2);
+        PyList_SetItem(l, 0, pov1);
+        PyList_SetItem(l, 1, pov2);
+
+        PyDict_SetItem(dict, pok, l);
+        Py_DecRef(pok); 
+        return dict;
+    }
+
+    PyObject* dict_set(PyObject* dict, const std::string& key, const bool& val){
+        PyObject* pok    = Py_BuildValue("s", key.c_str()); 
+        if (val){
+            PyDict_SetItem(dict, pok, Py_True);
+        }else{
+            PyDict_SetItem(dict, pok, Py_False);
+        }
+        // Py_DecRef(pok); 
+        return dict;
     }
     void set_attr(PyObject* module, const std::string& attr_name, const std::string& str) {
         PyObject* s = Py_BuildValue("s", str.c_str()); 

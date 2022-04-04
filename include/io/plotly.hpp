@@ -3,6 +3,7 @@
 
 #include "io_define.hpp"
 #include "algebra/array/array_list.hpp"
+// #include "pyhon_interpreter.hpp"
 
 // #include <Python.h>
 #include <map>
@@ -321,7 +322,8 @@ public:
     typedef PyObject* pPO;
     typedef std::shared_ptr<Plotly_actor> spPA;
     typedef std::map<std::string, pPO> Map;
-    public:
+
+public:
     Plotly() {
         _init();
         set_auto_open(false);
@@ -515,6 +517,12 @@ protected:
     PyObject*   _go;
 
 public:
+    PlotlyActor(){
+        this->_py = PythonInterpreter::Get();
+        this->_go = this->_py->import("plotly.graph_objects");
+        this->_trace = nullptr;
+        this->_trace_type = "nullptr";
+    }
     PlotlyActor(const std::string& trace_type){
         this->_py = PythonInterpreter::Get();
         this->_go = this->_py->import("plotly.graph_objects");
@@ -525,15 +533,56 @@ public:
         this->_py = PythonInterpreter::Get();
     }
     PlotlyActor& operator=(const PlotlyActor &other) {
-    if (this == &other) {
+        if (this == &other) {
+            return *this;
+        }
+        this->_trace_type = other._trace_type; 
+        this->_trace = other._trace;
+        this->_go = other._go;
+        this->_py = other._py;
         return *this;
     }
-    this->_trace_type = other._trace_type; 
-    this->_trace = other._trace;
-    this->_go = other._go;
-    this->_py = other._py;
-    return *this;
-}
+    void update_colorscale(const std::string& cmin, const std::string& cmax){
+        pPO dict    = PyDict_New();
+        pPO tarray  = PyList_New(0);
+        pPO row0    = PyList_New(0);
+        PyList_Append(row0, Py_BuildValue("d", 0.0));
+        PyList_Append(row0, Py_BuildValue("s", cmin.c_str()));
+        pPO row1    = PyList_New(0);
+        PyList_Append(row1, Py_BuildValue("d", 1.0));
+        PyList_Append(row1, Py_BuildValue("s", cmax.c_str()));
+
+        PyList_Append(tarray, row0);
+        PyList_Append(tarray, row1);
+
+        dict = _py->dict_set(dict, "colorscale", tarray);
+        _py->call_method(this->_trace, "update", dict); 
+        Py_DECREF(dict);
+    }
+    void update(const std::string& key, const double& val){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, val);
+        _py->call_method(this->_trace, "update", dict); 
+        Py_DECREF(dict);
+    }
+    void update(const std::string& key, const std::string& val){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, val);
+        _py->call_method(this->_trace, "update", dict); 
+        Py_DECREF(dict);
+    }
+    void update_true(const std::string& key){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, Py_True);
+        _py->call_method(this->_trace, "update", dict); 
+        Py_DECREF(dict);
+    }
+    void update_false(const std::string& key){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, Py_False);
+        _py->call_method(this->_trace, "update", dict); 
+        Py_DECREF(dict);
+    }
     void name(const std::string& name){
         _py->set_attr(this->_trace, "name", name);
     }
@@ -547,6 +596,11 @@ public:
         return _py->get_attr_as_float(this->_trace, "opacity");
     }
     template<class CONTAINER, ENABLE_IF_1D_ARITHMATIC(CONTAINER)> 
+    void data(const CONTAINER& con, const std::string& name,int jump = 0){
+        PyObject* l = _py->to_list(con, jump);
+        PyObject_SetAttrString(this->_trace, name, l);
+    }
+    template<class CONTAINER, ENABLE_IF_1D_ARITHMATIC(CONTAINER)> 
     void data_x(const CONTAINER& con, int jump = 0){
         PyObject* l = _py->to_list(con, jump);
         PyObject_SetAttrString(this->_trace, "x", l);
@@ -555,9 +609,9 @@ public:
     PyObject* trace() const{
         return _trace;
     }
-
-    template<class CONTAINER, ENABLE_IF_2D_ARITHMATIC(CONTAINER) > 
-    void data_xy(const CONTAINER& con, int jump = 0){
+    template<class CONTAINER, ENABLE_IF_1D_ARITHMATIC(CONTAINER)> 
+    void data(const CONTAINER& con, 
+              const std::string& n1, const std::string& n2, int jump = 0){
         typedef typename CONTAINER::value_type::value_type value_type;
         std::list<value_type> colx, coly; 
         for(auto& row : con){
@@ -568,11 +622,17 @@ public:
         }
         PyObject* lx = _py->to_list(colx, jump);
         PyObject* ly = _py->to_list(coly, jump);
-        PyObject_SetAttrString(this->_trace, "x", lx);
-        PyObject_SetAttrString(this->_trace, "y", ly);
+        PyObject_SetAttrString(this->_trace, n1.c_str(), lx);
+        PyObject_SetAttrString(this->_trace, n2.c_str(), ly);
     }
     template<class CONTAINER, ENABLE_IF_2D_ARITHMATIC(CONTAINER) > 
-    void data_xyz(const CONTAINER& con, int jump = 0){
+    void data_xy(const CONTAINER& con, int jump = 0){
+        this->data(con, "x", "y", jump); 
+    }
+    template<class CONTAINER, ENABLE_IF_2D_ARITHMATIC(CONTAINER)> 
+    void data(const CONTAINER& con,
+              const std::string& n1, const std::string& n2, const std::string& n3, 
+              int jump = 0){
         typedef typename CONTAINER::value_type::value_type value_type;
         std::list<value_type> colx, coly, colz; 
         for(auto& row : con){
@@ -586,9 +646,13 @@ public:
         PyObject* lx = _py->to_list(colx, jump);
         PyObject* ly = _py->to_list(coly, jump);
         PyObject* lz = _py->to_list(colz, jump);
-        PyObject_SetAttrString(this->_trace, "x", lx);
-        PyObject_SetAttrString(this->_trace, "y", ly);
-        PyObject_SetAttrString(this->_trace, "z", lz);
+        PyObject_SetAttrString(this->_trace, n1.c_str(), lx);
+        PyObject_SetAttrString(this->_trace, n2.c_str(), ly);
+        PyObject_SetAttrString(this->_trace, n3.c_str(), lz);
+    }
+    template<class CONTAINER, ENABLE_IF_2D_ARITHMATIC(CONTAINER) > 
+    void data_xyz(const CONTAINER& con, int jump = 0){
+        this->data(con, "x", "y", "z", jump); 
     }
     virtual ~PlotlyActor(){};
 protected:
@@ -610,6 +674,10 @@ protected:
         Py_DECREF(c_trace); 
     }
 };
+
+
+typedef std::map<std::string, PlotlyActor> PlotlyActorGroup; 
+
 
 
 class Plotly_ {
@@ -656,7 +724,65 @@ public:
         return str;
     }
 
-    void add(const PlotlyActor& actor){
+    void layout_true(const std::string& key){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, Py_True);
+        _py->call_method(this->_figure, "update_layout", dict); 
+        Py_DECREF(dict);
+    }
+    void layout_false(const std::string& key){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, Py_False);
+        _py->call_method(this->_figure, "update_layout", dict); 
+        Py_DECREF(dict);
+    }
+    void layout(const std::string& key, const double& d){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, d);
+        _py->call_method(this->_figure, "update_layout", dict); 
+        Py_DECREF(dict);
+    }
+    void layout(const std::string& key, const std::string& str){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, str);
+        
+        _py->call_method(this->_figure, "update_layout", dict); 
+        Py_DECREF(dict);
+    }
+    void layout(const std::string& key, const double& v1, const double& v2){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, v1, v2);
+        _py->call_method(this->_figure, "update_layout", dict); 
+        Py_DECREF(dict);
+    }
+    void title(const std::string& t) {
+        this->layout("title", t);
+    }
+
+    void size(const int& width = 800, const int& height = 600){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, "width",  double(width));
+        dict = _py->dict_set(dict, "height", double(height));
+        _py->call_method(this->_figure, "update_layout", dict); 
+    }
+
+    void margin(const int& l=80, const int& r=80, const int& t=100, const int& b = 80){
+        pPO dict = PyDict_New();
+        _py->dict_set(dict, "l", double(l));
+        _py->dict_set(dict, "r", double(r));
+        _py->dict_set(dict, "t", double(t));
+        _py->dict_set(dict, "b", double(b));
+        
+        pPO mdict = PyDict_New();
+        _py->dict_set(mdict, "margin", dict);
+        _py->call_method(this->_figure, "update_layout", mdict); 
+
+        Py_DecRef(mdict);
+        Py_DecRef(dict);
+    }
+    template<class ACTOR, typename std::enable_if< 
+             std::is_same<ACTOR, PlotlyActor>::value , bool>::type = true>
+    void add(const ACTOR& actor){
         // pPO class_Figure = _py->import_sub(this->_plotly_go, "Figure");
         auto pt = _py->import_sub(this->_figure, "add_trace");
         auto trace = actor.trace();
@@ -670,8 +796,34 @@ public:
         Py_DecRef(pt);
     }
 
+    template<class CON, typename std::enable_if< 
+                    std::is_same<typename CON::mapped_type, PlotlyActor>::value , bool>::type = true>
+    void add(const CON& container){
+        for(const auto& pair : container){
+            this->add(pair.second);
+        }
+    }
+
     void show(){
         _py->call_method(this->_figure, "show");
+    }
+
+    void write(const std::string& fullname, const std::string& type){
+        std::string name = fullname + "." + type;
+        pPO poname = Py_BuildValue("s", name.c_str());
+        pPO args   = Py_BuildValue("(O)", poname);
+        pPO fun;
+        if (type == "html"){
+            fun = _py->import_sub(this->_figure, "write_html");
+            PyObject_Call(fun, args, nullptr);
+            return;
+        }else if(type == "png" || type == "jpeg" || type == "pdf"){
+            fun = _py->import_sub(this->_figure, "write_image");
+            PyObject_Call(fun, args, nullptr);
+            return;
+        }else{
+            throw std::invalid_argument("Invalid type :" + type);
+        }
     }
 
 protected:

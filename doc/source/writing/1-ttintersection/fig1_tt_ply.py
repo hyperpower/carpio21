@@ -132,9 +132,6 @@ fig.update_layout(
 )
 
 
-ttry = go.Mesh3d()
-ttry.name = "aa"
-print(ttry.name)
-# fig.write_image("fig1.png")
+fig.write_image("fig1.png")
 # fig.write_html("out.html")
 # fig.show()

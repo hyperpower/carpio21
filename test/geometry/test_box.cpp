@@ -20,6 +20,10 @@ typedef Line_<double>       Line;
 //typedef GGnuplotActor_<double, 2> GA;
 typedef GGnuplotActorMaker_<double, 2> GAM;
 
+TEST(bezier, mkdir){
+    // Do not disable this test
+    MakeDir("./fig/");
+}
 TEST(box, point_to_box_position){
 	Point2 x(1, 0);
 	Point2 y(0, 1);
@@ -130,6 +134,54 @@ TEST(box, box3_vs_plane){
 	spbox1->style() = "with lines lw 2 lc 8";
 	gnu.add(spbox1);
 
-	gnu.splot();
+	// gnu.splot();
 }
 
+TEST(box, box3_vs_plane_plotly){
+	std::cout << "Initial box3d" << std::endl;
+	Point3 min1(0.0, 0.0, 0.0);
+	Point3 max1(1.0, 1.0, 1.0);
+	Box3 box1(min1, max1);
+	std::cout << "The box 1 is " << box1 << std::endl;
+
+    Plotly_ plotly;
+	// gnu.set_xrange(-0.25, 1.25);
+	// gnu.set_yrange(-0.25, 1.25);
+	// gnu.set_zrange(-0.25, 1.25);
+	// gnu.set_view(65,55,1.1);
+	// gnu.set_equal_aspect_ratio();
+	// gnu.set("set view equal xyz");
+	// gnu.set_ticslevel();
+	// gnu.set_terminal_png("./fig/line_box_normal3");
+	// auto spbox1 = ToPlotlyActor(box1);
+	// spbox1->style() = "with lines lw 2 lc 8";
+	// gnu.add(spbox1);
+	auto abox = ToPlotlyActor(box1);
+	abox.update("name", "box");
+	abox.update("line_color", "black");
+	abox.update("line_width", 3);
+	plotly.add(abox);
+	plotly.add(MakePlotlyCoordinateArrow<3>());
+    // plotly.title("a title name ");
+    plotly.margin(40, 40, 50, 40);
+    plotly.layout("width", 800.0);
+    plotly.layout("height", 600.0);
+    plotly.layout("scene_aspectmode", "cube");
+    plotly.layout("scene_xaxis_range", 0, 1.5);
+    plotly.layout("scene_yaxis_range", 0, 1.5);
+    plotly.layout("scene_zaxis_range", 0, 1.5);
+    plotly.layout_false("scene_xaxis_showbackground");
+    plotly.layout("scene_xaxis_gridcolor",      "grey");
+    plotly.layout_false("scene_yaxis_showbackground");
+    plotly.layout("scene_yaxis_gridcolor",      "grey");
+    plotly.layout_false("scene_zaxis_showbackground");
+    plotly.layout("scene_zaxis_gridcolor",      "grey");
+
+	
+
+
+    // plotly.show();
+    plotly.write("./fig/out", "html");
+    
+	// gnu.splot();
+}

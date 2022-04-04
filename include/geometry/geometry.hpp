@@ -32,8 +32,8 @@
 
 #include "geometry/io/ggnuplot_actor.hpp"
 #include "geometry/io/ggnuplot_actor_maker.hpp"
-// #include "geometry/io/gplotly_actor.hpp"
-// #include "geometry/io/gplotly_actor_ts.hpp"
+#include "geometry/io/gplotly_actor.hpp"
+
 #include "geometry/io/gfile.hpp"
 
 #include "geometry/operation/creation/create_ts.hpp"

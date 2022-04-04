@@ -15,24 +15,25 @@ set(Sources
     # test_seg_tri.cpp
     # test_predicate.cpp
 )
+find_package(Python COMPONENTS Interpreter Development)
+
+IF(Python_FOUND)
+  INCLUDE_DIRECTORIES("${Python_INCLUDE_DIRS}")
+ELSE()
+  MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
+ENDIF()
 
 add_executable(${This} ${Sources})
-
-# IF(PYTHONLIBS_FOUND)
-#   INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}")
-# ELSE()
-#   MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
-# ENDIF()
 
 target_link_libraries(${This} PUBLIC
     gtest_main
 )
 
-# if(PYTHON_LIBRARIES)
-#   TARGET_LINK_LIBRARIES(${This} ${PYTHON_LIBRARIES})
-# ELSE()
-#   MESSAGE(FATAL_ERROR "Unable to link python libraries")
-# ENDIF()
+if(Python_FOUND)
+  target_link_libraries(${This} PUBLIC ${Python_LIBRARIES})
+ELSE()
+  MESSAGE(FATAL_ERROR "Unable to link python libraries")
+ENDIF()
 
 add_test(
     NAME ${This}
