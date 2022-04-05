@@ -70,8 +70,12 @@ void _RegularVectorByDim(const CONTAINER& container, ARR& arr, double default_va
     auto size_container = container.size();
     auto size_arr       = arr.size();
     for(auto i = 0 ; i < size_arr; ++i){
-        arr[i] = i < size_container ? (*iter) : default_value;
-        std::advance(iter, 1);
+        if (i < size_container){
+            arr[i] = (*iter);
+            std::advance(iter, 1);
+        }else{
+            arr[i] = default_value;
+        }
     }
 }
 template<class CONTAINER>
@@ -80,9 +84,26 @@ void _NegativeContainer(CONTAINER& container){
         a = -a;
     }
 }
-
+template<class GEO, class NUM,
+        typename std::enable_if<
+            std::integral_constant< bool, 
+                   std::is_arithmetic<NUM>::value 
+                && IsGeometry<GEO>::value
+            >::value, bool>::type = true> 
+void Translate(GEO& geo, const NUM& num){
+    typedef typename GEO::Tag Tag;
+    std::array<NUM, GEO::Dim> arr;
+    for(auto& v : arr){
+        v = num;
+    }
+    _Translate(geo, arr, Tag());
+}
 template<class GEO, class VEC,
-        typename std::enable_if<IsGeometry<GEO>::value, bool>::type = true> 
+         typename std::enable_if<
+            std::integral_constant< bool, 
+                   IsContainer<VEC>::value 
+                && IsGeometry<GEO>::value
+            >::value, bool>::type = true> 
 void Translate(GEO& geo, const VEC& container){
     typedef typename GEO::Tag Tag;
     std::array<typename VEC::value_type, GEO::Dim> arr;

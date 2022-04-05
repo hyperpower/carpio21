@@ -145,46 +145,46 @@ inline TYPE mid(TYPE a, TYPE b, TYPE c,
 		return Comp_ge(a, b) ? a : b;
 }
 
-template<class TYPE>
-inline void sort(const TYPE& a, const TYPE& b, const TYPE& c,  //
-		bool (*Comp)(const TYPE&, const TYPE&), //
-		TYPE& big, TYPE& mid, TYPE& small) {
-	int idx = Comp(a, b) ? 1 : 2;
-	if (idx == 1)
-		idx = Comp(a, c) ? 1 : 3;
-	else
-		idx = Comp(b, c) ? 2 : 3;
-	if (idx == 1) {
-		big = a;
-		if (Comp(b, c)) {
-			mid = b;
-			small = c;
-		} else {
-			mid = c;
-			small = b;
-		}
-		return;
-	}
-	if (idx == 2) {
-		big = b;
-		if (Comp(a, c)) {
-			mid = a;
-			small = c;
-		} else {
-			mid = c;
-			small = a;
-		}
-		return;
-	}
-	big = c;
-	if (Comp(a, b)) {
-		mid = a;
-		small = b;
-	} else {
-		mid = b;
-		small = a;
-	}
-}
+// template<class TYPE>
+// inline void sort(const TYPE& a, const TYPE& b, const TYPE& c,  //
+// 		bool (*Comp)(const TYPE&, const TYPE&), //
+// 		TYPE& big, TYPE& mid, TYPE& small) {
+// 	int idx = Comp(a, b) ? 1 : 2;
+// 	if (idx == 1)
+// 		idx = Comp(a, c) ? 1 : 3;
+// 	else
+// 		idx = Comp(b, c) ? 2 : 3;
+// 	if (idx == 1) {
+// 		big = a;
+// 		if (Comp(b, c)) {
+// 			mid = b;
+// 			small = c;
+// 		} else {
+// 			mid = c;
+// 			small = b;
+// 		}
+// 		return;
+// 	}
+// 	if (idx == 2) {
+// 		big = b;
+// 		if (Comp(a, c)) {
+// 			mid = a;
+// 			small = c;
+// 		} else {
+// 			mid = c;
+// 			small = a;
+// 		}
+// 		return;
+// 	}
+// 	big = c;
+// 	if (Comp(a, b)) {
+// 		mid = a;
+// 		small = b;
+// 	} else {
+// 		mid = b;
+// 		small = a;
+// 	}
+// }
 
 template<class TYPE>
 bool Comp_great(const TYPE& a, const TYPE& b) {
@@ -196,46 +196,46 @@ bool Comp_less(const TYPE& a, const TYPE& b) {
 	return a < b;
 }
 
-template<class TYPE>
-inline void sort(const TYPE& a, const TYPE& b, const TYPE& c,  //
-		bool (*Comp)(const TYPE&, const TYPE&), //
-		int& big, int& mid, int& small) {
-	int idx = Comp(a, b) ? 0 : 1;
-	if (idx == 0)
-		idx = Comp(a, c) ? 0 : 2;
-	else
-		idx = Comp(b, c) ? 1 : 2;
-	if (idx == 0) {
-		big = 0;
-		if (Comp(b, c)) {
-			mid = 1;
-			small = 2;
-		} else {
-			mid = 2;
-			small = 1;
-		}
-		return;
-	}
-	if (idx == 1) {
-		big = 1;
-		if (Comp(a, c)) {
-			mid = 0;
-			small = 2;
-		} else {
-			mid = 2;
-			small = 0;
-		}
-		return;
-	}
-	big = 2;
-	if (Comp(a, b)) {
-		mid = 0;
-		small = 1;
-	} else {
-		mid = 1;
-		small = 0;
-	}
-}
+// template<class TYPE>
+// inline void sort(const TYPE& a, const TYPE& b, const TYPE& c,  //
+// 		bool (*Comp)(const TYPE&, const TYPE&), //
+// 		int& big, int& mid, int& small) {
+// 	int idx = Comp(a, b) ? 0 : 1;
+// 	if (idx == 0)
+// 		idx = Comp(a, c) ? 0 : 2;
+// 	else
+// 		idx = Comp(b, c) ? 1 : 2;
+// 	if (idx == 0) {
+// 		big = 0;
+// 		if (Comp(b, c)) {
+// 			mid = 1;
+// 			small = 2;
+// 		} else {
+// 			mid = 2;
+// 			small = 1;
+// 		}
+// 		return;
+// 	}
+// 	if (idx == 1) {
+// 		big = 1;
+// 		if (Comp(a, c)) {
+// 			mid = 0;
+// 			small = 2;
+// 		} else {
+// 			mid = 2;
+// 			small = 0;
+// 		}
+// 		return;
+// 	}
+// 	big = 2;
+// 	if (Comp(a, b)) {
+// 		mid = 0;
+// 		small = 1;
+// 	} else {
+// 		mid = 1;
+// 		small = 0;
+// 	}
+// }
 template<class TYPE>
 inline void Swap(TYPE& a, TYPE& b) //
 		{

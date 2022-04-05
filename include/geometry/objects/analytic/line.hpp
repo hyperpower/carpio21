@@ -7,34 +7,27 @@
 #include <memory>
 
 namespace carpio {
+
 template<typename NUM>
-NUM InterseptX(const NUM& a, const NUM& alpha){
-	if(std::abs(a) < (_SMALL_)){
-		return  alpha / (_SMALL_);
-	}else{
-		return alpha / a;
-	}
-}
-template<typename NUM>
-NUM InterseptX(const NUM& a, const NUM& alpha, const Vt& s){
-	if(std::abs(a) < (s)){
-		return  alpha / s;
+inline NUM InterseptX(const NUM& a, const NUM& alpha, const Vt& epsilon){
+	if(std::abs(a) < (epsilon)){
+		return  alpha / epsilon;
 	}else{
 		return alpha / a;
 	}
 }
 
 template<typename NUM>
-NUM InterseptY(const NUM& b, const NUM& alpha, const Vt& s){
-	if(std::abs(b) < s){
-		return  alpha / (s);
+inline NUM InterseptY(const NUM& b, const NUM& alpha, const Vt& epsilon){
+	if(std::abs(b) < epsilon){
+		return  alpha / (epsilon);
 	}else{
 		return alpha / b;
 	}
 }
 
 template<typename NUM>
-NUM CalculateX(const NUM& a, const NUM& b, const NUM& alpha,  // The line
+inline NUM CalculateX(const NUM& a, const NUM& b, const NUM& alpha,  // The line
 		       const NUM& value,                              // Y = value
 		       const NUM& s = 1e-10){
 	if(std::abs(a) < s){
@@ -44,7 +37,7 @@ NUM CalculateX(const NUM& a, const NUM& b, const NUM& alpha,  // The line
 	}
 }
 template<typename NUM>
-NUM CalculateY(const NUM& a, const NUM& b, const NUM& alpha,  // The line
+inline NUM CalculateY(const NUM& a, const NUM& b, const NUM& alpha,  // The line
 		       const NUM& value,                              // X = value
 		       const NUM& s = 1e-10){
 	if(std::abs(b) < s){
@@ -54,7 +47,7 @@ NUM CalculateY(const NUM& a, const NUM& b, const NUM& alpha,  // The line
 	}
 }
 template<typename NUM>
-NUM Calculate(const NUM& a,  const NUM& b, const NUM& alpha,  // The line
+inline NUM Calculate(const NUM& a,  const NUM& b, const NUM& alpha,  // The line
 		      const Axes& axe, const NUM& value,              // Axes = value
 		      const NUM& s = 1e-10){
 	if(axe == _X_){

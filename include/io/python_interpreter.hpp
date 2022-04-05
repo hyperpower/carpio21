@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _PYTHON_INTERPRETER_HPP_
 #define _PYTHON_INTERPRETER_HPP_
 
@@ -13,7 +14,10 @@
 #include <cmath>
 #include <mutex>
 #include <memory>
+#include <iostream>
 #include <algorithm>
+
+#include "type_define.hpp"
 
 namespace carpio {
 

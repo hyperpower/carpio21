@@ -3,6 +3,11 @@ from jinja2 import Environment, Template
 import datetime
 import runtool as RT
 
+def generate_0_svg(p):
+    fn = "0.svg"
+    f = open(os.path.abspath(os.path.join(p, fn)), "w")
+    f.write("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"0\"/>")
+    f.close()
 
 def text_runing_time(info):
     text = """

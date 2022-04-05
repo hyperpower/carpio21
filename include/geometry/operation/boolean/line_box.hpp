@@ -226,7 +226,7 @@ _OpLineBox(const POINT& min, const POINT& max,
     auto arr_scale = max - min;
     auto inv_scale(arr_scale);
     for(auto& d : inv_scale){
-        d = 1.0/(d + 1e-15);
+        d = 1.0/(d + tol);
     }
     Translate(line, -min);
     Scale(line, inv_scale);
@@ -243,6 +243,14 @@ template<class POINT>
 std::list<POINT>
 IntersectLineBox(const POINT& min, const POINT& max, 
                  const double& a, const double& b, const double& alpha,// Point max=(1,1)
+                 const double& tol = 1e-14){     
+    typedef _FunctorIntersectOrientLineUnitBox_<POINT> Functor;
+    return _OpLineBox<POINT, Functor>(min, max, a, b, alpha, tol);
+}
+template<class POINT>
+std::list<POINT>
+IntersectPlaneBox(const POINT& min, const POINT& max, 
+                 const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
                  const double& tol = 1e-14){     
     typedef _FunctorIntersectOrientLineUnitBox_<POINT> Functor;
     return _OpLineBox<POINT, Functor>(min, max, a, b, alpha, tol);

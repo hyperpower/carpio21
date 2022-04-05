@@ -48,39 +48,22 @@ struct IsGeoObj {
   static const bool value = false;
 };
 
-template<typename TYPE, St DIM>
-struct IsGeoObj<Point_<TYPE, DIM> > {
-  static const bool value = true;
-};
-//template<typename TYPE>
-//struct IsGeoObj<Line_<TYPE> > {
-//  static const bool value = true;
-//};
-//template<typename TYPE>
-//struct IsGeoObj<Plane_<TYPE> > {
-//  static const bool value = true;
-//};
-//template<typename TYPE>
-//struct IsGeoObj<Contour_<TYPE> > {
-//  static const bool value = true;
-//};
-//template<typename TYPE>
-//struct IsGeoObj<Polygon_<TYPE> > {
-//  static const bool value = true;
-//};
-//template<typename TYPE, St DIM>
-//struct IsGeoObj<Segment_<TYPE, DIM> > {
-//  static const bool value = true;
-//};
-//template<typename TYPE, St DIM>
-//struct IsGeoObj<PointChain_<TYPE, DIM> > {
-//  static const bool value = true;
-//};
-//template<typename TYPE, St DIM>
-//struct IsGeoObj<Triangle_<TYPE, DIM> > {
-//  static const bool value = true;
-//};
 
+template<class ANY>
+struct IsGeometry{
+private:
+	typedef char yes;
+    typedef long no;
+
+    template<class T>
+    static yes  test(int i, typename T::Tag = typename T::Tag());
+    template<class T>
+    static no test(...);
+public:
+    static const bool value = sizeof(test<ANY>(0)) == sizeof(yes);
+
+	typedef typename std::integral_constant<bool, value>::type type;
+};
 }
 
 #endif

@@ -16,7 +16,6 @@ else:
 from plotly_helper import *
 # sys.path.append(p)
 
-# from plotly_helper import *
 
 
 # data part

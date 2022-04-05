@@ -158,6 +158,7 @@ class Runer:
                 shutil.rmtree(os.path.join(doc_source_dir, "fig"))
             shutil.copytree(os.path.join(this_dir, "fig"), 
                             os.path.join(doc_source_dir, "fig"))
+            generate_0_svg(os.path.join(doc_source_dir, "fig"))
         # revise rst
         revise_report_rst(this_dir, self._info, doc_source_dir)
 

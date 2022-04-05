@@ -82,7 +82,14 @@ public:
         ASSERT(idx < Dim);
         return this->at(idx);
     }
-
+    const_reference operator()(Axes a) const {
+        ASSERT(St(a) < Dim);
+        return this->at(St(a));
+    }
+    reference operator()(Axes a) {
+        ASSERT(St(a) < Dim);
+        return this->at(St(a));
+    }
     CV value(St idx) const {
         CV res;
         if (idx < Dim) {
@@ -92,6 +99,9 @@ public:
         }
     }
 
+    void set(Axes a, Vt value){
+        (*this)(a) = value;
+    }
     const_reference x() const {
         return this->at(0);
     }
@@ -239,6 +249,29 @@ public:
         if (Dim == 3) {
             this->at(2) = this->at(2) * CV(dz);
         }
+    }
+
+    Axes max_axes() const{
+        return this->_max_axes(typename DimTagTraits_<Dim>::Type());
+    }
+    Axes _max_axes(Dim2Tag) const{
+        return this->at(0) >= this->at(1) ? _X_ : _Y_;
+    }
+    Axes _max_axes(Dim3Tag) const{
+        auto idx = (this->at(0) >= this->at(1)) ? 0 : 1;
+        idx = (this->at(2) > this->at(idx)) ? 2 : idx;
+        return ToAxes(idx);
+    }
+    Axes abs_max_axes() const{
+        return this->_abs_max_axes(typename DimTagTraits_<Dim>::Type());
+    }
+    Axes _abs_max_axes(Dim2Tag) const{
+        return (std::abs(this->at(0)) >= std::abs(this->at(1))) ? _X_ : _Y_;
+    }
+    Axes _abs_max_axes(Dim3Tag) const{
+        auto idx = (std::abs(this->at(0)) >= std::abs(this->at(1))) ? 0 : 1;
+        idx = (std::abs(this->at(2)) > std::abs(this->at(idx))) ? 2 : idx;
+        return ToAxes(idx);
     }
     /**
      *  Distance to other point
