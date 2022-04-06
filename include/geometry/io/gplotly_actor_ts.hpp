@@ -201,7 +201,7 @@ auto MakePlotlyActor(TriSurfaceTag, const ANY& sur, const std::string& type){
     if(ct == "Scatter3d"){
         PlotlyActor actor(ct);
         
-        actor.update("name", "tri_surface");
+        actor.update("name", "tri_wireframe");
         actor.update("mode", "lines");
 
         std::list<typename ANY::Point> list;
@@ -224,15 +224,19 @@ auto MakePlotlyActor(TriSurfaceTag, const ANY& sur, const std::string& type){
         // actor.update("mode", "lines");
 
         std::list<typename ANY::Point> list;
+        std::list<std::array<double, 3> > ijk;
 
+        double count = 0;
         for (auto iter = sur.faces.begin(); iter != sur.faces.end(); ++iter) {
             auto pf = (*iter);
             for (typename ANY::size_type i = 0; i < 3; i++) {
-                    list.push_back(*(pf->vertex(i)));
+                list.push_back(*(pf->vertex(i)));
             }
-            // list.push_back(*(pf->vertex(0)));
+            ijk.emplace_back(std::array<double,3>{count, count + 1, count + 2});
+            count += 3;
         }
-        actor.data_xyz(list,3);
+        actor.data_xyz(list);
+        actor.data(ijk, "i", "j", "k");
         return actor;
     }
 }

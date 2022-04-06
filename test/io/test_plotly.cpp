@@ -4,7 +4,6 @@
 #include "geometry/geometry.hpp"
 #include "io/python_interpreter.hpp"
 #include "io/plotly.hpp"
-
 using namespace carpio;
 
 typedef Point_<double, 3> Point3;
@@ -58,3 +57,4 @@ TEST(test_plotly, test2) {
     plotly.write("./fig/out", "png");
     
 }
+

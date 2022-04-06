@@ -4,6 +4,7 @@ set(This IO)
 
 set(Sources
     test_plotly.cpp
+    # test_ply.cpp
     # test_csv.cpp
     # test_textfile.cpp
 )
