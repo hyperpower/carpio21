@@ -13,6 +13,9 @@
 #include "objects/basic/point_chain.hpp"
 
 #include "objects/ts/vertex.hpp"
+#include "objects/ts/edge.hpp"
+#include "objects/ts/triface.hpp"
+#include "objects/ts/trisurface.hpp"
 
 #include "objects/bbtree/aabbox.hpp"
 #include "objects/bbtree/bbnode.hpp"

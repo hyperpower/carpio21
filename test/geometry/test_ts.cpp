@@ -71,8 +71,9 @@ TEST(TS, ts_initial3){
     // typedef GPlotlyActor_TS_<double, 3> PA;
 
     CreateTS creator;
-    // auto sur = creator.from_ply_file("./test/input_files/icosahedron_ascii.ply");
-    auto sur = creator.from_ply_file("./test/input_files/elephant.ply");
+    // auto sur = creator.from_ply_file("./test/input_files/icosahedron.ply");
+    auto sur = creator.from_ply_file("./test/input_files/teapot.ply");
+    // auto sur = creator.from_ply_file("./test/input_files/elephant.ply");
 
     Plotly_ plot;
     std::cout << "Plotly Version : " << plot.version() << std::endl;

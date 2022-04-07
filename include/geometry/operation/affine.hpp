@@ -10,54 +10,59 @@
 namespace carpio{
 
 template<class GEO, class TRANSVEC>
-void _Translate(GEO& point, const TRANSVEC& vec, PointTag){
+void _Translate(PointTag, GEO& point, const TRANSVEC& vec){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     _Translate(point, vec, PointTag(), DimTag()); 
 }
 
 template<class GEO, class VEC>
-void _Translate(GEO&point, const VEC& arr, PointTag, 
-                Dim1Tag){
+void _Translate(GEO&point, const VEC& arr, PointTag, Dim1Tag){
     point[0] += arr[0];
 }
 template<class GEO, class VEC>
-void _Translate(GEO& point, const VEC& arr, PointTag, 
-                Dim2Tag){
+void _Translate(GEO& point, const VEC& arr, PointTag, Dim2Tag){
     point[0] += arr[0];
     point[1] += arr[1];
 }
 template<class GEO, class VEC>
-void _Translate(GEO&point, const VEC& arr,  PointTag, 
-                Dim3Tag){
+void _Translate(GEO&point, const VEC& arr,  PointTag, Dim3Tag){
     point[0] += arr[0];
     point[1] += arr[1];
     point[2] += arr[2];
 }
 template<class GEO, class VEC>
-void _Translate(GEO& seg, const VEC& arr, SegmentTag){
+void _Translate(SegmentTag, 
+                GEO& seg, const VEC& arr){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     _Translate(seg[0], arr, PointTag(), DimTag()); 
     _Translate(seg[1], arr, PointTag(), DimTag()); 
 }
 template<class GEO, class VEC>
-void _Translate(      GEO&       box, const VEC& arr,
-                BoxTag){ 
+void _Translate( BoxTag, 
+                 GEO&   box, const VEC& arr){ 
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     _Translate(box.min(), arr, PointTag(), DimTag()); 
     _Translate(box.max(), arr, PointTag(), DimTag()); 
 }
 template<class GEO, class VEC>
-void _Translate(      GEO&       pointchain, const VEC& arr,
-                PointChainTag){ 
+void _Translate( PointChainTag, 
+                 GEO&  pointchain, const VEC& arr){ 
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     for(auto& p : pointchain ){
         _Translate(p, arr, PointTag(), DimTag()); 
     }
 }
 template<class GEO, class VEC>
-void _Translate(      GEO&       line, const VEC& arr,
-                LineTag){ 
+void _Translate( LineTag,      GEO&       line, const VEC& arr){ 
     line.alpha() = line.alpha() + line.a() * arr[0] + line.b() * arr[1]; 
+}
+
+template<class GEO, class VEC>
+void _Translate( TriSurfaceTag,  GEO& surface, const VEC& arr){ 
+    auto fun = [&arr](typename GEO::Vertex& ver){
+        _Translate(PointTag(), ver, arr);
+    };
+    surface.foreach_vertex(fun);
 }
 // arr has same length as the Dim  
 template<class CONTAINER, class ARR,
@@ -96,7 +101,7 @@ void Translate(GEO& geo, const NUM& num){
     for(auto& v : arr){
         v = num;
     }
-    _Translate(geo, arr, Tag());
+    _Translate(Tag(), geo, arr);
 }
 template<class GEO, class VEC,
          typename std::enable_if<
@@ -108,7 +113,7 @@ void Translate(GEO& geo, const VEC& container){
     typedef typename GEO::Tag Tag;
     std::array<typename VEC::value_type, GEO::Dim> arr;
     _RegularVectorByDim(container, arr);
-    _Translate(geo, arr, Tag());
+    _Translate(Tag(), geo, arr);
 }
 template<class CONTAINER, class VEC, 
         typename std::enable_if<
@@ -125,7 +130,7 @@ void Translate(CONTAINER& con_geo, const VEC& vec){
 // Scale
 // ==================================================
 template<class GEO, class VEC>
-void _Scale(GEO& point, const VEC& container, PointTag){
+void _Scale(PointTag, GEO& point, const VEC& container){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     _Scale(point, container, PointTag(), DimTag()); 
 }
@@ -145,23 +150,30 @@ void _Scale(GEO& point, const VEC& arr,PointTag, Dim3Tag){
     point[2] *= arr[2];
 }
 template<class GEO, class VEC>
-void _Scale(GEO& box, const VEC& arr, BoxTag){
+void _Scale(BoxTag, GEO& box, const VEC& arr){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     _Scale(box.min(), arr, PointTag(), DimTag()); 
     _Scale(box.max(), arr, PointTag(), DimTag()); 
 }
 template<class GEO, class VEC>
-void _Scale(GEO& line, const VEC& arr, LineTag){
+void _Scale(LineTag, GEO& line, const VEC& arr){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     line.a() = line.a() / arr[0];
     line.b() = line.b() / arr[1];
 }
 template<class GEO, class VEC>
-void _Scale(GEO& pointchain, const VEC& arr, PointChainTag){
+void _Scale(PointChainTag, GEO& pointchain, const VEC& arr){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     for(auto& p : pointchain ){
         _Scale(p, arr, PointTag(), DimTag()); 
     }
+}
+template<class GEO, class VEC>
+void _Scale( TriSurfaceTag,  GEO& surface, const VEC& arr){ 
+    auto fun = [&arr](typename GEO::Vertex& ver){
+        _Scale(PointTag(), ver, arr);
+    };
+    surface.foreach_vertex(fun);
 }
 template<class GEO, class VEC, class POINT,
          typename std::enable_if<IsGeometry<GEO>::value, bool>::type = true>
@@ -170,10 +182,10 @@ void Scale(GEO& geo, const VEC& vec, const POINT& about){
     std::array<typename VEC::value_type, GEO::Dim> arr_n;
     _RegularVectorByDim(about, arr_n);
     _NegativeContainer(arr_n);
-    _Translate(geo, arr_n, Tag()); // make "about" become origin
+    _Translate(Tag(), geo, arr_n); // make "about" become origin
     Scale(geo, vec);
     _NegativeContainer(arr_n);
-    _Translate(geo, arr_n, Tag()); // translate back 
+    _Translate(Tag(), geo, arr_n); // translate back 
 }
 template<class GEO, class VEC,
          typename std::enable_if<IsGeometry<GEO>::value, bool>::type = true>
@@ -181,14 +193,14 @@ void Scale(GEO& geo, const VEC& vec){
     typedef typename GEO::Tag Tag;
     std::array<typename VEC::value_type, GEO::Dim> arr;
     _RegularVectorByDim(vec, arr, 1);
-    _Scale(geo, arr, Tag());
+    _Scale(Tag(), geo, arr);
 }
 template<class CONTAINER, class VEC, class POINT,
         typename std::enable_if<
             std::integral_constant< bool, 
                    IsContainer<CONTAINER>::value 
                 && IsGeometry<typename CONTAINER::value_type>::value
-            >::value, bool>::type = true> // Line: ax + by = alpha
+            >::value, bool>::type = true>
 void Scale(CONTAINER& con_geo, const VEC& vec, const POINT& about){
     for (auto& geo : con_geo){
         Scale(geo, vec, about);
@@ -199,7 +211,7 @@ template<class CONTAINER, class VEC,
             std::integral_constant< bool, 
                    IsContainer<CONTAINER>::value 
                 && IsGeometry<typename CONTAINER::value_type>::value
-            >::value, bool>::type = true> // Line: ax + by = alpha
+            >::value, bool>::type = true> 
 void Scale(CONTAINER& con_geo, const VEC& vec){
     for (auto& geo : con_geo){
         Scale(geo, vec);
@@ -210,7 +222,7 @@ void Scale(CONTAINER& con_geo, const VEC& vec){
 // ==================================================
 template<class GEO, class VT,
          typename std::enable_if<std::is_arithmetic<VT>::value, bool>::type = true> 
-void _Rotate(GEO& point, const VT& theta, const int& axe, PointTag){
+void _Rotate( PointTag, GEO& point, const VT& theta, const int& axe){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     _Rotate(point, theta, axe, PointTag(), DimTag()); 
 }
@@ -251,7 +263,7 @@ void _Rotate(GEO& point, const VT& theta, ZTag, PointTag, Dim3Tag){
 
 template<class GEO, class VT,
          typename std::enable_if<std::is_arithmetic<VT>::value, bool>::type = true> 
-void _Rotate(GEO& pointchain, const VT& theta, const int& axe, PointChainTag){
+void _Rotate(PointChainTag, GEO& pointchain, const VT& theta, const int& axe){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     for(auto& p : pointchain ){
         _Rotate(p, theta, axe, PointTag(), DimTag()); 
@@ -260,7 +272,7 @@ void _Rotate(GEO& pointchain, const VT& theta, const int& axe, PointChainTag){
 template<class GEO, class VT>
 void Rotate(GEO& geo, const VT& theta, const int& axe = _Z_){
     typedef typename GEO::Tag Tag;
-    _Rotate(geo, theta, axe, Tag());
+    _Rotate(Tag(), geo, theta, axe);
 }
 template<class GEO, class VT, class POINT> 
 void Rotate(GEO& geo, const VT& theta,  const POINT& about, const int& axe = _Z_){
@@ -269,9 +281,9 @@ void Rotate(GEO& geo, const VT& theta,  const POINT& about, const int& axe = _Z_
     _RegularVectorByDim(about, arr, 0.0);
     std::array<typename POINT::value_type, GEO::Dim> neg_arr(arr);
     _NegativeContainer(neg_arr);
-    _Translate(geo, neg_arr, Tag()); // make "about" become origin
-    _Rotate(geo, theta, axe, Tag());
-    _Translate(geo, arr, Tag());     // translate back 
+    _Translate(Tag(), geo, neg_arr); // make "about" become origin
+    _Rotate(Tag(), geo, theta, axe);
+    _Translate(Tag(), geo, arr);     // translate back 
 }
 // ==================================================
 //   Shear 
@@ -297,7 +309,7 @@ void _Shear(GEO& point, const VT& theta, const int& axe, PointTag, Dim2Tag){
 
 template<class GEO, class VT,
          typename std::enable_if<std::is_arithmetic<VT>::value, bool>::type = true> 
-void _Shear(GEO& pointchain, const VT& theta, const int& axe, PointChainTag){
+void _Shear(PointChainTag, GEO& pointchain, const VT& theta, const int& axe){
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     for(auto& p : pointchain ){
         _Shear(p, theta, axe, PointTag(), DimTag()); 
@@ -306,7 +318,7 @@ void _Shear(GEO& pointchain, const VT& theta, const int& axe, PointChainTag){
 template<class GEO, class VT>
 void Shear(GEO& geo, const VT& theta, const int& axe = _X_){
     typedef typename GEO::Tag Tag;
-    _Shear(geo, theta, axe, Tag());
+    _Shear(Tag(), geo, theta, axe);
 }
 template<class GEO, class VT, class POINT,
          typename std::enable_if<std::is_arithmetic<typename POINT::value_type>::value, bool>::type = true> 
@@ -316,15 +328,15 @@ void Shear(GEO& geo, const VT& theta, const POINT& about, const int& axe = _X_){
     _RegularVectorByDim(about, arr, 0.0);
     std::array<typename POINT::value_type, GEO::Dim> neg_arr(arr);
     _NegativeContainer(neg_arr);
-    _Translate(geo, neg_arr, Tag()); // make "about" become origin
-    _Shear(geo, theta, axe, Tag());
-    _Translate(geo, arr, Tag());     // translate back 
+    _Translate(Tag(),geo, neg_arr); // make "about" become origin
+    _Shear(Tag(), geo, theta, axe);
+    _Translate(Tag(), geo, arr);     // translate back 
 }
 // ========================
 // Reflect about axe
 // ========================
 template<class GEO> 
-void _Reflect(GEO& point, const Axes& axe,  PointTag){
+void _Reflect(PointTag, GEO& point, const Axes& axe){
     if (axe == _X_){
         point[1] = -point[1];
     }else if (axe ==_Y_){
@@ -332,7 +344,7 @@ void _Reflect(GEO& point, const Axes& axe,  PointTag){
     }
 }
 template<class GEO> 
-void _Reflect(GEO& point, const Axes& axe, const double& v, PointTag){
+void _Reflect(PointTag, GEO& point, const Axes& axe, const double& v){
     if (axe == _X_){
         point[0] = -(point[0] - v);
     }else if (axe == _Y_){
@@ -340,19 +352,19 @@ void _Reflect(GEO& point, const Axes& axe, const double& v, PointTag){
     }
 }
 template<class GEO> 
-void _Reflect(GEO& point, PointTag){
+void _Reflect(PointTag, GEO& point){
     point = -point;
 }
 template<class GEO> 
-void _Reflect(GEO& pointchain, const Axes& axe, PointChainTag){
+void _Reflect(PointChainTag, GEO& pointchain, const Axes& axe){
     for(auto& p : pointchain ){
-        _Reflect(p, axe, PointTag());
+        _Reflect(PointTag(), p, axe);
     }
 }
 template<class GEO> 
-void _Reflect(GEO& pointchain, PointChainTag){
+void _Reflect(PointChainTag, GEO& pointchain){
     for(auto& p : pointchain ){
-        _Reflect(p, PointTag());
+        _Reflect(PointTag(), p);
     }
 }
 // template<class GEO>
@@ -364,19 +376,19 @@ void Reflect(GEO& geo, const Axes& axe){
     typedef typename GEO::Tag Tag;
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     assert(GEO::Dim == 2);
-    _Reflect(geo, axe, Tag());
+    _Reflect(Tag(), geo, axe);
 }
 template<class GEO>  // X = vt or Y = vt
 void Reflect(GEO& geo, const Axes& axe, const double& vt){
     typedef typename GEO::Tag Tag;
     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
     assert(GEO::Dim == 2);
-    _Reflect(geo, axe, vt, Tag());
+    _Reflect(Tag(), geo, axe, vt);
 }
 template<class GEO>
 void Reflect(GEO& geo){  // Reflect about original points
     typedef typename GEO::Tag Tag;
-    _Reflect(geo, Tag());
+    _Reflect(Tag(), geo);
 }
 template<class GEO, class POINT,
          typename std::enable_if<std::is_arithmetic<typename POINT::value_type>::value, bool>::type = true>
@@ -386,9 +398,9 @@ void Reflect(GEO& geo, const POINT& about){
     _RegularVectorByDim(about, arr, 0.0);
     std::array<typename POINT::value_type, GEO::Dim> neg_arr(arr);
     _NegativeContainer(neg_arr);
-    _Translate(geo, neg_arr, Tag()); // make "about" become origin
-    _Reflect(geo, Tag());
-    _Translate(geo, arr, Tag());     // translate back 
+    _Translate(Tag(), geo, neg_arr); // make "about" become origin
+    _Reflect(Tag(), geo);
+    _Translate(Tag(), geo, arr);     // translate back 
 }
 template<class GEO> // Line: ax + by = alpha
 void _Reflect(GEO& point, double a, double b, double alpha, PointTag, Dim2Tag){

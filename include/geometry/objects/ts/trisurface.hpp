@@ -32,8 +32,11 @@ public:
     typedef TYPE vt;
 
     typedef TriFace_<TYPE, DIM, Self> Fac;
+    typedef TriFace_<TYPE, DIM, Self> Face;
     typedef Edge_<TYPE, DIM, Fac>     Edg;
+    typedef Edge_<TYPE, DIM, Fac>     Edge;
     typedef Vertex_<TYPE, DIM, Edg>   Ver;
+    typedef Vertex_<TYPE, DIM, Edg>   Vertex;
 
     typedef Point_<TYPE, DIM>         Poi;
     typedef Point_<TYPE, DIM>         Point;
@@ -51,8 +54,8 @@ public:
     typedef std::list<pSur> list_pSur;
     typedef std::function<void(Fac&)> Fun_Fac;
 
-    typedef typename std::list<pFac>::iterator iterator;
-    typedef typename std::list<pFac>::const_iterator const_iterator;
+    typedef typename std::set<pFac>::iterator iterator;
+    typedef typename std::set<pFac>::const_iterator const_iterator;
 
 
 public:
@@ -350,7 +353,7 @@ public:
             }
         }
     }
-    void foreach_vertex(std::function<void(Ver&)> fun) const {
+    void foreach_vertex(std::function<void(const Ver&)> fun) const {
         std::set<pVer> tmp;
         for (auto iter = faces.begin(); iter != faces.end(); ++iter) {
             pFac pf = (*iter);

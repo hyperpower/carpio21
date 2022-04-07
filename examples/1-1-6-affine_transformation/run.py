@@ -7,7 +7,9 @@ FILE_ORIGINAL = [
     "plot.py",
     "run.py",
     "report.rst",
-    "icosahedron_ascii.ply"
+    "teapot.ply",
+    "affine_transform_in_2d.h",
+    "affine_transform_in_3d.h"
 ]
 
 PATH_PYTOOLS  = os.path.abspath(os.path.join(__file__, "../../pytools"))

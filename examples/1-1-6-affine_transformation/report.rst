@@ -58,13 +58,7 @@ The box (dashed line) locates at (0,0) to (1,1). It can be translated by a vecto
    Translate a box.
 
 
-.. raw:: html
-   :file: fig/out.div
 
-.. figure:: fig/0.svg
-   :align: center
-
-   Translate a box in 3D
 
 
 Scale
@@ -99,6 +93,15 @@ A scaling about a piont is a combination of transform and scaling operations.
    :align: center 
 
    Scale a box about a point.
+
+.. raw:: html
+   :file: fig/scale_3d.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   Scale a shape in 3D
+
 
 Rotate
 ===================
