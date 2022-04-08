@@ -55,7 +55,8 @@ private:
 	typedef char yes;
     typedef long no;
 
-    template<class T>
+    template<class T, typename std::enable_if<
+            std::is_base_of<GeometryTag, typename T::Tag>::value, bool>::type = true > 
     static yes  test(int i, typename T::Tag = typename T::Tag());
     template<class T>
     static no test(...);

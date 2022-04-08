@@ -43,11 +43,7 @@ void AddActorTransformed(Plotly_& plot, const Surface& sur){
     plot.add(actor);
 }
 
-void TestScaleIn3d(){
-    auto teapot = MakeShape3d();
-
-    Plotly_ plotly;
-
+void PlotlyLayoutSetup(Plotly_& plotly){
     plotly.add(MakePlotlyCoordinateArrow<3>(2.0,2.0,2.0));
 
     plotly.margin(0, 0, 0, 0);
@@ -59,7 +55,7 @@ void TestScaleIn3d(){
     plotly.layout("scene_camera_eye_y",    -1.5);
     plotly.layout("scene_xaxis_range", -4.0, 4);
     plotly.layout("scene_yaxis_range", -4.0, 4);
-    plotly.layout("scene_zaxis_range", -0.0, 5);
+    plotly.layout("scene_zaxis_range", -0.0, 8);
     plotly.layout_false("scene_xaxis_showbackground");
     plotly.layout("scene_xaxis_gridcolor",      "black");
     plotly.layout_false("scene_yaxis_showbackground");
@@ -70,6 +66,28 @@ void TestScaleIn3d(){
     plotly.layout("legend_y", 0.95);
     plotly.layout("legend_traceorder", "normal");
     plotly.layout("legend_font_size", 13.0);
+}
+void TestTranslateIn3d(){
+    auto teapot = MakeShape3d();
+
+    Plotly_ plotly;
+    PlotlyLayoutSetup(plotly);
+
+    AddActorOriginal(plotly, *teapot);
+    // 
+    std::array<double, 3> vec   {-1.5,-1.4,2.3};
+    // std::array<double, 3> about {-4.0 , -4.0, 0.0};
+    Translate(*teapot, vec);
+    // 
+    AddActorTransformed(plotly, *teapot);
+    plotly.write("./fig/translate_3d", "div");    
+}
+
+void TestScaleIn3d(){
+    auto teapot = MakeShape3d();
+
+    Plotly_ plotly;
+    PlotlyLayoutSetup(plotly);
 
     AddActorOriginal(plotly, *teapot);
     // 
@@ -78,8 +96,49 @@ void TestScaleIn3d(){
     Scale(*teapot, vec, about);
     // 
     AddActorTransformed(plotly, *teapot);
-    plotly.write("./fig/scale_3d", "div");
-    
+    plotly.write("./fig/scale_3d", "div");    
+}
+void TestRotateIn3d(){
+    auto teapot = MakeShape3d();
+
+    Plotly_ plotly;
+    PlotlyLayoutSetup(plotly);
+
+    AddActorOriginal(plotly, *teapot);
+    // 
+    std::array<double, 3> vec   {1.1,1.1,1.3};
+    std::array<double, 3> about {-4.0 , -4.0, 0.0};
+    Rotate(*teapot, 0.5, _Z_);
+    // 
+    AddActorTransformed(plotly, *teapot);
+    plotly.write("./fig/rotate_z_3d", "div");    
+}
+void TestShearIn3d(){
+    auto teapot = MakeShape3d();
+
+    Plotly_ plotly;
+    PlotlyLayoutSetup(plotly);
+
+    AddActorOriginal(plotly, *teapot);
+    // 
+    Shear(*teapot, 0.5, _X_);
+    // 
+    AddActorTransformed(plotly, *teapot);
+    plotly.write("./fig/shear_x_3d", "div");    
+}
+void TestReflectIn3d(){
+    auto teapot = MakeShape3d();
+
+    Plotly_ plotly;
+    PlotlyLayoutSetup(plotly);
+    plotly.layout("scene_zaxis_range", -4.0, 4);
+
+    AddActorOriginal(plotly, *teapot);
+    // 
+    Reflect(*teapot);
+    // 
+    AddActorTransformed(plotly, *teapot);
+    plotly.write("./fig/reflect_o_3d", "div");    
 }
 
 #endif

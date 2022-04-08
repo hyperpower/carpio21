@@ -57,7 +57,13 @@ The box (dashed line) locates at (0,0) to (1,1). It can be translated by a vecto
 
    Translate a box.
 
+.. raw:: html
+   :file: fig/translate_3d.div
 
+.. figure:: fig/0.svg
+   :align: center
+
+   Translate a shape in 3D
 
 
 
@@ -155,6 +161,14 @@ A rotation matrix rotates an object about one of the three coordinate axes, or a
 
    Rotate a box about a point. (2D)
 
+.. raw:: html
+   :file: fig/rotate_z_3d.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   Roate a shape in 3D
+
 
 Shear
 ===================
@@ -197,6 +211,14 @@ Shear operations "tilt" objects.
    :align: center 
 
    Rotate a box about a point in Y. (2D)
+
+.. raw:: html
+   :file: fig/shear_x_3d.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   Shear a shape in 3D (X direction)
 
 
 Reflect
@@ -247,6 +269,13 @@ Reflect about point
 
    Reflect a box about origin. (2D)
 
+.. raw:: html
+   :file: fig/reflect_o_3d.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   Reflect a shape in 3D
 
 .. figure:: fig/affine_reflect_about_point.png
    :align: center 

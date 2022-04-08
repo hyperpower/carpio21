@@ -30,6 +30,10 @@ int main(){
 
 
     std::cout << "Affine Transformation 3D" << std::endl;
+    TestTranslateIn3d();
     TestScaleIn3d();
+    TestRotateIn3d();
+    TestShearIn3d();
+    TestReflectIn3d();
 }
 
