@@ -72,8 +72,8 @@ public:
         this->at(2) = c;
         this->at(3) = alpha;
     }
-    Plane_(const vt& x, const vt& y, const vt& z, const vt& nx, const vt& ny,
-            const vt& nz) {
+    Plane_(const vt& x, const vt& y,    const vt& z,
+           const vt& nx, const vt& ny,  const vt& nz) {
         //assert(!isEqual(ax, bx) || !isEqual(ay,by));
         this->a() = nx;
         this->b() = ny;
@@ -112,7 +112,7 @@ public:
         return this->at(2);
     }
     inline const_reference alpha() const {
-        return this->at(2);
+        return this->at(3);
     }
     vt cal_x(const vt& y, const vt& z) const {
         return CalculateX(this->a(), this->b(), this->c(), this->alpha(),
@@ -160,7 +160,15 @@ public:
                 << " Z = " << this->alpha() << "\n";
     }
 };
-
+template<typename TYPE>
+std::ostream& operator<<(std::ostream& stream, const Plane_<TYPE>& plane) {
+	stream << std::setprecision(4) 
+	       << plane.a() << " X + "
+		   << plane.b() << " Y + "
+		   << plane.c() << " Z = "
+		   << plane.alpha();
+	return stream;
+}
 }
 
 #endif

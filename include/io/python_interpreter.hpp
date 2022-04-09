@@ -225,6 +225,25 @@ public:
         }
         return pl;
     } 
+    template<class CONTAINER, ENABLE_IF_1D_ARITHMATIC(CONTAINER) > 
+    PyObject* append_list(PyObject* list, const CONTAINER& arr, int jump = 0) const {
+        auto s = PyList_Size(list);
+        if(s > 0 && jump > 0 ){
+            PyList_Append(list, Py_None);
+        }
+        int i = 0;
+        for (auto& v : arr) {
+            PyObject* p = Py_BuildValue("d", v);
+            if (jump > 0) {
+                if (i % jump == 0 && i > 0) {
+                    PyList_Append(list, Py_None);
+                }
+            }
+            PyList_Append(list, p);
+            i++;
+        }
+        return list;
+    } 
     
 public:
     

@@ -649,6 +649,28 @@ public:
         PyObject_SetAttrString(this->_trace, n2.c_str(), ly);
         PyObject_SetAttrString(this->_trace, n3.c_str(), lz);
     }
+    template<class CONTAINER, ENABLE_IF_2D_ARITHMATIC(CONTAINER)> 
+    void data_append(const CONTAINER& con,
+                     const std::string& n1, const std::string& n2, const std::string& n3, 
+                     int jump = 0){
+        typedef typename CONTAINER::value_type::value_type value_type;
+        std::list<value_type> colx, coly, colz; 
+        for(auto& row : con){
+            auto iter = row.begin();
+            colx.push_back(*iter);
+            std::advance(iter, 1);
+            coly.push_back(*iter);
+            std::advance(iter, 1);
+            colz.push_back(*iter);
+        }
+        
+        PyObject* lx = _py->to_list(colx, jump);
+        PyObject* ly = _py->to_list(coly, jump);
+        PyObject* lz = _py->to_list(colz, jump);
+        PyObject_SetAttrString(this->_trace, n1.c_str(), lx);
+        PyObject_SetAttrString(this->_trace, n2.c_str(), ly);
+        PyObject_SetAttrString(this->_trace, n3.c_str(), lz);
+    }
     template<class CONTAINER, ENABLE_IF_2D_ARITHMATIC(CONTAINER) > 
     void data_xyz(const CONTAINER& con, int jump = 0){
         this->data(con, "x", "y", "z", jump); 

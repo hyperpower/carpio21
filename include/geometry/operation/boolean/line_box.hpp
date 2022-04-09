@@ -212,16 +212,61 @@ public:
             return res;
         }
         this->_cal_on_z(c, alpha, tol);
-        if (this->on_z <= 1.0 && this->on_z > 0){
+        if (0 < this->on_z && this->on_z <= 1.0 ){
             res.emplace_back(Point(0.0, 0.0, on_z));
-        } else if (this->on_z > 1.0){
-            FunctorLine fun;
-            auto lp = fun(a, b, alpha - c, tol);
-            for (auto& p : lp){
-                p.set(_Z_, 1.0);
+        } 
+        this->_cal_on_x(a, alpha, tol);
+        double on_x1y1 = (alpha - a - b) / (c + tol);
+        if (0 < this->on_x && this->on_x <=1.0){
+            res.emplace_back(Point(this->on_x, 0.0, 0.0));
+        } else if (this->on_x > 1.0){
+            double on_x1y0 = (alpha - a) / (c + tol);
+            if( 0 < on_x1y0 && on_x1y0 <= 1.0){
+                res.emplace_back(Point(1.0, 0.0, on_x1y0));
             }
-            res.splice(res.end(), lp);
+            if (on_x1y1 < 0){
+                double on_x1z0 = (alpha - a) / (b + tol);
+                res.emplace_back(Point(1.0, on_x1z0, 0.0));
+            } else { 
+                res.emplace_back(Point(1.0, 1.0, on_x1y1));
+            }
         }
+        this->_cal_on_y(b, alpha, tol);
+        if (0 < this->on_y && this->on_y <= 1.0) {
+            res.emplace_back(Point(0.0, this->on_y, 0.0));
+        } else if (this->on_y > 1.0) {
+            if (on_x1y1 < 0){
+                double on_y1z0 = (alpha - b) / (a + tol);
+                res.emplace_back(Point(on_y1z0, 1.0, 0.0));
+            }
+            double on_x0y1 = (alpha - b) / (c + tol);
+            if( 0 < on_x0y1 && on_x0y1 <= 1.0){
+                res.emplace_back(Point(0.0, 1.0, on_x0y1));
+            }
+        }
+        if ( this->on_z > 1.0){
+            double on_y0z1 = (alpha - c) / (a + tol);
+            if (0 < on_y0z1 && on_y0z1 <= 1.0){
+                res.emplace_front(Point(on_y0z1, 0.0, 1.0));
+            } else {
+                double on_x1z1 = (alpha - a - c) / (b + tol);
+                res.emplace_front(Point(1.0, on_x1z1, 1.0));
+            }
+            double on_x0z1 = (alpha - c) / (b + tol);
+            if (0 < on_x0z1 && on_x0z1 <= 1.0){
+                res.emplace_back(Point(0.0, on_x0z1, 1.0));
+            } else {
+                double on_y1z1 = (alpha - b - c) / (a + tol);
+                res.emplace_back(Point(on_y1z1, 1.0, 1.0));
+            }
+        }
+            // double on_y0z1 = (alpha - c) / (a + tol);
+            // if ( 0 < on_y0z1 && on_y0z1 <= 1){
+            //     res.emplace_back(Point(on_y0z1, 0.0, 1.0));
+            // }else{
+            //     double on_x1z1 = (alpha - a - c) / (b + tol);
+            //     res.emplace_back(Point(1.0, on_x1z1, 1.0));
+            // }
         
         return res;
     } 

@@ -191,6 +191,7 @@ inline std::string _ChooseType(const std::string& type){
     auto def_type = (type == "auto") ? "wireframe" : type;
 
     def_type = (def_type == "wireframe") ? "Scatter3d" : def_type;
+    def_type = (def_type == "vertex") ? "Scatter3d" : def_type;
     def_type = (def_type == "surface") ? "Mesh3d" : def_type;
     return def_type;
 }
