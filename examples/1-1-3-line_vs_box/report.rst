@@ -8,8 +8,8 @@ We want to find intersection results of a line vs box.
 
    A line intersects with box.
 
-Results
-===================
+Line Box
+=======================
 
 Intersections
 ---------------------
@@ -88,3 +88,49 @@ The figure shows the both side of a line splitted box. The positive side colored
    :align: center 
 
    A line intersects with box and its positive and negative sides.
+
+Plane Box
+==========================
+
+Intersections
+---------------------
+
+Normal
+^^^^^^^^^^^^^^^^^^^^
+
+A plane passes through the box. Multiple intersect points can be found.
+
+.. raw:: html
+   :file: fig/plane_box_normal.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   A Plane intersects with box (Normal).
+
+Corner
+^^^^^^^^^^^^^^^^^^^^
+
+A plane touches the box on corner.
+
+.. raw:: html
+   :file: fig/plane_box_corner.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   A Plane intersects with box (Corner).
+
+
+Edge
+^^^^^^^^^^^^^^^^^^^^
+
+A plane touches the box on edge.
+
+.. raw:: html
+   :file: fig/plane_box_edge.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   A Plane intersects with box (Edge).

@@ -30,37 +30,42 @@ PlotlyActor MakePlotlyActor(PlaneTag,
     Axes d1, d2;
     NormalPlane(maxd, d1, d2);
     
+    Point p0;
+    p0.set(d1, *(con1.begin()));
+    p0.set(d2, *(con2.begin()));
+    p0.set(maxd, plane.cal(maxd, p0(d1), p0(d2)));
+
     Point p1;
-    p1.set(d1, *(con1.begin()));
+    p1.set(d1, *(std::next(con1.begin())));
     p1.set(d2, *(con2.begin()));
     p1.set(maxd, plane.cal(maxd, p1(d1), p1(d2)));
 
     Point p2;
-    p2.set(d1, *(std::next(con1.begin())));
-    p2.set(d2, *(con2.begin()));
+    p2.set(d1, *(con1.begin()));
+    p2.set(d2, *(std::next(con2.begin())));
     p2.set(maxd, plane.cal(maxd, p2(d1), p2(d2)));
 
     Point p3;
-    p3.set(d1, *(con1.begin()));
+    p3.set(d1, *(std::next(con1.begin())));
     p3.set(d2, *(std::next(con2.begin())));
     p3.set(maxd, plane.cal(maxd, p3(d1), p3(d2)));
 
-    Point p4;
-    p4.set(d1, *(std::next(con1.begin())));
-    p4.set(d2, *(std::next(con2.begin())));
-    p4.set(maxd, plane.cal(maxd, p4(d1), p4(d2)));
-
     std::list<Point_<double, ANY::Dim> > list;
+    list.push_back(p0);
     list.push_back(p1);
-    list.push_back(p2);
-    list.push_back(p4);
     list.push_back(p3);
-    list.push_back(p1);
+    list.push_back(p2);
+
+    std::list<std::array<double, 3> > ijk;
+    ijk.push_back({0,1,2});
+    ijk.push_back({2,3,0});
 
     if constexpr (ANY::Dim == 2){
         actor.data_xy(list);
+        actor.data(ijk, "i", "j", "k");
     }else if constexpr (ANY::Dim == 3){
         actor.data_xyz(list);
+        actor.data(ijk, "i", "j", "k");
     }
 
     return actor;
@@ -159,6 +164,10 @@ auto MakePlotlyActor(PointChainTag, const ANY& pc, const std::string& type ="aut
         actor.update("mode", "markers");
     }else if( type == "wireframe" ){
         actor.update("mode", "lines");
+    }
+
+    if (pc.size() <= 0){
+        return actor;
     }
 
     std::list<typename ANY::Point> list;

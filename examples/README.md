@@ -8,7 +8,7 @@ This folder include all the examples for Carpio project.
    1. Basic Geometry Objects
       1. :ballot_box_with_check: Point Location 
       2. :ballot_box_with_check: Segments Intersection
-      3. :ballot_box_with_check: Segment Box Intersection
+      3. :ballot_box_with_check: Line Box Intersection
       4. :construction: Segment Triangle Intersection
       5. :ballot_box_with_check: Point in Polygon
       6. :construction: affine transformation

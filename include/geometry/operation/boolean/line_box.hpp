@@ -5,6 +5,7 @@
 #include "geometry/objects/basic/point.hpp"
 #include "geometry/objects/basic/segment.hpp"
 #include "geometry/objects/analytic/line.hpp"
+#include "geometry/objects/analytic/plane.hpp"
 #include "geometry/objects/basic/point_chain.hpp"
 #include "geometry/operation/affine.hpp"
 
@@ -46,8 +47,8 @@ public:
     _FunctorIntersectOrientLineUnitBox_(const Self& other):
         on_x(other.on_x), on_y(other.on_y), is_trivial(other.is_trivial){};
 
-    ListPoint trivial(const double& a, const double& b, const double& alpha, // Point max=(1,1)
-                      const double& tol = 1e-10){
+    ListPoint trivial(const double& a, const double& b, const double& alpha // Point max=(1,1)
+                      ){
         // line pass (0,0)
         ListPoint res;
         bool zero_a     = a == 0.0;
@@ -91,7 +92,7 @@ public:
 
     ListPoint operator()(const double& a, const double& b, const double& alpha,// Point max=(1,1)
                         const double& tol = 1e-10){
-        ListPoint res = this->trivial(a, b, alpha, tol);
+        ListPoint res = this->trivial(a, b, alpha);
         // no intersection or on intersection
         if ((a + b - alpha < 0) || (-alpha > 0) || this->is_trivial)
         {
@@ -152,7 +153,7 @@ public:
         on_x(other.on_x), on_y(other.on_y), on_z(other.on_z), is_trivial(other.is_trivial){};
 
     ListPoint trivial(const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
-                      const double& tol = 1e-10){
+                      const double& tol){
         // line pass (0,0)
         ListPoint res;
         bool zero_a = (a == 0.0);
@@ -183,15 +184,51 @@ public:
                 return res;
             }
         }else if (zero_a && zero_b){ // z = 0
-            double adc = alpha/a;
-            if ( adc >= 0.0 && adc <= 1.0 ){ 
+            double adc = alpha/c;
+            if ( 0.0 <= adc && adc <= 1.0 ){ 
                 res.emplace_back(Point(0.0, 0.0, adc));
                 res.emplace_back(Point(1.0, 0.0, adc));
                 res.emplace_back(Point(1.0, 1.0, adc));
-                res.emplace_back(Point(1.0, 1.0, adc));
+                res.emplace_back(Point(0.0, 1.0, adc));
                 is_trivial = true;
                 return res;
             }
+        }else if (zero_a ){
+            FunctorLine fun;
+            auto lp = fun(b, c, alpha, tol);
+            for (auto& p : lp){
+                res.emplace_back(Point(0.0, p[0], p[1]));
+            } 
+            for (auto i = lp.rbegin(); i != lp.rend(); ++i ) {
+                auto& p = *i; 
+                res.emplace_back(Point(1.0, p[0], p[1]));
+            }         
+            is_trivial = true;
+            return res;
+        } else if ( zero_b ){
+            FunctorLine fun;
+            auto lp = fun(a, c, alpha, tol);
+            for (auto& p : lp){
+                res.emplace_back(Point( p[0], 0.0, p[1]));
+            } 
+            for (auto i = lp.rbegin(); i != lp.rend(); ++i ) {
+                auto& p = *i; 
+                res.emplace_back(Point( p[0], 1.0, p[1]));
+            }      
+            is_trivial = true;
+            return res;
+        } else if ( zero_c ){
+            FunctorLine fun;
+            auto lp = fun(a, b, alpha, tol);
+            for (auto& p : lp){
+                res.emplace_back(Point( p[0], p[1], 0.0));
+            } 
+            for (auto i = lp.rbegin(); i != lp.rend(); ++i ) {
+                auto& p = *i; 
+                res.emplace_back(Point( p[0], p[1], 1.0));
+            }      
+            is_trivial = true;
+            return res;
         }else if (alpha == 0.0){
             res.emplace_back(Point(0.0, 0.0, 0.0));
             is_trivial = true;
@@ -206,9 +243,14 @@ public:
 
     ListPoint operator()(const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
                         const double& tol = 1e-10){
-        ListPoint res = this->trivial(a, b, c, alpha, tol);
+        // std::cout << "trivial size = " << res.size() << std::endl;
+        // std::cout << "is trivail   = " << this->is_trivial << std::endl;
         // no intersection or on intersection
-        if ((a + b + c - alpha < 0) || (-alpha > 0) || this->is_trivial){
+        if ((a + b + c - alpha < 0) || (-alpha > 0) ){
+            return ListPoint();
+        }
+        ListPoint res = this->trivial(a, b, c, alpha, tol);
+        if (this->is_trivial){
             return res;
         }
         this->_cal_on_z(c, alpha, tol);
@@ -260,14 +302,6 @@ public:
                 res.emplace_back(Point(on_y1z1, 1.0, 1.0));
             }
         }
-            // double on_y0z1 = (alpha - c) / (a + tol);
-            // if ( 0 < on_y0z1 && on_y0z1 <= 1){
-            //     res.emplace_back(Point(on_y0z1, 0.0, 1.0));
-            // }else{
-            //     double on_x1z1 = (alpha - a - c) / (b + tol);
-            //     res.emplace_back(Point(1.0, on_x1z1, 1.0));
-            // }
-        
         return res;
     } 
 };
@@ -284,7 +318,7 @@ public:
     
     ListPoint operator()(const double& a, const double& b, const double& alpha,// Point max=(1,1)
                         const double& tol = 1e-14){
-        ListPoint res = this->Base::operator()(a, b, alpha, tol);
+        ListPoint res = this->Base::operator()(a, b, alpha);
         if (res.size() <= 1){
             return res;
         }
@@ -338,7 +372,7 @@ public:
 template<class POINT, class FUNCTOR>
 std::list<POINT>
 _OpOrientLineUnitBox(const double& a, const double& b, const double& alpha,// Point max=(1,1)
-                      const double& tol = 1e-14){     
+                      const double& tol){     
     double na = std::abs(a);
     double nb = std::abs(b);
     double nalpha = alpha;
@@ -365,7 +399,7 @@ _OpOrientLineUnitBox(const double& a, const double& b, const double& alpha,// Po
 template<class POINT, class FUNCTOR>
 std::list<POINT>
 _OpOrientLineUnitBox(const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
-                     const double& tol = 1e-14){
+                     const double& tol){
     double na = std::abs(a);
     double nb = std::abs(b);
     double nc = std::abs(c);
@@ -380,7 +414,7 @@ _OpOrientLineUnitBox(const double& a, const double& b, const double& c, const do
         nalpha = nalpha - c;
     }
     FUNCTOR fun;
-    auto res = fun(na, nb, nalpha, tol);
+    auto res = fun(na, nb, nc, nalpha, tol);
 
     for(auto& p : res){
         if (a == -na){
@@ -400,7 +434,7 @@ template<class POINT, class FUNCTOR>
 std::list<POINT>
 _OpLineBox(const POINT& min, const POINT& max, 
             const double& a, const double& b, const double& alpha,// Point max=(1,1)
-            const double& tol = 1e-14){ 
+            const double& tol){ 
     Line_<double> line(a, b, alpha);
     auto arr_scale = max - min;
     auto inv_scale(arr_scale);
@@ -421,8 +455,8 @@ template<class POINT, class FUNCTOR>
 std::list<POINT>
 _OpLineBox(const POINT& min, const POINT& max, 
             const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
-            const double& tol = 1e-14){ 
-    Plane_<double> plane(a, b, alpha);
+            const double& tol){ 
+    Plane_<double> plane(a, b, c, alpha);
     auto arr_scale = max - min;
     auto inv_scale(arr_scale);
     for(auto& d : inv_scale){
@@ -451,8 +485,8 @@ std::list<POINT>
 IntersectPlaneBox(const POINT& min, const POINT& max, 
                  const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
                  const double& tol = 1e-14){     
-    typedef _FunctorIntersectOrientLineUnitBox_<POINT> Functor;
-    return _OpLineBox<POINT, Functor>(min, max, a, b, alpha, tol);
+    typedef _FunctorIntersectOrientPlaneUnitBox_<POINT> Functor;
+    return _OpLineBox<POINT, Functor>(min, max, a, b, c, alpha, tol);
 }
 
 template<class POINT>

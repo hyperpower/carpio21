@@ -217,7 +217,7 @@ inline Orientation ToOrientation(const St& i) {
     return _M_;
 }
 
-enum Plane {
+enum CoorPlane {
     _XY_ = 24,
     _YZ_ = 48,
     _ZX_ = 40,

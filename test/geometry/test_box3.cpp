@@ -60,17 +60,6 @@ TEST(box, box3_vs_plane_plotly){
     std::cout << ToString(max1.max_axes()) << std::endl; 
     Plotly_ plotly;
 
-    // gnu.set_xrange(-0.25, 1.25);
-    // gnu.set_yrange(-0.25, 1.25);
-    // gnu.set_zrange(-0.25, 1.25);
-    // gnu.set_view(65,55,1.1);
-    // gnu.set_equal_aspect_ratio();
-    // gnu.set("set view equal xyz");
-    // gnu.set_ticslevel();
-    // gnu.set_terminal_png("./fig/line_box_normal3");
-    // auto spbox1 = ToPlotlyActor(box1);
-    // spbox1->style() = "with lines lw 2 lc 8";
-    // gnu.add(spbox1);
     auto abox = ToPlotlyActor(box1);
     abox.update("name", "box");
     abox.update("line_color", "black");
@@ -78,18 +67,21 @@ TEST(box, box3_vs_plane_plotly){
     plotly.add(abox);
     plotly.add(MakePlotlyCoordinateArrow<3>());
 
-    Plane_<double> plane(1.0, 1.0, 3.0, 1.5);
+    Plane_<double> plane(1.0, 1.0, 1.0, 3.0);
     std::cout << plane << std::endl;
 
     typedef std::array<double, 2> Arr2;
     auto ap = ToPlotlyActor(plane, Arr2{-2.0,2.0}, Arr2{-2.0,2.0});
-    ap.update("color", "red");
-    ap.update("name", "plane");
+    ap.update("color",  "red");
+    ap.update("name",   "plane");
     plotly.add(ap);
     
     _FunctorIntersectOrientPlaneUnitBox_<Point3> Functor;
     auto listp = Functor(plane.a(), plane.b(), plane.c(), plane.alpha());
     std::cout << "Return size : " << listp.size() << std::endl;
+    for (auto& p : listp){
+        std::cout << " " << p << " " << std::endl;
+    }
     PointChain pc(listp);
     plotly.add(ToPlotlyActor(pc));
     // plotly.add(ToPlotlyActor(listp, "vertex"));
@@ -122,7 +114,73 @@ TEST(box, box3_vs_plane_plotly){
     // plotly.layout("scene_camera_projection_type", "orthographic");
 
     // plotly.show();
+    // plotly.write("./fig/out", "html");
+    
+}
+
+TEST(box, box3_plane_plotly){
+    std::cout << "Initial box3d" << std::endl;
+    Point3 min1(0.3, 0.2, 0.4);
+    Point3 max1(1.4, 1.3, 1.6);
+    Box3 box1(min1, max1);
+    std::cout << "The box 1 is " << box1 << std::endl;
+
+    std::cout << ToString(max1.max_axes()) << std::endl; 
+    Plotly_ plotly;
+
+    auto abox = ToPlotlyActor(box1);
+    abox.update("name", "box");
+    abox.update("line_color", "black");
+    abox.update("line_width", 3.0);
+    plotly.add(abox);
+    plotly.add(MakePlotlyCoordinateArrow<3>());
+
+    Plane_<double> plane(-1.0, -1.1, -1.2, -3.5);
+    std::cout << plane << std::endl;
+
+    typedef std::array<double, 2> Arr2;
+    auto ap = ToPlotlyActor(plane, Arr2{-2.0,2.0}, Arr2{-2.0,2.0});
+    ap.update("color",  "red");
+    ap.update("name",   "plane");
+    plotly.add(ap);
+    
+    auto listp = IntersectPlaneBox(min1, max1, plane.a(), plane.b(), plane.c(), plane.alpha());
+    std::cout << "Return size : " << listp.size() << std::endl;
+    for (auto& p : listp){
+        std::cout << " " << p << " " << std::endl;
+    }
+    PointChain pc(listp);
+    plotly.add(ToPlotlyActor(pc));
+    // plotly.add(ToPlotlyActor(listp, "vertex"));
+    // plotly.title("a title name ");
+    plotly.margin(0, 0, 0, 0);
+    plotly.layout("width", 660.0);
+    plotly.layout("height", 400.0);
+    plotly.layout("scene_aspectmode", "cube");
+    plotly.layout("scene_xaxis_range", -0.5, 2.5);
+    plotly.layout("scene_yaxis_range", -0.5, 2.5);
+    plotly.layout("scene_zaxis_range", -0.5, 2.5);
+    plotly.layout("scene_xaxis_dtick", 0.5);
+    plotly.layout("scene_yaxis_dtick", 0.5);
+    plotly.layout("scene_zaxis_dtick", 0.5);
+    // plotly.layout_true("scene_xaxis_zeroline");
+    // plotly.layout_false("scene_xaxis_visible");
+    // plotly.layout("scene_xaxis_zerolinewidth" , 3);
+    // plotly.layout("scene_xaxis_zerolinecolor" , "black");
+
+    // plotly.layout_false("scene_yaxis_showgrid");
+    // plotly.layout_false("scene_zaxis_showgrid");
+    plotly.layout_false("scene_xaxis_showbackground");
+    plotly.layout("scene_xaxis_gridcolor",      "grey");
+    plotly.layout_false("scene_yaxis_showbackground");
+    plotly.layout("scene_yaxis_gridcolor",      "grey");
+    plotly.layout_false("scene_zaxis_showbackground");
+    plotly.layout("scene_zaxis_gridcolor",      "grey");
+    plotly.layout("scene_camera_eye_y", -2.0);
+    plotly.layout("scene_camera_eye_z", 0.5);
+    // plotly.layout("scene_camera_projection_type", "orthographic");
+
+    // plotly.show();
     plotly.write("./fig/out", "html");
     
-    // gnu.splot();
 }

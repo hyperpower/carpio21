@@ -54,7 +54,7 @@ public:
 		_min = o._min;
 		_max = o._max;
 	}
-	Box_(CV x_min, CV y_min, CV x_max, CV y_max) {
+	Box_(const CV& x_min, const CV& y_min, const CV& x_max, const CV& y_max) {
 		ASSERT(Dim == 2);
 		_min[0] = x_min;
 		_min[1] = y_min;

@@ -9,30 +9,7 @@ typedef Point_<double, 2>              Point2;
 typedef Segment_<double, 2>            Seg2;
 typedef Box_<double, 2>                Box2;
 typedef Line_<double>                  Line;
-typedef GGnuplotActor_<double, 2>      GA;
-typedef GGnuplotActorMaker_<double, 2> GAM;
 
-
-
-// Forware Declare
-int  LineBox(double a, double b, double alpha, const std::string& name);
-void BoxLinePositiveCase(int num_case, 
-                         double x, double y,
-                         double a, double b, double alpha);
-void BoxLinePNCase(int num_case, 
-                         double x, double y,
-                         double a, double b, double alpha);
-void RotateLineCutBox();
-
-int main(){
-    int r = LineBox(1.5, 1.0, 1.3, "line_box_normal");
-    LineBox(1.5, 1.0, 0.0, "line_box_corner");
-    LineBox(0.0, 1.0, 1.0, "line_box_edge");
-    RotateLineCutBox();
-    BoxLinePNCase(1, 1.3, 0.9,  1.5, 1.0, 1.1);
-    BoxLinePNCase(2, 1.3, 0.9, -1.5, -1.0, -1.5);
-
-}
 
 auto AddAxes(Gnuplot& gnu){
     gnu.set_label(10, "x",  0.45, -0.08, "textcolor rgb \"#00A4EF\"");
@@ -98,23 +75,6 @@ int LineBox(double a, double b, double alpha, const std::string& name){
     return 0;
 }
 
-void RotateLineCutBox(){
-    int n = 100;
-    Vt dt = 3.1415926 / double(n);
-    for(int i = 0; i<n; i++){
-        Vt x1 = 0.5, y1 = 0.5;
-        Vt r = 1;
-        Vt theta = i * dt;
-        Vt x2 = x1 + r * std::cos(theta);
-        Vt y2 = y1 + r * std::sin(theta);
-        Vt a = y1 - y2;
-        Vt b = x2 - x1;
-        Vt alpha = x2 * y1 - x1 * y2;
-
-        BoxLinePositiveCase(i, 1.1, 0.8, a, b, alpha);
-    }
-}
-
 void BoxLinePositiveCase(int num_case,
         double x, double y,
         double a, double b, double alpha) {
@@ -127,7 +87,6 @@ void BoxLinePositiveCase(int num_case,
     auto lspp = PositiveLineBox(min1, max1, line.a(), line.b(), line.alpha());
 
     Gnuplot gnu;
-    GAM gam;
     gnu.set_xrange(-0.5, 1.5);
     gnu.set_yrange(-0.5, 1.5);
     gnu.set_equal_aspect_ratio();
@@ -166,6 +125,25 @@ void BoxLinePositiveCase(int num_case,
     gnu.plot();
 }
 
+
+void RotateLineCutBox(){
+    int n = 100;
+    Vt dt = 3.1415926 / double(n);
+    for(int i = 0; i<n; i++){
+        Vt x1 = 0.5, y1 = 0.5;
+        Vt r = 1;
+        Vt theta = i * dt;
+        Vt x2 = x1 + r * std::cos(theta);
+        Vt y2 = y1 + r * std::sin(theta);
+        Vt a = y1 - y2;
+        Vt b = x2 - x1;
+        Vt alpha = x2 * y1 - x1 * y2;
+
+        BoxLinePositiveCase(i, 1.1, 0.8, a, b, alpha);
+    }
+}
+
+
 void BoxLinePNCase(int num_case,
         double x, double y,
         double a, double b, double alpha) {
@@ -179,7 +157,6 @@ void BoxLinePNCase(int num_case,
     auto lspn = NegativeLineBox(min1, max1, line.a(), line.b(), line.alpha());
 
     Gnuplot gnu;
-    GAM gam;
     gnu.set_xrange(-0.5, 1.5);
     gnu.set_yrange(-0.5, 1.5);
     gnu.set_equal_aspect_ratio();

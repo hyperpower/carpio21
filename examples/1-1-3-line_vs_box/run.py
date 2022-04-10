@@ -6,7 +6,9 @@ FILE_ORIGINAL = [
     "CMakeLists.txt",
     "plot.py",
     "run.py",
-    "report.rst"
+    "report.rst",
+    "line_box.h",
+    "plane_box.h"
 ]
 
 PATH_PYTOOLS  = os.path.abspath(os.path.join(__file__, "../../pytools"))

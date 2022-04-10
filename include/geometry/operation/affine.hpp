@@ -391,24 +391,9 @@ void _Reflect(PointTag, GEO& point, const Axes& axe, Dim3Tag){
 }
 template<class GEO> 
 void _Reflect(PointTag, GEO& point, const Axes& axe, const double& v){
-    typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
-    _Reflect(PointTag(), point, axe, v, DimTag());
+    point[axe] = -(point[axe] - v);
 }
-template<class GEO> 
-void _Reflect(PointTag, GEO& point, const Axes& axe, const double& v, Dim2Tag){
-    if (axe == _X_){
-        point[0] = -(point[0] - v);
-    }else if (axe == _Y_){
-        point[1] = -(point[1] - v);
-    }
-}
-template<class GEO> 
-void _Reflect(PointTag, GEO& point, const Axes& axe, const double& v, Dim3Tag){
-    Axes d1, d2;
-    NormalPlane(axe, d1, d2);
-    point[d1] = -(point[d1] - v);
-    point[d2] = -(point[d2] - v);
-}
+
 template<class GEO> 
 void _Reflect(PointTag, GEO& point){
     point = -point;

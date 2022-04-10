@@ -89,7 +89,9 @@ public:
     template<class Container_Point>
     PointChain_(const Container_Point& ver,
             bool closed = true) : _closed(closed){
-        std::copy(ver.begin(), ver.end(), std::back_inserter(_lpoints));
+        if (ver.size() > 0){
+            std::copy(ver.begin(), ver.end(), std::back_inserter(_lpoints));
+        }
     }
 
     void init(const Segment& s) {
