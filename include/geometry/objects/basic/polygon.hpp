@@ -1,5 +1,5 @@
-#ifndef _POINT_CHAIN_HPP_
-#define _POINT_CHAIN_HPP_
+#ifndef _POLYGON_HPP_
+#define _POLYGON_HPP_
 
 #include "geometry/geometry_define.hpp"
 #include "point_chain.hpp"

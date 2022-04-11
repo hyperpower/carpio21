@@ -545,7 +545,12 @@ Point_<TYPE, DIM> Between(
     }
     return res;
 }
-
+template<typename TYPE, St DIM>
+Point_<TYPE, DIM> Normalize(const Point_<TYPE, DIM>& a){
+    Point_<TYPE, DIM> res(a);
+    res.normalize();
+    return res;
+}
 //===============================================
 // Cross product (v1 - v4) . ((v2-v4) x (v3-v4))
 // for Point

@@ -43,9 +43,8 @@ public:
     void _open_read(fst& ins) {
         ins.open(this->_filename.c_str(), std::ifstream::in);
         if (!ins.is_open()) {
-            std::cerr << "!> Open file error! " << this->_filename.c_str()
-                    << std::endl;
-            exit(-1);
+            std::cerr << "!> Open file error! " << this->_filename.c_str() << std::endl;
+            throw std::invalid_argument("!> Open file \"" + this->_filename + "\" error");
         }
     }
 
@@ -54,7 +53,7 @@ public:
         if (!outs.is_open()) {
             std::cerr << "!> Open file error! " << this->_filename.c_str()
                     << std::endl;
-            exit(-1);
+            throw std::invalid_argument("!> Open file \"" + this->_filename + "\" error");
         }
     }
 
@@ -114,8 +113,7 @@ public:
     std::string get_config(const std::string& key) const {
         typename dict::const_iterator iter = this->_config.find(key);
         if (iter == this->_config.end()) {
-            ASSERT_MSG(false, "Not found key");
-            return "";
+            throw std::invalid_argument( "\"" + key + "\" not found");
         } else {
             return iter->second;
         }

@@ -6,14 +6,14 @@ This folder include all the examples for Carpio project.
 
 1. Geometry
    1. Basic Geometry Objects
-      1. :ballot_box_with_check: Point Location 
-      2. :ballot_box_with_check: Segments Intersection
-      3. :ballot_box_with_check: Line Box Intersection
-      4. :construction: Segment Triangle Intersection
-      5. :ballot_box_with_check: Point in Polygon
-      6. :construction: affine transformation
-      7. :construction: Triangles intersection
-      8. Distance and Closest Point
+      1. Point Position to Segment  :ballot_box_with_check:
+      2. Segments Intersection :ballot_box_with_check:
+      3. Line Box Intersection :ballot_box_with_check:
+      4. Segment Triangle Intersection :construction: 
+      5. Point in Polygon      :ballot_box_with_check:
+      6. Affine Transformation  :construction:
+      7. Triangles Intersection :construction:
+      8. Distance and Nearest Point 
       9. Polygon collision detection
       10. Polygon boolean
    2. Triangle Surface

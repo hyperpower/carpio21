@@ -371,7 +371,7 @@ public:
 
 template<class POINT, class FUNCTOR>
 std::list<POINT>
-_OpOrientLineUnitBox(const double& a, const double& b, const double& alpha,// Point max=(1,1)
+_Orient(const double& a, const double& b, const double& alpha,// Point max=(1,1)
                       const double& tol){     
     double na = std::abs(a);
     double nb = std::abs(b);
@@ -398,7 +398,7 @@ _OpOrientLineUnitBox(const double& a, const double& b, const double& alpha,// Po
 }
 template<class POINT, class FUNCTOR>
 std::list<POINT>
-_OpOrientLineUnitBox(const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
+_Orient(const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
                      const double& tol){
     double na = std::abs(a);
     double nb = std::abs(b);
@@ -432,7 +432,7 @@ _OpOrientLineUnitBox(const double& a, const double& b, const double& c, const do
 }
 template<class POINT, class FUNCTOR>
 std::list<POINT>
-_OpLineBox(const POINT& min, const POINT& max, 
+_TranslateAndScale(const POINT& min, const POINT& max, 
             const double& a, const double& b, const double& alpha,// Point max=(1,1)
             const double& tol){ 
     Line_<double> line(a, b, alpha);
@@ -444,7 +444,7 @@ _OpLineBox(const POINT& min, const POINT& max,
     Translate(line, -min);
     Scale(line, inv_scale);
 
-    auto res = _OpOrientLineUnitBox<POINT, FUNCTOR>(line.a(), line.b(), line.alpha(), tol);
+    auto res = _Orient<POINT, FUNCTOR>(line.a(), line.b(), line.alpha(), tol);
     
     Scale(res, arr_scale);
     Translate(res, min);
@@ -453,7 +453,7 @@ _OpLineBox(const POINT& min, const POINT& max,
 }
 template<class POINT, class FUNCTOR>
 std::list<POINT>
-_OpLineBox(const POINT& min, const POINT& max, 
+_TranslateAndScale(const POINT& min, const POINT& max, 
             const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
             const double& tol){ 
     Plane_<double> plane(a, b, c, alpha);
@@ -465,7 +465,7 @@ _OpLineBox(const POINT& min, const POINT& max,
     Translate(plane,  -min);
     Scale(plane, inv_scale);
 
-    auto res = _OpOrientLineUnitBox<POINT, FUNCTOR>(plane.a(), plane.b(), plane.c(), plane.alpha(), tol);
+    auto res = _Orient<POINT, FUNCTOR>(plane.a(), plane.b(), plane.c(), plane.alpha(), tol);
     
     Scale(res, arr_scale);
     Translate(res, min);
@@ -478,7 +478,7 @@ IntersectLineBox(const POINT& min, const POINT& max,
                  const double& a, const double& b, const double& alpha,// Point max=(1,1)
                  const double& tol = 1e-14){     
     typedef _FunctorIntersectOrientLineUnitBox_<POINT> Functor;
-    return _OpLineBox<POINT, Functor>(min, max, a, b, alpha, tol);
+    return _TranslateAndScale<POINT, Functor>(min, max, a, b, alpha, tol);
 }
 template<class POINT>
 std::list<POINT>
@@ -486,7 +486,7 @@ IntersectPlaneBox(const POINT& min, const POINT& max,
                  const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
                  const double& tol = 1e-14){     
     typedef _FunctorIntersectOrientPlaneUnitBox_<POINT> Functor;
-    return _OpLineBox<POINT, Functor>(min, max, a, b, c, alpha, tol);
+    return _TranslateAndScale<POINT, Functor>(min, max, a, b, c, alpha, tol);
 }
 
 template<class POINT>
@@ -495,7 +495,7 @@ NegativeLineBox(const POINT& min, const POINT& max,
                  const double& a, const double& b, const double& alpha,// Point max=(1,1)
                  const double& tol = 1e-14){     
     typedef _FunctorNegativeOrientLineUnitBox_<POINT> Functor;
-    return _OpLineBox<POINT, Functor>(min, max, a, b, alpha, tol);
+    return _TranslateAndScale<POINT, Functor>(min, max, a, b, alpha, tol);
 }
 template<class POINT>
 std::list<POINT>
@@ -503,7 +503,7 @@ PositiveLineBox(const POINT& min, const POINT& max,
                  const double& a, const double& b, const double& alpha,// Point max=(1,1)
                  const double& tol = 1e-14){     
     typedef _FunctorPositiveOrientLineUnitBox_<POINT> Functor;
-    return _OpLineBox<POINT, Functor>(min, max, a, b, alpha, tol);
+    return _TranslateAndScale<POINT, Functor>(min, max, a, b, alpha, tol);
 }
 
 // Tools for VOF

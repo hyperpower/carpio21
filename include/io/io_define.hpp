@@ -22,6 +22,7 @@
 #include <sstream>
 #include <list>
 #include <map>
+#include <algorithm>
 
 namespace carpio {
 template<class V1>
@@ -149,6 +150,30 @@ inline std::string ToString(const Orientation& o) {
 		case _C_: {return "C"; break;}
 	}
 }
+
+//
+//  Lowercases string
+//
+template <typename T>
+std::basic_string<T> ToLowerCase(const std::basic_string<T>& s)
+{
+    std::basic_string<T> s2 = s;
+    std::transform(s2.begin(), s2.end(), s2.begin(), tolower);
+    return s2;
+}
+
+//
+// Uppercases string
+//
+template <typename T>
+std::basic_string<T> ToUpperCase(const std::basic_string<T>& s)
+{
+    std::basic_string<T> s2 = s;
+    std::transform(s2.begin(), s2.end(), s2.begin(), toupper);
+    return s2;
+}
+
+
 
 inline std::string GetWorkingPath()
 {
