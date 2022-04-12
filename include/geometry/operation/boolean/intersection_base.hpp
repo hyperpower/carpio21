@@ -31,21 +31,21 @@ inline Vt SquareSum(VEC& vec){
 }
 
 
-template<class VEC>
-inline short WhichSide32D(const VEC& v1, const VEC& v2, const VEC& v3){
-    /// d1    = v1 - v3
-    /// d2    = v2 - v3
-    /// cross = d1x * d2y - d1y * d2x
-    double res = ((v1[0] - v3[0]) * (v2[1] - v3[1])
-                - (v2[0] - v3[0]) * (v1[1] - v3[1]));
-    if (res < 0){
-        return 2;
-    }else if (res > 0){
-        return 1;
-    }else{
-        return 0;
-    }
-}
+// template<class VEC>
+// inline short WhichSide32D(const VEC& v1, const VEC& v2, const VEC& v3){
+//     /// d1    = v1 - v3
+//     /// d2    = v2 - v3
+//     /// cross = d1x * d2y - d1y * d2x
+//     double res = ((v1[0] - v3[0]) * (v2[1] - v3[1])
+//                 - (v2[0] - v3[0]) * (v1[1] - v3[1]));
+//     if (res < 0){
+//         return 2;
+//     }else if (res > 0){
+//         return 1;
+//     }else{
+//         return 0;
+//     }
+// }
 
 template<typename TYPE, St DIM>
 struct IntersectionReturn_{

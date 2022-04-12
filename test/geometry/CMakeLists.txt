@@ -15,7 +15,8 @@ set(Sources
     # test_tri_tri.cpp
     # test_seg_tri.cpp
     # test_predicate.cpp
-    test_polygon_partition.cpp
+    # test_polygon_partition.cpp
+    test_segment.cpp
 )
 find_package(Python COMPONENTS Interpreter Development)
 

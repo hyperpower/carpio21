@@ -5,12 +5,10 @@
  *      Author: zhou
  */
 
-#ifndef GEOMETRY_TEST_SEGMENT_HPP_
-#define GEOMETRY_TEST_SEGMENT_HPP_
 #include "geometry/geometry.hpp"
 #include "gtest/gtest.h"
 
-namespace carpio {
+using namespace carpio;
 
 typedef Point_<double, 3> Point3;
 typedef Point_<double, 2> Point2;
@@ -39,7 +37,7 @@ TEST(segment, segment_plot){
 	std::cout << "Point y = " << y << std::endl;
 
 	Seg2 seg(x, y);
-Gnuplot gnu;
+	Gnuplot gnu;
 	gnu.add(GA::LinesPoints(seg));
 //	gnu.plot();
 	std::cout << "The segemnt is " << seg << std::endl;
@@ -81,7 +79,7 @@ TEST(segment, intersection){
 	std::cout << "new point         : "<< np << std::endl;
 
 	Gnuplot gnu;
-    gnu.set_terminal_png("./plot/line_segment_1.png");
+    gnu.set_terminal_png("./fig/line_segment_1.png");
 	gnu.set_xrange(-5, 5);
 	gnu.set_yrange(-5, 5);
 	gnu.set_label(1, strtype, -4.5, 4);
@@ -107,7 +105,7 @@ TEST(segment, intersection2){
 	std::cout << "new point         : "<< np << std::endl;
 
 	Gnuplot gnu;
-    gnu.set_terminal_png("./plot/line_segment_2.png");
+    gnu.set_terminal_png("./fig/line_segment_2.png");
 	gnu.set_xrange(-5, 5);
 	gnu.set_yrange(-5, 5);
 	gnu.set_label(1, strtype, -4.5, 4);
@@ -132,7 +130,7 @@ TEST(segment, intersection3){
 	std::cout << "new point         : "<< np << std::endl;
 
 	Gnuplot gnu;
-    gnu.set_terminal_png("./plot/line_segment_3.png");
+    gnu.set_terminal_png("./fig/line_segment_3.png");
 	gnu.set_xrange(-5, 5);
 	gnu.set_yrange(-5, 5);
 	gnu.set_label(1, strtype, -4.5, 4);
@@ -142,11 +140,3 @@ TEST(segment, intersection3){
 	gnu.plot();
 }
 
-
-
-
-
-
-
-} //end namespace
-#endif

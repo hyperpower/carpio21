@@ -188,6 +188,20 @@ struct HasBeginEnd
     static bool const beg_value = sizeof(f<T>(0)) == 1;
     static bool const end_value = sizeof(g<T>(0)) == 1;
 };
+template <typename C>
+struct HasData
+{
+    typedef char yes;
+    typedef long no;
+
+    template<class T>
+    static yes has_data(int i,
+            typename T::value_type* = C().data());
+    template<class T>
+    static no has_data(...);
+
+    static bool const value = sizeof(has_data<C>(0)) == sizeof(yes);
+};
 
 template<typename T> 
 struct IsContainer : std::integral_constant<bool, 

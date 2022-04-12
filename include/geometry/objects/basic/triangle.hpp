@@ -325,8 +325,7 @@ protected:
             pc().z() = 0.0;
         }
     }
-}
-;
+};
 
 }
 #endif

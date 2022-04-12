@@ -2,7 +2,8 @@
 #ifndef _GEO_OPERATION_
 #define _GEO_OPERATION_
 
-#include <algorithm>
+#include "geometry/operation/operation_define.hpp"
+
 
 namespace carpio{
 
