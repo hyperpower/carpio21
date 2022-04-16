@@ -14,8 +14,9 @@ This folder include all the examples for Carpio project.
       6. Affine Transformation  :construction:
       7. Triangles Intersection :construction:
       8. Distance and Nearest Point 
-      9. Polygon collision detection
-      10. Polygon boolean
+      9. Polygon Partition
+      10. Polygon collision detection
+      11. Polygon boolean
    2. Triangle Surface
       1. Build triangle surface
       2. Delauney Triangulation

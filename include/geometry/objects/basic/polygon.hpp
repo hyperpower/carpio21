@@ -27,12 +27,15 @@ public:
 	typedef typename Base::const_iterator const_iterator;
 	typedef typename Base::reference reference;
 	typedef typename Base::const_reference const_reference;
-	typedef Operation_<TYPE, DIM> Op;
-	typedef Point value_type;
+	// typedef Operation_<TYPE, DIM> Op;
+	typedef TYPE value_type;
 
 
-	Polygon_() :
-				Base() {
+	Polygon_() : Base() {
+		this->_closed = true;
+	}
+
+	Polygon_(const Base& base): Base(base){
 		this->_closed = true;
 	}
 

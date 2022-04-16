@@ -1,5 +1,5 @@
 #include "geometry/geometry.hpp"
-// #include "geometry/operation/polygon_partition.hpp"
+#include "geometry/operation/polygon_partition.hpp"
 #include "utility/tinyformat.hpp"
 #include "geometry/io/gplotly_actor.hpp"
 #include "gtest/gtest.h"
@@ -12,7 +12,7 @@ typedef Segment_<double, 2> Seg2;
 typedef Box_<double, 2>     Box2;
 typedef Box_<double, 3>     Box3;
 typedef Line_<double>       Line;
-// typedef PolygonPartition_<Point2> PP;
+typedef PolygonPartition_<double, 2> PP;
 
 typedef PointChain_<double, 2> PointChain;
 //typedef GGnuplotActor_<double, 2> GA;
@@ -23,20 +23,46 @@ TEST(bezier, mkdir){
     MakeDir("./fig/");
 }
 
+TEST(partition, orient_test1){
+    Point2 p1(0.0,0.0);
+    Point2 p2(1.0,0.0);
+    Point2 p3(0.0,1.0);
+    Point2 p(-0.1,0.1);
+
+    std::cout << "p1 = " << p1 << std::endl;
+    std::cout << "p2 = " << p2 << std::endl;
+    std::cout << "p3 = " << p3 << std::endl;
+
+    PP pp;
+    std::cout << "is convex = " << pp.is_convex(p1, p2, p3) << std::endl;
+    ASSERT_EQ(pp.is_convex(p1, p2, p3), true);
+    std::cout << "is convex = " << pp.is_convex(p2, p1, p3) << std::endl;
+    ASSERT_EQ(pp.is_convex(p2, p1, p3), false);
+    std::cout << "in cone   = " << p  << "  " << pp.in_cone(p1, p2, p3, p) << std::endl;
+    p = {0.1, 0.1};
+    std::cout << "in cone   = " << p  << "  " << pp.in_cone(p1, p2, p3, p) << std::endl;
+}
+
+
 TEST(partition, test1){
     auto pc = ReadFile<PointChain>("./test/input_files/examplepolygon");
 
     std::cout << "PointChain size = " << pc.size() << std::endl;
-    std::cout << "PointChain size = " << pc.get(0) << std::endl;
 
-    // PP partition;
-    // partition.new_partition_vertex(pc);
+    std::cout << "Poly size = " << pc.size() << std::endl;
+    PP partition;
+    std::list<PointChain> res;
+    partition.ear_clipping(pc, res);
+    
+
+    std::cout << "Res size = " << res.size() << std::endl;
 
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/point_chain_partition");
 	// gnu.set_xrange(100, 1000);
 	// gnu.set_yrange(100, 1000);
 	gnu.add(ToGnuplotActor(pc));
+	gnu.add(ToGnuplotActor(res));
 	gnu.plot();
 }
 

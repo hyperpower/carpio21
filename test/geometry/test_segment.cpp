@@ -32,13 +32,13 @@ TEST(segment, segment_initial){
 TEST(segment, segment_plot){
 	Point2 x(1, 0);
 	Point2 y(0, 1);
-	std::cout << "Initial three points and output/n";
+	std::cout << "Initial three points and output" << std::endl;
 	std::cout << "Point x = " << x << std::endl;
 	std::cout << "Point y = " << y << std::endl;
 
 	Seg2 seg(x, y);
 	Gnuplot gnu;
-	gnu.add(GA::LinesPoints(seg));
+	gnu.add(ToGnuplotActor(seg));
 //	gnu.plot();
 	std::cout << "The segemnt is " << seg << std::endl;
 	ASSERT_EQ(seg.ps(), x);
@@ -52,15 +52,11 @@ TEST(segment, segment_point_location){
 
 	Point2 p(0.0, 1.50);
 
-	Gnuplot gnu;
-	gnu.add(GA::Points(p));
-	gnu.add(GA::LinesPoints(seg));
-//	gnu.plot();
 	std::cout << "The segemnt is :" << seg << std::endl;
 	std::cout << "The point is   :" << p << std::endl;
 	auto side = OnWhichSide7(seg, p);
 	std::cout << "Position       :" << ToString(side) << std::endl;
-//	ASSERT_EQ(side, _PS_RIGHT_);
+	ASSERT_EQ(side, _PS_OUT_END_);
 }
 
 TEST(segment, intersection){
@@ -83,8 +79,8 @@ TEST(segment, intersection){
 	gnu.set_xrange(-5, 5);
 	gnu.set_yrange(-5, 5);
 	gnu.set_label(1, strtype, -4.5, 4);
-	gnu.add(GA::LinesPoints(seg1, 0));
-	gnu.add(GA::LinesPoints(seg2, 1));
+	gnu.add(ToGnuplotActor(seg1));
+	gnu.add(ToGnuplotActor(seg2).line_color(1));
 	gnu.add(GA::Points(np, 3));
 	gnu.plot();
 }
@@ -109,9 +105,9 @@ TEST(segment, intersection2){
 	gnu.set_xrange(-5, 5);
 	gnu.set_yrange(-5, 5);
 	gnu.set_label(1, strtype, -4.5, 4);
-	gnu.add(GA::LinesPoints(seg1, 0));
-	gnu.add(GA::LinesPoints(seg2, 1));
-	gnu.add(GA::Points(np, 3));
+	gnu.add(ToGnuplotActor(seg1).line_color(0));
+	gnu.add(ToGnuplotActor(seg2).line_color(1));
+	gnu.add(ToGnuplotActor(np));
 	gnu.plot();
 }
 TEST(segment, intersection3){
@@ -134,9 +130,9 @@ TEST(segment, intersection3){
 	gnu.set_xrange(-5, 5);
 	gnu.set_yrange(-5, 5);
 	gnu.set_label(1, strtype, -4.5, 4);
-	gnu.add(GA::LinesPoints(seg1, 0));
-	gnu.add(GA::LinesPoints(seg2, 1));
-	gnu.add(GA::Points(np, 3));
+	gnu.add(ToGnuplotActor(seg1));
+	gnu.add(ToGnuplotActor(seg2).line_color(1));
+	gnu.add(ToGnuplotActor(np));
 	gnu.plot();
 }
 

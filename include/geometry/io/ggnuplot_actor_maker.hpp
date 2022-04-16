@@ -316,8 +316,9 @@ template<typename ANY,
         bool>::type = true>
 auto ToGnuplotActor(const ANY& geo){
     typedef std::shared_ptr<GnuplotActor> spActor;
-    spActor actor = spActor(new GnuplotActor());
-    MakeGnuplotActor(*actor, geo, ANY::Tag());    
+    // spActor actor = spActor(new GnuplotActor());
+    GnuplotActor actor;
+    MakeGnuplotActor(actor, geo, ANY::Tag());    
     return actor;
 }
 template<typename ANY, typename CONTAINER,
@@ -327,8 +328,9 @@ template<typename ANY, typename CONTAINER,
         bool>::type = true>
 auto ToGnuplotActor(const ANY& geo, const CONTAINER& con){
     typedef std::shared_ptr<GnuplotActor> spActor;
-    spActor actor = spActor(new GnuplotActor());
-    MakeGnuplotActor(*actor, geo, con,ANY::Tag());    
+    // spActor actor = spActor(new GnuplotActor());
+    GnuplotActor actor;
+    MakeGnuplotActor(actor, geo, con,ANY::Tag());    
     return actor;
 }
 template<typename ANY,
@@ -337,8 +339,9 @@ template<typename ANY,
         bool>::type = true>
 auto ToGnuplotActorAsVector(const ANY& geo){
     typedef std::shared_ptr<GnuplotActor> spActor;
-    spActor actor = spActor(new GnuplotActor());
-    MakeGnuplotActorAsVector(*actor, geo, ANY::Tag());    
+    // spActor actor = spActor(new GnuplotActor());
+    GnuplotActor actor;
+    MakeGnuplotActorAsVector(actor, geo, ANY::Tag());    
     return actor;
 }
 // template<class ANY, class VALUE,
@@ -362,6 +365,7 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& point, PointTag){
 
     actor.data().push_back("");
 }
+
 template<typename ANY, typename CONTAINER, 
           typename std::enable_if<std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
 void MakeGnuplotActor(GnuplotActor& actor, const ANY& line, const CONTAINER& con, LineTag){
@@ -486,7 +490,11 @@ template<class ANY,
             >::value, 
         bool>::type = true>
 auto ToGnuplotActor(const ANY& any) {
-    
+    GnuplotActor actor;
+    for (auto& geo : any){
+        MakeGnuplotActor(actor, geo, ANY::value_type::Tag());
+    }    
+    return actor;
 }
 
 }

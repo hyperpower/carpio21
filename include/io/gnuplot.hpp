@@ -33,26 +33,43 @@ namespace carpio {
 //
 class GnuplotActor {
 protected:
+    typedef std::list<std::string> ListString;
+    typedef std::shared_ptr<std::list<std::string> > spListString;
     std::string _scmd;  //style comand
     std::string _pcmd;  //plot command
-    std::list<std::string> _data;
+    spListString _data;
 public:
     friend class Gnuplot;
     /*
      *  Constructor
      */
     GnuplotActor() :
-            _scmd(""), _pcmd(""), _data() {
+            _scmd(""), _pcmd("") {
+        _data = std::make_shared<ListString>();
     }
-    GnuplotActor(const std::string& pcmd, const std::list<std::string>& data) :
-            _scmd(""), _pcmd(pcmd), _data(data) {
+    GnuplotActor(const std::string& pcmd, const ListString& data) :
+            _scmd(""), _pcmd(pcmd) {
+        _data = std::make_shared<ListString>(data);
     }
     GnuplotActor(const std::string& pcmd, const std::string& scmd,
             const std::list<std::string>& data) :
-            _scmd(scmd), _pcmd(pcmd), _data(data) {
+            _scmd(scmd), _pcmd(pcmd) {
+        _data = std::make_shared<ListString>(data);
     }
     GnuplotActor(const GnuplotActor& ga) :
             _scmd(ga._scmd), _pcmd(ga._pcmd), _data(ga._data) {
+    }
+    GnuplotActor(const GnuplotActor&& ga) :
+            _scmd(std::move(ga._scmd)), _pcmd(std::move(ga._pcmd)), _data(std::move(ga._data)) {
+    }
+    GnuplotActor& operator=(const GnuplotActor &other) {
+        if (this == &other) {
+            return *this;
+        }
+        this->_scmd = other._scmd;
+        this->_pcmd = other._pcmd;
+        this->_data = other._data;
+        return *this;
     }
     /*
      *  is empty
@@ -74,6 +91,10 @@ public:
     std::string& command() {
         return _pcmd;
     }
+    std::string& command(const std::string& input) {
+        this->_pcmd = input;
+        return _scmd;
+    }
     const std::string& command() const {
         return _pcmd;
     }
@@ -88,42 +109,50 @@ public:
         return _scmd;
     }
     std::list<std::string>& data() {
-        return _data;
+        return *_data;
     }
     const std::list<std::string>& data() const {
-        return _data;
+        return *_data;
     }
     void clear() {
         _pcmd = "";
         _scmd = "";
-        _data.clear();
+        _data->clear();
     }
     void show_command() const {
         std::cout << "Actor plot  command : " << _pcmd << "\n";
         std::cout << "Actor style command : " << _scmd << "\n";
     }
     void show_data() const {
-        for (std::list<std::string>::const_iterator ci = _data.begin();
-                ci != _data.end(); ++ci) {
+        for (std::list<std::string>::const_iterator ci = _data->begin();
+                ci != _data->end(); ++ci) {
             std::cout << (*ci) << std::endl;
         }
     }
     // set
-    void set_using(int num){
+    GnuplotActor set_using(int num){
         assert(num >=2 );
         std::string value = "1";
         for(short i = 2 ; i <= num ; i++){
             value += ":" + ToString(i);
         }
         this->_set_cmd(this->_pcmd, "using", value, 1);
+        return *this;
     }
 
-    void set_title(const std::string& title){
+    GnuplotActor& title(const std::string& title){
         this->_set_cmd(this->_pcmd, "title", title);
+        return *this;
     }
 
-    void set_point_size(const int& size){
+    GnuplotActor& point_size(const int& size){
         this->_set_cmd(this->_scmd, "pointsize", ToString(size));
+        return *this;
+    }
+
+    GnuplotActor& line_color(const int& idx){
+        this->_set_cmd(this->_scmd, "lc", ToString(idx));
+        return *this;
     }
 
 
@@ -878,8 +907,8 @@ public:
         cmd(sst.str());
         sst.str("");
         cmd("\n");
-        for (std::list<std::string>::const_iterator iter = actor._data.begin();
-                iter != actor._data.end(); ++iter) {
+        for (std::list<std::string>::const_iterator iter = actor._data->begin();
+                iter != actor._data->end(); ++iter) {
             sst << (*iter);
             cmd(sst.str());
             sst.str("");
@@ -986,8 +1015,8 @@ public:
         cmd(sst.str());
         sst.str("");
         cmd("\n");
-        for (std::list<std::string>::const_iterator iter = actor._data.begin();
-                iter != actor._data.end(); ++iter) {
+        for (std::list<std::string>::const_iterator iter = actor._data->begin();
+                iter != actor._data->end(); ++iter) {
             sst << (*iter);
             cmd(sst.str());
             sst.str("");
@@ -1029,8 +1058,8 @@ public:
 
     Gnuplot& output_inline_data(const GnuplotActor& actor) {
         std::ostringstream sst;
-        for (std::list<std::string>::const_iterator iter = actor._data.begin();
-                iter != actor._data.end(); ++iter) {
+        for (std::list<std::string>::const_iterator iter = actor._data->begin();
+                iter != actor._data->end(); ++iter) {
             sst << (*iter);
             cmd(sst.str());
             sst.str("");
@@ -1042,6 +1071,10 @@ public:
     // inner actors
     Gnuplot& add(spActor actor){
         this->_actors.push_back(actor);
+        return *this;
+    }
+    Gnuplot& add(const GnuplotActor& actor){
+        this->_actors.push_back(std::make_shared<GnuplotActor>(actor));
         return *this;
     }
     Gnuplot& clear(){
