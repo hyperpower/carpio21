@@ -9,7 +9,7 @@
 namespace carpio {
 template<typename NUM>
 inline NUM CalculateX(const NUM& a, const NUM& b, const NUM& c, const NUM& alpha,  // The line
-               const NUM& y, const NUM& z,                                            // Y = value
+               const NUM& y, const NUM& z,                                         // Y = value
                const NUM& s = 1e-10){
     if(std::abs(a) < s){
         return (alpha - y * b - z * c) / s;
@@ -19,7 +19,7 @@ inline NUM CalculateX(const NUM& a, const NUM& b, const NUM& c, const NUM& alpha
 }
 template<typename NUM>
 inline NUM CalculateY(const NUM& a, const NUM& b, const NUM& c, const NUM& alpha,  // The line
-               const NUM& z, const NUM& x,                                            // Y = value
+               const NUM& z, const NUM& x,                                         // Y = value
                const NUM& s = 1e-10){
     if(std::abs(b) < s){
         return (alpha - x * a - z * c) / s;
@@ -29,7 +29,7 @@ inline NUM CalculateY(const NUM& a, const NUM& b, const NUM& c, const NUM& alpha
 }
 template<typename NUM>
 inline NUM CalculateZ(const NUM& a, const NUM& b, const NUM& c, const NUM& alpha,  // The line
-               const NUM& x, const NUM& y,                                            // Y = value
+               const NUM& x, const NUM& y,                                         // Y = value
                const NUM& s = 1e-10){
     if(std::abs(c) < s){
         return (alpha - x * a - y * b) / s;
@@ -66,12 +66,14 @@ public:
     Plane_() :
             std::array<vt, 4>() {
     }
+    // direct assign
     Plane_(const vt& a, const vt& b, const vt& c, const vt& alpha) {
         this->at(0) = a;
         this->at(1) = b;
         this->at(2) = c;
         this->at(3) = alpha;
     }
+    // a point and normal vector
     Plane_(const vt& x, const vt& y,    const vt& z,
            const vt& nx, const vt& ny,  const vt& nz) {
         //assert(!isEqual(ax, bx) || !isEqual(ay,by));

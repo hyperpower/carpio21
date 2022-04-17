@@ -218,7 +218,7 @@ ANY _ReadLines(const TextFile& tf, PointChainTag){
         /// data line
         std::vector<std::string> tokens_d;
         Tokenize(line, tokens_d, ",");
-        pc.push_back(_ParseLineAs<typename ANY::value_type, ANY::Dim>(tokens_d, PointTag()));
+        pc.push_back(_ParseLineAs<typename ANY::value_type::value_type, ANY::Dim>(tokens_d, PointTag()));
     }
     try{
         if( 1 ==  std::stoi(tf.get_config("Closed")))

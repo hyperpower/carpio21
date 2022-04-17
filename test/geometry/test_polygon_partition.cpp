@@ -12,7 +12,7 @@ typedef Segment_<double, 2> Seg2;
 typedef Box_<double, 2>     Box2;
 typedef Box_<double, 3>     Box3;
 typedef Line_<double>       Line;
-typedef PolygonPartition_<double, 2> PP;
+typedef PolygonPartition_<Point2> PP;
 
 typedef PointChain_<double, 2> PointChain;
 //typedef GGnuplotActor_<double, 2> GA;
@@ -41,6 +41,9 @@ TEST(partition, orient_test1){
     std::cout << "in cone   = " << p  << "  " << pp.in_cone(p1, p2, p3, p) << std::endl;
     p = {0.1, 0.1};
     std::cout << "in cone   = " << p  << "  " << pp.in_cone(p1, p2, p3, p) << std::endl;
+
+    std::array<double, 3> ap{1.0,1.2,1.3};
+    Normalize(ap);
 }
 
 
@@ -51,18 +54,24 @@ TEST(partition, test1){
 
     std::cout << "Poly size = " << pc.size() << std::endl;
     PP partition;
-    std::list<PointChain> res;
+    typename PP::ListTri res;
     partition.ear_clipping(pc, res);
     
-
     std::cout << "Res size = " << res.size() << std::endl;
 
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/point_chain_partition");
 	// gnu.set_xrange(100, 1000);
 	// gnu.set_yrange(100, 1000);
-	gnu.add(ToGnuplotActor(pc));
-	gnu.add(ToGnuplotActor(res));
+	// gnu.add(ToGnuplotActor(pc));
+    int c = 1;
+    for(auto& t : res){
+        std::cout << "Tri count = " << c <<std::endl;
+	    auto tactor = ToGnuplotActor(t, 0);
+        tactor.style("with lines lc "+ ToString(c));
+        gnu.add(tactor);
+        c++;
+    }
 	gnu.plot();
 }
 

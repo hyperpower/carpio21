@@ -484,11 +484,10 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& pc, PointChainTag){
 // Geomentry objects in container entry
 template<class ANY, 
         typename std::enable_if<
-            std::integral_constant< bool, 
-                   IsContainer<ANY>::value 
+                   (! IsGeometry<ANY>::value)
+                && IsContainer<ANY>::value 
                 && IsGeometry<typename ANY::value_type>::value
-            >::value, 
-        bool>::type = true>
+        , bool>::type = true>
 auto ToGnuplotActor(const ANY& any) {
     GnuplotActor actor;
     for (auto& geo : any){
@@ -496,6 +495,32 @@ auto ToGnuplotActor(const ANY& any) {
     }    
     return actor;
 }
+template<class ANY, 
+        typename std::enable_if<
+                   (! IsGeometry<ANY>::value)
+                && IsContainer<ANY>::value 
+                && std::is_pointer<typename ANY::value_type>::value
+                && IsGeometry<typename std::remove_pointer<typename ANY::value_type>::type>::value
+        , bool>::type = true>
+auto ToGnuplotActor(const ANY& any, unsigned int jump = 1) {
+    typedef typename ANY::value_type pType;
+    typedef typename std::remove_pointer<pType>::type Type;
+    GnuplotActor actor;
+    int count = 0;
+    for (auto& geo : any){
+        MakeGnuplotActor(actor, *geo, Type::Tag());
+        if(jump > 0){
+            if((count % jump == 0)){
+                ++count;
+                continue;
+            }
+        }
+        actor.data().pop_back();
+        ++count;
+    }    
+    return actor;
+}
+
 
 }
 

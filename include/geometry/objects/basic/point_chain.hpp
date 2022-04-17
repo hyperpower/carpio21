@@ -49,7 +49,7 @@ public:
     typedef typename std::list<Point>::const_iterator const_iterator;
     typedef typename std::list<Point>::reference reference;
     typedef typename std::list<Point>::const_reference const_reference;
-    typedef TYPE value_type;  // < except for this one 
+    typedef Point value_type;  // < except for this one 
 
     typedef TYPE CV;
 

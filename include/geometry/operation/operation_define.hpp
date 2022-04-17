@@ -27,22 +27,5 @@ double Orient(
         const ARR& v4) {
     return exact::orient3d(v1.data(), v2.data(), v3.data(), v4.data());
 }
-template<typename ARR,  
-          typename std::enable_if<
-                IsContainer<ARR>::value
-             && std::arithmatic<typename ARR::value>::value, bool>::type = true>
-void Normailize(ARR& arr) {
-    typename ARR::value n = 0;
-    for (auto& v : arr) {
-        n += double(v * v);
-    }
-    n = std::sqrt(n);
-    for (auto& v : arr) {
-        if (n != 0) {
-            v /= n;
-        } else {
-            v = 0;
-        }
-    }
-}
+
 #endif

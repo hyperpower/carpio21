@@ -11,7 +11,26 @@
 namespace carpio {
 
 struct PointTag: public GeometryTag {};
+struct PointViewOnYZTag: public PointTag {};
 
+template<class CONTAINER, 
+         typename std::enable_if<
+            IsContainer<CONTAINER>::value
+        &&  std::is_arithmetic_v<typename CONTAINER::value_type>, bool>::type = true>
+void Normalize(CONTAINER& con){
+    double n = 0;
+    for (auto& v : con) {
+        n += double(v * v);
+    }
+    n = std::sqrt(n);
+    for (auto& v : con) {
+        if (n != 0) {
+            v /= n;
+        } else {
+            v = 0;
+        }
+    }
+}
 //Point T ====================================
 template<typename TYPE, St DIM>
 class Point_: public std::array<TYPE, DIM> {
@@ -97,6 +116,14 @@ public:
         } else {
             return 0;
         }
+    }
+    bool is_zero(){
+        for(auto& v : *this){
+            if (v != 0 ){
+                return false;
+            }
+        }
+        return true;
     }
 
     void set(Axes a, Vt value){
@@ -293,18 +320,7 @@ public:
      *  Normalize the point as a vector from (0,0,0) to this point.
      */
     void normalize() {
-        double n = 0;
-        for (St i = 0; i < Dim; i++) {
-            n += double(this->at(i) * this->at(i));
-        }
-        n = std::sqrt(n);
-        for (St i = 0; i < Dim; i++) {
-            if (n != 0) {
-                this->at(i) /= n;
-            } else {
-                this->at(i) = 0;
-            }
-        }
+        Normalize(*this);
     }
     inline size_type size() const {
         return size_type(Dim);
@@ -545,12 +561,8 @@ Point_<TYPE, DIM> Between(
     }
     return res;
 }
-template<typename TYPE, St DIM>
-Point_<TYPE, DIM> Normalize(const Point_<TYPE, DIM>& a){
-    Point_<TYPE, DIM> res(a);
-    res.normalize();
-    return res;
-}
+
+
 //===============================================
 // Cross product (v1 - v4) . ((v2-v4) x (v3-v4))
 // for Point
@@ -579,7 +591,14 @@ double Orient(
     SHOULD_NOT_REACH;
     return 0.0;
 }
+template<typename TYPE>
+Point_<TYPE, 3> Cross(const Point_<TYPE, 3>& a, const Point_<TYPE, 3>& b){
+    auto _x = a.y() * b.z() - a.z() * b.y();
+    auto _y = a.z() * b.x() - a.x() * b.z();
+    auto _z = a.x() * b.y() - a.y() * b.x();
 
+    return {_x, _y, _z};
+}
 // 1D
 template<typename TYPE>
 Trinary OnWhichSide3(
@@ -626,6 +645,19 @@ Trinary OnWhichSide3(
     }
 }
 
+template<class POINT, class TAG>
+class PointView{};
+
+template<class POINT>
+class PointView<POINT, PointViewOnYZTag>{
+public:
+    typedef PointViewOnYZTag Tag;
+    typedef POINT            Point;
+protected:
+    const Point* _p;
+public:
+    
+};
 
 
 } //end namespace

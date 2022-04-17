@@ -16,27 +16,27 @@ template<typename ST, typename VT>
 void Assign(const ST& n, VT*, const VT&);
 
 template<typename ST, typename VT>
-void AddEqual(     const ST& n, VT*, const VT*);
+void AddEqual(     const ST& , VT*, const VT*);
 template<typename ST, typename VT>
-void MinusEqual(   const ST& n, VT*, const VT*);
+void MinusEqual(   const ST& , VT*, const VT*);
 template<typename ST, typename VT>
-void MultiplyEqual(const ST& n, VT*, const VT*);
+void MultiplyEqual(const ST& , VT*, const VT*);
 template<typename ST, typename VT>
-void DivideEqual(  const ST& n, VT*, const VT*);
+void DivideEqual(  const ST& , VT*, const VT*);
 
 template<typename ST, typename VT>
-void AddEqual(     const ST& n, VT*, const VT&);
+void AddEqual(     const ST& , VT*, const VT&);
 template<typename ST, typename VT>
-void MinusEqual(   const ST& n, VT*, const VT&);
+void MinusEqual(   const ST& , VT*, const VT&);
 template<typename ST, typename VT>
-void MultiplyEqual(const ST& n, VT*, const VT&);
+void MultiplyEqual(const ST& , VT*, const VT&);
 template<typename ST, typename VT>
-void DivideEqual(  const ST& n, VT*, const VT&);
+void DivideEqual(  const ST& , VT*, const VT&);
 
 
 template<typename ST, typename VT>
-void Assign(const ST& n, VT* src, const VT& value){
-    for (ST i = 0; i < n; ++i) {
+void Assign(const ST& len, VT* src, const VT& value){
+    for (ST i = 0; i < len; ++i) {
         src[i] = value;
     }
 }
