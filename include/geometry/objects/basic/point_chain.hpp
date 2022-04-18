@@ -94,6 +94,14 @@ public:
         }
     }
 
+    PointChain_(const Self& o):_lpoints(o._lpoints), _closed(o._closed){
+        // std::cout << "self " << std::endl;
+    }
+    PointChain_(const Self&& o):_lpoints(std::move(o._lpoints)), _closed(std::move(o._closed)){
+        // std::cout << "move" << std::endl;
+    }
+
+
     void init(const Segment& s) {
         _lpoints.push_back(s.ps());
         _lpoints.push_back(s.pe());
@@ -373,7 +381,49 @@ bool IsInOn(const Point_<TYPE, 2>& p, const PointChain_<TYPE, 2>& pc){
     return wn > 0;
 }
 
-
+template<class TYPE>
+PointChain_<TYPE, 2> ProjectToXY(const PointChain_<TYPE, 3>& pc){
+    PointChain_<TYPE, 2> res;
+    for(auto& p : pc){
+        res.push_back({p.x(), p.y()});
+    }
+    
+    return res;
+}
+template<class CONTAINER, 
+        typename std::enable_if<   
+                   IsContainer<CONTAINER>::value 
+                && IsPoint<typename CONTAINER::value_type>::value
+        , bool>::type = true>
+auto ProjectAlong(const CONTAINER& pc, Axes a){
+    Axes d1, d2;
+    NormalPlane(a, d1, d2);
+    PointChain_<typename CONTAINER::value_type::value_type, 2> res;
+    for(auto& p : pc){
+        res.push_back({p(d1), p(d2)});
+    }
+    return res;
+}
+template<class TYPE>
+auto NormalFirstThree(const PointChain_<TYPE, 3>& pc){
+    typedef typename const PointChain_<TYPE, 3>::value_type Point;
+    typedef const Point* cpPoint;
+    if (pc.size() < 3){
+        throw std::invalid_argument("Length of PointChain is less than 3");
+    }
+    std::array<cpPoint, 3> arr;
+    int i = 0;
+    for(auto& p : pc){
+        if (i > 2){
+            break;
+        }
+        arr[i] = &p;
+        i++;
+    }
+    auto v1 = *(arr[1]) - *(arr[0]);
+    auto v2 = *(arr[2]) - *(arr[0]);
+    return Cross(v1, v2);
+}
 
 }
 

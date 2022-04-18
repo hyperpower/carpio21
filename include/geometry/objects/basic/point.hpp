@@ -13,6 +13,23 @@ namespace carpio {
 struct PointTag: public GeometryTag {};
 struct PointViewOnYZTag: public PointTag {};
 
+template<class ANY>
+struct IsPoint{
+private:
+	typedef char yes;
+    typedef long no;
+
+    template<class T, typename std::enable_if<
+            std::is_base_of<PointTag, typename T::Tag>::value, bool>::type = true > 
+    static yes  test(int i, typename T::Tag = typename T::Tag());
+    template<class T>
+    static no test(...);
+public:
+    static const bool value = sizeof(test<ANY>(0)) == sizeof(yes);
+
+	typedef typename std::integral_constant<bool, value>::type type;
+};
+
 template<class CONTAINER, 
          typename std::enable_if<
             IsContainer<CONTAINER>::value

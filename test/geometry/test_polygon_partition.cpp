@@ -15,6 +15,7 @@ typedef Line_<double>       Line;
 typedef PolygonPartition_<Point2> PP;
 
 typedef PointChain_<double, 2> PointChain;
+typedef PointChain_<double, 3> PointChain3;
 //typedef GGnuplotActor_<double, 2> GA;
 typedef GGnuplotActorMaker_<double, 2> GAM;
 
@@ -78,6 +79,17 @@ TEST(partition, test1){
 TEST(partition, trydata){
     typedef typename std::vector<double> Vec;
     std::cout << HasData<Vec>::value << std::endl;
+    Point3 p1(0.0, 0.0, 0.0);
+    Point3 p2(1.0, 0.0, 0.0);
+    Point3 p3(0.0, 1.0, 0.0);
+    Point3 p(-0.1, 0.1, 0.0);
+
+    PointChain3 pc(p1, p2, p3);
+    auto vn = NormalFirstThree(pc);
+    std::cout << "Normal Vec : "<< vn << std::endl;
+
+    auto ppc = ProjectAlong(pc, _Z_);
+    ppc.show();
 }
 
 
