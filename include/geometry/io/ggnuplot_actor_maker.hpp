@@ -310,40 +310,8 @@ public:
 
 // Function version
 // Geometry objects entry
-template<typename ANY,
-        typename std::enable_if<
-            IsGeometry<ANY>::value,
-        bool>::type = true>
-auto ToGnuplotActor(const ANY& geo){
-    typedef std::shared_ptr<GnuplotActor> spActor;
-    // spActor actor = spActor(new GnuplotActor());
-    GnuplotActor actor;
-    MakeGnuplotActor(actor, geo, ANY::Tag());    
-    return actor;
-}
-template<typename ANY, typename CONTAINER,
-        typename std::enable_if<
-            IsGeometry<ANY>::value
-         && IsContainer<CONTAINER>::value, 
-        bool>::type = true>
-auto ToGnuplotActor(const ANY& geo, const CONTAINER& con){
-    typedef std::shared_ptr<GnuplotActor> spActor;
-    // spActor actor = spActor(new GnuplotActor());
-    GnuplotActor actor;
-    MakeGnuplotActor(actor, geo, con,ANY::Tag());    
-    return actor;
-}
-template<typename ANY,
-        typename std::enable_if<
-            IsGeometry<ANY>::value,
-        bool>::type = true>
-auto ToGnuplotActorAsVector(const ANY& geo){
-    typedef std::shared_ptr<GnuplotActor> spActor;
-    // spActor actor = spActor(new GnuplotActor());
-    GnuplotActor actor;
-    MakeGnuplotActorAsVector(actor, geo, ANY::Tag());    
-    return actor;
-}
+
+
 // template<class ANY, class VALUE,
 //         typename std::enable_if<
 //             IsGeometry<ANY>::value,
@@ -424,6 +392,34 @@ void MakeGnuplotActorAsVector(GnuplotActor& actor, const ANY& seg, SegmentTag){
     }
     actor.data().push_back(ToString(seg[0], " ") + " " + ToString(seg[1], " "));
 
+    actor.data().push_back("");
+}
+template<typename ANY>
+void MakeGnuplotActorAsVector(GnuplotActor& actor, const ANY& pc, PointChainTag){
+    actor.command() = "using 1:2:3:4 title \"\" ";
+    actor.set_using(ANY::Dim * 2);
+    actor.style()   = "with vectors lc 1"; // default color is 1
+    if (pc.empty()){
+        actor.data().push_back("");
+        return;
+    }
+
+    auto iterps = pc.begin();
+    auto iterpe = pc.begin();
+    std::advance(iterpe, 1);
+    for (; iterpe != pc.end(); iterps++, iterpe++) {
+        actor.data().push_back(
+            ToString(iterps->x(), iterps->y(),
+                     iterpe->x() - iterps->x(),
+                     iterpe->y() - iterps->y(), " "));
+    }
+    if (pc.closed()){
+        actor.data().push_back(
+            ToString(pc.back().x(), pc.back().y(),
+                     pc.front().x() - pc.back().x(),
+                     pc.front().y() - pc.back().y(), 
+                     " "));
+    }
     actor.data().push_back("");
 }
 template<typename ANY>
@@ -520,8 +516,37 @@ auto ToGnuplotActor(const ANY& any, unsigned int jump = 1) {
     }    
     return actor;
 }
-
-
+template<typename ANY,
+        typename std::enable_if<
+            IsGeometry<ANY>::value,
+        bool>::type = true>
+auto ToGnuplotActor(const ANY& geo){
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    GnuplotActor actor;
+    MakeGnuplotActor(actor, geo, ANY::Tag());    
+    return actor;
+}
+template<typename ANY, typename CONTAINER,
+        typename std::enable_if<
+            IsGeometry<ANY>::value
+         && IsContainer<CONTAINER>::value, 
+        bool>::type = true>
+auto ToGnuplotActor(const ANY& geo, const CONTAINER& con){
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    GnuplotActor actor;
+    MakeGnuplotActor(actor, geo, con,ANY::Tag());    
+    return actor;
+}
+template<typename ANY,
+        typename std::enable_if<
+            IsGeometry<ANY>::value,
+        bool>::type = true>
+auto ToGnuplotActorAsVector(const ANY& geo){
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    GnuplotActor actor;
+    MakeGnuplotActorAsVector(actor, geo, ANY::Tag());    
+    return actor;
+}
 }
 
 #endif /* _ACTOR_GNUPLOT_HPP_ */

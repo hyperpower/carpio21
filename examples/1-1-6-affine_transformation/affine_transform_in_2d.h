@@ -45,48 +45,48 @@ auto MakeFShape(){
 
 auto AddActorsOriginal(Gnuplot& gnu, const PointChain2& box, const PointChain2& pc){
     auto actor_pori = ToGnuplotActor(box.get(0));
-    actor_pori->style("with points pt 7 ps 2 lc rgb \"#7FBA00\"");
+    actor_pori.style("with points pt 7 ps 2 lc rgb \"#7FBA00\"");
     gnu.add(actor_pori);
     auto actor_px = ToGnuplotActor(box.get(1));
-    actor_px->style("with points pt 7 ps 2 lc rgb \"#00A4EF\"");
+    actor_px.style("with points pt 7 ps 2 lc rgb \"#00A4EF\"");
     gnu.add(actor_px);
     auto actor_py = ToGnuplotActor(box.get(3));
-    actor_py->style("with points pt 7 ps 2 lc rgb \"#F25022\"");
+    actor_py.style("with points pt 7 ps 2 lc rgb \"#F25022\"");
     gnu.add(actor_py);
     auto actor_box = ToGnuplotActor(box);
-    actor_box->style("with lines lt 1 dashtype 2 lw 2 lc \"black\"");
+    actor_box.style("with lines lt 1 dashtype 2 lw 2 lc \"black\"");
     gnu.add(actor_box);
     auto actor_pc  = ToGnuplotActor(pc);
-    actor_pc->style("with lines lt 1 dashtype 2 lw 2 lc rgb \"#FFB900\"");
+    actor_pc.style("with lines lt 1 dashtype 2 lw 2 lc rgb \"#FFB900\"");
     gnu.add(actor_pc);
 }
 auto AddActorsTransformed(Gnuplot& gnu, const PointChain2& box, const PointChain2& pc){
     auto actor_pori = ToGnuplotActor(box.get(0));
-    actor_pori->style("with points pt 7 ps 2 lc rgb \"#7FBA00\"");
+    actor_pori.style("with points pt 7 ps 2 lc rgb \"#7FBA00\"");
     gnu.add(actor_pori);
     auto actor_px = ToGnuplotActor(box.get(1));
-    actor_px->style("with points pt 7 ps 2 lc rgb \"#00A4EF\"");
+    actor_px.style("with points pt 7 ps 2 lc rgb \"#00A4EF\"");
     gnu.add(actor_px);
     auto actor_py = ToGnuplotActor(box.get(3));
-    actor_py->style("with points pt 7 ps 2 lc rgb \"#F25022\"");
+    actor_py.style("with points pt 7 ps 2 lc rgb \"#F25022\"");
     gnu.add(actor_py);
     auto actor_box = ToGnuplotActor(box);
-    actor_box->style("with lines lt 1 lw 2 lc \"black\"");
+    actor_box.style("with lines lt 1 lw 2 lc \"black\"");
     gnu.add(actor_box);
     auto actor_pc  = ToGnuplotActor(pc);
-    actor_pc->style("with lines lt 1 lw 2 lc rgb \"#FFB900\"");
+    actor_pc.style("with lines lt 1 lw 2 lc rgb \"#FFB900\"");
     gnu.add(actor_pc);
 }
 
 auto AddAxes(Gnuplot& gnu){
     gnu.set_label(1, "x",  0.45, -0.08, "textcolor rgb \"#00A4EF\"");
     auto actor_x = ToGnuplotActorAsVector(Segment2(Point2(0.0,0.0), Point2(0.5,0.0)));
-    actor_x->style("with vectors lt 1 lw 3 lc rgb \"#00A4EF\"");
+    actor_x.style("with vectors lt 1 lw 3 lc rgb \"#00A4EF\"");
     gnu.add(actor_x);
 
     gnu.set_label(2, "y", -0.08, 0.45, "textcolor rgb \"#F25022\"");
     auto actor_y = ToGnuplotActorAsVector(Segment2(Point2(0.0,0.0), Point2(0.0,0.5)));
-    actor_y->style("with vectors lt 1 lw 3 lc rgb \"#F25022\"");
+    actor_y.style("with vectors lt 1 lw 3 lc rgb \"#F25022\"");
     gnu.add(actor_y);
 }
 
@@ -102,7 +102,7 @@ void TestTranslate(){
 
     Point2 trans_vec = {0.2, 0.3}; 
     auto actor_tv = ToGnuplotActorAsVector(Segment2(Point2(0.0,0.0), Point2(trans_vec)));
-    actor_tv->style("with vectors lt 1 lw 3 lc rgb \"#7FBA00\"");
+    actor_tv.style("with vectors lt 1 lw 3 lc rgb \"#7FBA00\"");
     gnu.add(actor_tv);
     Point2 mid = Mid(trans_vec, {0.0,0.0});
     gnu.set_label(3, "Translate Vetor",  mid[0]+0.05, mid[1], "textcolor rgb \"#7FBA00\"");
@@ -128,7 +128,7 @@ void TestScale(){
 
     Point2 vec = {1.5, 1.2}; 
     auto actor_tv = ToGnuplotActorAsVector(Segment2(Point2(0.0,0.0), Point2(vec)));
-    actor_tv->style("with vectors lt 1 lw 3 lc rgb \"#7FBA00\"");
+    actor_tv.style("with vectors lt 1 lw 3 lc rgb \"#7FBA00\"");
     gnu.add(actor_tv);
     Point2 mid = Mid(vec, {0.0,0.0});
     gnu.set_label(3, "Scale Vetor",  mid[0]+0.05, mid[1], "textcolor rgb \"#7FBA00\"");
@@ -137,7 +137,7 @@ void TestScale(){
     Line line({1, 1, 1.0});
     std::array<double,2> range = {-2.5,2.5};
     auto actor_lineo = ToGnuplotActor(line, range);
-    actor_lineo->style("with lines lt 1 lw 2 lc \"black\"");
+    actor_lineo.style("with lines lt 1 lw 2 lc \"black\"");
     gnu.add(actor_lineo);
     gnu.set_label(4, "Line : " + ToString(line),  -0.2, 1.75, "textcolor \"black\"");
 
@@ -149,7 +149,7 @@ void TestScale(){
     AddActorsTransformed(gnu, box, pc);
 
     auto actor_linen = ToGnuplotActor(line, range);
-    actor_linen->style("with lines lt 1 lw 2 lc \"red\"");
+    actor_linen.style("with lines lt 1 lw 2 lc \"red\"");
     gnu.add(actor_linen);
     gnu.set_label(5, "Scaled Line : " + ToString(line),  -0.2, 1.65, "textcolor \"red\"");
 
@@ -168,7 +168,7 @@ void TestScaleAbout(){
 
     Point2 about = {0.4, 0.5};
     auto actor_about = ToGnuplotActor(about);
-    actor_about->style("with points pt 7 ps 2 lc \"black\"");
+    actor_about.style("with points pt 7 ps 2 lc \"black\"");
     gnu.add(actor_about);
 
     Point2 vec   = {1.2, 1.3}; 
@@ -178,7 +178,7 @@ void TestScaleAbout(){
     Line line({1, 1, 1.0});
     std::array<double,2> range = {-2.5,2.5};
     auto actor_lineo = ToGnuplotActor(line, range);
-    actor_lineo->style("with lines lt 1 lw 2 lc \"black\"");
+    actor_lineo.style("with lines lt 1 lw 2 lc \"black\"");
     gnu.add(actor_lineo);
     gnu.set_label(4, "Line : " + ToString(line),  -0.2, 1.45, "textcolor \"black\"");
 
@@ -190,7 +190,7 @@ void TestScaleAbout(){
     AddActorsTransformed(gnu, box, pc);
 
     auto actor_linen = ToGnuplotActor(line, range);
-    actor_linen->style("with lines lt 1 lw 2 lc \"red\"");
+    actor_linen.style("with lines lt 1 lw 2 lc \"red\"");
     gnu.add(actor_linen);
     gnu.set_label(5, "Scaled Line : " + ToString(line),  -0.2, 1.35, "textcolor \"red\"");
     
@@ -234,7 +234,7 @@ void TestRotateAbout(){
 
     Point2 about = {0.7, 0.8};
     auto actor_about = ToGnuplotActor(about);
-    actor_about->style("with points pt 7 ps 2 lc \"black\"");
+    actor_about.style("with points pt 7 ps 2 lc \"black\"");
     gnu.add(actor_about);
 
     gnu.set_label(3, "Rotate Center",   about[0], about[1]-0.1, "center textcolor \"black\"");
@@ -298,7 +298,7 @@ void TestReflectAboutPoint(){
 
     Point2 about = {0.7, 0.8};
     auto actor_about = ToGnuplotActor(about);
-    actor_about->style("with points pt 7 ps 2 lc \"black\"");
+    actor_about.style("with points pt 7 ps 2 lc \"black\"");
     gnu.add(actor_about);
     gnu.set_label(3, "Reflect Center",   about[0], about[1]-0.1, "center textcolor \"black\"");
 
@@ -328,7 +328,7 @@ void TestReflectAboutLine(const Line& line){
     std::array<double,2> range = {-0.5,2.0};
     std::cout << "Line : " <<line << std::endl;
     auto actor_line = ToGnuplotActor(line, range);
-    actor_line->style("with lines lt 1 lw 1 lc \"black\"");
+    actor_line.style("with lines lt 1 lw 1 lc \"black\"");
     gnu.add(actor_line);
     gnu.set_label(3, "Line : " + ToString(line),  0.0, 1.8, "textcolor \"black\"");
 
@@ -377,7 +377,7 @@ void TestShearAbout(Axes axe, double theta, Point2 about){
     AddActorsTransformed(gnu, box, pc);
 
     auto actor_about = ToGnuplotActor(about);
-    actor_about->style("with points pt 7 ps 2 lc \"black\"");
+    actor_about.style("with points pt 7 ps 2 lc \"black\"");
     gnu.add(actor_about);
     gnu.set_label(3, "Shear Center",   about[0], about[1]-0.1, "center textcolor \"black\"");
 

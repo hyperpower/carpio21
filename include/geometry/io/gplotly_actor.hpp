@@ -253,7 +253,8 @@ auto ToPlotlyActor(const ANY& geo, const std::string& type ="auto"){
 }
 template<typename ANY,
         typename std::enable_if<
-            IsGeometry<typename ANY::value_type>::value
+            !(IsGeometry<ANY>::value)
+         && IsGeometry<typename ANY::value_type>::value
          && IsContainer<ANY>::value, 
         bool>::type = true >
 auto ToPlotlyActor(const ANY& container, const std::string& type ="auto"){

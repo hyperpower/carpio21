@@ -1,6 +1,7 @@
 Problem Description
 ===================
 
+
 We want to find two segments intersection. Here, we define 6 possible cases for the intersect or not.
 
 .. table:: Segement vs. Segment Locations

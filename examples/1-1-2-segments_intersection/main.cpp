@@ -30,13 +30,13 @@ int a_case(const Point2& p1,
     gnu.set_label(1, strtype, -4.5, 4);
 
     auto a1 = ToGnuplotActor(seg1);
-    a1->style() = "with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"";
+    a1.style("with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
 
     auto a2 = ToGnuplotActor(seg2);
-    a2->style() = "with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#F25022\"";
+    a2.style("with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#F25022\"");
 
     auto a3 = ToGnuplotActor(np);
-    a3->style() = "with linespoints pointtype 1 pointsize 3 lw 3 lc black";
+    a3.style("with linespoints pointtype 1 pointsize 3 lw 3 lc black");
 
     gnu.add(a1);
     gnu.add(a2);

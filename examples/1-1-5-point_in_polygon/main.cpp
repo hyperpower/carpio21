@@ -37,14 +37,14 @@ int case_random() {
     int count = 1;
     for(auto& p : ltp){
         bool wn = IsInOn(p, pc);
-        auto actor = GA::Points(p, wn? 3 : 4);
-        actor->style() = "with points ps 2 pt 7 lc variable";
+        auto actor = ToGnuplotActor(p); 
+        actor.style("with points ps 2 pt 7 lc " + ToString(wn? 3 : 4));
         gnu.add(actor);
         gnu.set_label(count, wn? "  IN ":"  OUT ", p.x(), p.y(), "left" );
         count++;
     }
-    auto a_arrows = GA::Arrows(pc, 2);
-    a_arrows->style() = "with vectors lw 2 lc variable";
+    auto a_arrows = ToGnuplotActorAsVector(pc);
+    a_arrows.style("with vectors lw 2 lc 2");
     gnu.add(a_arrows);
     gnu.plot();
     return 0;
@@ -76,14 +76,14 @@ int case_on_edge() {
     int count = 1;
     for(auto& p : ltp){
         bool wn = IsInOn(p, pc);
-        auto actor = GA::Points(p, wn? 3 : 4);
-        actor->style() = "with points ps 2 pt 7 lc variable";
+        auto actor = ToGnuplotActor(p); 
+        actor.style("with points ps 2 pt 7 lc " + ToString(wn? 3 : 4));
         gnu.add(actor);
         gnu.set_label(count, wn? "  IN ":"  OUT ", p.x(), p.y(), "left" );
         count++;
     }
-    auto a_arrows = GA::Arrows(pc, 2);
-    a_arrows->style() = "with vectors lw 2 lc variable";
+    auto a_arrows = ToGnuplotActorAsVector(pc);
+    a_arrows.style("with vectors lw 2 lc 2");
     gnu.add(a_arrows);
     gnu.plot();
     return 0;
@@ -116,14 +116,14 @@ int case_on_vertex() {
     int count = 1;
     for(auto& p : ltp){
         bool wn = IsInOn(p, pc);
-        auto actor = GA::Points(p, wn? 3 : 4);
-        actor->style() = "with points ps 2 pt 7 lc variable";
+        auto actor = ToGnuplotActor(p); 
+        actor.style("with points ps 2 pt 7 lc " + ToString(wn? 3 : 4));
         gnu.add(actor);
         gnu.set_label(count, wn? "  IN ":"  OUT ", p.x(), p.y(), "left" );
         count++;
     }
-    auto a_arrows = GA::Arrows(pc, 2);
-    a_arrows->style() = "with vectors lw 2 lc variable";
+    auto a_arrows = ToGnuplotActorAsVector(pc);
+    a_arrows.style("with vectors lw 2 lc 2");
     gnu.add(a_arrows);
     gnu.plot();
     return 0;

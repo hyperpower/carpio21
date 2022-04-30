@@ -14,12 +14,12 @@ typedef Line_<double>                  Line;
 auto AddAxes(Gnuplot& gnu){
     gnu.set_label(10, "x",  0.45, -0.08, "textcolor rgb \"#00A4EF\"");
     auto actor_x = ToGnuplotActorAsVector(Seg2(Point2(0.0,0.0), Point2(0.5,0.0)));
-    actor_x->style("with vectors lt 1 lw 3 lc rgb \"#00A4EF\"");
+    actor_x.style("with vectors lt 1 lw 3 lc rgb \"#00A4EF\"");
     gnu.add(actor_x);
 
     gnu.set_label(11, "y", -0.08, 0.45, "textcolor rgb \"#F25022\"");
     auto actor_y = ToGnuplotActorAsVector(Seg2(Point2(0.0,0.0), Point2(0.0,0.5)));
-    actor_y->style("with vectors lt 1 lw 3 lc rgb \"#F25022\"");
+    actor_y.style("with vectors lt 1 lw 3 lc rgb \"#F25022\"");
     gnu.add(actor_y);
 }
 
@@ -46,17 +46,17 @@ int LineBox(double a, double b, double alpha, const std::string& name){
     gnu.set_terminal_png("./fig/" + name);
     AddAxes(gnu);
     auto spbox1 = ToGnuplotActor(box1);
-    spbox1->style() = "with lines lw 2 lc 8";
+    spbox1.style("with lines lw 2 lc 8");
     gnu.add(spbox1);
     std::array<double,2> line_range{-0.5, 1.5};
     auto spline = ToGnuplotActor(line, line_range);
-    spline->style() = "with lines lw 3 lc 6";
+    spline.style("with lines lw 3 lc 6");
     gnu.add(spline);
     // add intersection points
     int numlabel = 30;
     for(auto& sp : lspp){
         auto sppoint = ToGnuplotActor(sp);
-        sppoint->style() = "with points pt 7 ps 2 lc 7";
+        sppoint.style("with points pt 7 ps 2 lc 7");
         gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", sp.x(), sp.y()),
                      sp.x(), sp.y()+ 0.05, "left font \",13\"");
         gnu.add(sppoint);
@@ -93,17 +93,17 @@ void BoxLinePositiveCase(int num_case,
     gnu.set_terminal_png(tfm::format("./fig/lb_%02d", num_case));
     AddAxes(gnu);
     auto spbox1 = ToGnuplotActor(box1);
-    spbox1->style() = "with lines lw 2 lc 8";
+    spbox1.style("with lines lw 2 lc 8");
     gnu.add(spbox1);
     std::array<double,2> line_range{-0.5, 1.5};
     auto spline = ToGnuplotActor(line, line_range);
-    spline->style() = "with lines lw 3 lc 6";
+    spline.style("with lines lw 3 lc 6");
     gnu.add(spline);
     // add intersection points
     int numlabel = 30;
     for (auto& sp : lspp) {
         auto sppoint = ToGnuplotActor(sp);
-        sppoint->style() = "with points pt 7 ps 2 lc 7";
+        sppoint.style("with points pt 7 ps 2 lc 7");
         gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", 
                       sp.x(), sp.y()),
                       sp.x(), sp.y() + 0.05, "left font \",13\"");
@@ -163,17 +163,17 @@ void BoxLinePNCase(int num_case,
     gnu.set_terminal_png(tfm::format("./fig/pn_%02d", num_case));
     AddAxes(gnu);
     auto spbox1 = ToGnuplotActor(box1);
-    spbox1->style() = "with lines lw 2 lc 8";
+    spbox1.style("with lines lw 2 lc 8");
     gnu.add(spbox1);
     std::array<double,2> line_range{-0.5, 1.5};
     auto spline = ToGnuplotActor(line, line_range);
-    spline->style() = "with lines lw 3 lc 6";
+    spline.style("with lines lw 3 lc 6");
     gnu.add(spline);
     // add intersection points
     int numlabel = 30;
     for (auto& sp : lspp) {
         auto sppoint = ToGnuplotActor(sp);
-        sppoint->style() = "with points pt 7 ps 2 lc 7";
+        sppoint.style("with points pt 7 ps 2 lc 7");
         gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", 
                       sp.x(), sp.y()),
                       sp.x(), sp.y() + 0.05, "left font \",13\"");

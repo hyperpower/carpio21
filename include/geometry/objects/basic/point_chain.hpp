@@ -100,7 +100,19 @@ public:
     PointChain_(const Self&& o):_lpoints(std::move(o._lpoints)), _closed(std::move(o._closed)){
         // std::cout << "move" << std::endl;
     }
-
+    Self& operator=(const Self&o){
+        if (this == &o) {
+            return *this;
+        }
+        this->_lpoints= o._lpoints;
+        this->_closed = o._closed;
+        return *this;
+    }
+    Self& operator=(Self&&o){
+        this->_lpoints = std::move(o._lpoints);
+        this->_closed  = std::move(o._closed);
+        return *this;
+    }
 
     void init(const Segment& s) {
         _lpoints.push_back(s.ps());

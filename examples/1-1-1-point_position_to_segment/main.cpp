@@ -33,10 +33,10 @@ std::string a_case(const Point& p1, const Point& p2, const Point& p3){
 	gnu.set_label(1, str_res, -0.3, 1.2);
 
 	auto a1 = ToGnuplotActor(seg);
-	a1->style() = "with linespoints pointtype 7 pointsize 3 lw 2 lc black";
+	a1.style("with linespoints pointtype 7 pointsize 3 lw 2 lc black");
 
 	auto a2 = ToGnuplotActor(p3);
-	a2->style() = "with points pointtype 5 pointsize 3 lc rgb \"#00A4EF\"";
+	a2.style("with points pointtype 5 pointsize 3 lc rgb \"#00A4EF\"");
 	
 	gnu.add(a1);
 	gnu.add(a2);

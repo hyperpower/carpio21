@@ -1,14 +1,3 @@
---------------------
-A title
---------------------
-
-
-.. toctree::
-   :hidden:
-
-   report
-
-
 
 Problem Description
 ===================

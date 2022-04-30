@@ -121,7 +121,8 @@ void Translate(GEO& geo, const VEC& container){
 template<class CONTAINER, class VEC, 
         typename std::enable_if<
             std::integral_constant< bool, 
-                   IsContainer<CONTAINER>::value 
+                ( ! IsGeometry<CONTAINER>::value)
+                && IsContainer<CONTAINER>::value 
                 && IsGeometry<typename CONTAINER::value_type>::value
             >::value, bool>::type = true> // Line: ax + by = alpha
 void Translate(CONTAINER& con_geo, const VEC& vec){
@@ -208,7 +209,8 @@ void Scale(GEO& geo, const VEC& vec){
 template<class CONTAINER, class VEC, class POINT,
         typename std::enable_if<
             std::integral_constant< bool, 
-                   IsContainer<CONTAINER>::value 
+                ( ! IsGeometry<CONTAINER>::value)
+                && IsContainer<CONTAINER>::value 
                 && IsGeometry<typename CONTAINER::value_type>::value
             >::value, bool>::type = true>
 void Scale(CONTAINER& con_geo, const VEC& vec, const POINT& about){
@@ -219,7 +221,8 @@ void Scale(CONTAINER& con_geo, const VEC& vec, const POINT& about){
 template<class CONTAINER, class VEC, 
         typename std::enable_if<
             std::integral_constant< bool, 
-                   IsContainer<CONTAINER>::value 
+                ( ! IsGeometry<CONTAINER>::value)
+                && IsContainer<CONTAINER>::value 
                 && IsGeometry<typename CONTAINER::value_type>::value
             >::value, bool>::type = true> 
 void Scale(CONTAINER& con_geo, const VEC& vec){
@@ -463,7 +466,8 @@ void Reflect(GEO& geo){  // Reflect about original points
     _Reflect(Tag(), geo);
 }
 template<class GEO, class POINT,
-         typename std::enable_if<std::is_arithmetic<typename POINT::value_type>::value, bool>::type = true>
+         typename std::enable_if<
+            std::is_arithmetic<typename POINT::value_type>::value, bool>::type = true>
 void Reflect(GEO& geo, const POINT& about){
     typedef typename GEO::Tag Tag;
     std::array<typename POINT::value_type, GEO::Dim> arr;
@@ -499,7 +503,8 @@ void Reflect(GEO& geo, double a, double b, double alpha){
 template<class CONTAINER,
         typename std::enable_if<
             std::integral_constant< bool, 
-                   IsContainer<CONTAINER>::value 
+                   (! IsGeometry<CONTAINER>::value)
+                && IsContainer<CONTAINER>::value 
                 && IsGeometry<typename CONTAINER::value_type>::value
             >::value, bool>::type = true> // Line: ax + by = alpha
 void Reflect(CONTAINER& con_geo, double a, double b, double alpha){
