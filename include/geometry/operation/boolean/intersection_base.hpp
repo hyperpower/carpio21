@@ -1,7 +1,8 @@
 #ifndef _BOOLEAN_INTERSECTION_BASE_HPP_
 #define _BOOLEAN_INTERSECTION_BASE_HPP_
 
-#include <mutex>          // std::mutex
+#include <list>
+#include <memory>
 
 #include "geometry/geometry_define.hpp"
 
@@ -47,17 +48,25 @@ inline Vt SquareSum(VEC& vec){
 //     }
 // }
 
-template<typename TYPE, St DIM>
-struct IntersectionReturn_{
-    typedef Point_<TYPE, DIM> Point;
-    typedef std::list<int>  ListSize;
-    typedef std::list<std::shared_ptr<Point> > ListspPoint;
+template<class GEO1, class GEO2, class POINT = typename GEO1::Point>
+class IntersectionReturn_{
+    typedef POINT Point;
+    typedef const Point* cpPoint;
+    typedef std::shared_ptr<Point> spPoint;
+    typedef GEO1  Geo1;
+    typedef const GEO1*  cpGeo1;
+    typedef GEO2  Geo2;
+    typedef const GEO2*  cpGeo2;
 
-    double      return_code;  //
-    // std::string return_sting; // intersection name
-    ListSize    indexs;       // size of each return objects
+    typedef std::list<spPoint> ListspPoint;
+
+    typedef IntersectionReturn_<GEO1, GEO2, POINT> Self;
+
+    cpGeo1      geo1;
+    cpGeo2      geo2;
     ListspPoint points;
 
+    int         return_code;  //
     // return code 1 intersect
     //             0 No intersect
     //             2 point touch
@@ -65,11 +74,22 @@ struct IntersectionReturn_{
     //             4 ploy touch
 
     IntersectionReturn_():
+        geo1(nullptr),
+        geo2(nullptr),
         return_code(0){
     }
 
-    IntersectionReturn_(const int& c):
+    IntersectionReturn_(const GEO1& g1, const GEO2& g2, const int& c):
+        geo1(&g1), geo2(&g2),
         return_code(c){
+    }
+
+    IntersectionReturn_(const Self& o): 
+        geo1(o.geo1), geo2(o.geo2), return_code(o.return_code){
+    }
+
+    void push_back(const Point& p){
+        points.push_back(std::make_shared<Point>(p));
     }
 };
 
@@ -80,7 +100,7 @@ public:
     typedef OBJ1 Object1;
     typedef OBJ2 Object2;
     typedef typename Object1::ValueType ValueType ;
-    typedef IntersectionReturn_<ValueType, Object1::Dim> ReturnType;
+    typedef IntersectionReturn_<OBJ1, OBJ2> ReturnType;
 protected:
     bool _inited;
     bool _called_intersect;

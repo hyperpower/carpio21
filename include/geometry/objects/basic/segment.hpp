@@ -20,7 +20,6 @@ class Segment_: public std::array< Point_<TYPE, DIM>, 2> {
 public:
 	static const St Dim = DIM;
 	typedef SegmentTag Tag;
-    typedef TYPE value_type;
 	typedef TYPE Vt;
 	typedef Vt& ref_Vt;
 	typedef const Vt& const_ref_Vt;
@@ -28,6 +27,7 @@ public:
 	typedef Segment_<TYPE, DIM>& ref_Self;
 	typedef const Segment_<TYPE, DIM>& const_ref_Self;
 	typedef Point_<TYPE, DIM> Point;
+    typedef Point value_type;
 	typedef Point* pPoint;
 	typedef Point& ref_Point;
 	typedef const Point& const_ref_Point;

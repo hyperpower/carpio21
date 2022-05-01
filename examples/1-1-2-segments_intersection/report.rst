@@ -1,5 +1,8 @@
-Problem Description
-===================
+Problem 1 Two Segments Intersection 
+====================================
+
+Description
+-------------
 
 
 We want to find two segments intersection. Here, we define 6 possible cases for the intersect or not.
@@ -21,10 +24,10 @@ We want to find two segments intersection. Here, we define 6 possible cases for 
 
 
 Results
-===================
+-------------
 
 Location 0 NO
---------------
+^^^^^^^^^^^^^^
 Two segments are seperated. There are no intersection between the two segments. But function of finding the intersection point is still working. The intersection point is on neither of the segments.
 
 .. figure:: fig/NO.png
@@ -34,7 +37,7 @@ Two segments are seperated. There are no intersection between the two segments. 
    An example of two segments has no intersection.
 
 Location 1 CONNET
-------------------
+^^^^^^^^^^^^^^^^^^
 Two segments are connected. 
 
 .. figure:: fig/CONNECT.png
@@ -45,7 +48,7 @@ Two segments are connected.
 
 
 Location 2 TOUCH
-------------------
+^^^^^^^^^^^^^^^^^^
 Two segments are touched.
 
 .. figure:: fig/TOUCH.png
@@ -56,7 +59,7 @@ Two segments are touched.
 
 
 Location 3 OVERLAP
---------------------
+^^^^^^^^^^^^^^^^^^^^^
 Two segments are overlap each other. 
 
 .. warning::
@@ -70,7 +73,7 @@ Two segments are overlap each other.
 
 
 Location 4 SAME
---------------------
+^^^^^^^^^^^^^^^^^^
 Two segments are the same. 
 
 .. warning::
@@ -83,7 +86,7 @@ Two segments are the same.
    An example of two segments are same.
 
 Location 4 INTERSECT
----------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 Two segments are intersect.
 
 .. figure:: fig/INTERSECT.png
@@ -91,3 +94,28 @@ Two segments are intersect.
    :align: center 
 
    An example of two segments are intersect.
+
+
+Problem 2 Multiple Segments Intersection 
+=========================================
+
+Description
+---------------
+
+The input is a set S of segments in the plane (each defined by a pair of points). The output is
+a list of all the places where these line segments intersect.
+
+Method 1 Trivial n2
+-------------------------
+
+There’s a trivial :math:`O(n^2)` algorithm: Just apply segment intersection to all pairs of segments.
+ 
+Method 2 Sweep Line
+-------------------------
+
+Generally speaking sweepline means that you are processing the data in some order (e.g. left to
+right order). A data structure is maintained that keeps the information gleened from the part of
+the data currently to the left of the sweepline.
+
+
+
