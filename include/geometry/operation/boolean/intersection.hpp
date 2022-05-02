@@ -2,6 +2,8 @@
 #define _BOOLEAN_INTERSECTION_HPP_
 
 #include "intersection_base.hpp"
+#include "segment_segment.hpp"
+#include "multi_segments.hpp"
 
 
 namespace carpio{
@@ -22,6 +24,18 @@ IntersectionReturn_<GEO1, GEO2> Intersect(const GEO1& g1, const GEO2& g2){
     return Intersect(g1, g2, Tag1(), Tag2());
 }
 
+template<class CONTAINER,
+        typename std::enable_if<
+                   (! IsGeometry<CONTAINER>::value)
+                && IsContainer<CONTAINER>::value
+                && IsGeometry<typename CONTAINER::value_type>::value 
+        , bool>::type = true>
+auto Intersect(const CONTAINER& con, const std::string& method = ""){
+    typedef typename CONTAINER::value_type GEO;
+    typedef typename GEO::Tag Tag;
+//     typedef IntersectionReturn_<GEO> RetType;
+    return Intersect(con, method, Tag());
+}
 }
 
 #endif

@@ -210,11 +210,59 @@ public:
 
         return CalSegmentsIntersection((*(_arrp[0])), (*(_arrp[1])), (*(_arrp[2])),(*(_arrp[3])));
     }
-
-
-
-
 };
+template<class CONTAINER>
+auto IntersectN2(const CONTAINER& con, SegmentTag){
+    typedef typename CONTAINER::value_type Seg;
+    typedef typename Seg::coord_value_type Cvt;
+    typedef IntersectionPairSS_<Cvt, Seg::Dim> Inter;
+
+    typedef IntersectionReturn_<Seg> InterRet;
+    typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
+    ListInterRet res;
+    for(auto iter = con.begin(); iter != con.end(); ++iter){
+        auto& seg1 = *iter;
+        for(auto iterin = std::next(iter); iterin != con.end(); ++iterin){
+            // if(iter == iterin){
+                // continue;
+            // }
+            auto& seg2 = *iterin;
+            // std::cout << "seg1 = " << seg1 <<std::endl;
+            // std::cout << "seg2 = " << seg2 <<std::endl;
+            Inter inter(seg1, seg2);
+            auto t = inter.cal_intersection_type();
+            if(t == _SS_NO_){
+                continue;
+            }
+            // std::cout << "inter type = " << ToString(t) << std::endl;
+            InterRet ret(seg1, seg2, ToString(t));
+            if(t == _SS_INTERSECT_){
+                auto p = inter.cal_intersection_point();
+                // std::cout <<"inter sect point = " << p << std::endl;
+                ret.push_back(p);
+            }
+            res.push_back(ret);
+        }
+    }
+    return res;
+}
+
+template<class CONTAINER, 
+        typename std::enable_if<
+                   (! IsGeometry<CONTAINER>::value)
+                && IsContainer<CONTAINER>::value
+                && IsGeometry<typename CONTAINER::value_type>::value 
+        , bool>::type = true>
+auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
+    typedef typename CONTAINER::value_type Seg;
+    typedef IntersectionReturn_<Seg> InterRet;
+    typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
+    std::string m = ToLowerCase(method);
+    if (m == "" || m == "n2"){
+        return IntersectN2(con, SegmentTag());
+    }
+    // return ListInterRet(); 
+}
 
 
 

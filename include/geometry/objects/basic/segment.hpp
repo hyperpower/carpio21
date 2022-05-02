@@ -21,6 +21,7 @@ public:
 	static const St Dim = DIM;
 	typedef SegmentTag Tag;
 	typedef TYPE Vt;
+	typedef TYPE coord_value_type;
 	typedef Vt& ref_Vt;
 	typedef const Vt& const_ref_Vt;
 	typedef Segment_<TYPE, DIM> Self;

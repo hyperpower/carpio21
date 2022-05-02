@@ -48,8 +48,9 @@ inline Vt SquareSum(VEC& vec){
 //     }
 // }
 
-template<class GEO1, class GEO2, class POINT = typename GEO1::Point>
+template<class GEO1, class GEO2 = GEO1, class POINT = typename GEO1::Point>
 class IntersectionReturn_{
+public:
     typedef POINT Point;
     typedef const Point* cpPoint;
     typedef std::shared_ptr<Point> spPoint;
@@ -58,15 +59,15 @@ class IntersectionReturn_{
     typedef GEO2  Geo2;
     typedef const GEO2*  cpGeo2;
 
-    typedef std::list<spPoint> ListspPoint;
+    typedef std::list<Point> ListPoint;
 
     typedef IntersectionReturn_<GEO1, GEO2, POINT> Self;
 
     cpGeo1      geo1;
-    cpGeo2      geo2;
-    ListspPoint points;
+    cpGeo2      geo2; 
+    ListPoint   points;
 
-    int         return_code;  //
+    std::string  return_msg;  //
     // return code 1 intersect
     //             0 No intersect
     //             2 point touch
@@ -76,23 +77,47 @@ class IntersectionReturn_{
     IntersectionReturn_():
         geo1(nullptr),
         geo2(nullptr),
-        return_code(0){
+        return_msg(0){
     }
 
-    IntersectionReturn_(const GEO1& g1, const GEO2& g2, const int& c):
+    IntersectionReturn_(const GEO1& g1, const GEO2& g2, const std::string& c):
         geo1(&g1), geo2(&g2),
-        return_code(c){
+        return_msg(c){
     }
 
     IntersectionReturn_(const Self& o): 
-        geo1(o.geo1), geo2(o.geo2), return_code(o.return_code){
+        geo1(o.geo1), geo2(o.geo2), return_msg(o.return_msg), points(o.points){
+    }
+
+    Self& operator=(const Self& o){
+        if(this = &o){
+            return *this;
+        }
+        geo1 = o.geo1;
+        geo2 = o.geo2; 
+        return_msg = o.return_msg;
+        points = o.points;
+        return *this;
     }
 
     void push_back(const Point& p){
-        points.push_back(std::make_shared<Point>(p));
+        points.push_back(p);
     }
+
+
 };
 
+template<class GEO1, class GEO2 = GEO1, class POINT = typename GEO1::Point>
+std::ostream& operator<<(std::ostream& stream, const IntersectionReturn_<GEO1, GEO2, POINT>& ret) {
+    stream << ret.return_msg << " ";
+    int count = 0;
+    for(auto& p : ret.points){
+        stream << count <<"_"<< p << " ";
+        count ++;
+    }
+    // stream << std::endl;
+    return stream;
+}
 
 template<class OBJ1, class OBJ2>
 class IntersectionBase_{
