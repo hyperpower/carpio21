@@ -194,7 +194,7 @@ TEST(segment, sweep_line){
     // intersection =========
     typedef Segment_<double, 2> Segment;
     IntersectionLineSweep_<Segment> inter(lseg);
-
-    inter.print_event_queue();
+    inter.execute();
+    // inter.print_event_queue();
    
 }
