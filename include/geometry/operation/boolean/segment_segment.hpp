@@ -211,58 +211,160 @@ public:
         return CalSegmentsIntersection((*(_arrp[0])), (*(_arrp[1])), (*(_arrp[2])),(*(_arrp[3])));
     }
 };
-template<class CONTAINER>
-auto IntersectN2(const CONTAINER& con, SegmentTag){
-    typedef typename CONTAINER::value_type Seg;
-    typedef typename Seg::coord_value_type Cvt;
-    typedef IntersectionPairSS_<Cvt, Seg::Dim> Inter;
+template<class GEO1, class GEO2>
+class IntersectionResultImplement_<GEO1, GEO2, SegmentTag, SegmentTag>{
+public:
+    typedef GEO1 Geo1;
+    typedef GEO2 Geo2;
+    typedef typename GEO1::Point Point;
+    typedef IntersectionResultImplement_<GEO1, GEO2, SegmentTag, SegmentTag> Self;
 
-    typedef IntersectionReturn_<Seg> InterRet;
-    typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
-    ListInterRet res;
-    for(auto iter = con.begin(); iter != con.end(); ++iter){
-        auto& seg1 = *iter;
-        for(auto iterin = std::next(iter); iterin != con.end(); ++iterin){
-            // if(iter == iterin){
-                // continue;
-            // }
-            auto& seg2 = *iterin;
-            // std::cout << "seg1 = " << seg1 <<std::endl;
-            // std::cout << "seg2 = " << seg2 <<std::endl;
-            Inter inter(seg1, seg2);
-            auto t = inter.cal_intersection_type();
-            if(t == _SS_NO_){
-                continue;
-            }
-            // std::cout << "inter type = " << ToString(t) << std::endl;
-            InterRet ret(seg1, seg2, ToString(t));
-            if(t == _SS_INTERSECT_){
-                auto p = inter.cal_intersection_point();
-                // std::cout <<"inter sect point = " << p << std::endl;
-                ret.push_back(p);
-            }
-            res.push_back(ret);
+    const Geo1* geo1;
+    const Geo2* geo2;
+
+    int type;
+    Point point;
+
+    IntersectionResultImplement_(): 
+        geo1(nullptr), geo2(nullptr), type(-1){}
+    
+    IntersectionResultImplement_(const Geo1& g1, const Geo2& g2, int t): 
+        geo1(&g1), geo2(&g2), type(t){}
+    
+    void show() const{
+        std::cout << "Seg1 : " << *geo1 << std::endl;
+        std::cout << "Seg2 : " << *geo2 << std::endl;
+        auto tss = ToIntersectionTypeSS(type);
+        std::cout << "Type : " << ToString(tss) << std::endl;
+        std::cout << "Point: " << point << std::endl;
+    }
+};
+
+
+// Replace  IntersectionPairSS_
+template<class GEO1, class GEO2>
+class IntersectionImplement_<GEO1, GEO2, SegmentTag, SegmentTag>{
+public:
+    // static const St Dim = DIM;
+    typedef typename GEO1::Point Point;
+    typedef typename Point::coord_value_type Cvt;
+    typedef Box_<Cvt, Point::Dim> Box;
+    // typedef Segment_<TYPE, DIM> Segment;
+    // typedef TYPE Vt;
+    typedef IntersectionResultImplement_<GEO1, GEO2, SegmentTag, SegmentTag> Result;
+
+    typedef const Point& crPoint;
+    typedef const Point* cpPoint;
+protected:
+    std::array<cpPoint, 4> _arrp; //pPoint list
+    std::array<int, 4>     _position;      //point position
+
+    // std::shared_ptr<Point> _sppoint; //new intersection point
+    Result _res;
+public:
+    IntersectionImplement_(
+            const Point& p1,
+            const Point& p2,
+            const Point& p3,
+            const Point& p4){
+        _arrp[0] = &p1;
+        _arrp[1] = &p2;
+        _arrp[2] = &p3;
+        _arrp[3] = &p4;
+        _position.fill(-1);
+        if (_is_box_in_on()) {
+            _get_relation();
         }
     }
-    return res;
-}
-
-template<class CONTAINER, 
-        typename std::enable_if<
-                   (! IsGeometry<CONTAINER>::value)
-                && IsContainer<CONTAINER>::value
-                && IsGeometry<typename CONTAINER::value_type>::value 
-        , bool>::type = true>
-auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
-    typedef typename CONTAINER::value_type Seg;
-    typedef IntersectionReturn_<Seg> InterRet;
-    typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
-    std::string m = ToLowerCase(method);
-    if (m == "" || m == "n2"){
-        return IntersectN2(con, SegmentTag());
+    IntersectionImplement_(
+            const GEO1& seg1,
+            const GEO2& seg2
+            ){
+        _arrp[0] = &(seg1.ps());
+        _arrp[1] = &(seg1.pe());
+        _arrp[2] = &(seg2.ps());
+        _arrp[3] = &(seg2.pe());
+        _position.fill(-1);
+        if (_is_box_in_on()) {
+            _get_relation();
+        }
+        _res.geo1 = &seg1;
+        _res.geo2 = &seg2;
     }
-    // return ListInterRet(); 
-}
+    IntersectionTypeSS cal_intersection_type(){
+        if(_position[1] > -1){
+            short t1 = _get_ss_type1();
+            if(t1 == _SS_FURTHER_) { // type is further
+                short t2 = _get_ss_type2();
+                if(t2 == _SS_FURTHER_){
+                    return _SS_INTERSECT_;
+                }else{
+                    return ToIntersectionTypeSS(t2);
+                }
+            }else{
+                return ToIntersectionTypeSS(t1);
+            }
+        }else{
+            return _SS_NO_;
+        }
+    }
+    // normal intersection
+    Point cal_intersection_point(){
+        // The intersection type must be _SS_INTERSECT_
+        ASSERT(Point::Dim == 2);
+        return CalSegmentsIntersection((*(_arrp[0])), (*(_arrp[1])), (*(_arrp[2])),(*(_arrp[3])));
+    }
+
+    Result execute(){
+        auto t = this->cal_intersection_type()
+        this->res.type = t;
+        if(t == _SS_INTERSECT_){
+            this->res.p = cal_intersection_point();
+        }
+    }
+
+protected:
+    short _get_ss_type1(){ // seg1 to seg2
+        short t = _SSTYPE[_position[0]][_position[1]];
+        ASSERT(t != _SS_ERROR_);
+        return t;
+    }
+
+    short _get_ss_type2() { // seg2 to seg1
+        short t = _SSTYPE[_position[2]][_position[3]];
+        ASSERT(t != _SS_ERROR_);
+        return t;
+    }
+    bool _is_box_in_on(){
+        Box b1(*(_arrp[0]), *(_arrp[1]));
+        Box b2(*(_arrp[2]), *(_arrp[3]));
+        return IsInOn(b1, b2);
+    }
+    void _get_relation(){
+        _position[0] = OnWhichSide7(*(_arrp[2]), *(_arrp[3]), *(_arrp[0]));
+        _position[1] = OnWhichSide7(*(_arrp[2]), *(_arrp[3]), *(_arrp[1]));
+        if(_get_ss_type1() == _SS_FURTHER_){
+            _position[2] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[2]));
+            _position[3] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[3]));
+        }
+    }
+    int point_position(St idx){
+        ASSERT(idx >= 0 && idx < 4);
+        // 0 start of seg1
+        // 1 start of seg1
+        // 2 start of seg2
+        // 3 start of seg2
+        if(idx == 2 || idx == 3){
+            _position[2] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[2]));
+            _position[3] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[3]));
+        }
+        return _position[idx];
+    }
+};
+// Replace  IntersectionPairSS_
+
+
+
 
 
 

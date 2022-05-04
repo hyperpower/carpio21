@@ -73,7 +73,7 @@ TEST(segment, segment_point_location){
 }
 
 TEST(segment, intersection){
-    typedef IntersectionPairSS_<double, 2> Inter;
+    // typedef IntersectionPairSS_<double, 2> Inter;
     Point2 p1(  -1,    0);
     Point2 p2(   3,  0.5);
     Point2 p3( 0.8,  2.0);
@@ -81,7 +81,9 @@ TEST(segment, intersection){
     Seg2 seg1(p1, p2);
     Seg2 seg2(p3, p4);
 
-    Inter inter(seg1, seg2);
+    typedef Intersection_<Seg2, Seg2> Intersection;
+
+    Intersection inter(seg1, seg2);
     auto strtype = ToString(inter.cal_intersection_type());
     std::cout << "Intersection Type : "<< strtype << std::endl;
     Point2 np = inter.cal_intersection_point();
@@ -99,7 +101,7 @@ TEST(segment, intersection){
 }
 
 TEST(segment, intersection2){
-    typedef IntersectionPairSS_<double, 2> Inter;
+    typedef Intersection_<Seg2, Seg2> Inter;
     Point2 p1(  2.0,    0);
     Point2 p2(  2.0,  2.0);
     Point2 p3(  3.0,  1.0);
@@ -124,7 +126,7 @@ TEST(segment, intersection2){
     gnu.plot();
 }
 TEST(segment, intersection3){
-    typedef IntersectionPairSS_<double, 2> Inter;
+    typedef Intersection_<Seg2, Seg2> Inter;
     Point2 p1(  0.0,    0);
     Point2 p2(  1.0,  0.0);
     Point2 p3( -3.0,  0.0);
@@ -168,7 +170,7 @@ auto GenerateRandomSegments(int num,
 
 
 TEST(segment, multi){
-    auto lseg = GenerateRandomSegments(5, 0, 1, 0, 1);
+    auto lseg = GenerateRandomSegments(10, 0, 1, 0, 1);
     // intersection =========
     auto res = Intersect(lseg);
     
@@ -181,8 +183,9 @@ TEST(segment, multi){
 
     int count = 1;
     for(auto& r : res){
-        std::cout << count << "  " << r << std::endl;
-        auto actor = ToGnuplotActor(r.points);
+        std::cout << count << std::endl;
+        r.show();
+        auto actor = ToGnuplotActor(r.point);
         gnu.add(actor);
         count++;
     }
@@ -190,11 +193,29 @@ TEST(segment, multi){
 }
 
 TEST(segment, sweep_line){
-    auto lseg = GenerateRandomSegments(5, 0, 1, 0, 1);
+    auto lseg = GenerateRandomSegments(10, 0, 1, 0, 1);
     // intersection =========
     typedef Segment_<double, 2> Segment;
-    IntersectionLineSweep_<Segment> inter(lseg);
-    inter.execute();
+    IntersectionSweepLineSimple_<Segment> inter(lseg);
+    auto res = inter.execute();
     // inter.print_event_queue();
-   
+
+    // IntersectionRet<Segment, Segment> ret;
+    // ret.geo1;
+    // show =================
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/line_segment_5.png");
+    gnu.set_xrange(-0.2, 1.2);
+    gnu.set_yrange(-0.2, 1.2);
+    gnu.add(ToGnuplotActor(lseg));
+
+    int count = 1;
+    for(auto& r : res){
+        std::cout << count << std::endl;
+        r.show();
+        auto actor = ToGnuplotActor(r.point);
+        gnu.add(actor);
+        count++;
+    }
+    gnu.plot();
 }

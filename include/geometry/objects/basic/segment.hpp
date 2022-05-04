@@ -338,6 +338,22 @@ inline std::ostream& operator<<(std::ostream& o, const Segment_<TYPE, DIM>& p) {
 	return o << p.ps() << "-->" << p.pe();
 }
 
+template<typename TYPE, St DIM>
+inline TYPE MinX(const Segment_<TYPE, DIM>& p) {
+	return p.psx() < p.pex() ? p.psx() : p.pex();
+}
+template<typename TYPE, St DIM>
+inline TYPE MinY(const Segment_<TYPE, DIM>& p) {
+	return p.psy() < p.pey() ? p.psy() : p.pey();
+}
+template<typename TYPE, St DIM>
+inline TYPE MaxX(const Segment_<TYPE, DIM>& p) {
+	return p.psx() > p.pex() ? p.psx() : p.pex();
+}
+template<typename TYPE, St DIM>
+inline TYPE MaxY(const Segment_<TYPE, DIM>& p) {
+	return p.psy() > p.pey() ? p.psy() : p.pey();
+}
 // Point loaction relative to a segment in 2D
 // It has 7 possibilities
 // ================================

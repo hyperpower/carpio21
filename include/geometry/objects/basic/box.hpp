@@ -28,7 +28,7 @@ public:
 	typedef Point_<TYPE, DIM> Point;
 	typedef Box_<TYPE, DIM> Self;
 	typedef St size_type;
-	typedef TYPE CoordinateValue;
+	typedef TYPE coord_value_type;
 	typedef TYPE CV;
 	typedef BoxTag Tag;
 	

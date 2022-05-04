@@ -56,7 +56,7 @@ public:
     typedef PointTag Tag;
     typedef Point_<TYPE, DIM> Point;
     typedef Point_<TYPE, DIM> Self;
-    typedef TYPE CoordinateValue;
+	typedef TYPE coord_value_type;
     typedef TYPE CV;  // short for CoordinateValue  
     // std like
     typedef std::array<TYPE, DIM> Base;
