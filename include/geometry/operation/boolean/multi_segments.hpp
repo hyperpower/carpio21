@@ -8,6 +8,8 @@
 
 #include "segment_segment.hpp"
 
+#include "utility/profile.hpp"
+
 namespace carpio{
 
 template<class CONTAINER>
@@ -23,44 +25,23 @@ auto IntersectN2(const CONTAINER& con, SegmentTag){
     for(auto iter = con.begin(); iter != con.end(); ++iter){
         auto& seg1 = *iter;
         for(auto iterin = std::next(iter); iterin != con.end(); ++iterin){
-            // if(iter == iterin){
-                // continue;
-            // }
+            ProfileStart("IntersectCall");
             auto& seg2 = *iterin;
-            // std::cout << "seg1 = " << seg1 <<std::endl;
-            // std::cout << "seg2 = " << seg2 <<std::endl;
             Inter inter(seg1, seg2);
             auto t = inter.cal_intersection_type();
-            if(t == _SS_NO_){
-                continue;
+            if(t != _SS_NO_){
+                InterRes ret(seg1, seg2, t);
+                if(t == _SS_INTERSECT_){
+                    ret.point = inter.cal_intersection_point();
+                }
+                res.push_back(ret);
             }
-            // std::cout << "inter type = " << ToString(t) << std::endl;
-            InterRes ret(seg1, seg2, t);
-            if(t == _SS_INTERSECT_){
-                ret.point = inter.cal_intersection_point();
-            }
-            res.push_back(ret);
+            ProfileEnd();
         }
     }
     return res;
 }
 
-template<class CONTAINER, 
-        typename std::enable_if<
-                   (! IsGeometry<CONTAINER>::value)
-                && IsContainer<CONTAINER>::value
-                && IsGeometry<typename CONTAINER::value_type>::value 
-        , bool>::type = true>
-auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
-    typedef typename CONTAINER::value_type Seg;
-    typedef IntersectionReturn_<Seg> InterRet;
-    typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
-    std::string m = ToLowerCase(method);
-    if (m == "" || m == "n2"){
-        return IntersectN2(con, SegmentTag());
-    }
-    // return ListInterRet(); 
-}
 
 
 template<class GEO>
@@ -133,10 +114,10 @@ public:
         int i = 0;
         while (!_eq.empty()){
         // for(int i = 0; i < 5; i++){
-            std::cout << "Step = " << i << " =========== " << std::endl;
+            // std::cout << "Step = " << i << " =========== " << std::endl;
             Event event = _eq.top();
             _eq.pop();
-            std::cout <<"This Event = "<< *(event.geo) << ' ' << (event.value) <<" T = " << event.type_to_string() << std::endl;
+            // std::cout <<"This Event = "<< *(event.geo) << ' ' << (event.value) <<" T = " << event.type_to_string() << std::endl;
             if (event.type == Event::_START_){
                 auto pair = _set.insert(event.geo);
                 ASSERT(pair.second == true);
@@ -149,7 +130,7 @@ public:
                 }
             }
             i++;
-            std::cout << "Geo Set size = " << _set.size() << std::endl;
+            // std::cout << "Geo Set size = " << _set.size() << std::endl;
         }
         return _list_res;
     }
@@ -184,6 +165,7 @@ protected:
         }
     }
     auto check_intersect(const Geo& g1, const Geo& g2, SegmentTag){
+        ProfileStart("SIntersectCall");
         typedef Intersection_<Geo, Geo> Inter;
         Inter inter(g1, g2);
         auto t = inter.cal_intersection_type();
@@ -192,6 +174,7 @@ protected:
             auto p = inter.cal_intersection_point();
             ret.point = p;
         }
+        ProfileEnd();
         return ret;
     }
 };
@@ -430,7 +413,25 @@ public:
 };
 
  
-
+template<class CONTAINER, 
+        typename std::enable_if<
+                   (! IsGeometry<CONTAINER>::value)
+                && IsContainer<CONTAINER>::value
+                && IsGeometry<typename CONTAINER::value_type>::value 
+        , bool>::type = true>
+auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
+    typedef typename CONTAINER::value_type Seg;
+    typedef IntersectionReturn_<Seg> InterRet;
+    typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
+    std::string m = ToLowerCase(method);
+    if (m == "" || m == "n2"){
+        return IntersectN2(con, SegmentTag());
+    }else if( m == "sweep_line_simple"){
+        IntersectionSweepLineSimple_<typename CONTAINER::value_type> inter(con);
+        return inter.execute();
+    }
+    // return ListInterRet(); 
+}
 }
 
 #endif

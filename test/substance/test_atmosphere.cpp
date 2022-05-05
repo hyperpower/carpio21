@@ -5,14 +5,14 @@
 
 using namespace carpio;
 
-const std::string OUTPUTPATH = "./test_output/";
+const std::string OUTPUTPATH = "./fig/";
 
 const int fig_width  = 600;
 const int fig_height = 900;
 
 TEST(atmosphere, mkdir){
     // Do not disable this test
-    MakeDir("./test_output/");
+    MakeDir("./fig/");
 }
 
 TEST(atmosphere, test1) {
@@ -26,13 +26,12 @@ TEST(atmosphere, test1) {
     }
 
     Gnuplot gnu;
-    GnuplotActorMaker maker;
     gnu.set_grid();
     gnu.set_title("Figure. 3 in US Standard Atmosphere 1976");
     gnu.set_xlabel("Molecular-scale temperature, K");
     gnu.set_xrange(160, 300);
     gnu.set_ylabel("Geoportential Altitude, m");
-    gnu.add(maker.array_xy(
+    gnu.add(ToGnuplotActor(
                   x, y,
                   "using 1:2 title \"\" ",
                   "with lines lw 1"));
@@ -51,13 +50,12 @@ TEST(atmosphere, test2) {
     }
 
     Gnuplot gnu;
-    GnuplotActorMaker maker;
     gnu.set_grid();
     gnu.set_title("Figure. 6 in US Standard Atmosphere 1976");
     gnu.set_xlabel("Molecular Weight, kg/mol");
 //	gnu.set_xrange(160, 300);
     gnu.set_ylabel("Geometric Altitude, km");
-    gnu.add(maker.array_xy(
+    gnu.add(ToGnuplotActor(
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
@@ -76,7 +74,6 @@ TEST(atmosphere, pressure) {
     }
 
     Gnuplot gnu;
-    GnuplotActorMaker maker;
     gnu.set_grid();
     gnu.set_title("Figure. 7 in US Standard Atmosphere 1976");
     gnu.set_xlabel("Pressure, Pa");
@@ -84,7 +81,7 @@ TEST(atmosphere, pressure) {
     gnu.set_xformat("%.0e");
 //	gnu.set_xrange(160, 300);
     gnu.set_ylabel("Geometric Altitude, km");
-    gnu.add(maker.array_xy(
+    gnu.add(ToGnuplotActor(
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
@@ -103,7 +100,6 @@ TEST(atmosphere, Density) {
     }
 
     Gnuplot gnu;
-    GnuplotActorMaker maker;
 
     gnu.set_grid();
     gnu.set_title("Figure. 7 in US Standard Atmosphere 1976");
@@ -112,7 +108,7 @@ TEST(atmosphere, Density) {
     gnu.set_xformat("%.0e");
 //	gnu.set_xrange(160, 300);
     gnu.set_ylabel("Geometric Altitude, km");
-    gnu.add(maker.array_xy(
+    gnu.add(ToGnuplotActor(
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
@@ -131,7 +127,6 @@ TEST(atmosphere, SpeedOfSound) {
     }
 
     Gnuplot gnu;
-    GnuplotActorMaker maker;
 
     gnu.set_grid();
     gnu.set_title("Figure. 13 in US Standard Atmosphere 1976");
@@ -140,7 +135,7 @@ TEST(atmosphere, SpeedOfSound) {
     gnu.set_xformat("%.0f");
     gnu.set_yrange(0, 90);
     gnu.set_ylabel("Geometric Altitude, km");
-    gnu.add(maker.array_xy(
+    gnu.add(ToGnuplotActor(
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));
@@ -159,7 +154,6 @@ TEST(atmosphere, DynamicViscosity) {
     }
 
     Gnuplot gnu;
-    GnuplotActorMaker maker;
 
     gnu.set_grid();
     gnu.set_title("Figure. 14 in US Standard Atmosphere 1976");
@@ -168,7 +162,7 @@ TEST(atmosphere, DynamicViscosity) {
     gnu.set_xformat("%.1f");
     gnu.set_yrange(0, 90);
     gnu.set_ylabel("Geometric Altitude, km");
-    gnu.add(maker.array_xy(
+    gnu.add(ToGnuplotActor(
                   x, y,
                     "using 1:2 title \"\" ",
                   "with lines lw 1"));

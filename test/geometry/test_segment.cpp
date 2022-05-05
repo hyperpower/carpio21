@@ -7,6 +7,7 @@
 
 #include "geometry/geometry.hpp"
 #include "utility/random.hpp"
+#include "utility/profile.hpp"
 #include "gtest/gtest.h"
 
 using namespace carpio;
@@ -170,9 +171,16 @@ auto GenerateRandomSegments(int num,
 
 
 TEST(segment, multi){
-    auto lseg = GenerateRandomSegments(10, 0, 1, 0, 1);
+    ProfileStart("N2");
+    ProfileStart("GenerateSegments");
+    auto lseg = GenerateRandomSegments(1000, 0, 1000, 0, 1);
+    ProfileEnd();
     // intersection =========
+    ProfileStart("Intersect");
     auto res = Intersect(lseg);
+    ProfileEnd();
+    ProfileEnd();
+    ProfileListShow();
     
     // show =================
     Gnuplot gnu;
@@ -183,23 +191,32 @@ TEST(segment, multi){
 
     int count = 1;
     for(auto& r : res){
-        std::cout << count << std::endl;
-        r.show();
+        // std::cout << count << std::endl;
+        // r.show();
         auto actor = ToGnuplotActor(r.point);
         gnu.add(actor);
         count++;
     }
-    gnu.plot();
+    // gnu.plot();
 }
 
 TEST(segment, sweep_line){
-    auto lseg = GenerateRandomSegments(10, 0, 1, 0, 1);
+    ProfileStart("SweepLine");
+    ProfileStart("SGenerateSegments");
+    auto lseg = GenerateRandomSegments(1000, 0, 1000, 0, 1);
+    ProfileEnd();
     // intersection =========
     typedef Segment_<double, 2> Segment;
+    ProfileStart("SSortSegments");
     IntersectionSweepLineSimple_<Segment> inter(lseg);
-    auto res = inter.execute();
-    // inter.print_event_queue();
+    ProfileEnd();
 
+    ProfileStart("SExecute");
+    auto res = inter.execute();
+    ProfileEnd();
+    // inter.print_event_queue();
+    ProfileEnd();
+    ProfileListShow();
     // IntersectionRet<Segment, Segment> ret;
     // ret.geo1;
     // show =================
@@ -211,11 +228,11 @@ TEST(segment, sweep_line){
 
     int count = 1;
     for(auto& r : res){
-        std::cout << count << std::endl;
-        r.show();
+        // std::cout << count << std::endl;
+        // r.show();
         auto actor = ToGnuplotActor(r.point);
         gnu.add(actor);
         count++;
     }
-    gnu.plot();
+    // gnu.plot();
 }

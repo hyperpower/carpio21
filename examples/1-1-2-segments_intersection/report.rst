@@ -106,16 +106,26 @@ The input is a set S of segments in the plane (each defined by a pair of points)
 a list of all the places where these line segments intersect.
 
 Method 1 Trivial n2
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 There’s a trivial :math:`O(n^2)` algorithm: Just apply segment intersection to all pairs of segments.
  
-Method 2 Sweep Line
--------------------------
+Method 2 Sweep Line -- Simple
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Generally speaking sweepline means that you are processing the data in some order (e.g. left to
-right order). A data structure is maintained that keeps the information gleened from the part of
+right order). A data structure is maintained that keeps the information orgnised from the part of
 the data currently to the left of the sweepline.
+
+Benchmark
+-------------------------------
+
+Random Segments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Different amount of segments have been randomly generated. The methods mentioned have been tested.
+
+
 
 
 

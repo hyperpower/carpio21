@@ -98,9 +98,11 @@ public:
     const std::string& command() const {
         return _pcmd;
     }
+    // deprecate---
     std::string& style() {
         return _scmd;
     }
+    // deprecate---
     const std::string& style() const {
         return _scmd;
     }
@@ -354,7 +356,7 @@ protected:
             throw std::runtime_error(
                     "In function \"Gnuplot::file_exists\": mode\
                         has to be an integer between 0 and 7");
-            return false;
+            // return false;
         }
 
         //  int _access(const char *path, int mode);
@@ -1100,57 +1102,33 @@ public:
     }
 };
 
-class GnuplotActorMaker{
-public:
-    typedef std::shared_ptr<carpio::GnuplotActor> spActor;
-
-public:
-    GnuplotActorMaker(){};
-
-    template<typename X, typename Y>
-    spActor array_xy(const X& x, const Y& y,
+template<typename X, typename Y,
+    typename std::enable_if<
+        std::is_arithmetic<typename X::value_type>::value
+    && IsContainer<X>::value
+    && std::is_arithmetic<typename Y::value_type>::value
+    && IsContainer<Y>::value, 
+    bool>::type = true>
+auto ToGnuplotActor(const X& x, const Y& y,
             const std::string &pcmd = "using 1:2 title \"\" ",
-            const std::string& scmd = "") {
-        auto actor = _make_spactor(pcmd, scmd);
-        ASSERT(x.size() == y.size());
-        typename X::const_iterator xiter = x.begin();
-        typename X::const_iterator yiter = y.begin();
-        for (; xiter != x.end();) {
-            std::ostringstream sst;
-            sst << (*xiter) << " " << (*yiter);
-            actor->data().push_back(sst.str());
-            xiter++;
-            yiter++;
-        }
-        return actor;
+            const std::string& scmd = ""){
+    GnuplotActor actor;
+    actor.command(pcmd);
+    actor.style(scmd);
+    ASSERT(x.size() == y.size());
+    auto xiter = x.begin();
+    auto yiter = y.begin();
+    for (; xiter != x.end();) {
+        std::ostringstream sst;
+        sst << (*xiter) << " " << (*yiter);
+        actor.data().push_back(sst.str());
+        xiter++;
+        yiter++;
     }
+    return actor;
+}
 
-    template<typename Container>
-    spActor matrix_xy(
-            const Container& con, // matrix like data structure
-            const St& c1, // column index
-            const St& c2, // column index
-            const std::string &pcmd = "using 1:2 title \"\" ",
-            const std::string& scmd = "") {
-        auto actor = _make_spactor(pcmd, scmd);
-        for (auto& row : con) {
-            std::ostringstream sst;
-            sst << row[c1] << " " << row[c2];
-            actor->data().push_back(sst.str());
-        }
-        return actor;
-    }
 
-protected:
-    spActor _make_spactor(
-        const std::string &pcmd = "using 1:2 title \"\" ",
-        const std::string& scmd = ""){
-        spActor actor    = spActor(new GnuplotActor());
-        actor->command() = pcmd;
-        actor->style()   = scmd;
-        return actor;
-    }
-};
 
 }
 

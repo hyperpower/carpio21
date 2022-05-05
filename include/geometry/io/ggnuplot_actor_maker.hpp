@@ -18,11 +18,12 @@
 
 namespace carpio {
 
+
 template<typename TYPE, St DIM>
-class GGnuplotActorMaker_ : public GnuplotActorMaker{
+class GGnuplotActorMaker_ { //deprecate ----
 public:
     static const St Dim = DIM;
-    typedef GnuplotActorMaker Base;
+    // typedef GnuplotActorMaker Base;
     typedef TYPE Vt;
     typedef Point_<TYPE, DIM> Point;
     typedef Box_<TYPE, DIM>   Box;

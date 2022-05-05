@@ -23,21 +23,18 @@ namespace carpio {
 
 class PythonInterpreter
 {
-public:
-    // std::array<std::array<int,3>, 3> _mapte0e1;
 private:
     static PythonInterpreter * pinstance_;
     static std::mutex mutex_;
 protected:
     PythonInterpreter()
     {
-        // optional but recommended
 #if PY_MAJOR_VERSION >= 3
         wchar_t name[] = L"plotting";
 #else
         char name[] = "plotting";
 #endif
-        std::cout << "Singleton Python Interpreter" << std::endl;
+        // std::cout << "Singleton Python Interpreter" << std::endl;
         Py_SetProgramName(name);
         Py_Initialize();
 
@@ -50,7 +47,6 @@ protected:
 #else
         PySys_SetArgv(argc, (char **)(argv));
 #endif
-
     }
     ~PythonInterpreter() {
         Py_Finalize();
