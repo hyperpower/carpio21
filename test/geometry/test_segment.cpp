@@ -173,7 +173,7 @@ auto GenerateRandomSegments(int num,
 TEST(segment, multi){
     ProfileStart("N2");
     ProfileStart("GenerateSegments");
-    auto lseg = GenerateRandomSegments(1000, 0, 1000, 0, 1);
+    auto lseg = GenerateRandomSegments(100, 0, 1000, 0, 1);
     ProfileEnd();
     // intersection =========
     ProfileStart("Intersect");
@@ -203,7 +203,7 @@ TEST(segment, multi){
 TEST(segment, sweep_line){
     ProfileStart("SweepLine");
     ProfileStart("SGenerateSegments");
-    auto lseg = GenerateRandomSegments(1000, 0, 1000, 0, 1);
+    auto lseg = GenerateRandomSegments(100, 0, 1000, 0, 1);
     ProfileEnd();
     // intersection =========
     typedef Segment_<double, 2> Segment;

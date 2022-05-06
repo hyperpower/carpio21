@@ -34,7 +34,7 @@ struct FunctionInfo{
     void show_sum(){
         auto calls = lstart.size();
         double ms = this->sum();
-        std::string date = tfm::format("%20s :  %d   %.3d\n",
+        std::string date = tfm::format("%25s :  %10d   %.3f\n",
                                  name, calls, ms);
         std::cout << date;
     }
@@ -45,14 +45,14 @@ private:
     static Profile * pinstance_;
     static std::mutex mutex_;
 
-    int level;
+    // int level;
     std::list<std::string> _cur_name;
     std::list<tick_t> _cur_tick;
 
     std::list<FunctionInfo> _list;
 protected:
     Profile(){
-        level = 0;
+        // level = 0;
     }
     ~Profile() {
     }
@@ -71,10 +71,10 @@ public:
     void operator=(const Profile &) = delete;
 
     void probe_start(const std::string& name){
-        level++;
+        // level++;
 	    _cur_tick.push_back(Clock::Tick());
         // auto nn = _cur_tick.size();
-        std::string nn = ToString(level) + "_" + name;
+        std::string nn = name;
         _cur_name.push_back(nn);
         auto pinfo = this->_find(nn);
         if (pinfo == this->_list.end()){
@@ -85,7 +85,7 @@ public:
     }
 
     void probe_end(){
-        level--;
+        // level--;
         // _cur_end = Clock::Tick();
         auto cn = _cur_name.back();
         auto ct = _cur_tick.back();
