@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 set(This Utility)
 
 set(Sources
-    test_any.cpp
-    test_clock.cpp
+    test_tree.cpp
+    # test_clock.cpp
 )
 
 add_executable(${This} ${Sources})

@@ -8,33 +8,94 @@
 #ifndef _BINARYTREE_HPP_
 #define _BINARYTREE_HPP_
 
-#include "type_define.h"
+#include "type_define.hpp"
 // #include "Iterator.h"
 
 namespace carpio {
 
+template<class TYPE, std::size_t S>
+class TreeNode_{
+};
+
 template<typename TYPE>
-class BinaryTreeNode{
-protected:
-    typedef BinaryTreeNode<TYPE>* pNode;
+class TreeNode_<TYPE, 2>{
+public:
+    typedef TreeNode_<TYPE, 2>   Node;
+    typedef TreeNode_<TYPE, 2>* pNode;
+    typedef const TreeNode_<TYPE, 2>* cpNode;
+    typedef TYPE value_type;
+    typedef std::size_t size_type;
+
+    typedef TreeNode_<TYPE, 2> Self;
 public:
     TYPE  value;
-    pNode lchild;
-    pNode rchild;
-    pNode father;
+    pNode f;
+    pNode leftc;
+    pNode rightc;
+
+    TreeNode_():
+        f(nullptr), leftc(nullptr), rightc(nullptr){}
     
-    BinaryTreeNode():
-            lchild(nullptr), rchild(nullptr), father(nullptr){
-        value = TYPE();
+    TreeNode_(const TYPE &data):
+        value(data), f(nullptr), leftc(nullptr), rightc(nullptr){} 
+    
+    TreeNode_(const TYPE &data, pNode lc, pNode rc, pNode fc):
+        value(data){
+        leftc  = lc;
+        rightc = rc;
+        father = fc
+    }
+
+    ~TreeNode_(){
+        this->destory(this->leftc);
+        this->destory(this->rightc);
+        if(this->f != nullptr){
+            if(this == this->f->left_child()){
+                this->f->left_child(nullptr);
+            }
+            if(this == this->f->right_child()){
+                this->f->right_child(nullptr);
+            }
+        }
+    }
+    pNode child(std::size_t idx){
+        switch (idx)
+        {
+        case 0:
+            return this->left_child; 
+            break;
+        case 1:
+            return this->right_child; 
+            break;
+        default:
+            throw 
+            break;
+        }
     }
     
-    BinaryTreeNode(const TYPE &data): 
-        value(data), 
-        lchild(nullptr), rchild(nullptr), father(nullptr){}
-    
-    BinaryTreeNode(const TYPE &data, pNode lc, pNode rc, pNode fc):
-        value(data), 
-        lchild(lc), rchild(rc), father(fc){}
+
+    pNode left_child(){
+        return this->leftc;
+    }
+    pNode right_child(){
+        return this->rightc;
+    }
+    cpNode left_child() const{
+        return this->leftc;
+    }
+    cpNode right_child() const{
+        return this->rightc;
+    }
+    void left_child(pNode node){
+        this->leftc = node;
+    }
+    void right_child(pNode node){
+        this->rightc = node;
+    }
+
+    void father(pNode node){
+        this->f = node;
+    }
 
     pNode leftmost(){
         pNode ptn = this;
@@ -44,151 +105,83 @@ public:
     }
     pNode rightmost(){
         pNode ptn = this;
-        while (ptn->rchild != nullptr)
-            ptn = ptn->rchild;
+        while (ptn->rightc != nullptr)
+            ptn = ptn->rightc;
         return ptn;
     }
 
     St height() const{
-        return 1 + std::max(height(lchild), height(rchild));
+        return 1 + std::max(height(this->leftc), height(this->rightc));
     }
     St height(pNode cur) const{
         if (cur == nullptr)
             return 0;
         else
-            return 1 + MAX(height(cur->lchild), height(cur->rchild));
-    }
-};
-
-
-//This is the end of Class BinaryTreeNode
-//-----------------------------------------------
-
-template<class _Tp, class _Ref, class _Ptr>
-class _BinaryTree_iterator {
-public:
-    typedef St size_type;
-    typedef St difference_type;
-    typedef bidirectional_iterator_tag iterator_category;
-
-    typedef _BinaryTree_iterator<_Tp, _Tp&, _Tp*> iterator;
-    typedef _BinaryTree_iterator<_Tp, const _Tp&, const _Tp*> const_iterator;
-    typedef _BinaryTree_iterator<_Tp, _Ref, _Ptr> _Self;
-
-    typedef _Tp  value_type;
-    typedef _Ptr pointer;
-    typedef _Ref reference;
-    typedef BinaryTreeNode<_Tp> _Node;
-
-    BinaryTreeNode<_Tp>* _ptr;
-
-    _BinaryTree_iterator() {
-        _ptr = nullptr;
-    }
-    _BinaryTree_iterator(BinaryTreeNode<_Tp>* _x) {
-        this->_ptr = _x;
-    }
-    _BinaryTree_iterator(const iterator& _x) {
-        this->_ptr = _x._ptr;
+            return 1 + MAX(height(cur->left_child()), height(cur->right_child()));
     }
 
-    void _incr() {
-        BinaryTreeNode<_Tp>* fn;
-        if (_ptr != nullptr) {
-            if (_ptr->rchild != nullptr) {
-                _ptr = _ptr->rchild->leftmost();
-                return;
-            }
-            fn = _ptr->father;
-            while (fn && _ptr == fn->rchild) {
-                _ptr = fn;
-                fn = fn->father;
-            }
-            _ptr = fn;
+    void destory(pNode& Current) {
+        if (Current != nullptr) {
+            destory(Current->leftc);
+            destory(Current->rightc);
+            delete Current;
+            Current = nullptr;
         }
     }
 
-    void _decr() {
-        BinaryTreeNode<_Tp>* fn;
-        if (_ptr != NULL) {
-            if (_ptr->lchild) {
-                _ptr = _ptr->lchild->rightmost();
-                return;
-            }
-            fn = _ptr->father;
-            while (fn && _ptr == fn->lchild) {
-                _ptr = fn;
-                fn = _ptr->father;
-            }
+    pNode copy() const{
+        pNode dst = new Node(this->value);
+        copy(this, dst);
+        return dst;
+    }
+    
+    void copy(cpNode src, pNode dst) const{
+        ASSERT(src != nullptr);
+        ASSERT(dst != nullptr);
+
+        dst->value = src->value;
+       
+        if (src->leftc != nullptr){
+            dst->leftc = new Node(src->leftc->value);
+            dst->leftc->f = dst;
+            copy(src->leftc, dst->leftc);
         }
-    }
-
-    bool operator==(const _BinaryTree_iterator& _x) const {
-        return _ptr == _x._ptr;
-    }
-    bool operator!=(const _BinaryTree_iterator& _x) const {
-        return _ptr != _x._ptr;
-    }
-
-    reference operator*() const {
-        return ((_Node*) _ptr)->value;
-    }
-
-    pointer operator->() const {
-        return &(operator*());
-    }
-
-    _Self& operator++() {
-        this->_incr();
-        return *this;
-    }
-
-    _Self operator++(int) {
-        _Self __tmp = *this;
-        this->_incr();
-        return __tmp;
-    }
-
-    _Self& operator--() {
-        this->_decr();
-        return *this;
-    }
-
-    _Self operator--(int) {
-        _Self __tmp = *this;
-        this->_decr();
-        return __tmp;
-    }
-
-    bool isExist(){
-        return _ptr!=nullptr;
+        if (src->rightc != nullptr){
+            dst->rightc = new Node(src->rightc->value);
+            dst->rightc->f = dst;
+            copy(src->rightc, dst->rightc);
+        }
     }
 };
 
 //===============================================
-template<typename TYPE>
-class BinaryTree {
+template<typename NODE>
+class BinaryTree_ {
 public:
-    typedef TYPE& reference;
-    typedef const TYPE& const_reference;
-    typedef TYPE* pointer;
-    typedef const TYPE* const_pointer;
-    typedef _BinaryTree_iterator<TYPE, TYPE&, TYPE*> iterator;
-    typedef _BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> const_iterator;
+    typedef typename NODE::value_type  value_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
 
-    typedef St size_type;
-    typedef St difference_type;
+    typedef BinaryTree_<NODE> Self;
+    // typedef _BinaryTree_iterator<TYPE, TYPE&, TYPE*> iterator;
+    // typedef _BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> const_iterator;
+
+    typedef typename NODE::size_type size_type;
+    // typedef std::size_t difference_type;
+    typedef NODE          Node;
+    typedef Node*        pNode;
+    typedef const Node* cpNode;
 protected:
-    typedef BinaryTreeNode<TYPE>          Node;
-    typedef BinaryTreeNode<TYPE>*        pNode;
-    typedef const BinaryTreeNode<TYPE>* cpNode;
-    typedef void (*pFun_BinaryTree)(pNode, utPointer);
+    pNode _end;
+protected:
 
-    pNode _root;
+    // typedef void (*pFun_BinaryTree)(pNode, utPointer);
 
-    void _preorder(pNode, pFun_BinaryTree, utPointer);
-    void _inorder(pNode, pFun_BinaryTree, utPointer);
-    void _postorder(pNode, pFun_BinaryTree, utPointer);
+    // void _preorder(pNode, pFun_BinaryTree, utPointer);
+    // void _inorder(pNode, pFun_BinaryTree, utPointer);
+    // void _postorder(pNode, pFun_BinaryTree, utPointer);
 
     void _destory(pNode&);
     void _copy(pNode&, const pNode&);
@@ -196,230 +189,294 @@ protected:
     size_type _height(pNode) const;
     size_type _size(const pNode&) const;
 
-    iterator root();
-    const_iterator root() const;
+    // iterator root();
+    // const_iterator root() const;
 public:
     //constructor================================
-    BinaryTree();
-    BinaryTree(const BinaryTree<TYPE>&);
+    BinaryTree_(){
+        _end  = new Node();
+    }
+    BinaryTree_(const Self& o){
+        _end  = new Node();
+        if(!(o.empty())){
+            _end->leftc = o.root()->copy();
+        }
+    }
     //destructor ================================
-    ~BinaryTree();
+    ~BinaryTree_(){
+        delete _end;
+    }
     //operator= =================================
-    BinaryTree<TYPE>& operator=(const BinaryTree<TYPE>&);
+    Self& operator=(const Self& o){
+        if(o.empty()){
+            return *this;
+        }        
+        if(!(this->empty())){
+            delete this->root();
+        }
+        this->root(o.root()->copy());
+        return *this;
+    }
+
+    cpNode root() const{
+        return _end->leftc;
+    }
+    pNode root(){
+        return _end->leftc;
+    }
+    void root(pNode pn){
+        _end->leftc = pn;
+        _end->leftc->f = _end;
+    }
     //Traversal =================================
-    void pre_order(pFun_BinaryTree, utPointer);
-    void in_order(pFun_BinaryTree, utPointer);
-    void post_order(pFun_BinaryTree, utPointer);
+    // void pre_order(pFun_BinaryTree, utPointer);
+    // void in_order(pFun_BinaryTree, utPointer);
+    // void post_order(pFun_BinaryTree, utPointer);
     //iterator===================================
-    iterator begin();
-    const_iterator begin() const;
-    iterator end();
-    const_iterator end() const;
+    // iterator begin();
+    // const_iterator begin() const;
+    // iterator end();
+    // const_iterator end() const;
     //===========================================
 
-    bool empty() const;
+    bool empty() const{
+       return _end->leftc == nullptr; 
+    }
     size_type size() const;
     void reverse();
     void clear();
     size_type height() const;
+protected:
 };
 
-template<typename TYPE>
-BinaryTree<TYPE>::BinaryTree() {
-    _root = new Node();
-}
+template<class NODE, class COMP = std::less<typename NODE::value_type> >
+class SortedBinaryTree_ : public BinaryTree_<NODE>{
+public:
+    typedef typename NODE::value_type  value_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
 
-template<typename TYPE>
-BinaryTree<TYPE>::BinaryTree(const BinaryTree<TYPE>& a) {
-    this->_root = nullptr;
-    _copy(this->_root, a._root);
-}
+    typedef BinaryTree_<NODE> Base;
+    typedef SortedBinaryTree_<NODE, COMP> Self;
 
-template<typename TYPE>
-BinaryTree<TYPE>::~BinaryTree() {
-    _destory(_root);
-}
+    typedef NODE          Node;
+    typedef Node*        pNode;
+    typedef const Node* cpNode;
 
-template<typename TYPE>
-BinaryTree<TYPE>& BinaryTree<TYPE>::operator=(
-        const BinaryTree<TYPE>& original) {
-    _destory(this->_root);
-    this->_root=nullptr;
-    _copy(this->_root, original._root);
-    return *this;
-}
+public:
+    SortedBinaryTree_():Base(){}
 
-template<typename TYPE>
-void BinaryTree<TYPE>::_destory(pNode& Current) {
-    if (Current != nullptr) {
-        _destory(Current->lchild);
-        _destory(Current->rchild);
-        delete Current;
-        Current = nullptr;
+    SortedBinaryTree_(const Self& o){
+        this->_end = new Node();
+        this->root(o.root()->copy());
     }
-}
 
-template<class TYPE>
-void BinaryTree<TYPE>::_copy(pNode& Current, const pNode& original) {
-    if (Current == nullptr) {
-        Current = new Node(original->value);
+    void insert(const_reference value){
+        if(this->empty()){
+            this->root(new Node(value));
+            return;
+        }else{
+            this->_insert(this->_end->leftc, value);
+        }
     }
-    if (original->lchild != nullptr) {
-        Current->lchild = new Node(original->lchild->value);
-        Current->lchild->father = Current;
-        _copy(Current->lchild, original->lchild);
+protected:
+    void _insert(pNode& cur, const_reference value){
+        if (cur == nullptr) {
+            cur = new Node(value);
+            return;
+        } else if (COMP{}(value, cur->value)) {
+            _insert(cur->leftc, value);
+            cur->leftc->f = cur;
+        } else if (!COMP{}(value, cur->value)){   //data >= Current->m_value
+            _insert(cur->rightc, value);
+            cur->rightc->f = cur;
+        } else {
+            return;
+        }
     }
-    if (original->rchild != nullptr) {
-        Current->rchild = new Node(original->rchild->value);
-        Current->rchild->father = Current;
-        _copy(Current->rchild, original->rchild);
-    }
-}
+};
 
-template<typename TYPE>
-void BinaryTree<TYPE>::_preorder(pNode Current, pFun_BinaryTree visit,
-        utPointer utp) {
-    if (Current != nullptr) {
-        (*visit)(Current->value, utp);
-        _preorder(Current->lchild, visit, utp);
-        _preorder(Current->rchild, visit, utp);
-    }
-}
+// template<typename TYPE>
+// BinaryTree<TYPE>::BinaryTree(const BinaryTree<TYPE>& a) {
+//     this->_root = nullptr;
+//     _copy(this->_root, a._root);
+// }
 
-template<class TYPE>
-void BinaryTree<TYPE>::pre_order(pFun_BinaryTree visit, utPointer utp) {
-    _preorder(_root->lchild, visit, utp);
-}
+// template<typename TYPE>
+// BinaryTree<TYPE>::~BinaryTree() {
+//     _destory(_root);
+// }
 
-template<typename TYPE>
-void BinaryTree<TYPE>::_postorder(pNode Current, pFun_BinaryTree visit,
-        utPointer utp) {
-    if (Current != nullptr) {
-        _postorder(Current->lchild, visit, utp);
-        _postorder(Current->rchild, visit, utp);
-        (*visit)(Current->value, utp);
-    }
-}
+// template<typename TYPE>
+// BinaryTree<TYPE>& BinaryTree<TYPE>::operator=(
+//         const BinaryTree<TYPE>& original) {
+//     _destory(this->_root);
+//     this->_root=nullptr;
+//     _copy(this->_root, original._root);
+//     return *this;
+// }
 
-template<class TYPE>
-void BinaryTree<TYPE>::post_order(pFun_BinaryTree visit, utPointer utp) {
-    _postorder(_root->lchild, visit, utp);
-}
+// template<typename TYPE>
+// void BinaryTree<TYPE>::_destory(pNode& Current) {
+//     if (Current != nullptr) {
+//         _destory(Current->lchild);
+//         _destory(Current->rchild);
+//         delete Current;
+//         Current = nullptr;
+//     }
+// }
 
-template<typename TYPE>
-void BinaryTree<TYPE>::_inorder(pNode Current, pFun_BinaryTree visit,
-        utPointer utp) {
-    if (Current != nullptr) {
-        _inorder(Current->lchild, visit, utp);
-        (*visit)(Current->value, utp);
-        _inorder(Current->rchild, visit, utp);
-    }
-}
+// template<class TYPE>
+// void BinaryTree<TYPE>::_copy(pNode& Current, const pNode& original) {
+//     if (Current == nullptr) {
+//         Current = new Node(original->value);
+//     }
+//     if (original->lchild != nullptr) {
+//         Current->lchild = new Node(original->lchild->value);
+//         Current->lchild->father = Current;
+//         _copy(Current->lchild, original->lchild);
+//     }
+//     if (original->rchild != nullptr) {
+//         Current->rchild = new Node(original->rchild->value);
+//         Current->rchild->father = Current;
+//         _copy(Current->rchild, original->rchild);
+//     }
+// }
 
-template<class TYPE>
-void BinaryTree<TYPE>::in_order(pFun_BinaryTree visit, utPointer utp) {
-    _inorder(_root->lchild, visit, utp);
-}
+// template<typename TYPE>
+// void BinaryTree<TYPE>::_preorder(pNode Current, pFun_BinaryTree visit,
+//         utPointer utp) {
+//     if (Current != nullptr) {
+//         (*visit)(Current->value, utp);
+//         _preorder(Current->lchild, visit, utp);
+//         _preorder(Current->rchild, visit, utp);
+//     }
+// }
 
-template<class TYPE>
-_BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> BinaryTree<TYPE>::begin() const {
-    Node *pnode = _root->lchild;
-    if (pnode == nullptr) {
-        return _root;
-    }
-    if (pnode->lchild) {
-        while (pnode->lchild)
-            pnode = pnode->lchild;
-    }
-    return pnode;
-}
+// template<class TYPE>
+// void BinaryTree<TYPE>::pre_order(pFun_BinaryTree visit, utPointer utp) {
+//     _preorder(_root->lchild, visit, utp);
+// }
 
-template<class TYPE>
-_BinaryTree_iterator<TYPE, TYPE&, TYPE*> BinaryTree<TYPE>::begin() {
-    Node *pnode = _root->lchild;
-    if (pnode == nullptr) {
-        return _root;
-    }
-    if (pnode->lchild) {
-        while (pnode->lchild)
-            pnode = pnode->lchild;
-    }
-    return pnode;
-}
-template<class TYPE>
-_BinaryTree_iterator<TYPE, TYPE&, TYPE*> BinaryTree<TYPE>::root() {
-    return _root->lchild;
-}
-template<class TYPE>
-_BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> BinaryTree<TYPE>::root() const {
-    return _root->lchild;
-}
+// template<typename TYPE>
+// void BinaryTree<TYPE>::_postorder(pNode Current, pFun_BinaryTree visit,
+//         utPointer utp) {
+//     if (Current != nullptr) {
+//         _postorder(Current->lchild, visit, utp);
+//         _postorder(Current->rchild, visit, utp);
+//         (*visit)(Current->value, utp);
+//     }
+// }
 
-template<class TYPE>
-_BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> BinaryTree<TYPE>::end() const {
-    return _root;
-}
+// template<class TYPE>
+// void BinaryTree<TYPE>::post_order(pFun_BinaryTree visit, utPointer utp) {
+//     _postorder(_root->lchild, visit, utp);
+// }
 
-template<class TYPE>
-_BinaryTree_iterator<TYPE, TYPE&, TYPE*> BinaryTree<TYPE>::end() {
-    return _root;
-}
+// template<typename TYPE>
+// void BinaryTree<TYPE>::_inorder(pNode Current, pFun_BinaryTree visit,
+//         utPointer utp) {
+//     if (Current != nullptr) {
+//         _inorder(Current->lchild, visit, utp);
+//         (*visit)(Current->value, utp);
+//         _inorder(Current->rchild, visit, utp);
+//     }
+// }
+
+// template<class TYPE>
+// void BinaryTree<TYPE>::in_order(pFun_BinaryTree visit, utPointer utp) {
+//     _inorder(_root->lchild, visit, utp);
+// }
+
+// template<class TYPE>
+// _BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> BinaryTree<TYPE>::begin() const {
+//     Node *pnode = _root->lchild;
+//     if (pnode == nullptr) {
+//         return _root;
+//     }
+//     if (pnode->lchild) {
+//         while (pnode->lchild)
+//             pnode = pnode->lchild;
+//     }
+//     return pnode;
+// }
+
+// template<class TYPE>
+// _BinaryTree_iterator<TYPE, TYPE&, TYPE*> BinaryTree<TYPE>::begin() {
+//     Node *pnode = _root->lchild;
+//     if (pnode == nullptr) {
+//         return _root;
+//     }
+//     if (pnode->lchild) {
+//         while (pnode->lchild)
+//             pnode = pnode->lchild;
+//     }
+//     return pnode;
+// }
+// template<class TYPE>
+// _BinaryTree_iterator<TYPE, TYPE&, TYPE*> BinaryTree<TYPE>::root() {
+//     return _root->lchild;
+// }
+// template<class TYPE>
+// _BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> BinaryTree<TYPE>::root() const {
+//     return _root->lchild;
+// }
+
+// template<class TYPE>
+// _BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> BinaryTree<TYPE>::end() const {
+//     return _root;
+// }
+
+// template<class TYPE>
+// _BinaryTree_iterator<TYPE, TYPE&, TYPE*> BinaryTree<TYPE>::end() {
+//     return _root;
+// }
 
 
 
-template<typename TYPE>
-bool BinaryTree<TYPE>::empty() const {
-    return _root->lchild == nullptr;
-}
+// template<typename TYPE>
+// bool BinaryTree<TYPE>::empty() const {
+//     return _root->lchild == nullptr;
+// }
 
-template<typename TYPE>
-LarusDef::size_type BinaryTree<TYPE>::_size(const pNode& Current) const {
-    if (Current == nullptr) {
-        return 0;
-    } else {
-        return _size(Current->lchild) + _size(Current->rchild) + 1;
-    }
-}
+// template<typename TYPE>
+// LarusDef::size_type BinaryTree<TYPE>::_size(const pNode& Current) const {
+//     if (Current == nullptr) {
+//         return 0;
+//     } else {
+//         return _size(Current->lchild) + _size(Current->rchild) + 1;
+//     }
+// }
 
-template<typename TYPE>
-LarusDef::size_type BinaryTree<TYPE>::size() const {
-    return _size(_root->lchild);
-}
+// template<typename TYPE>
+// LarusDef::size_type BinaryTree<TYPE>::size() const {
+//     return _size(_root->lchild);
+// }
 
-template<class TYPE>
-void BinaryTree<TYPE>::reverse() {
-    _reverse(_root->lchild);
-}
+// template<class TYPE>
+// void BinaryTree<TYPE>::reverse() {
+//     _reverse(_root->lchild);
+// }
 
-template<class TYPE>
-void BinaryTree<TYPE>::_reverse(pNode Current) {
-    if (Current != nullptr) {
-        pNode temp = Current->lchild;
-        Current->lchild = Current->rchild;
-        Current->rchild = temp;
-        _reverse(Current->lchild);
-        _reverse(Current->rchild);
-    }
-}
+// template<class TYPE>
+// void BinaryTree<TYPE>::_reverse(pNode Current) {
+//     if (Current != nullptr) {
+//         pNode temp = Current->lchild;
+//         Current->lchild = Current->rchild;
+//         Current->rchild = temp;
+//         _reverse(Current->lchild);
+//         _reverse(Current->rchild);
+//     }
+// }
 
-template<class TYPE>
-void BinaryTree<TYPE>::clear() {
-    _destory(_root->lchild);
-    //_root = nullptr;
-}
+// template<class TYPE>
+// void BinaryTree<TYPE>::clear() {
+//     _destory(_root->lchild);
+//     //_root = nullptr;
+// }
 
-template<class TYPE>
-int BinaryTree<TYPE>::_height(pNode Current) const {
-    if (Current == nullptr)
-        return 0;
-    else
-        return 1 + MAX(_height(Current->lchild), _height(Current->rchild));
-}
-
-template<class TYPE>
-LarusDef::size_type BinaryTree<TYPE>::height() const {
-    return _height(_root->lchild);
-}
 
 }
 
