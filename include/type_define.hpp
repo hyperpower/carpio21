@@ -5,7 +5,9 @@
 #include <assert.h>
 #include <math.h>
 #include <string>
-#include <functional>
+#include <functional>  // for std::forward()
+#include <type_traits> // for std::is_same<> and invoke_result<>
+#include <utility>     // for std::invoke()
 #ifdef OPENMP
 #include <omp.h>
 #endif
@@ -207,6 +209,23 @@ template<typename T>
 struct IsContainer : std::integral_constant<bool, 
     HasConstIterator<T>::value && HasBeginEnd<T>::beg_value && HasBeginEnd<T>::end_value> 
 { };
+
+template <typename Callable, typename... Args>
+decltype(auto) Invoke(Callable &&op, Args &&... args) {
+
+  if constexpr (std::is_same_v<std::invoke_result_t<Callable, Args...>, void>) {
+    // return type is void:
+    std::invoke(std::forward<Callable>(op), std::forward<Args>(args)...);
+    // ... 
+    return;
+  } else {
+    // return type is not void:
+    decltype(auto) ret{
+        std::invoke(std::forward<Callable>(op), std::forward<Args>(args)...)};
+    // ... 
+    return ret;
+  }
+}
 
 
 /*

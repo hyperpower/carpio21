@@ -178,10 +178,30 @@ protected:
 protected:
 
     // typedef void (*pFun_BinaryTree)(pNode, utPointer);
-
-    // void _preorder(pNode, pFun_BinaryTree, utPointer);
-    // void _inorder(pNode, pFun_BinaryTree, utPointer);
-    // void _postorder(pNode, pFun_BinaryTree, utPointer);
+    template <typename Callable, typename... Args>
+    void _pre_order(pNode current, Callable &&op, Args &&... args){
+	    if (current != nullptr) {
+	    	std::invoke(op, current, args...);
+	    	_pre_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_pre_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    }
+    }
+    template <typename Callable, typename... Args>
+    void _in_order(pNode current, Callable &&op, Args &&... args){
+	    if (current != nullptr) {
+	    	_in_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	std::invoke(op, current, args...);
+	    	_in_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    }
+    }
+    template <typename Callable, typename... Args>
+    void _post_order(pNode current, Callable &&op, Args &&... args){
+	    if (current != nullptr) {
+	    	_post_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_post_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	std::invoke(op, current, args...);
+	    }
+    }
 
     void _destory(pNode&);
     void _copy(pNode&, const pNode&);
@@ -228,10 +248,19 @@ public:
         _end->leftc = pn;
         _end->leftc->f = _end;
     }
-    //Traversal =================================
-    // void pre_order(pFun_BinaryTree, utPointer);
-    // void in_order(pFun_BinaryTree, utPointer);
-    // void post_order(pFun_BinaryTree, utPointer);
+    //Traversal =============================
+    template <typename Callable, typename... Args>
+    void pre_order(Callable &&op, Args &&... args){
+        this->_pre_order(this->root(), std::forward<Callable>(op), std::forward<Args>(args)...);
+    }
+    template <typename Callable, typename... Args>
+    void in_order(Callable &&op, Args &&... args){
+        this->_in_order(this->root(), std::forward<Callable>(op), std::forward<Args>(args)...);
+    }
+    template <typename Callable, typename... Args>
+    void post_order(Callable &&op, Args &&... args){
+        this->_post_order(this->root(), std::forward<Callable>(op), std::forward<Args>(args)...);
+    }
     //iterator===================================
     // iterator begin();
     // const_iterator begin() const;

@@ -7,6 +7,7 @@
 #include <math.h>
 #include <string>
 #include <memory>
+#include <iostream>
 // #include "mpi.h"
 
 #include "utility/binary_tree.hpp"
@@ -26,9 +27,15 @@ TEST(binary_tree, basic){
     ASSERT_EQ(tree.empty(), 1);
 }
 
+typedef TreeNode_<int, 2> Node;
+typedef SortedBinaryTree_<Node> BinaryTree;
+
+void visit(BinaryTree::pNode pn){
+    std::cout << pn->value << "  " << std::endl;
+}
+
+
 TEST(binary_tree, sorted){
-    typedef TreeNode_<int, 2> Node;
-    typedef SortedBinaryTree_<Node> BinaryTree;
 
     BinaryTree tree;
     BinaryTree t2;
@@ -37,10 +44,12 @@ TEST(binary_tree, sorted){
 
     tree.insert(1);
     tree.insert(2);
-    tree.insert(3);
+    tree.insert(5);
 
     std::cout << "tree is empty " << tree.empty() << std::endl;
     ASSERT_EQ(tree.empty(), 0);
+
+    tree.pre_order(visit);
 
 }
 
