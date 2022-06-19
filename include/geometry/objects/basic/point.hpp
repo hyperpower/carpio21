@@ -175,25 +175,22 @@ public:
     }
 
     void reconstruct(const CV& a, const CV& b = 0, const CV& c = 0) {
-        _reconstruct<DIM>(a, b, c);
-    }
-protected:
-    template<St DIM>
-    void _reconstruct(const CV& a, const CV& b, const CV& c ){ SHOULD_NOT_REACH; }
-    template<>
-    void _reconstruct<1>(const CV& a, const CV& b, const CV& c){
-        this->at(0) = a;
-    }
-    template<>
-    void _reconstruct<2>(const CV& a, const CV& b, const CV& c){
-        this->at(0) = a;
-        this->at(1) = b;
-    }
-    template<>
-    void _reconstruct<3>(const CV& a, const CV& b, const CV& c){
-        this->at(0) = a;
-        this->at(1) = b;
-        this->at(2) = c;
+        if constexpr (DIM == 1){
+            this->at(0) = a;
+            return;
+        }
+        if constexpr (DIM == 2){
+            this->at(0) = a;
+            this->at(1) = b;
+            return;
+        }
+        if constexpr (DIM == 3){
+            this->at(0) = a;
+            this->at(1) = b;
+            this->at(2) = c;
+            return;
+        }
+
     }
 public:   
     Point operator-() const{

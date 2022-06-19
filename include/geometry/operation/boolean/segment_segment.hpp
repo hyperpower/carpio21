@@ -316,7 +316,7 @@ public:
     }
 
     Result execute(){
-        auto t = this->cal_intersection_type()
+        auto t = this->cal_intersection_type();
         this->res.type = t;
         if(t == _SS_INTERSECT_){
             this->res.p = cal_intersection_point();

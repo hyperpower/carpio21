@@ -2,7 +2,7 @@
 #define _GEO_AFFINE_
 
 #include <algorithm>
-#include "geometry\geometry_define.hpp"
+#include "geometry/geometry_define.hpp"
 #include <array>
 #include <iterator>
 #include <type_traits>
@@ -311,13 +311,13 @@ void Rotate(GEO& geo, const VT& theta,  const POINT& about, const int& axe = _Z_
 // ==================================================
 //   Shear 
 // ==================================================
-template<class GEO, class VT,
-         typename std::enable_if<std::is_arithmetic<VT>::value, bool>::type = true> 
-void _Shear(GEO& point, const VT& theta, const int& axe, PointTag){
-    typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
-    typedef typename AxesTagTraits_<axe>::Type AxesTag;
-    _Shear(point, theta, AxesTag(), PointTag(), DimTag()); 
-}
+// template<class GEO, class VT,
+//          typename std::enable_if<std::is_arithmetic<VT>::value, bool>::type = true> 
+// void _Shear(GEO& point, const VT& theta, const int axe, PointTag){
+//     typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
+//     typedef typename AxesTagTraits_<axe>::Type AxesTag;
+//     _Shear(point, theta, AxesTag(), PointTag(), DimTag()); 
+// }
 
 template<class GEO, class VT>
 void _Shear(GEO& point, const VT& theta, const int& axe, PointTag, Dim2Tag){
@@ -423,7 +423,7 @@ void _Reflect(PointChainTag, GEO& pointchain){
 }
 template<class GEO> 
 void _Reflect(TriSurfaceTag, GEO& surface, const Axes& axe, const double& v){
-    auto fun = [&axe](typename GEO::Vertex& ver){
+    auto fun = [&axe, v](typename GEO::Vertex& ver){
         typedef typename DimTagTraits_<GEO::Dim>::Type DimTag;
         _Reflect(PointTag(), ver, axe, v, DimTag());
     };

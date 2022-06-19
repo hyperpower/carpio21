@@ -256,35 +256,35 @@ public:
         return pe == e1 || pe == e2 || pe == e3;
     }
 
-    Poi centroid() const {
-        return Op::Centroid(
-                *(this->vertex(0)),
-                *(this->vertex(1)),
-                *(this->vertex(2)));
-    }
+    // Poi centroid() const {
+    //     return Op::Centroid(
+    //             *(this->vertex(0)),
+    //             *(this->vertex(1)),
+    //             *(this->vertex(2)));
+    // }
 
-    Poi normal() const {
-        return Op::Normal(
-                *(this->vertex(0)),
-                *(this->vertex(1)),
-                *(this->vertex(2)));
-    }
+    // Poi normal() const {
+    //     return Op::Normal(
+    //             *(this->vertex(0)),
+    //             *(this->vertex(1)),
+    //             *(this->vertex(2)));
+    // }
 
-    Vt signed_area() const {
-        ASSERT(Dim == 2);
-        return Op::SignedArea(
-                *(this->vertex(0)),
-                *(this->vertex(1)),
-                *(this->vertex(2)));
-    }
+    // Vt signed_area() const {
+    //     ASSERT(Dim == 2);
+    //     return Op::SignedArea(
+    //             *(this->vertex(0)),
+    //             *(this->vertex(1)),
+    //             *(this->vertex(2)));
+    // }
 
-    bool is_inon(const Poi& poi) const {
-        ASSERT(Dim == 2);
-        return Op::IsInOn(
-                *(this->vertex(0)),
-                *(this->vertex(1)),
-                *(this->vertex(2)), poi);
-    }
+    // bool is_inon(const Poi& poi) const {
+    //     ASSERT(Dim == 2);
+    //     return Op::IsInOn(
+    //             *(this->vertex(0)),
+    //             *(this->vertex(1)),
+    //             *(this->vertex(2)), poi);
+    // }
 
 //	typename Op::Box box() const {
 //		return Op::BoundingBox(

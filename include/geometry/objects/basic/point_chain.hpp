@@ -418,7 +418,7 @@ auto ProjectAlong(const CONTAINER& pc, Axes a){
 }
 template<class TYPE>
 auto NormalFirstThree(const PointChain_<TYPE, 3>& pc){
-    typedef typename const PointChain_<TYPE, 3>::value_type Point;
+    typedef const typename PointChain_<TYPE, 3>::value_type Point;
     typedef const Point* cpPoint;
     if (pc.size() < 3){
         throw std::invalid_argument("Length of PointChain is less than 3");

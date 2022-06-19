@@ -43,7 +43,7 @@ public:
         value(data){
         leftc  = lc;
         rightc = rc;
-        father = fc
+        father = fc;
     }
 
     ~TreeNode_(){
@@ -68,7 +68,6 @@ public:
             return this->right_child; 
             break;
         default:
-            throw 
             break;
         }
     }

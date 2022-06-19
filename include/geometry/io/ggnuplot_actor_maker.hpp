@@ -488,7 +488,7 @@ template<class ANY,
 auto ToGnuplotActor(const ANY& any) {
     GnuplotActor actor;
     for (auto& geo : any){
-        MakeGnuplotActor(actor, geo, ANY::value_type::Tag());
+        MakeGnuplotActor(actor, geo, typename ANY::value_type::Tag());
     }    
     return actor;
 }
@@ -524,7 +524,7 @@ template<typename ANY,
 auto ToGnuplotActor(const ANY& geo){
     typedef std::shared_ptr<GnuplotActor> spActor;
     GnuplotActor actor;
-    MakeGnuplotActor(actor, geo, ANY::Tag());    
+    MakeGnuplotActor(actor, geo, typename ANY::Tag());    
     return actor;
 }
 template<typename ANY, typename CONTAINER,
