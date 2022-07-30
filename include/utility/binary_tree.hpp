@@ -20,8 +20,8 @@ class TreeNode_{
 template<typename TYPE>
 class TreeNode_<TYPE, 2>{
 public:
-    typedef TreeNode_<TYPE, 2>   Node;
-    typedef TreeNode_<TYPE, 2>* pNode;
+    typedef TreeNode_<TYPE, 2>          Node;
+    typedef TreeNode_<TYPE, 2>*        pNode;
     typedef const TreeNode_<TYPE, 2>* cpNode;
     typedef TYPE value_type;
     typedef std::size_t size_type;
@@ -29,35 +29,37 @@ public:
     typedef TreeNode_<TYPE, 2> Self;
 public:
     TYPE  value;
-    pNode f;
-    pNode leftc;
-    pNode rightc;
+
+    pNode father;
+    pNode left_child;
+    pNode right_child;
 
     TreeNode_():
-        f(nullptr), leftc(nullptr), rightc(nullptr){}
+        father(nullptr), left_child(nullptr), right_child(nullptr){}
     
     TreeNode_(const TYPE &data):
-        value(data), f(nullptr), leftc(nullptr), rightc(nullptr){} 
+        value(data), father(nullptr), left_child(nullptr), right_child(nullptr){} 
     
     TreeNode_(const TYPE &data, pNode lc, pNode rc, pNode fc):
         value(data){
-        leftc  = lc;
-        rightc = rc;
-        father = fc;
+        left_child  = lc;
+        right_child = rc;
+        father      = fc;
     }
 
     ~TreeNode_(){
-        this->destory(this->leftc);
-        this->destory(this->rightc);
-        if(this->f != nullptr){
-            if(this == this->f->left_child()){
-                this->f->left_child(nullptr);
+        this->destory(this->left_child);
+        this->destory(this->right_child);
+        if(this->father != nullptr){
+            if(this == this->father->left_child){
+                this->father->left_child = nullptr;
             }
-            if(this == this->f->right_child()){
-                this->f->right_child(nullptr);
+            if(this == this->father->right_child){
+                this->father->right_child = nullptr;
             }
         }
     }
+
     pNode child(std::size_t idx){
         switch (idx)
         {
@@ -71,47 +73,24 @@ public:
             break;
         }
     }
-    
-
-    pNode left_child(){
-        return this->leftc;
-    }
-    pNode right_child(){
-        return this->rightc;
-    }
-    cpNode left_child() const{
-        return this->leftc;
-    }
-    cpNode right_child() const{
-        return this->rightc;
-    }
-    void left_child(pNode node){
-        this->leftc = node;
-    }
-    void right_child(pNode node){
-        this->rightc = node;
-    }
-
-    void father(pNode node){
-        this->f = node;
-    }
 
     pNode leftmost(){
-        pNode ptn = this;
-        while (ptn->lchild != nullptr)
-            ptn = ptn->lchild;
-        return ptn;
+        pNode cur = this;
+        while (cur->left_child != nullptr)
+            cur = cur->left_child;
+        return cur;
     }
     pNode rightmost(){
-        pNode ptn = this;
-        while (ptn->rightc != nullptr)
-            ptn = ptn->rightc;
-        return ptn;
+        pNode cur = this;
+        while (cur->right_child != nullptr)
+            cur = cur->right_child;
+        return cur;
     }
 
     St height() const{
-        return 1 + std::max(height(this->leftc), height(this->rightc));
+        return 1 + std::max(height(this->left_child), height(this->right_child));
     }
+
     St height(pNode cur) const{
         if (cur == nullptr)
             return 0;
@@ -119,12 +98,12 @@ public:
             return 1 + MAX(height(cur->left_child()), height(cur->right_child()));
     }
 
-    void destory(pNode& Current) {
-        if (Current != nullptr) {
-            destory(Current->leftc);
-            destory(Current->rightc);
-            delete Current;
-            Current = nullptr;
+    void destory(pNode& cur) {
+        if (cur != nullptr) {
+            destory(cur->left_child);
+            destory(cur->right_child);
+            delete cur;
+            cur = nullptr;
         }
     }
 
@@ -140,20 +119,26 @@ public:
 
         dst->value = src->value;
        
-        if (src->leftc != nullptr){
-            dst->leftc = new Node(src->leftc->value);
-            dst->leftc->f = dst;
-            copy(src->leftc, dst->leftc);
+        if (src->left_child != nullptr){
+            dst->left_child = new Node(src->left_child->value);
+            dst->left_child->father = dst;
+            copy(src->left_child, dst->left_child);
         }
-        if (src->rightc != nullptr){
-            dst->rightc = new Node(src->rightc->value);
-            dst->rightc->f = dst;
-            copy(src->rightc, dst->rightc);
+        if (src->right_child != nullptr){
+            dst->right_child = new Node(src->right_child->value);
+            dst->right_child->father = dst;
+            copy(src->right_child, dst->right_child);
         }
     }
 };
 
 //===============================================
+//concept{
+    //require public member : value
+    //require public member : father
+    //require public member : left_child 
+    //require public member : right_child
+//}
 template<typename NODE>
 class BinaryTree_ {
 public:
@@ -176,28 +161,27 @@ protected:
     pNode _end;
 protected:
 
-    // typedef void (*pFun_BinaryTree)(pNode, utPointer);
     template <typename Callable, typename... Args>
     void _pre_order(pNode current, Callable &&op, Args &&... args){
 	    if (current != nullptr) {
 	    	std::invoke(op, current, args...);
-	    	_pre_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
-	    	_pre_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_pre_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_pre_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    }
     }
     template <typename Callable, typename... Args>
     void _in_order(pNode current, Callable &&op, Args &&... args){
 	    if (current != nullptr) {
-	    	_in_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_in_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    	std::invoke(op, current, args...);
-	    	_in_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_in_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    }
     }
     template <typename Callable, typename... Args>
     void _post_order(pNode current, Callable &&op, Args &&... args){
 	    if (current != nullptr) {
-	    	_post_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
-	    	_post_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_post_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_post_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    	std::invoke(op, current, args...);
 	    }
     }
@@ -238,14 +222,14 @@ public:
     }
 
     cpNode root() const{
-        return _end->leftc;
+        return _end->left_child;
     }
     pNode root(){
-        return _end->leftc;
+        return _end->left_child;
     }
     void root(pNode pn){
-        _end->leftc = pn;
-        _end->leftc->f = _end;
+        _end->left_child = pn;
+        _end->left_child->father = _end;
     }
     //Traversal =============================
     template <typename Callable, typename... Args>
@@ -268,7 +252,7 @@ public:
     //===========================================
 
     bool empty() const{
-       return _end->leftc == nullptr; 
+       return _end->left_child == nullptr; 
     }
     size_type size() const;
     void reverse();
@@ -306,7 +290,7 @@ public:
             this->root(new Node(value));
             return;
         }else{
-            this->_insert(this->_end->leftc, value);
+            this->_insert(this->_end->left_child, value);
         }
     }
 protected:
@@ -315,11 +299,11 @@ protected:
             cur = new Node(value);
             return;
         } else if (COMP{}(value, cur->value)) {
-            _insert(cur->leftc, value);
-            cur->leftc->f = cur;
+            _insert(cur->left_child, value);
+            cur->left_child->father = cur;
         } else if (!COMP{}(value, cur->value)){   //data >= Current->m_value
-            _insert(cur->rightc, value);
-            cur->rightc->f = cur;
+            _insert(cur->right_child, value);
+            cur->right_child->father = cur;
         } else {
             return;
         }
