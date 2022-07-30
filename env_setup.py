@@ -91,7 +91,7 @@ def main():
     check_path()
     check_python()
     check_and_new_folder("external")
-    check_and_new_folder("test_output")
+    check_and_new_folder("fig")
     download_googletest()
     # if not check_ffmpeg():
         # download_ffmpeg()

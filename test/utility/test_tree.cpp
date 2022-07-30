@@ -8,11 +8,14 @@
 #include <string>
 #include <memory>
 #include <iostream>
-// #include "mpi.h"
 
 #include "utility/binary_tree.hpp"
 
 namespace carpio {
+
+typedef TreeNode_<int, 2> Node;
+typedef SortedBinaryTree_<Node> BinaryTree;
+
 
 TEST(binary_tree, basic){
     typedef TreeNode_<int, 2> Node;
@@ -26,9 +29,6 @@ TEST(binary_tree, basic){
     std::cout << "tree is empty " << tree.empty() << std::endl;
     ASSERT_EQ(tree.empty(), 1);
 }
-
-typedef TreeNode_<int, 2> Node;
-typedef SortedBinaryTree_<Node> BinaryTree;
 
 void visit(BinaryTree::pNode pn){
     std::cout << pn->value << "  " << std::endl;

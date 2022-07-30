@@ -7,8 +7,8 @@
 #include <set>
 
 #include "segment_segment.hpp"
-
 #include "utility/profile.hpp"
+
 
 namespace carpio{
 
