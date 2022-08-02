@@ -42,9 +42,9 @@ public:
     
     TreeNode_(const TYPE &data, pNode lc, pNode rc, pNode fc):
         value(data){
-        left_child  = lc;
-        right_child = rc;
-        father      = fc;
+        this->left_child  = lc;
+        this->right_child = rc;
+        this->father      = fc;
     }
 
     ~TreeNode_(){

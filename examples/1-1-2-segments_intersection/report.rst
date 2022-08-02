@@ -125,7 +125,11 @@ Random Segments
 
 Different amount of segments have been randomly generated. The methods mentioned have been tested.
 
+.. figure:: fig/benchmark.png
+   :alt: Figure intersection benchmark
+   :align: center 
 
+   benchmark of two intersection methods
 
 
 
