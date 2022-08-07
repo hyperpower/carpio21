@@ -130,6 +130,20 @@ public:
             copy(src->right_child, dst->right_child);
         }
     }
+
+    bool is_leaf() const {
+		_RETURN_VAL_IF_FAIL(this->left_child == nullptr, false);
+		_RETURN_VAL_IF_FAIL(this->right_child == nullptr, false);
+		return true;
+	}
+    bool is_left_child() const {
+		_RETURN_VAL_IF_FAIL(this->father != nullptr, false);
+        return this->father->left_child == this;
+    }
+    bool is_right_child() const {
+		_RETURN_VAL_IF_FAIL(this->father != nullptr, false);
+        return this->father->right_child == this;
+    }
 };
 
 //===============================================

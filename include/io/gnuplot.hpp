@@ -282,10 +282,8 @@ protected:
         this->_valid = true;
 
         //set terminal type
-        cmd("set output");
-        cmd(
-                "set terminal " + this->terminal_std
-                        + " enhanced font 'Helvetica,12'");
+        // cmd("set output");
+        cmd("set terminal " + this->terminal_std + " enhanced font 'Helvetica,12'");
 
         return;
     }
@@ -652,8 +650,10 @@ public:
         this->terminal_std = "pngcairo";
         std::stringstream sst;
         sst << "set terminal " << this->terminal_std << " dashed enhanced font '"
-                << font << "," << fontsize << "'" << "size " << x << ", " << y;
+                << font << "," << fontsize << "'" << " size " << x << ", " << y;
+        // sst << "set terminal " << this->terminal_std;
         cmd(sst.str());
+        // std::cout << sst.str() << std::endl;
         cmd("set output '" + filename + ".png'");
         return *this;
     }

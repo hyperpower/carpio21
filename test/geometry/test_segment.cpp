@@ -197,7 +197,7 @@ TEST(segment, multi){
         gnu.add(actor);
         count++;
     }
-    // gnu.plot();
+    gnu.plot();
 }
 
 TEST(segment, sweep_line){
@@ -234,5 +234,5 @@ TEST(segment, sweep_line){
         gnu.add(actor);
         count++;
     }
-    // gnu.plot();
+    gnu.plot();
 }

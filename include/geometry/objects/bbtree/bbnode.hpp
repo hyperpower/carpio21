@@ -66,8 +66,8 @@ public:
 	}
 
 	bool is_leaf() const {
-		_return_val_if_fail(this->lchild == nullptr, false);
-		_return_val_if_fail(this->rchild == nullptr, false);
+		_RETURN_VAL_IF_FAIL(this->lchild == nullptr, false);
+		_RETURN_VAL_IF_FAIL(this->rchild == nullptr, false);
 		return true;
 	}
 	BOX& box(){
