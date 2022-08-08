@@ -643,17 +643,14 @@ public:
 
     Gnuplot& set_terminal_png(
             const std::string& filename,
-                       double  x         = 800,
-                       double  y         = 600,
-            const std::string& font      = "arial",
-                          int  fontsize  = 14) {
+            double  x  = 800,  double  y  = 600,
+            const std::string& font       = "Arial",
+                          int  fontsize   = 12) {
         this->terminal_std = "pngcairo";
         std::stringstream sst;
         sst << "set terminal " << this->terminal_std << " dashed enhanced font '"
                 << font << "," << fontsize << "'" << " size " << x << ", " << y;
-        // sst << "set terminal " << this->terminal_std;
         cmd(sst.str());
-        // std::cout << sst.str() << std::endl;
         cmd("set output '" + filename + ".png'");
         return *this;
     }
@@ -1104,7 +1101,9 @@ public:
 
 template<typename X, typename Y,
     typename std::enable_if<
-        std::is_arithmetic<typename X::value_type>::value
+       (! HasTag<X>::value)   //no tag
+    && (! HasTag<Y>::value)   //no tag
+    && std::is_arithmetic<typename X::value_type>::value
     && IsContainer<X>::value
     && std::is_arithmetic<typename Y::value_type>::value
     && IsContainer<Y>::value, 

@@ -82,8 +82,23 @@ typedef std::function<void(Vt, Vt, Vt, Vt)> FunXYZT;
 typedef std::function<Vt(Vt, Vt, Vt)>       FunXYZ_V;
 typedef std::function<void(Vt, Vt, Vt)>     FunXYZ;
 
+struct BaseTag{};
+
+template<typename T>
+struct HasTag
+{
+private:
+    typedef char                      yes;
+    typedef struct { char array[2]; } no;
+
+    template<typename C> static yes test(typename C::Tag*);
+    template<typename C> static no  test(...);
+public:
+    static const bool value = sizeof(test<T>(0)) == sizeof(yes);
+};
+
 // Dim tag
-struct DimTag{};
+struct DimTag: public BaseTag{};
 struct Dim1Tag:public DimTag{};
 struct Dim2Tag:public DimTag{};
 struct Dim3Tag:public DimTag{};
@@ -106,7 +121,7 @@ enum Axes {
     _Z_ = 2, //
 };
 // Dim tag
-struct AxesTag{};
+struct AxesTag :public BaseTag{};
 struct XTag:public AxesTag{};
 struct YTag:public AxesTag{};
 struct ZTag:public AxesTag{};

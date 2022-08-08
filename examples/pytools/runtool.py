@@ -176,9 +176,8 @@ class Runer:
 
         # command
         build_format  = 'html'  # singlehtml
-        args = f"-b {build_format} " \
-               f"{doc_source_dir} {doc_build_dir}"
-        sphinx_main(args.split())
+        args = ["-b", str(build_format), str(doc_source_dir), str(doc_build_dir)]
+        sphinx_main(args)
 
     def _init_time_record(self):
         names = [
