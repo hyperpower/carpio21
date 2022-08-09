@@ -8,6 +8,7 @@
 #ifndef _BINARYTREE_HPP_
 #define _BINARYTREE_HPP_
 
+#include <algorithm>
 #include "type_define.hpp"
 // #include "Iterator.h"
 
@@ -87,15 +88,15 @@ public:
         return cur;
     }
 
-    St height() const{
-        return 1 + std::max(height(this->left_child), height(this->right_child));
+    size_type height() const{
+        return 1 + std::max<size_type>(this->height(this->left_child), this->height(this->right_child));
     }
 
-    St height(pNode cur) const{
+    size_type height(cpNode cur) const{
         if (cur == nullptr)
             return 0;
         else
-            return 1 + MAX(height(cur->left_child()), height(cur->right_child()));
+            return 1 + std::max<size_type>(height(cur->left_child), height(cur->right_child));
     }
 
     void destory(pNode& cur) {
@@ -271,7 +272,9 @@ public:
     size_type size() const;
     void reverse();
     void clear();
-    size_type height() const;
+    size_type height() const{
+        return this->root()->height();
+    }
 protected:
 };
 

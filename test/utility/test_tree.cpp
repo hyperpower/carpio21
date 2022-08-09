@@ -17,8 +17,10 @@ namespace carpio {
 typedef TreeNode_<int, 2> Node;
 typedef SortedBinaryTree_<Node> BinaryTree;
 
-void AddNode(int order, Gnuplot& gnu,
-    const double& x, const double& y, const std::string& str){
+void AddNode(
+    int order, Gnuplot& gnu,
+    const double& x, const double& y, 
+    const std::string& str){
     // plot a circle
     std::list<double> lx, ly;
     int n = 10;
@@ -80,8 +82,10 @@ TEST(binary_tree, basic){
     ASSERT_EQ(tree.empty(), 1);
 }
 
-void visit(BinaryTree::pNode pn){
+void visit(BinaryTree::pNode pn, int& count){
     std::cout << pn->value << "  " << std::endl;
+    std::cout << "c = " << count << std::endl;
+    count++;
 }
 
 
@@ -97,9 +101,10 @@ TEST(binary_tree, sorted){
     tree.insert(5);
 
     std::cout << "tree is empty " << tree.empty() << std::endl;
+    std::cout << "height = " << tree.height() << std::endl;
     ASSERT_EQ(tree.empty(), 0);
-
-    tree.pre_order(visit);
+    int c =0;
+    tree.pre_order(visit, c);
 
 }
 
