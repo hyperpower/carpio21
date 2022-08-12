@@ -28,6 +28,10 @@ public:
     typedef std::size_t size_type;
 
     typedef TreeNode_<TYPE, 2> Self;
+
+    static const int _LEFT_  = 0;
+    static const int _RIGHT_ = 1;
+
 public:
     TYPE  value;
 
@@ -60,7 +64,6 @@ public:
             }
         }
     }
-
     pNode child(std::size_t idx){
         switch (idx)
         {
@@ -74,7 +77,19 @@ public:
             break;
         }
     }
-
+    cpNode child(std::size_t idx) const{
+        switch (idx)
+        {
+        case 0:
+            return this->left_child; 
+            break;
+        case 1:
+            return this->right_child; 
+            break;
+        default:
+            break;
+        }
+    }
     pNode leftmost(){
         pNode cur = this;
         while (cur->left_child != nullptr)
@@ -137,6 +152,18 @@ public:
 		_RETURN_VAL_IF_FAIL(this->right_child == nullptr, false);
 		return true;
 	}
+    bool has_child() const{
+        return !(this->is_leaf());
+    }
+    bool has_child(int d) const{
+        if(d == _LEFT_){
+		    _RETURN_VAL_IF_FAIL(this->left_child == nullptr, true);
+        }
+        if(d == _RIGHT_){
+		    _RETURN_VAL_IF_FAIL(this->right_child == nullptr, true);
+        }
+        return false;
+    }
     bool is_left_child() const {
 		_RETURN_VAL_IF_FAIL(this->father != nullptr, false);
         return this->father->left_child == this;
@@ -144,6 +171,41 @@ public:
     bool is_right_child() const {
 		_RETURN_VAL_IF_FAIL(this->father != nullptr, false);
         return this->father->right_child == this;
+    }
+    bool is_child(int d) const{
+		_RETURN_VAL_IF_FAIL(this->father != nullptr, false);
+        if(d == _LEFT_){
+            return this->father->left_child == this;
+        }else{
+            return this->father->right_child == this;
+        }
+    }
+
+    pNode neighbor(cpNode cur, int d){
+        pNode ca = nullptr;            //common ancestor
+        if (cur->father != nullptr
+                && cur->is_child(d)) {
+            ca = neighbor(cur->father, d);
+        } else {
+            ca = cur->father;
+        }
+        pNode pt = nullptr;
+        if (ca != nullptr && ca->has_child()) {
+            pt = ca->child[Current->reflect(d)];
+        } else if (ca == nullptr) {
+            pt = Current->get_root_neighbor(d);
+        } else {
+            pt = ca;
+        }
+        return pt;
+    }
+
+    static int Reflect(int d){
+        if(d == _LEFT_){
+            return _RIGHT_;
+        }else{
+            return _LEFT_;
+        }
     }
 };
 
