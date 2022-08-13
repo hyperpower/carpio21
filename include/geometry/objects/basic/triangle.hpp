@@ -201,7 +201,7 @@ public:
         St ib[] = { 1, 2, 0 };
         const Point& a = this->p(ia[idx]);
         const Point& b = this->p(ib[idx]);
-        return Op::Distance(a, b);
+        return Distance(a, b);
     }
     bool is_valid() const {
         vt a = this->length(0);

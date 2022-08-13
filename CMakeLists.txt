@@ -8,7 +8,10 @@ if (POLICY CMP0048)
 endif (POLICY CMP0048)
 
 # window pre-define
-if(MSVC)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    message("COMPILER is MSVC")
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    # set(cmake_cxx_standard 20)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     # Force to always compile with W4
     if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -16,6 +19,11 @@ if(MSVC)
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
+endif()
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message("COMPILER is GCC")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 endif()
 
 
@@ -32,7 +40,6 @@ IF(ENABLE_OPENMP)
 ENDIF(ENABLE_OPENMP)
 
 
-set(cmake_cxx_standard 20)
 # external project download form github
 #######################################
 # Prevent overriding the parent project's compiler/linker
@@ -46,10 +53,6 @@ set(cmake_cxx_standard 20)
 # execute_process(COMMAND "${CMAKE_COMMAND}" --build .
     # WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/googletest-download"
 # )
-
-# Prevent GoogleTest from overriding our compiler/linker options
-# when building with Visual Studio
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 # Add googletest directly to our build. This adds the following targets:
 # gtest, gtest_main, gmock and gmock_main

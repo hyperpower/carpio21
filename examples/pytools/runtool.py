@@ -118,16 +118,28 @@ class Runer:
         project_name = self._info["name"]
         if platform.system() == "Windows":
             cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
+        elif platform.system() == "Linux":
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
         print(cmd)
         os.system(cmd)
+
 
     def execute(self):
         current = os.getcwd()
         os.chdir(self._path.this)
-        print(self._path.this + "/build/Release/main.exe")
-        os.system("\"" + self._path.this + "/build/Release/main.exe\"")
+        exe = self._path.this + "/build/Release/main.exe"
+        if os.path.exists(exe):
+            cmd = "\"" + exe +"\""
+        elif os.path.exists(self._path.this + "/build/main"):
+            cmd = self._path.this + "/build/main"
+        else:
+            print("! executable file not found !")
+            os.chdir(current)
+            return
+
+        os.system(cmd)
         os.chdir(current)
-        pass
+        
 
     def plot(self):
         current = os.getcwd()
@@ -164,9 +176,8 @@ class Runer:
 
         # command
         build_format  = 'html'  # singlehtml
-        args = f"-b {build_format} " \
-               f"{doc_source_dir} {doc_build_dir}"
-        sphinx_main(args.split())
+        args = ["-b", str(build_format), str(doc_source_dir), str(doc_build_dir)]
+        sphinx_main(args)
 
     def _init_time_record(self):
         names = [

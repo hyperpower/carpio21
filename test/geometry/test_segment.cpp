@@ -21,7 +21,7 @@ TEST(segment, mkdir){
     // check current working dir
     auto curdir = GetWorkingPath();
     std::cout << "Current Working dir = " << curdir << std::endl;
-    auto binclude = FileAccessCheck(curdir + "\\include", 0);
+    auto binclude = FileAccessCheck(curdir + "/include", 0);
     std::cout << "Is include Ok = " << binclude << std::endl;
     if (! binclude) {
         GTEST_FATAL_FAILURE_("Current working directroy may be not in Project Folder");
@@ -91,7 +91,7 @@ TEST(segment, intersection){
     std::cout << "new point         : "<< np << std::endl;
 
     Gnuplot gnu;
-    gnu.set_terminal_png("./fig/line_segment_1.png");
+    gnu.set_terminal_png("./fig/line_segment_1");
     gnu.set_xrange(-5, 5);
     gnu.set_yrange(-5, 5);
     gnu.set_label(1, strtype, -4.5, 4);
@@ -117,7 +117,7 @@ TEST(segment, intersection2){
     std::cout << "new point         : "<< np << std::endl;
 
     Gnuplot gnu;
-    gnu.set_terminal_png("./fig/line_segment_2.png");
+    gnu.set_terminal_png("./fig/line_segment_2");
     gnu.set_xrange(-5, 5);
     gnu.set_yrange(-5, 5);
     gnu.set_label(1, strtype, -4.5, 4);
@@ -142,7 +142,7 @@ TEST(segment, intersection3){
     std::cout << "new point         : "<< np << std::endl;
 
     Gnuplot gnu;
-    gnu.set_terminal_png("./fig/line_segment_3.png");
+    gnu.set_terminal_png("./fig/line_segment_3");
     gnu.set_xrange(-5, 5);
     gnu.set_yrange(-5, 5);
     gnu.set_label(1, strtype, -4.5, 4);
@@ -184,7 +184,7 @@ TEST(segment, multi){
     
     // show =================
     Gnuplot gnu;
-    gnu.set_terminal_png("./fig/line_segment_4.png");
+    gnu.set_terminal_png("./fig/line_segment_4");
     gnu.set_xrange(-0.2, 1.2);
     gnu.set_yrange(-0.2, 1.2);
     gnu.add(ToGnuplotActor(lseg));
@@ -197,7 +197,7 @@ TEST(segment, multi){
         gnu.add(actor);
         count++;
     }
-    // gnu.plot();
+    gnu.plot();
 }
 
 TEST(segment, sweep_line){
@@ -221,7 +221,7 @@ TEST(segment, sweep_line){
     // ret.geo1;
     // show =================
     Gnuplot gnu;
-    gnu.set_terminal_png("./fig/line_segment_5.png");
+    gnu.set_terminal_png("./fig/line_segment_5");
     gnu.set_xrange(-0.2, 1.2);
     gnu.set_yrange(-0.2, 1.2);
     gnu.add(ToGnuplotActor(lseg));
@@ -234,5 +234,5 @@ TEST(segment, sweep_line){
         gnu.add(actor);
         count++;
     }
-    // gnu.plot();
+    gnu.plot();
 }

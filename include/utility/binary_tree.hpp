@@ -8,6 +8,7 @@
 #ifndef _BINARYTREE_HPP_
 #define _BINARYTREE_HPP_
 
+#include <algorithm>
 #include "type_define.hpp"
 // #include "Iterator.h"
 
@@ -20,45 +21,50 @@ class TreeNode_{
 template<typename TYPE>
 class TreeNode_<TYPE, 2>{
 public:
-    typedef TreeNode_<TYPE, 2>   Node;
-    typedef TreeNode_<TYPE, 2>* pNode;
+    typedef TreeNode_<TYPE, 2>          Node;
+    typedef TreeNode_<TYPE, 2>*        pNode;
     typedef const TreeNode_<TYPE, 2>* cpNode;
     typedef TYPE value_type;
     typedef std::size_t size_type;
 
     typedef TreeNode_<TYPE, 2> Self;
+
+    static const int _LEFT_  = 0;
+    static const int _RIGHT_ = 1;
+
 public:
     TYPE  value;
-    pNode f;
-    pNode leftc;
-    pNode rightc;
+
+    pNode father;
+    pNode left_child;
+    pNode right_child;
 
     TreeNode_():
-        f(nullptr), leftc(nullptr), rightc(nullptr){}
+        father(nullptr), left_child(nullptr), right_child(nullptr){}
     
     TreeNode_(const TYPE &data):
-        value(data), f(nullptr), leftc(nullptr), rightc(nullptr){} 
+        value(data), father(nullptr), left_child(nullptr), right_child(nullptr){} 
     
     TreeNode_(const TYPE &data, pNode lc, pNode rc, pNode fc):
         value(data){
-        leftc  = lc;
-        rightc = rc;
-        father = fc
+        this->left_child  = lc;
+        this->right_child = rc;
+        this->father      = fc;
     }
 
     ~TreeNode_(){
-        this->destory(this->leftc);
-        this->destory(this->rightc);
-        if(this->f != nullptr){
-            if(this == this->f->left_child()){
-                this->f->left_child(nullptr);
+        this->destory(this->left_child);
+        this->destory(this->right_child);
+        if(this->father != nullptr){
+            if(this == this->father->left_child){
+                this->father->left_child = nullptr;
             }
-            if(this == this->f->right_child()){
-                this->f->right_child(nullptr);
+            if(this == this->father->right_child){
+                this->father->right_child = nullptr;
             }
         }
     }
-    pNode child(std::size_t idx){
+    pNode child(int idx){
         switch (idx)
         {
         case 0:
@@ -68,91 +74,74 @@ public:
             return this->right_child; 
             break;
         default:
-            throw 
+            return nullptr;   
             break;
         }
     }
-
-    pNode left_child(){
-        return this->leftc;
-    }
-    pNode right_child(){
-        return this->rightc;
-    }
-    pNode father(){
-        return this->f;
-    }
-    cpNode father() const{
-        return this->f;
-    }
-    cpNode left_child() const{
-        return this->leftc;
-    }
-    cpNode right_child() const{
-        return this->rightc;
-    }
-    void left_child(pNode node){
-        this->leftc = node;
-    }
-    void right_child(pNode node){
-        this->rightc = node;
-    }
-    void father(pNode node){
-        this->f = node;
-    }
-    bool is_left_child() const{
-        if (this->f != nullptr){
-            return this->f->leftc == this; 
-        }else{
-            return false;
+    cpNode child(int idx) const{
+        switch (idx)
+        {
+        case 0:
+            return this->left_child; 
+            break;
+        case 1:
+            return this->right_child; 
+            break;
+        default:
+            return nullptr;
+            break;
         }
     }
-    bool is_right_child() const{
-        if (this->f != nullptr){
-            return this->f->rightc == this; 
-        }else{
-            return false;
+    pNode sibling(){
+        if(this->father != nullptr){
+            if(this->is_left_child()){
+                return this->father->right_child;
+            }else if(this->is_right_child()){
+                return this->father->left_child;
+            }
         }
+        return nullptr;
     }
-    pNode left_most(){
-        pNode ptn = this;
-        while (ptn->leftc != nullptr)
-            ptn = ptn->leftc;
-        return ptn;
+    cpNode sibling() const{
+        if(this->father != nullptr){
+            if(this->is_left_child()){
+                return this->father->right_child;
+            }else if(this->is_right_child()){
+                return this->father->left_child;
+            }
+        }
+        return nullptr;
     }
-    pNode right_most(){
-        pNode ptn = this;
-        while (ptn->rightc != nullptr)
-            ptn = ptn->rightc;
-        return ptn;
+    pNode leftmost(){
+        pNode cur = this;
+        while (cur->left_child != nullptr)
+            cur = cur->left_child;
+        return cur;
+    }
+    pNode rightmost(){
+        pNode cur = this;
+        while (cur->right_child != nullptr)
+            cur = cur->right_child;
+        return cur;
     }
 
-    std::size_t height() const{
-        return std::max<std::size_t>(height(this->leftc), height(this->rightc)) ;
+    size_type height() const{
+        return 1 + std::max<size_type>(this->height(this->left_child), this->height(this->right_child));
     }
-    std::size_t height(pNode cur) const{
+
+    size_type height(cpNode cur) const{
         if (cur == nullptr)
             return 0;
         else
-            return 1 + std::max<std::size_t>(height(cur->left_child()), height(cur->right_child()));
+            return 1 + std::max<size_type>(height(cur->left_child), height(cur->right_child));
     }
 
-    std::size_t level() const{
-        return this->level(this);
-    }
-    std::size_t level(cpNode cur) const{
-        if (cur == nullptr)
-            return 0;
-        else
-            return 1 + level(cur->f);
-    }
-
-    void destory(pNode& current) {
-        if (current != nullptr) {
-            destory(current->leftc);
-            destory(current->rightc);
-            delete current;
-            current = nullptr;
+    void destory(pNode& cur) {
+        if (cur != nullptr) {
+            destory(cur->left_child);
+            destory(cur->right_child);
+            delete cur;
+            cur = nullptr;
         }
     }
 
@@ -168,20 +157,136 @@ public:
 
         dst->value = src->value;
        
-        if (src->leftc != nullptr){
-            dst->leftc = new Node(src->leftc->value);
-            dst->leftc->f = dst;
-            copy(src->leftc, dst->leftc);
+        if (src->left_child != nullptr){
+            dst->left_child = new Node(src->left_child->value);
+            dst->left_child->father = dst;
+            copy(src->left_child, dst->left_child);
         }
-        if (src->rightc != nullptr){
-            dst->rightc = new Node(src->rightc->value);
-            dst->rightc->f = dst;
-            copy(src->rightc, dst->rightc);
+        if (src->right_child != nullptr){
+            dst->right_child = new Node(src->right_child->value);
+            dst->right_child->father = dst;
+            copy(src->right_child, dst->right_child);
+        }
+    }
+
+    bool is_leaf() const {
+		_RETURN_VAL_IF_FAIL(this->left_child == nullptr, false);
+		_RETURN_VAL_IF_FAIL(this->right_child == nullptr, false);
+		return true;
+	}
+    bool has_child() const{
+        return !(this->is_leaf());
+    }
+    bool has_child(int d) const{
+        if(d == _LEFT_){
+		    _RETURN_VAL_IF_FAIL(this->left_child == nullptr, true);
+        }
+        if(d == _RIGHT_){
+		    _RETURN_VAL_IF_FAIL(this->right_child == nullptr, true);
+        }
+        return false;
+    }
+    bool is_left_child() const {
+		_RETURN_VAL_IF_FAIL(this->father != nullptr, false);
+        return this->father->left_child == this;
+    }
+    bool is_right_child() const {
+		_RETURN_VAL_IF_FAIL(this->father != nullptr, false);
+        return this->father->right_child == this;
+    }
+    bool is_child(int d) const{
+		_RETURN_VAL_IF_FAIL(this->father != nullptr, false);
+        if(d == _LEFT_){
+            return this->father->left_child == this;
+        }else{
+            return this->father->right_child == this;
+        }
+    }
+    bool has_sibling() const{
+        if(this->is_left_child()){
+            return this->father->right_child != nullptr;
+        }else if(this->is_right_child()){
+            return this->father->left_child != nullptr;
+        }else{
+            return false;
+        }
+    }
+
+    bool has_sibling(int d) const{
+        if(this->is_left_child()){
+            return (d == _RIGHT_) && (this->father->right_child != nullptr);
+        }else if(this->is_right_child()){
+            return (d == _LEFT_) && (this->father->left_child != nullptr);
+        }else{
+            return false;
+        }
+    }
+
+    pNode neighbor(pNode cur, int d){
+        pNode ca = nullptr;            //common ancestor
+        if (cur->father != nullptr
+                && !(cur->has_sibling(d))) {
+            ca = neighbor(cur->father, d);
+        } else if (cur->father != nullptr){
+            ca = cur->father;
+        } else {
+            ca = cur;
+        }
+        pNode pt = nullptr;
+        if (ca != nullptr && cur->father == ca) {
+            pt = ca->child(d);
+        } else {
+            pt = ca->child(Reflect(d));
+            if(pt == nullptr){
+                pt = ca->child(d);
+            }
+        }
+        return pt;
+    }
+
+    pNode neighbor(int d){
+        return neighbor(this, d);
+    }
+
+    static int Reflect(int d){
+        if(d == _LEFT_){
+            return _RIGHT_;
+        }else{
+            return _LEFT_;
         }
     }
 };
 
+template<typename TYPE>
+std::ostream& operator<<(std::ostream& stream, const TreeNode_<TYPE, 2>& node) {
+	if(node.father == nullptr){
+        stream << "father = null";
+    }else{
+        stream << "father = " << node.father;
+    }
+    stream << std::endl;
+    if(node.left_child == nullptr){
+        stream << "left   = null";
+    }else{
+        stream << "left = " << node.left_child;
+    }
+    stream << std::endl;
+    if(node.right_child == nullptr){
+        stream << "right  = null";
+    }else{
+        stream << "right = " << node.right_child;
+    }
+    stream << std::endl;
+    stream << "value  = " << node.value; 
+	return stream;
+}
 //===============================================
+//concept{
+    //require public member : value
+    //require public member : father
+    //require public member : left_child 
+    //require public member : right_child
+//}
 template<typename NODE>
 class BinaryTree_ {
 public:
@@ -204,28 +309,27 @@ protected:
     pNode _end;
 protected:
 
-    // typedef void (*pFun_BinaryTree)(pNode, utPointer);
     template <typename Callable, typename... Args>
     void _pre_order(pNode current, Callable &&op, Args &&... args){
 	    if (current != nullptr) {
-	    	std::invoke(std::forward<Callable>(op), current, std::forward<Args>(args)...);
-	    	_pre_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
-	    	_pre_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	std::invoke(op, current, args...);
+	    	_pre_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_pre_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    }
     }
     template <typename Callable, typename... Args>
     void _in_order(pNode current, Callable &&op, Args &&... args){
 	    if (current != nullptr) {
-	    	_in_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_in_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    	std::invoke(op, current, args...);
-	    	_in_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_in_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    }
     }
     template <typename Callable, typename... Args>
     void _post_order(pNode current, Callable &&op, Args &&... args){
 	    if (current != nullptr) {
-	    	_post_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
-	    	_post_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_post_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_post_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    	std::invoke(op, current, args...);
 	    }
     }
@@ -266,14 +370,14 @@ public:
     }
 
     cpNode root() const{
-        return _end->leftc;
+        return _end->left_child;
     }
     pNode root(){
-        return _end->leftc;
+        return _end->left_child;
     }
     void root(pNode pn){
-        _end->leftc = pn;
-        _end->leftc->f = _end;
+        _end->left_child = pn;
+        _end->left_child->father = _end;
     }
     //Traversal =============================
     template <typename Callable, typename... Args>
@@ -296,12 +400,14 @@ public:
     //===========================================
 
     bool empty() const{
-       return _end->leftc == nullptr; 
+       return _end->left_child == nullptr; 
     }
     size_type size() const;
     void reverse();
     void clear();
-    size_type height() const;
+    size_type height() const{
+        return this->root()->height();
+    }
 protected:
 };
 
@@ -329,28 +435,30 @@ public:
         this->root(o.root()->copy());
     }
 
-    void insert(const_reference value){
+    pNode insert(const_reference value){
+        pNode res = nullptr;
         if(this->empty()){
             this->root(new Node(value));
-            return;
+            return this->root();
         }else{
-            this->_insert(this->_end->leftc, value);
+            res = this->_insert(this->_end->left_child, value);
         }
+        return res;
     }
 protected:
-    void _insert(pNode& cur, const_reference value){
+    pNode _insert(pNode& cur, const_reference value){
         if (cur == nullptr) {
             cur = new Node(value);
-            return;
         } else if (COMP{}(value, cur->value)) {
-            _insert(cur->leftc, value);
-            cur->leftc->f = cur;
-        } else if (COMP{}(cur->value, value)){   //data >= Current->m_value
-            _insert(cur->rightc, value);
-            cur->rightc->f = cur;
+            _insert(cur->left_child, value);
+            cur->left_child->father = cur;
+        } else if (!COMP{}(value, cur->value)){   //data >= Current->m_value
+            _insert(cur->right_child, value);
+            cur->right_child->father = cur;
         } else {
-            return;
+            return nullptr;
         }
+        return cur;
     }
 };
 

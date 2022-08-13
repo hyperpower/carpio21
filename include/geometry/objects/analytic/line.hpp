@@ -1,10 +1,12 @@
 #ifndef _LINE_HPP_
 #define _LINE_HPP_
 
-#include "geometry/geometry_define.hpp"
-#include "geometry/objects/basic/point.hpp"
+#include <iomanip>
 #include <array>
 #include <memory>
+
+#include "geometry/geometry_define.hpp"
+#include "geometry/objects/basic/point.hpp"
 
 namespace carpio {
 

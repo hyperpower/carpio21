@@ -8,17 +8,16 @@
 
 using namespace carpio;
 
-typedef Point_<double, 2>              Point2;
-typedef Segment_<double, 2>            Seg2;
-typedef Intersection_<Seg2, Seg2>      Inter;
+typedef Point_<double, 2>   Point2;
+typedef Segment_<double, 2> Segment2;
+typedef Intersection_<Segment2, Segment2>  Inter;
 typedef GGnuplotActor_<double, 2>      GA;
 
 
 auto GenerateRandomSegments(int num,
                             const double& xmin, const double& xmax,
                             const double& ymin, const double& ymax){
-    typedef Segment_<double, 2> Segment;
-    typedef std::list<Segment> ListSegment;
+    typedef std::list<Segment2> ListSegment;
     ListSegment lseg;
     // Random::seed(std::time(0));
     for (int i = 0; i< num ; i++){
@@ -26,7 +25,7 @@ auto GenerateRandomSegments(int num,
         double y1 = Random::nextDouble(ymin, ymax);
         double x2 = Random::nextDouble(xmin, xmax);
         double y2 = Random::nextDouble(ymin, ymax);
-        lseg.push_back(Segment(x1, x2, y1, y2));
+        lseg.push_back(Segment2(x1, x2, y1, y2));
     }
     return lseg;
 }
@@ -64,8 +63,8 @@ void benchmark_test(){
     ProfileListShow();
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/benchmark");
-    // gnu.set_xrange(-5, 5);
-    // gnu.set_yrange(-5, 5);
+    gnu.set_xlabel("number of segments");
+    gnu.set_ylabel("time (s)");
     // gnu.set_label(1, strtype, -4.5, 4);
 
     auto a1 = ToGnuplotActor(arr_num, m1_time);
@@ -86,8 +85,8 @@ int a_case(const Point2& p1,
            const Point2& p2,
            const Point2& p3,
            const Point2& p4){
-    Seg2 seg1(p1, p2);
-    Seg2 seg2(p3, p4);
+    Segment2 seg1(p1, p2);
+    Segment2 seg2(p3, p4);
 
     Inter inter(seg1, seg2);
     auto strtype = ToString(inter.cal_intersection_type());
