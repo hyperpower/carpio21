@@ -31,7 +31,24 @@ typedef TreeNode_<int, 2> Node;
 typedef SortedBinaryTree_<Node> BinaryTree;
 
 void visit(BinaryTree::pNode pn){
-    std::cout << pn->value << "  " << std::endl;
+    std::cout << "value  : " <<  pn->value   << "  " << std::endl;
+    std::cout << " height : " <<  pn->height() << std::endl;
+    std::cout << " level  : " <<  pn->level() << std::endl;
+    if (pn->father() != nullptr){
+        std::cout << " f : "   <<  pn->father()->value << std::endl;
+    }else{
+        std::cout << " f : null" << std::endl;
+    }
+    if (pn->left_child() != nullptr){
+        std::cout << " left : "   <<  pn->left_child()->value << std::endl;
+    }else{
+        std::cout << " left : null" << std::endl;
+    }
+    if (pn->right_child() != nullptr){
+        std::cout << " right : "   <<  pn->right_child()->value << std::endl;
+    }else{
+        std::cout << " right : null" << std::endl;
+    }
 }
 
 
@@ -45,6 +62,9 @@ TEST(binary_tree, sorted){
     tree.insert(1);
     tree.insert(2);
     tree.insert(5);
+    tree.insert(3);
+    // tree.insert(3);
+    tree.insert(4);
 
     std::cout << "tree is empty " << tree.empty() << std::endl;
     ASSERT_EQ(tree.empty(), 0);

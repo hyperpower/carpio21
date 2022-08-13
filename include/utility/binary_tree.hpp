@@ -72,13 +72,18 @@ public:
             break;
         }
     }
-    
 
     pNode left_child(){
         return this->leftc;
     }
     pNode right_child(){
         return this->rightc;
+    }
+    pNode father(){
+        return this->f;
+    }
+    cpNode father() const{
+        return this->f;
     }
     cpNode left_child() const{
         return this->leftc;
@@ -92,40 +97,62 @@ public:
     void right_child(pNode node){
         this->rightc = node;
     }
-
     void father(pNode node){
         this->f = node;
     }
-
-    pNode leftmost(){
+    bool is_left_child() const{
+        if (this->f != nullptr){
+            return this->f->leftc == this; 
+        }else{
+            return false;
+        }
+    }
+    bool is_right_child() const{
+        if (this->f != nullptr){
+            return this->f->rightc == this; 
+        }else{
+            return false;
+        }
+    }
+    pNode left_most(){
         pNode ptn = this;
-        while (ptn->lchild != nullptr)
-            ptn = ptn->lchild;
+        while (ptn->leftc != nullptr)
+            ptn = ptn->leftc;
         return ptn;
     }
-    pNode rightmost(){
+    pNode right_most(){
         pNode ptn = this;
         while (ptn->rightc != nullptr)
             ptn = ptn->rightc;
         return ptn;
     }
 
-    St height() const{
-        return 1 + std::max(height(this->leftc), height(this->rightc));
+    std::size_t height() const{
+        return std::max<std::size_t>(height(this->leftc), height(this->rightc)) ;
     }
-    St height(pNode cur) const{
+    std::size_t height(pNode cur) const{
         if (cur == nullptr)
             return 0;
         else
-            return 1 + MAX(height(cur->left_child()), height(cur->right_child()));
+            return 1 + std::max<std::size_t>(height(cur->left_child()), height(cur->right_child()));
     }
 
-    void destory(pNode& Current) {
-        if (Current != nullptr) {
-            destory(Current->leftc);
-            destory(Current->rightc);
-            delete Current;
-            Current = nullptr;
+    std::size_t level() const{
+        return this->level(this);
+    }
+    std::size_t level(cpNode cur) const{
+        if (cur == nullptr)
+            return 0;
+        else
+            return 1 + level(cur->f);
+    }
+
+    void destory(pNode& current) {
+        if (current != nullptr) {
+            destory(current->leftc);
+            destory(current->rightc);
+            delete current;
+            current = nullptr;
         }
     }
 
@@ -181,7 +208,7 @@ protected:
     template <typename Callable, typename... Args>
     void _pre_order(pNode current, Callable &&op, Args &&... args){
 	    if (current != nullptr) {
-	    	std::invoke(op, current, args...);
+	    	std::invoke(std::forward<Callable>(op), current, std::forward<Args>(args)...);
 	    	_pre_order(current->leftc, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    	_pre_order(current->rightc, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    }
@@ -318,7 +345,7 @@ protected:
         } else if (COMP{}(value, cur->value)) {
             _insert(cur->leftc, value);
             cur->leftc->f = cur;
-        } else if (!COMP{}(value, cur->value)){   //data >= Current->m_value
+        } else if (COMP{}(cur->value, value)){   //data >= Current->m_value
             _insert(cur->rightc, value);
             cur->rightc->f = cur;
         } else {
