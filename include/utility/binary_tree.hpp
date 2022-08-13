@@ -144,6 +144,20 @@ public:
             cur = nullptr;
         }
     }
+    
+    template <typename Callable, typename... Args>
+    void _pre_order(pNode cur, Callable &&op, Args &&... args){
+	    if (cur != nullptr) {
+	    	std::invoke(op, cur, args...);
+	    	_pre_order(cur->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_pre_order(cur->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    }
+    }
+
+    template <typename Callable, typename... Args>
+    void pre_order(Callable &&op, Args &&... args){
+        this->_pre_order(this, std::forward<Callable>(op), std::forward<Args>(args)...);
+    }
 
     pNode copy() const{
         pNode dst = new Node(this->value);
@@ -220,32 +234,6 @@ public:
         }else{
             return false;
         }
-    }
-
-    pNode neighbor(pNode cur, int d){
-        pNode ca = nullptr;            //common ancestor
-        if (cur->father != nullptr
-                && !(cur->has_sibling(d))) {
-            ca = neighbor(cur->father, d);
-        } else if (cur->father != nullptr){
-            ca = cur->father;
-        } else {
-            ca = cur;
-        }
-        pNode pt = nullptr;
-        if (ca != nullptr && cur->father == ca) {
-            pt = ca->child(d);
-        } else {
-            pt = ca->child(Reflect(d));
-            if(pt == nullptr){
-                pt = ca->child(d);
-            }
-        }
-        return pt;
-    }
-
-    pNode neighbor(int d){
-        return neighbor(this, d);
     }
 
     static int Reflect(int d){
@@ -408,7 +396,40 @@ public:
     size_type height() const{
         return this->root()->height();
     }
-protected:
+    pNode neighbor(pNode cur, int d){
+        pNode ca = nullptr;            //common ancestor
+        if (cur->father != nullptr && cur->father != this->_end
+                && !(cur->has_sibling(d))) {
+            ca = neighbor(cur->father, d);
+        } else if (cur->father != nullptr && cur->father != this->_end){
+            ca = cur->father;
+        } else {
+            ca = cur;
+        }
+        pNode pt = nullptr;
+        if (ca != nullptr && cur->father != nullptr && cur->father == ca) {
+            pt = ca->child(d);
+        } else if (ca != nullptr) {
+            pt = ca->child(Node::Reflect(d));
+            if(pt == nullptr){
+                pt = ca->child(d);
+            }
+        }
+        return pt;
+    }
+
+    pNode common_ancestor(pNode cur, int d){
+        pNode ca = nullptr;            //common ancestor
+        if (cur->father != nullptr && cur->father != this->_end
+                && !(cur->has_sibling(d))) {
+            ca = common_ancestor(cur->father, d);
+        } else if (cur->father != nullptr && cur->father != this->_end){
+            ca = cur->father;
+        } else {
+            ca = cur;
+        }
+        return ca;
+    }
 };
 
 template<class NODE, class COMP = std::less<typename NODE::value_type> >
