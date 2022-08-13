@@ -259,7 +259,7 @@ public:
 
 template<typename TYPE>
 std::ostream& operator<<(std::ostream& stream, const TreeNode_<TYPE, 2>& node) {
-	if(node.father == nullptr){
+    if(node.father == nullptr){
         stream << "father = null";
     }else{
         stream << "father = " << node.father;
@@ -447,18 +447,20 @@ public:
     }
 protected:
     pNode _insert(pNode& cur, const_reference value){
+        pNode res = nullptr;
         if (cur == nullptr) {
             cur = new Node(value);
+            return cur;
         } else if (COMP{}(value, cur->value)) {
-            _insert(cur->left_child, value);
+            res = _insert(cur->left_child, value);
             cur->left_child->father = cur;
         } else if (!COMP{}(value, cur->value)){   //data >= Current->m_value
-            _insert(cur->right_child, value);
+            res = _insert(cur->right_child, value);
             cur->right_child->father = cur;
         } else {
             return nullptr;
         }
-        return cur;
+        return res;
     }
 };
 

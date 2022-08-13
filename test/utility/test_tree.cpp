@@ -57,15 +57,40 @@ std::ostream& operator<<(std::ostream& stream, const PlotInfo& v) {
 typedef TreeNode_<PlotInfo, 2> PlotNode;
 typedef SortedBinaryTree_<PlotNode> PlotTree;
 
-void UpdateXY(PlotTree::pNode& pn){
-    std::cout << *pn << std::endl;
-    auto pnn = pn->neighbor(0);
+void UpdateXY(PlotTree::pNode pn){
+    // increase y by father
+    if(pn->father != nullptr){
+        pn->value.y = pn->father->value.y + 1;
+    }
+    // increase x by neighbor
+    auto nei = pn->neighbor(PlotTree::Node::_LEFT_);
+    if(nei != nullptr){
+        if(nei->value.x == pn->value.x){
+
+        }
+    }
+    // output
+    if(pn != nullptr){
+        std::cout << *pn << std::endl;
+        std::cout << "--------------" << std::endl;
+    }
+    // auto pnn = pn->neighbor(0);
+    // if(pnn != nullptr){
+    //     std::cout << *pnn << std::endl;
+    // }else{
+    //     std::cout << "null" << std::endl;
+    // }
+
+    // std::cout << pnn << std::endl;
 }
 
 TEST(binary_tree, plot){
     PlotTree tree;
-    auto pn = tree.insert({1, 0, 0});
+    tree.insert({3, 0, 0});
+    auto pn = tree.insert({4, 0, 0});
     UpdateXY(pn);
+    UpdateXY(tree.insert({2, 0, 0}));
+
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/plot_tree");
     gnu.set_xrange(-5, 5);
