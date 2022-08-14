@@ -73,6 +73,8 @@ def parse_args():
     parser.add_argument("-r", "--run",
                         help="run project" ,
                         action="store_true")
+    parser.add_argument('--mpi', action='store_true',
+                         help='run by mpi')
     args=parser.parse_args()
     return args
 
@@ -112,7 +114,9 @@ class Runer:
         cmd = f"cmake -S \"{self._path.this}\"" \
               f" -B \"{path_build}\""
         print(cmd)
-        os.system(cmd)
+        # os.system(cmd)
+        result = os.popen(cmd)
+        print(result.read())
 
     def build(self):
         project_name = self._info["name"]
@@ -132,6 +136,22 @@ class Runer:
             cmd = "\"" + exe +"\""
         elif os.path.exists(self._path.this + "/build/main"):
             cmd = self._path.this + "/build/main"
+        else:
+            print("! executable file not found !")
+            os.chdir(current)
+            return
+
+        os.system(cmd)
+        os.chdir(current)
+
+    def execute_mpi(self):
+        current = os.getcwd()
+        os.chdir(self._path.this)
+        exe = self._path.this + "/build/Release/main.exe"
+        if os.path.exists(exe):
+            cmd = "mpiexec -n 4 \"" + exe +"\""
+        elif os.path.exists(self._path.this + "/build/main"):
+            cmd = "mpiexec -n 4 " + self._path.this + "/build/main"
         else:
             print("! executable file not found !")
             os.chdir(current)
@@ -237,6 +257,12 @@ class Runer:
             t  = time.perf_counter()
             record["execute"] = True
             self.execute()
+            self._info["execute_wall_time"] = time.perf_counter() - t
+        if args.mpi:
+            print("execute by mpi ===== ")
+            t  = time.perf_counter()
+            record["execute"] = True
+            self.execute_mpi()
             self._info["execute_wall_time"] = time.perf_counter() - t
         if args.plot:
             print("plot ======== ")
