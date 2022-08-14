@@ -14,6 +14,9 @@
 #include <iostream>
 #include <cmath>
 
+#undef max
+#undef min
+
 namespace carpio {
 
 inline int StepFun(Float x) {

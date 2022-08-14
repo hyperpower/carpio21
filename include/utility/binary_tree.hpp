@@ -532,50 +532,10 @@ protected:
 //     }
 // }
 
-// template<typename TYPE>
-// void BinaryTree<TYPE>::_preorder(pNode Current, pFun_BinaryTree visit,
-//         utPointer utp) {
-//     if (Current != nullptr) {
-//         (*visit)(Current->value, utp);
-//         _preorder(Current->lchild, visit, utp);
-//         _preorder(Current->rchild, visit, utp);
-//     }
-// }
 
-// template<class TYPE>
-// void BinaryTree<TYPE>::pre_order(pFun_BinaryTree visit, utPointer utp) {
-//     _preorder(_root->lchild, visit, utp);
-// }
 
-// template<typename TYPE>
-// void BinaryTree<TYPE>::_postorder(pNode Current, pFun_BinaryTree visit,
-//         utPointer utp) {
-//     if (Current != nullptr) {
-//         _postorder(Current->lchild, visit, utp);
-//         _postorder(Current->rchild, visit, utp);
-//         (*visit)(Current->value, utp);
-//     }
-// }
 
-// template<class TYPE>
-// void BinaryTree<TYPE>::post_order(pFun_BinaryTree visit, utPointer utp) {
-//     _postorder(_root->lchild, visit, utp);
-// }
 
-// template<typename TYPE>
-// void BinaryTree<TYPE>::_inorder(pNode Current, pFun_BinaryTree visit,
-//         utPointer utp) {
-//     if (Current != nullptr) {
-//         _inorder(Current->lchild, visit, utp);
-//         (*visit)(Current->value, utp);
-//         _inorder(Current->rchild, visit, utp);
-//     }
-// }
-
-// template<class TYPE>
-// void BinaryTree<TYPE>::in_order(pFun_BinaryTree visit, utPointer utp) {
-//     _inorder(_root->lchild, visit, utp);
-// }
 
 // template<class TYPE>
 // _BinaryTree_iterator<TYPE, const TYPE&, const TYPE*> BinaryTree<TYPE>::begin() const {
@@ -623,10 +583,7 @@ protected:
 
 
 
-// template<typename TYPE>
-// bool BinaryTree<TYPE>::empty() const {
-//     return _root->lchild == nullptr;
-// }
+
 
 // template<typename TYPE>
 // LarusDef::size_type BinaryTree<TYPE>::_size(const pNode& Current) const {

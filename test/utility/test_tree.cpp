@@ -115,8 +115,8 @@ void UpdateXY(PlotTree& tree, PlotTree::pNode pn){
     
     // output
     if(pn != nullptr){
-        std::cout << *pn << std::endl;
-        std::cout << "--------------" << std::endl;
+        // std::cout << *pn << std::endl;
+        // std::cout << "--------------" << std::endl;
     }
 }
 
