@@ -46,7 +46,11 @@ double TimeTest(double tt, int nt){
         // usleep(St(tt * 1000));
         // std::this_thread::sleep_for(std::chrono::microseconds(std::size_t(tt * 1000)));
         // std::cout << "thread" << omp_get_thread_num() << std::endl;
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__)
         Sleep(tt);
+#else defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+        usleep(St(tt * 1000));
+#endif
     }
 // #endif
     tick_t end = Clock::Tick();

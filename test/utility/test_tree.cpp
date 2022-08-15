@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "utility/binary_tree.hpp"
+#include "geometry/geometry.hpp"
 #include "io/gnuplot.hpp"
 
 namespace carpio {
@@ -26,7 +27,7 @@ void AddNode(
     int n = 20;
     double r = 0.8;
     double da = 2 * _PI_ / n;
-    for (uInt i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         Vt rx = r * cos(i * da) + x;
         Vt ry = r * sin(i * da) + y;
         lx.push_back(rx);
@@ -38,16 +39,45 @@ void AddNode(
     actor.style("with filledcurves closed lc rgb \"#557FBA00\"");
     gnu.add(actor);
     // label
-    gnu.set_label(order, str, x, y, "center front");
+    gnu.set_label(order, str, x, y, "center noenhanced front");
 }
-
+void AddNodeEmphi(
+    int order, Gnuplot& gnu,
+    const double& x,  const double& y, 
+    const std::string& str){
+    // plot a circle
+    std::list<double> lx, ly;
+    int n = 20;
+    double r = 0.8;
+    double da = 2 * _PI_ / n;
+    for (int i = 0; i < n; i++) {
+        Vt rx = r * cos(i * da) + x;
+        Vt ry = r * sin(i * da) + y;
+        lx.push_back(rx);
+        ly.push_back(ry);
+    }
+    lx.push_back(r + x);
+    ly.push_back(y);
+    auto actor = ToGnuplotActor(lx, ly);
+    actor.style("with lines lc rgb \"#22F25022\" lw 4");
+    gnu.add(actor);
+    // label
+}
 void AddLink(Gnuplot& gnu, 
             const double& x, const double& y,
             const double& fx, const double& fy){
-    std::list<double> lx{x, fx};
-    std::list<double> ly{y, fy};
+    typedef Point_<double, 2> Point;
+    Point_<double, 2> s(x,   y);
+    Point_<double, 2> e(fx, fy);
+    // radius = 0.8
+    double r = 0.8;
+    auto ns = NewPointFromStart(s,e,r);
+    auto ne = NewPointFromEnd(s,e,r);
+    // std::list<Point>  lp{ns, ne}; 
+    std::list<double> lx{ns.x(), ne.x()};
+    std::list<double> ly{ns.y(), ne.y()};
     auto actor = ToGnuplotActor(lx, ly);
-    actor.style("with lines lc rgb \"#00A4EF\" lw 2");
+    actor.style("with lines lc rgb \"#00A4EF\" lw 3");
     gnu.add(actor);
 }
 
@@ -56,6 +86,15 @@ struct PlotInfo{
     double value;
     double x;
     double y;
+
+    PlotInfo():value(0.0), x(0.0), y(0.0){
+    }
+    PlotInfo(const double& _v,
+             const double& _x,
+             const double& _y):value(_v), x(_x), y(_y){
+    }
+
+    PlotInfo(const double& _v):value(_v), x(0.0), y(0.0){}
 
     bool operator<(const PlotInfo& rhs) const {
 		return (this->value < rhs.value);
@@ -136,15 +175,20 @@ TEST(binary_tree, plot){
     UpdateXY(tree, tree.insert({2.4, 0, 0}));
     UpdateXY(tree, tree.insert({2.6, 0, 0}));
     UpdateXY(tree, tree.insert({2.7, 0, 0}));
-    UpdateXY(tree, tree.insert({3.05, 0, 0}));
+    UpdateXY(tree, tree.insert({3.65, 0, 0}));
 
+    // find
+    auto pf = tree.find(3.1);
+    std::cout << "find = " << *pf << std::endl;
+    
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/plot_tree");
-    gnu.set_xrange(-10, 10);
-    gnu.set_yrange(-10, 1);
+    // gnu.set_xrange(-10, 10);
+    // gnu.set_yrange(-10, 1);
     gnu.set_equal_aspect_ratio();
     int order = 1;
     tree.pre_order(visit_add_node, gnu, order);
+    AddNodeEmphi(100, gnu, pf->value.x, pf->value.y, "aa"); 
     gnu.plot();
 }
 
@@ -191,7 +235,8 @@ TEST(binary_tree, sorted){
     std::cout << "pn child(1) has sibling = " << pn->has_sibling() << std::endl;
     std::cout << "pn child(1) neighbor  = " << tree.neighbor(pn,0)->value << std::endl;
 
-
+    // test find
+    
 }
 
 

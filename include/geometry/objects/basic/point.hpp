@@ -552,31 +552,69 @@ Point_<TYPE, DIM> Max(
 }
 
 template<typename TYPE, St DIM>
-Point_<TYPE, DIM> Between(
-        const Point_<TYPE, DIM>& a,
-        const Point_<TYPE, DIM>& b,
+Point_<TYPE, DIM> BetweenByRatio(
+        const Point_<TYPE, DIM>& start,
+        const Point_<TYPE, DIM>& end,
         const Vt& ratio) {
     // -1 <= ratio <= 1
     if (ratio == 1) {
-        return b;
+        return end;
     }
     if (ratio == -1) {
-        return a;
+        return start;
     }
     Point_<TYPE, DIM> res;
     if (ratio < 0) {
         for (St i = 0; i < DIM; ++i) {
-            res[i] = b[i] + (b[i] - a[i]) * ratio;
+            res[i] = end[i] + (end[i] - start[i]) * ratio;
         }
     } else if (ratio > 0) {
         for (St i = 0; i < DIM; ++i) {
-            res[i] = a[i] + (b[i] - a[i]) * ratio;
+            res[i] = start[i] + (end[i] - start[i]) * ratio;
         }
     }
     return res;
 }
-
-
+template<typename TYPE, St DIM>
+Point_<TYPE, DIM> NewPointFromStart(
+        const Point_<TYPE, DIM>& start,
+        const Point_<TYPE, DIM>& end,
+        const Vt& distance) {
+    auto dis = Distance(start, end);
+    auto ratio = distance / dis;
+    // -1 <= ratio <= 1
+    if (distance == 1) {
+        return end;
+    }
+    if (distance == 0) {
+        return start;
+    }
+    Point_<TYPE, DIM> res;
+    for (St i = 0; i < DIM; ++i) {
+        res[i] = start[i] + (end[i] - start[i]) * ratio;
+    }
+    return res;
+}
+template<typename TYPE, St DIM>
+Point_<TYPE, DIM> NewPointFromEnd(
+        const Point_<TYPE, DIM>& start,
+        const Point_<TYPE, DIM>& end,
+        const Vt& distance) {
+    auto dis = Distance(start, end);
+    auto ratio = distance / dis;
+    // -1 <= ratio <= 1
+    if (distance == 1) {
+        return end;
+    }
+    if (distance == 0) {
+        return start;
+    }
+    Point_<TYPE, DIM> res;
+    for (St i = 0; i < DIM; ++i) {
+        res[i] = end[i] - (end[i] - start[i]) * ratio;
+    }
+    return res;
+}
 //===============================================
 // Cross product (v1 - v4) . ((v2-v4) x (v3-v4))
 // for Point
@@ -659,19 +697,19 @@ Trinary OnWhichSide3(
     }
 }
 
-template<class POINT, class TAG>
-class PointView{};
+// template<class POINT, class TAG>
+// class PointView{};
 
-template<class POINT>
-class PointView<POINT, PointViewOnYZTag>{
-public:
-    typedef PointViewOnYZTag Tag;
-    typedef POINT            Point;
-protected:
-    const Point* _p;
-public:
+// template<class POINT>
+// class PointView<POINT, PointViewOnYZTag>{
+// public:
+//     typedef PointViewOnYZTag Tag;
+//     typedef POINT            Point;
+// protected:
+//     const Point* _p;
+// public:
     
-};
+// };
 
 
 } //end namespace

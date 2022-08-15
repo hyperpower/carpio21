@@ -83,7 +83,7 @@ public:
 		return this->operator [](i);
 	}
 
-    const_ref_Point& p(int i) const{
+    const_ref_Point p(int i) const{
 		ASSERT( (i==0) || (i==1));
 		return this->operator [](i);
 	}

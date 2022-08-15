@@ -466,6 +466,14 @@ public:
         }
         return res;
     }
+    
+    pNode find(const_reference value){
+        if(this->empty()){
+            return nullptr;
+        } else {
+            return this->_find(this->_end->left_child, value);
+        }
+    }
 protected:
     pNode _insert(pNode& cur, const_reference value){
         pNode res = nullptr;
@@ -475,11 +483,25 @@ protected:
         } else if (COMP{}(value, cur->value)) {
             res = _insert(cur->left_child, value);
             cur->left_child->father = cur;
-        } else if (!COMP{}(value, cur->value)){   //data >= Current->m_value
+        } else if (COMP{}(cur->value, value)){   //data >= Current->m_value
             res = _insert(cur->right_child, value);
             cur->right_child->father = cur;
         } else {
             return nullptr;
+        }
+        return res;
+    }
+    pNode _find(pNode& cur, const_reference value){
+        pNode res = nullptr;
+        if (cur == nullptr) {
+            return nullptr;
+        }
+        if (COMP{}(value, cur->value)) {
+            res = _find(cur->left_child, value);
+        } else if (COMP{}(cur->value, value)) {
+            res = _find(cur->right_child, value);
+        } else {
+            return cur;
         }
         return res;
     }
