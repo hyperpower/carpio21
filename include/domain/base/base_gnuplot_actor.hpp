@@ -11,10 +11,10 @@ namespace carpio{
 
 
 template<class ANY>
-spGnuplotActor _ToGnuplotActorLines(const ANY& a, const DomainTag& tag){};
+GnuplotActor _ToGnuplotActorLines(const ANY& a, const DomainTag& tag){};
 
 template<class ANY>
-spGnuplotActor ToGnuplotActorLines(const ANY& a){
+GnuplotActor ToGnuplotActorLines(const ANY& a){
     typedef typename ANY::Tag Tag;
     Tag t;
     return _ToGnuplotActorLines(a, t); 

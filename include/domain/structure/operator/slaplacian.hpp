@@ -1,6 +1,7 @@
 #ifndef _SLAPLACIAN_HPP
 #define _SLAPLACIAN_HPP
 
+#include "domain/base/base_operator_impl.hpp"
 #include "scommon.hpp"
 #include "algebra/algebra.hpp"
 
@@ -80,11 +81,12 @@ public:
 template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class LaplacianImplement_<
     FIELD, DIM, Vt,
-    GRID, GHOST, ORDER, StructureTag>: 
+    GRID, GHOST, ORDER, SFieldCenterTag>: 
     public SOperatorCommon_<FIELD, DIM, Vt, GRID, GHOST, ORDER>{     
 public:
+    typedef SFieldCenterTag Tag;
     typedef Vt ValueType;
-    typedef ApplyBCImplement_<FIELD, DIM, Vt, GRID, GHOST, ORDER, StructureTag> ApplyBC;
+    typedef ApplyBCImplement_<FIELD, DIM, Vt, GRID, GHOST, ORDER, SFieldCenterTag> ApplyBC;
     typedef typename GRID::Index Index;
     typedef FIELD Field;
     typedef GRID  Grid;

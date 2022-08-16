@@ -44,14 +44,10 @@ public:
         :Base(spg, spgh, spo){
         _initial_arr();
     }
-    SFieldCenter_(const Self&  other): Base(other){
-    }
-    SFieldCenter_(      Self&& other): Base(std::move(other)){
-    }
-    SFieldCenter_(const Base& b) :Base(b) {
-    }
-    SFieldCenter_(Base&& b) :Base(std::move(b)) {
-    }
+    SFieldCenter_(const Self&  other): Base(other){}
+    SFieldCenter_(      Self&& other): Base(std::move(other)){}
+    SFieldCenter_(const Base&  b) :Base(b) {}
+    SFieldCenter_(      Base&& b) :Base(std::move(b)) {}
 
     Self& operator=(const Self& other) {
         if (this == &other) {

@@ -11,7 +11,8 @@ template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class ApplyBCImplement_<
     FIELD, DIM, 
     LinearPolynomial_<Vt, typename GRID::Index>, 
-    GRID, GHOST, ORDER, StructureTag>{
+    GRID, GHOST, ORDER,
+    SFieldCenterTag>{
 public:
     typedef FIELD Field;
 
@@ -159,7 +160,7 @@ protected:
 template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class ApplyBCImplement_<
     FIELD, DIM, Vt, 
-    GRID, GHOST, ORDER, StructureTag>{
+    GRID, GHOST, ORDER, SFieldCenterTag>{
 public:
     typedef FIELD Field;
 

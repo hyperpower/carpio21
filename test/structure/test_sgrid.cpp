@@ -5,7 +5,7 @@
 
 using namespace carpio;
 
-const std::string OUTPUTPATH = "./test_output/";
+const std::string OUTPUTPATH = "./fig/";
 
 const int fig_width  = 900;
 const int fig_height = 900;
@@ -23,7 +23,7 @@ TEST(sgrid, initial){
 	Gnuplot gnu;
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 3.5);
-	gnu.set_equal_ratio();
+	gnu.set_equal_aspect_ratio();
 	gnu.add(ToGnuplotActorLines(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid", fig_width, fig_height);
 	gnu.plot();
@@ -42,7 +42,7 @@ TEST(sgrid, initial1){
 	Gnuplot gnu;
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 0.5);
-	gnu.set_equal_ratio();
+	gnu.set_equal_aspect_ratio();
 	gnu.add(ToGnuplotActorLines(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid1", fig_width, fig_height);
 	gnu.plot();
@@ -61,7 +61,7 @@ TEST(structure, nonuniform){
 	Gnuplot gnu;
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 3.5);
-	gnu.set_equal_ratio();
+	gnu.set_equal_aspect_ratio();
 	gnu.add(ToGnuplotActorLines(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "NonUniformSturctureGrid", fig_width, fig_height);
 	gnu.plot();

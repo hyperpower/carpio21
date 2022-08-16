@@ -11,7 +11,9 @@ namespace carpio{
 // - OCTUREE
 // - TRIANGLE
 // - POLY
-template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
+template<class FIELD, St DIM, class VT, 
+         class GRID, class GHOST, class ORDER, 
+         class TRAIT>
 class LaplacianImplement_{
 public:
     LaplacianImplement_(){
@@ -31,10 +33,13 @@ public:
         return res;
     }
     template<class BDYIDX>
-    int execute(const FIELD&, const BDYIDX&){};
+    FIELD execute(const FIELD& a, const BDYIDX&){
+        std::cout<< "Template Class Do Nothing" << std::endl;
+        FIELD res(a);
+        return res;
+    }
 
     // void set(const int& other){std::cout << "int" << std::endl;}
-        
 };
 template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
 class ApplyBCImplement_{
@@ -50,6 +55,7 @@ public:
         std::cout << "BuildMatrix Implement Basic" << std::endl;
     };
 };
+
 }
 
 #endif

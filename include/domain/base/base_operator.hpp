@@ -14,7 +14,7 @@ FIELD Laplacian(const FIELD& field, BI bi, const std::string& method){
                         typename FIELD::Grid, 
                         typename FIELD::Ghost,
                         typename FIELD::Order,
-                        typename FIELD::TraitTag
+                        typename FIELD::Tag
                         > imp;
     std::cout << "Laplacian----<" << std::endl;
     imp.set_method(method);
@@ -28,7 +28,7 @@ FIELD Laplacian(const FIELD& field, BI bi){
                         typename FIELD::Grid, 
                         typename FIELD::Ghost,
                         typename FIELD::Order,
-                        typename FIELD::TraitTag
+                        typename FIELD::Tag
                         > imp;
     return imp.execute(field, bi);
 }
@@ -40,7 +40,7 @@ FIELD Laplacian(const FIELD& field){
                         typename FIELD::Grid, 
                         typename FIELD::Ghost,
                         typename FIELD::Order,
-                        typename FIELD::TraitTag
+                        typename FIELD::Tag
                         > imp;
     return imp.execute(field);
 }

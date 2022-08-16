@@ -644,7 +644,7 @@ public:
     Gnuplot& set_terminal_png(
             const std::string& filename,
             double  x  = 800,  double  y  = 600,
-            const std::string& font       = "Helvetica",
+            const std::string& font       = "Fira Code",
                           int  fontsize   = 12) {
         this->terminal_std = "pngcairo";
         std::stringstream sst;
