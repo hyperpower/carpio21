@@ -46,7 +46,6 @@ TEST(sgrid, initial1){
 	gnu.add(ToGnuplotActorLines(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid1", fig_width, fig_height);
 	gnu.plot();
-
 }
 
 TEST(structure, nonuniform){

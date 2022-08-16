@@ -143,7 +143,7 @@ public:
     }
 
     GnuplotActor& title(const std::string& title){
-        this->_set_cmd(this->_pcmd, "title", title);
+        this->_set_cmd(this->_pcmd, "title", "\"" + title + "\" ");
         return *this;
     }
 
@@ -153,7 +153,11 @@ public:
     }
 
     GnuplotActor& line_color(const int& idx){
-        this->_set_cmd(this->_scmd, "lc", ToString(idx));
+        this->_set_cmd(this->_scmd, "lc", " " + ToString(idx) + " ");
+        return *this;
+    }
+    GnuplotActor& line_width(const int& idx){
+        this->_set_cmd(this->_scmd, "lw", " " + ToString(idx) + " ");
         return *this;
     }
 
@@ -673,6 +677,14 @@ public:
     Gnuplot& set(const std::string& str) {
         std::ostringstream cmdstr;
         cmdstr << "set " << str;
+        cmd(cmdstr.str());
+
+        return *this;
+    }
+    
+    Gnuplot& set_key_spacing(const double& vspace) {
+        std::ostringstream cmdstr;
+        cmdstr << "set key spacing " << ToString(vspace);
         cmd(cmdstr.str());
 
         return *this;
