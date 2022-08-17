@@ -14,7 +14,7 @@ template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class BuildMatrixImplement_<
     FIELD, DIM, 
     LinearPolynomial_<Vt, typename GRID::Index>, 
-    GRID, GHOST, ORDER, StructureTag>{
+    GRID, GHOST, ORDER, SFieldCenterTag>{
 public:
     typedef FIELD ExpField;
 
@@ -30,9 +30,9 @@ public:
     }
     
     // The boundary condition has been applied
-    void execute(const ExpField&         expf,
-                          Mat&           mat,
-                          Arr&           b){
+    void execute(const ExpField& expf,
+                          Mat&   mat,
+                          Arr&   b){
         auto& grid  = expf.grid();
         auto& order = expf.order();
         St    n     = order.size();

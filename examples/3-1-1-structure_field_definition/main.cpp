@@ -77,7 +77,59 @@ void Uniform1(){
 	gnu.plot();
 }
 
+void Uniform2(){
+	const std::size_t dim = 2;
+	typedef SGridUniform_<dim>                     Grid;
+	typedef std::shared_ptr<SGridUniform_<dim> > spGrid;
+
+	typedef SGhostRegular_<dim, Grid> Ghost;
+	typedef std::shared_ptr<Ghost> spGhost;
+
+	typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+	typedef std::shared_ptr<Order> spOrder;
+
+	typedef SFieldCenter_<dim, double, Grid, Ghost, Order> Field;
+
+	Point_<Vt, dim> pmin(0, 0, 0);
+	Point_<Vt, dim> pmax(1, 1, 1);
+	spGrid spgrid(new Grid(pmin, {5, 5}, 0.5, 2));
+    spGhost spghost(new Ghost(spgrid));
+
+	spOrder sporder(new Order(spgrid,spghost));
+
+    Field field(spgrid, spghost, sporder);
+
+	Gnuplot gnu;
+	gnu.set_xrange(-0.5, 3.5);
+	gnu.set_yrange(-0.5, 3.5);
+	gnu.set_xlabel("X");
+	gnu.set_ylabel("Y");
+	gnu.set_equal_aspect_ratio();
+	gnu.set_key_spacing(1.5);
+	
+	auto agrid = ToGnuplotActorLines(*spgrid);
+	agrid.title("Grid");
+	agrid.line_width(2);
+	gnu.add(agrid);
+
+	//center location
+	std::list<double> lx, ly;
+	for(auto& index : field.order()){
+		auto p = field.grid().c(index);
+		lx.push_back(p.x());
+		ly.push_back(p.y());
+	}
+	auto aloc = ToGnuplotActor(lx, ly);
+	aloc.title("Center scalar location");
+	aloc.style("with points ps 3 pt 7");
+	gnu.add(aloc);
+
+    gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid2", fig_width, fig_height);
+	gnu.plot();
+}
+
 int main(int argc, char** argv) {
     Uniform1();
+    Uniform2();
     
 }

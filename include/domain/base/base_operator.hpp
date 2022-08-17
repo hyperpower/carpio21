@@ -61,7 +61,7 @@ int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){
                         typename FIELD::Grid, 
                         typename FIELD::Ghost,
                         typename FIELD::Order,
-                        typename FIELD::TraitTag
+                        typename FIELD::Tag
                         > imp;
     imp.execute(field, mat, b);
     return 0;
