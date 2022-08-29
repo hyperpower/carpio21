@@ -199,6 +199,46 @@ protected:
 
 typedef std::shared_ptr<GnuplotActor> spGnuplotActor;
 
+class GnuplotActorGroup {
+public:
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    typedef std::list<std::shared_ptr<GnuplotActor> > list_spActor;
+    typedef typename list_spActor::iterator  iterator;
+    typedef typename list_spActor::const_iterator  const_iterator;
+protected:
+    list_spActor _actors;
+public:
+    GnuplotActorGroup(){
+    }
+    GnuplotActorGroup(const GnuplotActorGroup& ag) :
+            _actors(ag._actors) {
+    }
+    GnuplotActorGroup(const GnuplotActorGroup&& ag) :
+            _actors(std::move(ag._actors)) {
+    }
+    GnuplotActorGroup& operator=(const GnuplotActorGroup &other) {
+        if (this == &other) {
+            return *this;
+        }
+        this->_actors = other._actors;
+        return *this;
+    }
+
+    iterator begin(){
+        return _actors.begin();
+    }
+    const_iterator begin() const{
+        return _actors.begin();
+    }
+    iterator end(){
+        return _actors.end();
+    }
+    const_iterator end() const{
+        return _actors.end();
+    }
+};
+
+
 class Gnuplot {
 public:
     typedef std::shared_ptr<GnuplotActor> spActor;
@@ -738,7 +778,7 @@ public:
         std::ostringstream cmdstr;
         cmdstr<< "set palette defined(0 '#F7FBFF',\
                       1 '#DEEBF7',\
-                        2 '#C6DBEF',\
+                      2 '#C6DBEF',\
                       3 '#9ECAE1',\
                       4 '#6BAED6',\
                       5 '#4292C6',\
@@ -754,7 +794,7 @@ public:
         std::ostringstream cmdstr;
         cmdstr << "set palette defined ( 0 '#B2182B',\
                       1 '#D6604D',\
-                        2 '#F4A582',\
+                      2 '#F4A582',\
                       3 '#FDDBC7',\
                       4 '#E0E0E0',\
                       5 '#BABABA',\
@@ -1088,6 +1128,13 @@ public:
         this->_actors.push_back(std::make_shared<GnuplotActor>(actor));
         return *this;
     }
+    Gnuplot& add(const GnuplotActorGroup& gag){
+        for(auto& a : gag){
+            this->_actors.push_back(a);
+        }
+        return *this;
+    }
+
     Gnuplot& clear(){
         this->_actors.clear();
         return *this;

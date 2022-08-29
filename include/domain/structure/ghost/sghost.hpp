@@ -5,6 +5,8 @@
 
 namespace carpio{
 
+struct SGhostTag:  public StructureTag{};
+
 template<St DIM, class GRID>
 class SGhost_{
 public:

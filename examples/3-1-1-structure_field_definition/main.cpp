@@ -35,7 +35,7 @@ void Uniform1(){
     Field1 field(spgrid, spghost, sporder);
 
 	Gnuplot gnu;
-	gnu.set_xrange(-0.5, 3.5);
+	gnu.set_xrange(-0.5, 3.0);
 	gnu.set_yrange(-0.5, 2.0);
 	gnu.set_xlabel("Location");
 	gnu.set_ylabel("Scalar");
@@ -72,6 +72,13 @@ void Uniform1(){
 	ascalar.style("with points ps 3 pt 9");
 	gnu.add(ascalar);
 
+	// index label
+	int count = 1;
+	for(auto& index : field.order()){
+		auto p = field.grid().c(index);
+		gnu.set_label(count, ToString(count-1), p.x(), - 0.15, "center");
+		count++;
+	}
 
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid1", fig_width, fig_height);
 	gnu.plot();

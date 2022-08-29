@@ -548,6 +548,52 @@ auto ToGnuplotActorAsVector(const ANY& geo){
     MakeGnuplotActorAsVector(actor, geo, ANY::Tag());    
     return actor;
 }
+
+class GnuplotActorDistanceAnnotation : public GnuplotActorGroup{
+public:
+    typedef std::shared_ptr<GnuplotActor> spActor;
+    typedef std::list<std::shared_ptr<GnuplotActor> > list_spActor;
+    typedef GnuplotActorGroup Base;
+    typedef GnuplotActorDistanceAnnotation Self;
+protected:
+    Point_<double, 2> _p1; 
+    Point_<double, 2> _p2; 
+    double _offset;
+    std::string _text;
+    std::string _text_location;
+public:
+    GnuplotActorDistanceAnnotation():Base(){    
+        _p1 = {0.0, 0.0};  
+        _p2 = {0.0, 0.0};  
+    };
+    GnuplotActorDistanceAnnotation(
+        const double& x1, const double& y1,
+        const double& x2, const double& y2):Base(){    
+        _p1 = {x1, y1};
+        _p2 = {x2, y2};
+        double dis = Distance(_p1, _p2);
+        _offset = std::min(dis * 0.1, 0.05);
+        _text = ToString(dis);
+
+        this->_build_actors();
+    }
+
+protected:
+    void _build_actors(){
+        // vector  x y xdelta ydelta
+        GnuplotActor arrow;
+        double mx = (_p1[0] + _p2[0]) * 0.5;
+        double my = (_p1[1] + _p2[1]) * 0.5;
+        arrow.command("using 1:2:3:4 title \"\"");
+        arrow.style("with vectors filled head lc black");
+        arrow.data().push_back(ToString(mx, my, _p1[0] - mx, _p1[1] - my, " "));
+        arrow.data().push_back(ToString(mx, my, _p2[0] - mx, _p2[1] - my, " "));
+        this->_actors.push_back(std::make_shared<GnuplotActor>(arrow));
+    }
+
+};
+
+
 }
 
 #endif /* _ACTOR_GNUPLOT_HPP_ */
