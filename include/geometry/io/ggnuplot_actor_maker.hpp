@@ -10,7 +10,7 @@
 #define _GEOMETRY_GNUPLOT_ACTOR_MAKER_HPP_
 
 #include "geometry/geometry_define.hpp"
-#include "geometry/objects/shapes/distance_annotation.hpp"
+#include "geometry/objects/shapes/distance_indicator.hpp"
 #include <array>
 #include "geometry/objects/objects.hpp"
 #include "io/gnuplot.hpp"
@@ -552,38 +552,71 @@ auto ToGnuplotActorAsVector(const ANY& geo){
 
 
 
-class GnuplotActorDistanceAnnotation : public GnuplotActorGroup, DistanceAnnotation{
+class GnuplotActorDistanceIndicator : public GnuplotActorGroup, public DistanceIndicator{
 public:
     typedef std::shared_ptr<GnuplotActor> spActor;
     typedef std::list<std::shared_ptr<GnuplotActor> > list_spActor;
     typedef GnuplotActorGroup ActorGroup;
-    typedef DistanceAnnotation Shape;
-    typedef GnuplotActorDistanceAnnotation Self;
+    typedef DistanceIndicator Shape;
+    typedef typename Shape::Point Point;
+    typedef GnuplotActorDistanceIndicator Self;
 public:
-    GnuplotActorDistanceAnnotation():ActorGroup(), Shape(){    
+    GnuplotActorDistanceIndicator():ActorGroup(), Shape(){    
     };
-    GnuplotActorDistanceAnnotation(
+    GnuplotActorDistanceIndicator(
         const double& x1, const double& y1,
         const double& x2, const double& y2):
         ActorGroup(), Shape(x1, y1, x2, y2){    
         double dis = Distance(this->_p1, this->_p2);
-        this->_offset = std::min(dis * 0.1, 0.05);
-        this->_text = ToString(dis);
 
-        this->_build_actors();
+        // this->build_actors();
     }
 
-protected:
-    void _build_actors(){
+    void build_actors(){
         // vector  x y xdelta ydelta
         GnuplotActor arrow;
-        double mx = (_p1[0] + _p2[0]) * 0.5;
-        double my = (_p1[1] + _p2[1]) * 0.5;
+        Point  midp  = this->arrow_center();
+        Point  left  = this->arrow_left();
+        Point  right = this->arrow_right();
         arrow.command("using 1:2:3:4 title \"\"");
         arrow.style("with vectors filled head lc black");
-        arrow.data().push_back(ToString(mx, my, _p1[0] - mx, _p1[1] - my, " "));
-        arrow.data().push_back(ToString(mx, my, _p2[0] - mx, _p2[1] - my, " "));
+        arrow.data().push_back(ToString(midp[0], midp[1], left[0] - midp[0], left[1] - midp[1] , " "));
+        arrow.data().push_back(ToString(midp[0], midp[1], right[0] - midp[0], right[1] - midp[1], " "));
+        arrow.data().push_back(" ");
         this->_actors.push_back(std::make_shared<GnuplotActor>(arrow));
+        // normal line left
+        GnuplotActor normall;
+        Point l0 = this->normal_line_left(0);
+        Point l1 = this->normal_line_left(1);
+        normall.command("using 1:2 title \"\"");
+        normall.style("with lines lc black");
+        normall.data().push_back(ToString(l0[0], l0[1] , " "));
+        normall.data().push_back(ToString(l1[0], l1[1] , " "));
+        normall.data().push_back(" ");
+        this->_actors.push_back(std::make_shared<GnuplotActor>(normall));
+        // 
+        GnuplotActor normalr;
+        Point r0 = this->normal_line_right(0);
+        Point r1 = this->normal_line_right(1);
+        normalr.command("using 1:2 title \"\"");
+        normalr.style("with lines lc black");
+        normalr.data().push_back(ToString(r0[0], r0[1] , " "));
+        normalr.data().push_back(ToString(r1[0], r1[1] , " "));
+        normalr.data().push_back(" ");
+        this->_actors.push_back(std::make_shared<GnuplotActor>(normalr));
+        // 
+        if(this->is_offset()){
+            GnuplotActor ao;
+            Point o = this->offset();
+            ao.command("using 1:2 title \"\"");
+            ao.style("with lines lc black");
+            ao.data().push_back(ToString(midp[0], midp[1] , " "));
+            ao.data().push_back(ToString(o[0], o[1] , " "));
+            ao.data().push_back("");
+            this->_actors.push_back(std::make_shared<GnuplotActor>(ao));
+        }
+        
+
     }
 
 };

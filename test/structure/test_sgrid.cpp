@@ -95,14 +95,22 @@ TEST(sgrid, initial1){
 	int count = 1;
 	for(auto& index : field.order()){
 		auto p = field.grid().c(index);
-		gnu.set_label(count, ToString(count-1), p.x(), - 0.15, "center");
+		gnu.set_label(count, ToString(count-1), p.x(), - 0.15, "center noenhance");
 		count++;
 	}
 
 	auto& grid = field.grid();
-	GnuplotActorDistanceAnnotation anno_dis(0.5, 0.0, 1.0, 0.0);
 
-	gnu.add(anno_dis);
+	GnuplotActorDistanceIndicator anno_s(0.5, 0.0, 1.0, 0.0);
+	anno_s.set_space(0.12);
+	anno_s.set_height(0.2);
+	anno_s.set_normal_line_length(0.35);
+	// anno_dis.set_offset(0.5);
+	anno_s.build_actors();
+	gnu.add(anno_s);
+	auto c = anno_s.text_center(0.08);
+	gnu.set_label(10, "s_1", c[0], c[1], "center noenhance");
+
 
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid1", fig_width, fig_height);
 	gnu.plot();

@@ -259,20 +259,22 @@ void _Rotate(GEO& point, const VT& theta, const int& axe, PointTag, Dim3Tag){
 template<class GEO, class VT>
 void _Rotate(GEO& point, const VT& theta, XTag, PointTag, Dim3Tag){
 //  point[0] = point[0];
-    point[1] =   point[1] * std::cos(theta) + point[2] * std::sin(theta);
+    auto   y =   point[1] * std::cos(theta) + point[2] * std::sin(theta);
     point[2] = - point[1] * std::sin(theta) + point[2] * std::cos(theta);
+    point[1] = y;
 }
 template<class GEO, class VT>
 void _Rotate(GEO& point, const VT& theta, YTag, PointTag, Dim3Tag){
-    point[0] = point[0] * std::cos(theta) - point[2] * std::sin(theta);
+    auto   x = point[0] * std::cos(theta) - point[2] * std::sin(theta);
 //  point[1] = point[1];
     point[2] = point[0] * std::sin(theta) + point[2] * std::cos(theta);
+    point[0] = x;
 }
 template<class GEO, class VT>
 void _Rotate(GEO& point, const VT& theta, ZTag, PointTag, Dim3Tag){
-    point[0] = point[0] * std::cos(theta) - point[1] * std::sin(theta);
+    auto   x = point[0] * std::cos(theta) - point[1] * std::sin(theta);
     point[1] = point[0] * std::sin(theta) + point[1] * std::cos(theta);
-//  point[2] = point[2];
+    point[0] = x;
 }
 
 template<class GEO, class VT,
