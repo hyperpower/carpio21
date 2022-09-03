@@ -10,6 +10,7 @@
 #define _GEOMETRY_GNUPLOT_ACTOR_MAKER_HPP_
 
 #include "geometry/geometry_define.hpp"
+#include "geometry/objects/shapes/distance_annotation.hpp"
 #include <array>
 #include "geometry/objects/objects.hpp"
 #include "io/gnuplot.hpp"
@@ -549,31 +550,25 @@ auto ToGnuplotActorAsVector(const ANY& geo){
     return actor;
 }
 
-class GnuplotActorDistanceAnnotation : public GnuplotActorGroup{
+
+
+class GnuplotActorDistanceAnnotation : public GnuplotActorGroup, DistanceAnnotation{
 public:
     typedef std::shared_ptr<GnuplotActor> spActor;
     typedef std::list<std::shared_ptr<GnuplotActor> > list_spActor;
-    typedef GnuplotActorGroup Base;
+    typedef GnuplotActorGroup ActorGroup;
+    typedef DistanceAnnotation Shape;
     typedef GnuplotActorDistanceAnnotation Self;
-protected:
-    Point_<double, 2> _p1; 
-    Point_<double, 2> _p2; 
-    double _offset;
-    std::string _text;
-    std::string _text_location;
 public:
-    GnuplotActorDistanceAnnotation():Base(){    
-        _p1 = {0.0, 0.0};  
-        _p2 = {0.0, 0.0};  
+    GnuplotActorDistanceAnnotation():ActorGroup(), Shape(){    
     };
     GnuplotActorDistanceAnnotation(
         const double& x1, const double& y1,
-        const double& x2, const double& y2):Base(){    
-        _p1 = {x1, y1};
-        _p2 = {x2, y2};
-        double dis = Distance(_p1, _p2);
-        _offset = std::min(dis * 0.1, 0.05);
-        _text = ToString(dis);
+        const double& x2, const double& y2):
+        ActorGroup(), Shape(x1, y1, x2, y2){    
+        double dis = Distance(this->_p1, this->_p2);
+        this->_offset = std::min(dis * 0.1, 0.05);
+        this->_text = ToString(dis);
 
         this->_build_actors();
     }
