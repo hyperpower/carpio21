@@ -13,18 +13,42 @@ B-splines of order :math:`n` are basis functions for spline functions of the sam
 Definition
 ===================
 
+Basis Function
+-------------------
+
 B-splines can be defined by construction by the Cox–de Boor recursion formula. 
 
+.. math::
+    :label: eq_n0
+
+    \displaystyle N_{i,0}(x):=
+    {
+    \begin{cases}
+    1 & {\text{if }}t_{i} \leq x<t_{i+1},\\
+    0 & {\text{otherwise}}.
+    \end{cases}
+    }
 
 .. math::
-     :label: eq_a
+    :label: eq_nk
 
-     e^i + 1 = 0
+    N_{i,k}(x):=
+    \frac{t-t_i}{t_{i+k} - t_i} N_{i,k-1}(t) + \frac{t_{i+k+1}-t}{t_{i+k+1} - t_{i+1}}N_{i+1,k-1}(t)
 
-Which can be referenced in the text using Eq.:eq:`eq_a` and so on.
-Note the blank lines and the back-tics in the reference. 
-Also, there may not be a space between :eq: and `eq_a` in the reference!
-Further, no back-tics around the eq_a at the :label: line!
+1 order (0 degree) basis function
+----------------------------------
+
+When :math:`k=0`, :eq:`eq_n0` is the basis funtion. 
+
+2 order (1 degree) basis function
+----------------------------------
+
+When :math:`k=1`, two 1 order basis functions, :math:`N_{i+1,0}(t)` and :math:`N_{i,0}(t)`, are substituted in :eq:`eq_nk`.
+
+
+
+
+
 
 
 

@@ -236,6 +236,9 @@ public:
     const_iterator end() const{
         return _actors.end();
     }
+    void clear(){
+        this->_actors.clear();
+    }
 };
 
 

@@ -20,6 +20,9 @@ numfig = True
 project = u'Carpio'
 copyright = u'2022, Chengsi ZHOU'
 
+math_numfig = True
+math_eqref_format   = "Eq.{number}"
+
 version = ''
 release = ''
 
