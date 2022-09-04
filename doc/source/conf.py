@@ -74,7 +74,7 @@ numfig = True
 # Sphinx numbers like x.1, x.2, x.3... 2 means “in a subsection”. 
 # Sphinx numbers like x.x.1, x.x.2, x.x.3..., and so on. Default is 1.
 numfig_secnum_depth = 1
-math_eqref_format   = 'Eq.{number}'
+math_eqref_format   = "Equation.{number}"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
