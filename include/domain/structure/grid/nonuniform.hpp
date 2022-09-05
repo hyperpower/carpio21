@@ -131,14 +131,14 @@ public:
         }
         return std::move(res);
     }
-    Point C(Idx i, Idx j = 0, Idx k = 0) const {
-        Point res;
-        Idx ai[] = { i, j, k };
-        for (St d = 0; d < Dim; ++d) {
-            res[d] = _c[d][ai[d]];
-        }
-        return std::move(res);
-    }
+    // Point C(Idx i, Idx j = 0, Idx k = 0) const {
+    //     Point res;
+    //     Idx ai[] = { i, j, k };
+    //     for (St d = 0; d < Dim; ++d) {
+    //         res[d] = _c[d][ai[d]];
+    //     }
+    //     return std::move(res);
+    // }
     Vt c_(const St& dim, const Idx& idx) const {
         return (dim < Dim) ? _c[dim][_IDX(idx)] : 0;
     }
