@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "domain/structure/structure.hpp"
 // #include "domain/structure/io/splotly_actor.hpp"
-// #include "domain/structure/io/sgnuplot_actor.hpp"
+#include "domain/structure/io/sgnuplot_actor.hpp"
 
 using namespace carpio;
 

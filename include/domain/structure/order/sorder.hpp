@@ -9,9 +9,9 @@ namespace carpio{
 template<St DIM, class GRID, class GHOST>
 class SOrder_:public OrderBase_<DIM>{
 public:
-    typedef GRID Grid;
-    typedef std::shared_ptr<Grid> spGrid;
+    typedef GRID  Grid;
     typedef GHOST Ghost;
+    typedef std::shared_ptr<Grid> spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
     typedef typename Grid::Index Index;
 

@@ -36,7 +36,7 @@ void DivideEqual(  const ST& , VT*, const VT&);
 
 template<typename ST, typename VT>
 void Assign(const ST& len, VT* src, const VT& value){
-    for (ST i = 0; i < len; ++i) {
+    for (int i = 0; i < len; ++i) {
         src[i] = value;
     }
 }
@@ -44,14 +44,14 @@ void Assign(const ST& len, VT* src, const VT& value){
 template<typename ST, typename VT>
 void AddEqual(const ST& n, VT* src, const VT* dst) {
 #pragma omp parallel for
-    for (ST i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
         src[i] += dst[i];
     }
 }
 template<typename ST, typename VT>
 void MinusEqual(const ST& n, VT* src, const VT* dst) {
 #pragma omp parallel for
-	for (ST i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		src[i] -= dst[i];
 	}
 }
@@ -65,7 +65,7 @@ void MultiplyEqual(const ST& n, VT* src, const VT* dst) {
 template<typename ST, typename VT>
 void DivideEqual(const ST& n, VT* src, const VT* dst) {
 #pragma omp parallel for
-	for (ST i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		src[i] /= dst[i];
 	}
 }
@@ -73,42 +73,42 @@ void DivideEqual(const ST& n, VT* src, const VT* dst) {
 template<typename ST, typename VT>
 void AddEqual(const ST& n, VT* src, const VT& dst) {
 #pragma omp parallel for
-    for (ST i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
         src[i] += dst;
     }
 }
 template<typename ST, typename VT>
 void MinusEqual(const ST& n, VT* src, const VT& dst) {
 #pragma omp parallel for
-	for (ST i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		src[i] -= dst;
 	}
 }
 template<typename ST, typename VT>
 void MultiplyEqual(const ST& n, VT* src, const VT& dst) {
 #pragma omp parallel for
-	for (ST i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		src[i] *= dst;
 	}
 }
 template<typename ST, typename VT>
 void DivideEqual(const ST& n, VT* src, const VT& dst) {
 #pragma omp parallel for
-	for (ST i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		src[i] /= dst;
 	}
 }
 template<typename ST, typename VT>
 void Nagative(const ST& n, VT* src) {
 #pragma omp parallel for
-	for (ST i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		src[i] =  -(src[i]);
 	}
 }
 template<typename ST, typename VT>
 void Nagative(const ST& n, const VT* src, VT* dst) {
 #pragma omp parallel for
-	for (ST i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		dst[i] =  -(src[i]);
 	}
 }

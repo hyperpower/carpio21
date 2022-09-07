@@ -55,7 +55,7 @@ typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){
 // BuildMatrix
 template<class FIELD, class MAT, class ARR>
 int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){
-    std::cout << "Build Matix" << std::endl;
+    std::cout << "[   INFO   ] Fuction Build Matix" << std::endl;
     BuildMatrixImplement_<FIELD, FIELD::Dim,
                         typename FIELD::ValueType,
                         typename FIELD::Grid, 

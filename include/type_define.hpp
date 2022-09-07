@@ -68,8 +68,8 @@
 
 namespace carpio {
 // value type
-typedef signed int  St;    //size type
-typedef double        Vt;    //value type
+typedef std::size_t St;    //size type
+typedef double      Vt;    //value type
 typedef int           Int;
 typedef unsigned int uInt;
 typedef double        Float;

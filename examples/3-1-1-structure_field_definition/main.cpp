@@ -3,6 +3,7 @@
 #include <string>
 #include "geometry/geometry.hpp"
 #include "domain/structure/structure.hpp"
+#include "domain/structure/io/splotly_actor.hpp"
 
 using namespace carpio;
 
@@ -225,9 +226,27 @@ void Uniform2(){
 	gnu.plot();
 }
 
+void Uniform3(){
+	const std::size_t dim = 3;
+	typedef SGridUniform_<dim>                     Grid;
+	typedef std::shared_ptr<SGridUniform_<dim> > spGrid;
+
+	Point_<Vt, dim> pmin(0, 0, 0);
+	Point_<Vt, dim> pmax(1, 1, 1);
+	spGrid spgrid(new Grid(pmin, {5, 5, 5}, 0.5, 2));
+
+	Plotly_ plotly;
+    auto actor = ToPlotlyActorLines(*spgrid);
+	plotly.add(actor);
+    plotly.write("./fig/UniformGrid_3d", "html");    
+}
+
+
 int main(int argc, char** argv) {
+	std::cout << "here" << std::endl;
     Uniform1();
-	NonUniform1();
     Uniform2();
+	Uniform3();
     
+	NonUniform1();
 }

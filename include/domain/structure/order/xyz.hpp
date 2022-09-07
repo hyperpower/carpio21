@@ -120,9 +120,9 @@ public:
 protected:
     void _build_ov() {
         St count = 0;
-        for (St k = 0; k < ((DIM == 3) ? _grid->n(_Z_) : 1); k++) {
-            for (St j = 0; j < ((DIM >= 2) ? _grid->n(_Y_) : 1); j++) {
-                for (St i = 0; i < _grid->n(_X_); i++) {
+        for (auto k = 0; k < ((DIM == 3) ? _grid->n(_Z_) : 1); ++k) {
+            for (auto j = 0; j < ((DIM >= 2) ? _grid->n(_Y_) : 1); ++j) {
+                for (auto i = 0; i < _grid->n(_X_); ++i) {
                     Index index(i,j,k);
                     if(!(_ghost->is_ghost(index))){
                         _ov[count] = index;

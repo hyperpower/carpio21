@@ -40,7 +40,6 @@ public:
 
     void Loop(Field& f){}
 
-
 };
 
 

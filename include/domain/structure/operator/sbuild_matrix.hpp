@@ -27,6 +27,7 @@ public:
 
 public:
     BuildMatrixImplement_(){
+        std::cout << "[   INFO   ] Imp Build Matrix FieldCenterTag" << std::endl;
     }
     
     // The boundary condition has been applied
@@ -42,12 +43,12 @@ public:
         //   1 get size of none zero
         //   2 build b
         b.reconstruct(n);
-        St nz = 0;
+        std::size_t nz = 0;
         for(auto& index : order){
             auto& exp = expf(index);
-            St   nr   = exp.size();
+            auto   nr   = exp.size();
             nz       += nr;
-            St   row  = order.get_order(index);
+            auto   row  = order.get_order(index);
             b[row]    = -(exp.value());  // negative is here !!!
         }
         // Loop 2 ================
