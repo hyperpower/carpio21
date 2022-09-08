@@ -225,6 +225,29 @@ void Uniform2(){
     gnu.set_terminal_png(OUTPUTPATH + "UniformStructureGrid2", fig_width, fig_height);
 	gnu.plot();
 }
+void PlotlyLayoutSetup(Plotly_& plotly){
+    plotly.margin(0, 0, 0, 0);
+    plotly.layout("width",  660.0);
+    plotly.layout("height", 400.0);
+	plotly.layout("font_family", "Fira Code");
+    plotly.layout("scene_aspectmode", "cube");
+    plotly.layout("scene_camera_center_z", -0.15);
+    plotly.layout("scene_camera_eye_z",    0.8);
+    plotly.layout("scene_camera_eye_y",    -1.5);
+    plotly.layout("scene_xaxis_range", -0.5, 2);
+    plotly.layout("scene_yaxis_range", -0.5, 2);
+    plotly.layout("scene_zaxis_range", -0.5, 2);
+    plotly.layout_false("scene_xaxis_showbackground");
+    plotly.layout("scene_xaxis_gridcolor",      "black");
+    plotly.layout_false("scene_yaxis_showbackground");
+    plotly.layout("scene_yaxis_gridcolor",      "black");
+    plotly.layout_false("scene_zaxis_showbackground");
+    plotly.layout("scene_zaxis_gridcolor",      "black");
+    plotly.layout("legend_x", 0.05);
+    plotly.layout("legend_y", 0.95);
+    plotly.layout("legend_traceorder", "normal");
+    plotly.layout("legend_font_size", 14.0);
+}
 
 void Uniform3(){
 	const std::size_t dim = 3;
@@ -233,12 +256,23 @@ void Uniform3(){
 
 	Point_<Vt, dim> pmin(0, 0, 0);
 	Point_<Vt, dim> pmax(1, 1, 1);
-	spGrid spgrid(new Grid(pmin, {5, 5, 5}, 0.5, 2));
+	spGrid spgrid(new Grid(pmin, {3, 3, 3}, 0.5, 2));
 
 	Plotly_ plotly;
+	PlotlyLayoutSetup(plotly);
     auto actor = ToPlotlyActorLines(*spgrid);
+	actor.update("name", "Grid");
+	actor.update_true("showlegend");
+    actor.update("line_color", "#24292F");
 	plotly.add(actor);
-    plotly.write("./fig/UniformGrid_3d", "html");    
+
+    auto actor_c = ToPlotlyActorPoints(*spgrid);
+	actor_c.update("name", "Center Scalar Location");
+    actor_c.update("marker_color", "#009E73");
+	plotly.add(actor_c);
+
+		
+    plotly.write("./fig/UniformGrid3d", "div");    
 }
 
 

@@ -29,6 +29,15 @@ The data store on the center of the grid.
 
    Uniform Structure Grid 2D.
 
+.. raw:: html
+   :file: fig/UniformGrid3d.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   Uniform Structure Grid 3D.
+
+
 Field Face
 ===================
 

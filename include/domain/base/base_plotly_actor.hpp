@@ -19,7 +19,15 @@ PlotlyActor ToPlotlyActorLines(const ANY& a){
     Tag t;
     return _ToPlotlyActorLines(a, t); 
 }
-
+template<class ANY,
+        typename std::enable_if<
+            std::is_base_of<DomainTag, typename ANY::Tag>::value,
+        bool>::type = true >
+PlotlyActor ToPlotlyActorPoints(const ANY& a){
+    typedef typename ANY::Tag Tag;
+    Tag t;
+    return _ToPlotlyActorPoints(a, t); 
+}
 }
 
 #endif
