@@ -199,7 +199,28 @@ public:
             this->_configs["SOR_omega"] = any;
         }
     }
+    
+    bool has_boundary_index(const std::string& key) const {
+        auto it = this->_bis.find(key);
+        if (it != this->_bis.end()) {
+            return true;
+        }
+        return false;
+    }
 
+    void set_boundary_index(
+            const std::string& key,
+            spBoundaryIndex spbi){
+        this->_bis[key] = spbi;
+    }
+
+    spBoundaryIndex get_boundary_index(const std::string& key){
+        if (this->has_boundary_index(key)){
+            return this->_bis[key];
+        }else{
+            return _default_spbi;
+        }
+    }
 protected:
     void new_field(const std::string& name){
         if(!(this->has_field(name))){

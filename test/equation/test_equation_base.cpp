@@ -58,7 +58,26 @@ TEST(equation, laplace){
 
     typedef Laplace_<dim, Domain> Laplace;
 
+    // Define the equation
     Laplace equ(spgrid, spghost, sporder);
+
+    // Set boundary condition
+	typedef std::shared_ptr<BoundaryIndex> spBI;
+	typedef BoundaryCondition BC;
+	typedef std::shared_ptr<BoundaryCondition> spBC;
+	spBI spbi(new BoundaryIndex());
+	spBC spbcxm(new BoundaryConditionValue(BC::_BC1_, 1.0));
+	spBC spbcym(new BoundaryConditionValue(BC::_BC1_, 0.0));
+	spbi->insert(0, spbcym);
+	spbi->insert(1, spbcym);
+	spbi->insert(2, spbcym);
+	spbi->insert(3, spbcxm);
+	equ.set_boundary_index("phi", spbi);
+
+    // Set solver
+	equ.set_solver("Jacobi", 100, 1e-4);
+
+
 
     equ.run();
 
