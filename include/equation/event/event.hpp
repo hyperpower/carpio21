@@ -5,19 +5,23 @@
 #include <utility>
 #include <iostream>
 #include "type_define.hpp"
+#include "equation/equation_base.hpp"
 
 namespace carpio{
 
-// template<St DIM, class D> class Equation_;
+// template<class D> class EquationBase_;
 
-template<class EQU>
+template<class D>
 class Event_ {
 public:
     // static const St Dim         = DIM;
 
-    typedef EQU   Equ;
-    typedef Equ* pEqu;
-    typedef const Equ* const_pEqu;
+    // typedef EQU   Equ;
+    // typedef Equ* pEqu;
+    // typedef const Equ* const_pEqu;
+    typedef D Domain;
+    typedef EquationBase_<D> EquationBase;
+    
 
     static const int START  = 0x10;
     static const int END    = 0x20;
@@ -42,9 +46,10 @@ public:
         _iend   = ie;
         _istep  = istep;
     }
+    
 
-    virtual int execute(St step, Vt t, int fob, pEqu pd = nullptr) {
-        std::cout << "Event : execute \n";
+    virtual int execute(St step, Vt t, int fob, EquationBase& equ) {
+        std::cout << "Event : execute equ\n";
         return -1;
     }
 
@@ -115,13 +120,11 @@ public:
     }
 };
 
-template<class EQU>
-class EventCondition_ : public Event_<EQU>{
+template<class D>
+class EventCondition_ : public Event_<D>{
 public:
-    typedef Event_<EQU> Event;
-    typedef EQU Equ;
-    typedef Equ* pEqu;
-    typedef const Equ* const_pEqu;
+    typedef Event_<D> Event;
+    typedef EquationBase_<D> EquationBase;
 protected:
     bool _is_satisfied;
 public:
@@ -142,8 +145,8 @@ public:
         return true;
     }
 
-    virtual int execute(St step, Vt t, int fob, pEqu pd) {
-        std::cout << "Event Condition Base : execute \n";
+    virtual int execute(St step, Vt t, int fob, EquationBase& equ) {
+        std::cout << "Event : execute equ\n";
         return -1;
     }
 };

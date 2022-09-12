@@ -11,12 +11,12 @@ namespace carpio {
 //
 //   ▽•(beta(x,y)  ▽phi(x,y)  ) = 0   2D --version
 //   ▽•(beta(x,y,z)▽phi(x,y,z)) = 0   3D --version
-template<St DIM, class D>
-class Laplace_: public EquationBase_<DIM, D>{
+template<class D>
+class Laplace_: public EquationBase_<D>{
 public:
     typedef D Domain;
-    typedef Laplace_<DIM, D>             Self;
-    typedef EquationBase_<DIM, D>        Base;
+    typedef Laplace_<D>             Self;
+    typedef EquationBase_<D>        Base;
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
     typedef typename Domain::Grid         Grid;
@@ -42,6 +42,10 @@ public:
             this->new_field("phi");
             this->_configs["solver"] = this->_init_solver();
     }
+
+    virtual std::string name() const{
+        return "EquationLaplace";
+    };
 
     virtual ~Laplace_(){};
 

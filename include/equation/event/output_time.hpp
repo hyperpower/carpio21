@@ -12,13 +12,14 @@
 
 namespace carpio{
 
-template<class EQU>
-class EventOutputTime_ : public Event_<EQU>{
+template<class D>
+class EventOutputTime_ : public Event_<D>{
 public:
-    typedef Event_<EQU> Event;
-    typedef EQU Equ;
-    typedef Equ* pEqu;
-    typedef const Equ* const_pEqu;
+    typedef Event_<D> Event;
+    // typedef EQU Equ;
+    // typedef Equ* pEqu;
+    // typedef const Equ* const_pEqu;
+    typedef EquationBase_<D> EquationBase;
 
 protected:
     std::ostream* _stream;
@@ -41,7 +42,8 @@ public:
                          Event(is, ie, istep, flag) {
     }
 
-    int execute(St step, Vt t, int fob, pEqu pd = nullptr) {
+
+    virtual int execute(St step, Vt t, int fob, EquationBase& equ) {
         _record_time(step, t);
         _output(step, t);
         return -1;

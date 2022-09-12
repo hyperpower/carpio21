@@ -5,17 +5,20 @@
 #include "utility/any.hpp"
 #include "time_control.hpp"
 #include "stop_control.hpp"
+// #include "equation/event/event.hpp"
 #include "domain/boundary/boundary_index.hpp"
 #include <memory>
 #include <map>
 
 namespace carpio {
 
-template<class EQU> class Event_;
+template<class D> class Event_;
+template<class D> class EventCondition_;
 
-template<St DIM, class D>
+template<class D>
 class EquationBase_{
 public:
+    
     typedef D Domain;
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
@@ -28,10 +31,14 @@ public:
     typedef typename Domain::FieldCenter FieldCenter;
     typedef typename Domain::FieldCenterExp FieldCenterExp;
 
-    typedef EquationBase_<DIM, D> Self;
+    typedef EquationBase_<D> Self;
 
-    typedef Event_<Self>                   Event;
+    typedef Event_<D>                      Event;
     typedef std::shared_ptr<Event>       spEvent;
+
+    typedef EventCondition_<D>                EventCondition;
+    typedef std::shared_ptr<EventCondition>spEventCondition;
+
     typedef std::shared_ptr<FieldCenter>    spFieldCenter;
     typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
     typedef std::shared_ptr<BoundaryIndex> spBoundaryIndex;
@@ -41,10 +48,10 @@ public:
     typedef std::map<std::string, spBoundaryIndex> BIs;
     typedef std::map<std::string, spEvent>         Events;
 
-    typedef TimeControl_<DIM> TimeControl;
+    typedef TimeControl_<D::Dim> TimeControl;
     typedef std::shared_ptr<TimeControl> spTimeControl;
 
-    typedef StopControl_<Self> StopControl;
+    typedef StopControl_<D> StopControl;
     typedef std::shared_ptr<StopControl> spStopControl;
 
     typedef MatrixSCR_<Vt>    Mat;
@@ -81,6 +88,8 @@ public:
         _time(nullptr){
     }
 
+    
+
     virtual ~EquationBase_(){};
 
     virtual int run_one_step(St step) = 0;
@@ -91,6 +100,10 @@ public:
 
     virtual int solve() = 0;
 
+    virtual std::string name() const{
+        return "EquationBase";
+    };
+    
     void run() {
         // the equation don't have time
         if (this->_time == nullptr) {
@@ -141,13 +154,10 @@ public:
     void run_events(St step, Vt t, int fob) {
         for (auto& event : this->_events) {
             if (event.second->do_execute(step, t, fob)) {
-                event.second->execute(step, t, fob, this);
+                event.second->execute(step, t, fob, (*this));
             }
         }
     }
-
-    // virtual void run_events(St step, Vt t, int fob) = 0; 
-    
 
     virtual Ghost& ghost() {
         return *(this->_spghost);
@@ -239,7 +249,7 @@ public:
         ASSERT(spe != nullptr);
         this->_events[key] = spe;
         if(spe->is_condition_event()){
-            _stop_manager.add_condition(std::dynamic_pointer_cast<EventCondition>(spe));
+            _stop->add_condition(std::dynamic_pointer_cast<EventCondition>(spe));
         }
     }
     

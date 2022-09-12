@@ -23,7 +23,7 @@ TEST(equation, equation_base){
 
     typedef StructureDomain_<dim, Grid, Ghost, Order> Domain;
 
-    typedef EquationBase_<dim, Domain> EquationBase;
+    typedef EquationBase_<Domain> EquationBase;
 
     // EquationBase equ(spgrid, spghost, sporder);
     // auto s = Stringify(*spgrid);
@@ -56,7 +56,7 @@ TEST(equation, laplace){
 
     typedef StructureDomain_<dim, Grid, Ghost, Order> Domain;
 
-    typedef Laplace_<dim, Domain> Laplace;
+    typedef Laplace_<Domain> Laplace;
 
     // Define the equation
     Laplace equ(spgrid, spghost, sporder);
@@ -78,9 +78,9 @@ TEST(equation, laplace){
 	equ.set_solver("Jacobi", 100, 1e-4);
 
     // Add events
-	typedef Event_<Laplace> Event;
+	typedef Event_<Domain> Event;
 	typedef std::shared_ptr<Event>  spEvent;
-	spEvent spetime(new EventOutputTime_<Laplace>(std::cout,
+	spEvent spetime(new EventOutputTime_<Domain>(std::cout,
 		                                          -1, -1, 1, Event::START | Event::END));
 	equ.add_event("OutputTime", spetime);
 
