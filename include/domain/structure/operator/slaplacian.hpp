@@ -16,18 +16,18 @@ template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class LaplacianImplement_<
     FIELD, DIM, 
     LinearPolynomial_<Vt, typename GRID::Index>, 
-    GRID, GHOST, ORDER, StructureTag>: 
+    GRID, GHOST, ORDER, SFieldCenterTag>: 
     public SOperatorCommon_<FIELD, DIM, LinearPolynomial_<Vt, typename GRID::Index>, GRID, GHOST, ORDER>{     
 public:
     typedef LinearPolynomial_<Vt, typename GRID::Index> Exp;
-    typedef ApplyBCImplement_<FIELD, DIM, Exp, GRID, GHOST, ORDER, StructureTag> ApplyBC;
+    typedef ApplyBCImplement_<FIELD, DIM, Exp, GRID, GHOST, ORDER, SFieldCenterTag> ApplyBC;
     typedef typename GRID::Index Index;
 
     typedef BoundaryIndex BI;
     typedef std::shared_ptr<BI> spBI;
 public:
     LaplacianImplement_(){
-        // std::cout << "Laplacian Exp Structure" << std::endl;
+        std::cout << "Laplacian Exp Structure" << std::endl;
     };
 
     template<class ANY>

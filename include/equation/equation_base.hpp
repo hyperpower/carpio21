@@ -218,9 +218,31 @@ public:
         if (this->has_boundary_index(key)){
             return this->_bis[key];
         }else{
-            return _default_spbi;
+            return std::make_shared<BoundaryIndex>(BoundaryIndex());
         }
     }
+
+    /**
+     * @brief this function check the events
+     *        if flags contain key and value == val return true
+     *        the default val == 1
+     */
+    bool has_event(const std::string& key) const {
+        auto it = this->_events.find(key);
+        if (it != this->_events.end()) {
+            return true;
+        }
+        return false;
+    }
+
+    void add_event(const std::string& key, spEvent spe){
+        ASSERT(spe != nullptr);
+        this->_events[key] = spe;
+        if(spe->is_condition_event()){
+            _stop_manager.add_condition(std::dynamic_pointer_cast<EventCondition>(spe));
+        }
+    }
+    
 protected:
     void new_field(const std::string& name){
         if(!(this->has_field(name))){

@@ -77,7 +77,12 @@ TEST(equation, laplace){
     // Set solver
 	equ.set_solver("Jacobi", 100, 1e-4);
 
-
+    // Add events
+	typedef Event_<Laplace> Event;
+	typedef std::shared_ptr<Event>  spEvent;
+	spEvent spetime(new EventOutputTime_<Laplace>(std::cout,
+		                                          -1, -1, 1, Event::START | Event::END));
+	equ.add_event("OutputTime", spetime);
 
     equ.run();
 

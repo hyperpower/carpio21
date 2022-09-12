@@ -16,7 +16,7 @@ FIELD Laplacian(const FIELD& field, BI bi, const std::string& method){
                         typename FIELD::Order,
                         typename FIELD::Tag
                         > imp;
-    std::cout << "Laplacian----<" << std::endl;
+    std::cout << "[  Laplace ] field, bi" << std::endl;
     imp.set_method(method);
     return imp.execute(field, bi);
 }

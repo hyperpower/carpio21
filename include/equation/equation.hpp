@@ -6,6 +6,7 @@
 #include "poisson/laplace.hpp"
 
 #include "event/event.hpp"
+#include "event/output_time.hpp"
 
 namespace carpio {
 

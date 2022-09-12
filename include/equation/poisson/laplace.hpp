@@ -59,8 +59,12 @@ public:
 
     virtual int solve(){
         FieldCenter&    phi  = *(this->_fields["phi"]);
-        auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
-        auto   expf    = this->new_field_exp();
+        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        auto expf     = this->new_field_exp();
+        auto bis      = this->get_boundary_index("phi");
+
+        Laplacian((*expf), (*bis));
+
         Mat a;
         Arr b;
         BuildMatrix((*expf), a, b);
