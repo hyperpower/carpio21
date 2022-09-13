@@ -32,6 +32,8 @@ public:
     typedef ArrayListV_<ValueType> Arr; 
 
     typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+
+    typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
 public:
     SFieldCenter_(spGrid spg, spGhost spgh){
         this->_spgrid  = spg;
@@ -118,6 +120,22 @@ public:
     Self& operator/=(const Vt& rhs){
         Base::operator/=(rhs);
         return *this;
+    }
+    virtual void assign(const Vt& v){
+        this->_arr.assign(v);
+    }
+
+    virtual void assign(const Arr& other){
+        ASSERT(this->_sporder->size() == other.size());
+        this->_arr = other;
+    }
+    void assign(FunXYZT_Value fun, Vt t = 0.0){
+        for(auto& idx : (*this->_sporder)){
+            auto cp = this->_spgrid->c(idx);
+            this->operator ()(idx) = fun(cp.value(_X_),
+                                         cp.value(_Y_),
+                                         cp.value(_Z_), t);
+        }
     }
     // return a new scalar with compatible gird, ghost and order
     Self new_compatible() const{

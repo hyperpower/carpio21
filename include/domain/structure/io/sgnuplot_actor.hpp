@@ -76,7 +76,11 @@ GnuplotActor _ToGnuplotActorLines(const ANY& a, SGridTag){
     return _ToGnuplotActorLinesDim(a, t, dt); 
 }
 
-
+template<class ANY>
+GnuplotActor _ToGnuplotActorLines(const ANY& a, SFieldCenterTag){
+    auto& grid = a.grid();
+    return _ToGnuplotActorLines(grid, SGridTag()); 
+}
 
 }
 

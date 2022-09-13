@@ -16,9 +16,6 @@ template<class D>
 class EventOutputTime_ : public Event_<D>{
 public:
     typedef Event_<D> Event;
-    // typedef EQU Equ;
-    // typedef Equ* pEqu;
-    // typedef const Equ* const_pEqu;
     typedef EquationBase_<D> EquationBase;
 
 protected:
@@ -41,7 +38,6 @@ public:
                          _stream(&stream),
                          Event(is, ie, istep, flag) {
     }
-
 
     virtual int execute(St step, Vt t, int fob, EquationBase& equ) {
         _record_time(step, t);

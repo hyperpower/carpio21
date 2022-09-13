@@ -27,11 +27,13 @@ public:
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
 
+
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef ArrayListV_<ValueType> Arr; 
+    typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
 protected:
     // for saving data
     Arr _arr;
@@ -65,13 +67,17 @@ public:
         return *this;
     }
     
-    void assign(const Vt& v){
+    virtual void assign(const Vt& v){
         _arr.assign(v);
     }
 
-    void assign(const Arr& other){
+    virtual void assign(const Arr& other){
         ASSERT(this->_sporder->size() == other.size());
         this->_arr = other;
+    }
+
+    virtual void assign(FunXYZT_Value fun, Vt t = 0.0){
+        return;
     }
 
     Arr to_array() const{
