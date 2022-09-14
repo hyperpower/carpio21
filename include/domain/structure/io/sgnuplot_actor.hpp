@@ -81,7 +81,56 @@ GnuplotActor _ToGnuplotActorLines(const ANY& a, SFieldCenterTag){
     auto& grid = a.grid();
     return _ToGnuplotActorLines(grid, SGridTag()); 
 }
+template<class ANY>
+GnuplotActor _ToGnuplotActorContourDim(const ANY& f, SFieldCenterTag, Dim2Tag){
+    GnuplotActor actor;
+    actor.command("using 1:2:3:4:5:6:7 title \"\" ");
+    actor.style("with boxxy fs solid palette");
+    for(auto& index : f.order()){
+        auto pc   = f.grid().c(index);
+        auto pmin = f.grid().v(0, index);
+        auto pmax = f.grid().v(3, index);
+        actor.data().push_back(
+            ToString(pc(_X_),   pc(_Y_), 
+                     pmin(_X_), pmax(_X_),
+                     pmin(_Y_), pmax(_Y_),
+                     f(index),  " "));
+    }
+    return actor;
+}
 
+template<class ANY>
+GnuplotActor _ToGnuplotActorContour(const ANY& a, SFieldCenterTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorContourDim(a, Tag(), DimTag()); 
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorContourWireDim(const ANY& f, SFieldCenterTag, Dim2Tag){
+    GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with line lc palette");
+    for (St i = 0; i < f.grid().n(_X_); i++){
+        for (St j = 0; j < f.grid().n(_Y_); j++){
+            typename ANY::Grid::Index index(i, j);
+            auto pc = f.grid().c(index);
+            if (f.ghost().is_normal(index) == true){
+                actor.data().push_back(
+                    ToString(pc(_X_), pc(_Y_),
+                             f(index), f(index), " "));
+            }
+        }
+        actor.data().push_back("");
+    }
+    return actor;
+}
+
+template<class ANY>
+GnuplotActor _ToGnuplotActorContourWire(const ANY& a, SFieldCenterTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorContourWireDim(a, Tag(), DimTag()); 
+}
 }
 
 #endif

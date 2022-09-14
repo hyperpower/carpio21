@@ -16,12 +16,19 @@ GnuplotActor _ToGnuplotActorLines(const ANY& a, const DomainTag& tag){};
 template<class ANY>
 GnuplotActor ToGnuplotActorLines(const ANY& a){
     typedef typename ANY::Tag Tag;
-    Tag t;
-    return _ToGnuplotActorLines(a, t); 
+    return _ToGnuplotActorLines(a, Tag()); 
 }
 
-
-
+template<class ANY>
+GnuplotActor ToGnuplotActorContour(const ANY& a){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorContour(a, Tag()); 
+}
+template<class ANY>
+GnuplotActor ToGnuplotActorContourWire(const ANY& a){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorContourWire(a, Tag()); 
+}
 }
 
 #endif

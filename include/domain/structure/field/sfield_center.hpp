@@ -17,6 +17,7 @@ public:
     static const St Dim = DIM;
 
     typedef SFieldCenterTag Tag;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
@@ -122,12 +123,11 @@ public:
         return *this;
     }
     virtual void assign(const Vt& v){
-        this->_arr.assign(v);
+        Base::assign(v);
     }
 
     virtual void assign(const Arr& other){
-        ASSERT(this->_sporder->size() == other.size());
-        this->_arr = other;
+        Base::assign(other);
     }
     void assign(FunXYZT_Value fun, Vt t = 0.0){
         for(auto& idx : (*this->_sporder)){

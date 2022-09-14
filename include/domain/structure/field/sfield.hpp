@@ -18,11 +18,13 @@ class SField_: public FieldBase_<DIM, VT, GRID, GHOST, ORDER>{
 public:
     static const St Dim = DIM;
 
+    typedef SFieldTag Tag;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
+    
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
     typedef VT    ValueType;
-    typedef SFieldTag Tag;
     typedef FieldBase_<Dim, VT, GRID, GHOST, ORDER> Base;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
@@ -70,15 +72,11 @@ public:
     virtual void assign(const Vt& v){
         _arr.assign(v);
     }
-
     virtual void assign(const Arr& other){
         ASSERT(this->_sporder->size() == other.size());
         this->_arr = other;
     }
-
-    virtual void assign(FunXYZT_Value fun, Vt t = 0.0){
-        return;
-    }
+    
 
     Arr to_array() const{
         return Arr(_arr);
