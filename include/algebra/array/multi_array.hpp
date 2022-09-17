@@ -17,14 +17,17 @@
 
 namespace carpio {
 
+struct MultiArrayTag{
+};
+
 template<typename T, St DIM>
 class MultiArray_ {
   public:
     static const St Dim = DIM;
     // type definitions===================
-    typedef T value_t;
-    typedef MultiArray_<value_t, Dim> Self;
-    typedef MultiArray_<value_t, Dim>* pSelf;
+    typedef T value_type;
+    typedef MultiArray_<value_type, Dim> Self;
+    typedef MultiArray_<value_type, Dim>* pSelf;
     typedef T* pointer;
     typedef const T* const_pointer;
     typedef T& reference;
@@ -32,11 +35,11 @@ class MultiArray_ {
     typedef St size_type;
     typedef St difference_type;
 
-    typedef typename ArrayListT_<value_t>::iterator iterator;
-    typedef typename ArrayListT_<value_t>::const_iterator const_iterator;
+    typedef typename ArrayListT_<value_type>::iterator iterator;
+    typedef typename ArrayListT_<value_type>::const_iterator const_iterator;
   private:
     std::array<St, Dim> m_len;
-    ArrayListT_<value_t> m_array;
+    ArrayListT_<value_type> m_array;
   public:
     //constructor==========================
     MultiArray_(){
@@ -147,7 +150,13 @@ class MultiArray_ {
 		return idx;
     }
 
+	ArrayListT_<value_type>& array(){
+		return this->m_array;
+	}
 
+	const ArrayListT_<value_type>& array() const{
+		return this->m_array;
+	}
 
     reference       at(St i, St j= 0, St k= 0){
     	 St idx = to_1d_idx(i, j, k);
@@ -176,7 +185,7 @@ class MultiArray_ {
     }
 
     void assign(const T& value){
-    	 m_array.assign(value);
+    	m_array.assign(value);
     }
 
     //element access===============================
@@ -201,16 +210,19 @@ class MultiArray_ {
     }
 };
 
+
+
 template<typename T, St DIM>
 class MultiArrayV_ {
   public:
     static const St Dim = DIM;
+	typedef MultiArrayTag Tag;
     // type definitions===================
-    typedef T value_t;
-    typedef MultiArrayV_<value_t, Dim>                  Self;
-    typedef MultiArrayV_<value_t, Dim>&             ref_Self;
-    typedef const MultiArrayV_<value_t, Dim>& const_ref_Self;
-    typedef MultiArrayV_<value_t, Dim>*       pSelf;
+    typedef T value_type;
+    typedef MultiArrayV_<value_type, Dim>                  Self;
+    typedef MultiArrayV_<value_type, Dim>&             ref_Self;
+    typedef const MultiArrayV_<value_type, Dim>& const_ref_Self;
+    typedef MultiArrayV_<value_type, Dim>*       pSelf;
     typedef T* pointer;
     typedef const T* const_pointer;
     typedef T& reference;
@@ -218,11 +230,11 @@ class MultiArrayV_ {
     typedef St size_type;
     typedef St difference_type;
 
-    typedef typename ArrayListT_<value_t>::iterator iterator;
-    typedef typename ArrayListT_<value_t>::const_iterator const_iterator;
+    typedef typename ArrayListT_<value_type>::iterator iterator;
+    typedef typename ArrayListT_<value_type>::const_iterator const_iterator;
   private:
     std::array<St, Dim> m_len;
-    ArrayListV_<value_t> m_array;
+    ArrayListV_<value_type> m_array;
   public:
     //constructor==========================
     MultiArrayV_(){
@@ -278,10 +290,21 @@ class MultiArrayV_ {
     ~MultiArrayV_() {
     }
 
+	ArrayListV_<value_type>& array(){
+		return this->m_array;
+	}
+
+	const ArrayListV_<value_type>& array() const{
+		return this->m_array;
+	}
     //Capacity=====================================
     St size() const {
         return m_array.size();
     }
+	St size(const std::size_t& i) const{
+		ASSERT(i < Dim);
+		return m_len[i];
+	}
     St size_i() const {
         return m_len[0];
     }
@@ -294,9 +317,11 @@ class MultiArrayV_ {
     bool empty() const {
         return m_array.empty();
     }
-    bool is_compatible(const Self& other) const{
+	template<typename M, 
+             typename std::enable_if<std::is_base_of<typename M::Tag, MultiArrayTag>::value, bool>::type = true>
+    bool is_compatible(const M& other) const{
     	for(St i = 0; i< Dim;++i){
-    		if(m_len[i] != other.m_len[i]){
+    		if(m_len[i] != other.size(i)){
     			return false;
     		}
     	}
@@ -320,16 +345,16 @@ class MultiArrayV_ {
     //Element access===============================
     St to_1d_idx(St i, St j = 0, St k = 0) const{
 		ASSERT(i < this->m_len[0]);
-		if (Dim >= 2)
+		if constexpr (Dim >= 2)
 			ASSERT(j < this->m_len[1]);
-		if (Dim >= 3)
+		if constexpr (Dim >= 3)
 			ASSERT(k < this->m_len[2]);
 		std::array<St, Dim> inp;
 		inp[0] = i;
-		if (Dim >= 2) {
+		if constexpr (Dim >= 2) {
 			inp[1] = j;
 		}
-		if (Dim >= 3) {
+		if constexpr (Dim >= 3) {
 			inp[2] = k;
 		}
 		St idx = 0;
@@ -435,6 +460,12 @@ class MultiArrayV_ {
 		m_array += a.m_array;
 		return *this;
 	}
+	template<class VT2>
+	ref_Self operator+=(const MultiArrayV_<VT2, Dim>& a) {
+		ASSERT(this->is_compatible(a));
+		m_array += a.array();
+		return *this;
+	}
 	ref_Self operator-=(const Self& a) {
 		ASSERT(this->is_compatible(a));
 		m_array -= a.m_array;
@@ -472,9 +503,16 @@ MultiArrayV_<T, DIM> Abs(const MultiArrayV_<T, DIM> a){
 	MultiArrayV_<T, DIM> res(a);
 
 }
-template<typename V, St DIM>
-MultiArrayV_<V, DIM> operator+(      MultiArrayV_<V, DIM> x, 
+template<typename V,  St DIM>
+MultiArrayV_<V, DIM> operator+(      MultiArrayV_<V, DIM>   x, 
                                const MultiArrayV_<V, DIM> &y){
+	ASSERT(x.size() == y.size());
+	x += y;
+	return x;
+}
+template<typename V, typename V2, St DIM>
+MultiArrayV_<V, DIM> operator+(      MultiArrayV_<V, DIM>   x, 
+                               const MultiArrayV_<V2, DIM> &y){
 	ASSERT(x.size() == y.size());
 	x += y;
 	return x;

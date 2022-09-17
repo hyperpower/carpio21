@@ -526,6 +526,18 @@ public:
     ref_Self operator*=(const value_type& a);
     ref_Self operator/=(const value_type& a);
     ref_Self operator+=(const Self& a);
+    template<class VT2>
+    ref_Self operator+=(const ArrayListV_<VT2>& a){
+        ASSERT(this->size() == a.size());
+	    AddEqual(this->size(), this->m_p, a.data());
+        return *this;
+    }
+    template<class VT2>
+    ref_Self operator-=(const ArrayListV_<VT2>& a){
+        ASSERT(this->size() == a.size());
+	    MinusEqual(this->size(), this->m_p, a.data());
+        return *this;
+    }
     ref_Self operator-=(const Self& a);
     ref_Self operator*=(const Self& a);
     ref_Self operator/=(const Self& a);
@@ -558,6 +570,10 @@ public:
 };
 template<typename V>
 ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V> &y);
+
+template<typename V, typename V2>
+ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V2> &y);
+
 template<typename V>
 ArrayListV_<V> operator+(ArrayListV_<V> x, const V &a);
 template<typename V>
@@ -630,6 +646,13 @@ ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V> &y){
 	x += y;
 	return x;
 }
+template<typename V, typename V2>
+ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V2> &y){
+	ASSERT(x.size() == y.size());
+    x += y;
+	return x;
+}
+
 template<typename V>
 ArrayListV_<V> operator+(ArrayListV_<V> x, const V &a){
 	x += a;
@@ -835,7 +858,7 @@ void ArrayListV_<V>::show() const {
 }
 //=========================================================
 template<typename V>
-ArrayListV_<V>& ArrayListV_<V>::operator+=(const ArrayListV_<V>::value_type &a) {
+ArrayListV_<V>& ArrayListV_<V>::operator+=(const V &a) {
     AddEqual(this->size(), this->m_p, a);
     return *this;
 }
@@ -892,14 +915,6 @@ ArrayListV_<V> operator*(const ArrayListV_<V>& x, const V&a) {
     res *= a;
     return res;
 }
-
-
-
-typedef ArrayListV_<Float> arrayList;
-typedef ArrayListV_<St> arrayList_st;
-typedef ArrayListV_<int> arrayList_int;
-typedef ArrayListT_<bool> arrayList_bool;
-typedef ArrayListT_<unsigned long int> arrayList_ul;
 
 }
 

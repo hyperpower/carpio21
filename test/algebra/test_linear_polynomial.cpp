@@ -1,4 +1,6 @@
 #include "gtest/gtest.h"
+#include "algebra/array/array_list.hpp"
+#include "algebra/array/multi_array.hpp"
 #include "algebra/misc/linear_polynomial.hpp"
 
 using namespace carpio;
@@ -123,4 +125,47 @@ TEST(linear_polynomial, op_add_term){
     std::cout << " \"e\" + pb\n";
     str = "e";
     std::cout << str + pb << std::endl;
+}
+
+TEST(linear_polynomial, arr){
+    typedef LinearPolynomial_<double, std::string> Poly;
+
+	ArrayListV_<double> arrd(5);
+	ArrayListV_<Poly> arrexp(5);
+    
+    arrd.assign(1.0);
+
+    Poly poly;
+    poly["a"] = 1;
+    poly["b"] = 2;
+    poly["c"] = 3;
+
+    arrexp.assign(poly);
+
+	auto res =  arrexp + arrd;
+
+    std::cout << "arrd[1] = " << arrd[1] << std::endl;
+	std::cout << "arrexp[1]  = "<< arrexp[1] << std::endl;
+	std::cout << "res[1]  = " << res[1] << std::endl;
+}
+TEST(linear_polynomial, multiarry){
+    typedef LinearPolynomial_<double, std::string> Poly;
+
+	MultiArrayV_<double, 2> arrd(5,5);
+	MultiArrayV_<Poly,   2> arrexp(5,5);
+    
+    arrd.assign(1.0);
+
+    Poly poly;
+    poly["a"] = 1;
+    poly["b"] = 2;
+    poly["c"] = 3;
+
+    arrexp.assign(poly);
+
+	auto res =  arrexp + arrd;
+
+    std::cout << "arrd[1] = " << arrd(1,1) << std::endl;
+	std::cout << "arrexp[1]  = "<< arrexp(1,1) << std::endl;
+	std::cout << "res[1]  = " << res(1,1) << std::endl;
 }

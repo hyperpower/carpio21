@@ -1,7 +1,7 @@
 #ifndef S_FIELD_CENTER_HPP
 #define S_FIELD_CENTER_HPP
 
-#include "sfield.hpp"
+#include "domain/structure/field/sfield.hpp"
 
 namespace carpio{
 
@@ -98,6 +98,11 @@ public:
         Base::operator+=(rhs);
         return *this;
     }
+    template<class VT2>
+    Self& operator+=(const SFieldCenter_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+        Base::operator+=(rhs);
+        return *this;
+    }
     Self& operator-=(const Self& rhs){
         Base::operator-=(Base(rhs));
         return *this;
@@ -156,6 +161,13 @@ template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
 operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
           const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+    lhs += rhs;
+    return lhs;
+}
+template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
+          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
     lhs += rhs;
     return lhs;
 }

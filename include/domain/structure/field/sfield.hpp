@@ -7,7 +7,7 @@
 
 namespace carpio{
 
-struct SFieldTag: public StructureTag{};
+struct SFieldTag: public StructureTag, public FieldBaseTag{};
 
 template<St DIM, 
          class VT,
@@ -77,9 +77,15 @@ public:
         this->_arr = other;
     }
     
-
     Arr to_array() const{
         return Arr(_arr);
+    }
+
+    Arr& data(){
+        return this->_arr;
+    }
+    const Arr& data() const{
+        return this->_arr;
     }
     
     // ===========================================
@@ -97,6 +103,12 @@ public:
         _arr += rhs._arr;
         return *this;
     }
+    template<class VT2>
+    Self& operator+=(const SField_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+        ASSERT(this->is_compatible(rhs.spgrid(), rhs.spghost(), rhs.sporder()));
+        _arr += rhs.data();
+        return *this;
+    }
 
     Self& operator+=(const Vt& rhs){
         _arr += rhs;
@@ -108,7 +120,12 @@ public:
         _arr -= rhs._arr;
         return *this;
     }
-
+    template<class VT2>
+    Self& operator-=(const SField_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+        ASSERT(this->is_compatible(rhs.spgrid(), rhs.spghost(), rhs.sporder()));
+        _arr -= rhs.data();
+        return *this;
+    }
     Self& operator-=(const Vt& rhs) {
         _arr -= rhs;
         return *this;
@@ -148,10 +165,16 @@ operator+(      SField_<DIM, VT, GRID, GHOST, ORDER> lhs,
     lhs += rhs;
     return lhs;
 }
-
+template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
+inline SField_<DIM, VT, GRID, GHOST, ORDER>
+operator+(      SField_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+          const SField_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
+    lhs += rhs;
+    return lhs;
+}
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SField_<DIM, VT, GRID, GHOST, ORDER> operator+(
-    SField_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
+inline SField_<DIM, VT, GRID, GHOST, ORDER> 
+operator+(SField_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
     lhs += rhs;
     return lhs;
 }
@@ -234,6 +257,8 @@ inline SField_<DIM, VT, GRID, GHOST, ORDER> operator/(
     res /= rhs;
     return res;
 }
+
+
 // a^2
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 SField_<DIM, VT, GRID, GHOST, ORDER> Square(

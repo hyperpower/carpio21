@@ -34,6 +34,7 @@ public:
     virtual ~OrderBase_(){};
 };
 
+struct FieldBaseTag{};
 
 template<St DIM, 
          class VT, 
@@ -47,6 +48,7 @@ public:
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
+    typedef FieldBaseTag Tag;
     typedef VT    ValueType;
     typedef typename Grid::Index Index;
     typedef DomainTag TraitTag;
@@ -55,6 +57,9 @@ public:
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
     typedef std::shared_ptr<Order> spOrder;
+    typedef const std::shared_ptr<Grid>  spcGrid;
+    typedef const std::shared_ptr<Ghost> spcGhost;
+    typedef const std::shared_ptr<Order> spcOrder;
 
 protected:
     spGrid  _spgrid;
@@ -84,13 +89,19 @@ public:
     virtual const ValueType& operator()(const Index&) const = 0;
     virtual       ValueType& operator()(const Index&)       = 0;
 
-    Grid&  grid() {return *(this->_spgrid);};
-    const Grid&  grid() const{return *(this->_spgrid);};
+    Grid&  grid() {return *_spgrid;};
+    const Grid&  grid() const{return *_spgrid;};
     Ghost& ghost(){return *_spghost;};
     const Ghost& ghost() const{return *_spghost;}
     Order& order(){return *_sporder;};
     const Order& order() const{return *_sporder;};
-
+    
+    spGrid  spgrid() {return _spgrid;};
+    const spGrid  spgrid() const{return _spgrid;};
+    spGhost& spghost(){return _spghost;};
+    const spGhost& spghost() const{return _spghost;}
+    spOrder& sporder(){return _sporder;};
+    const spOrder& sporder() const{return _sporder;};
 protected:
     void _copy(const Self& other){
         this->_spgrid  = other._spgrid;
@@ -103,6 +114,12 @@ public:
                (this->_spghost == other._spghost) &&
                (this->_sporder == other._sporder);
     }
+    bool is_compatible(spGrid spgrid, spGhost spghost, spOrder sporder) const{
+        return (this->_spgrid  == spgrid) &&
+               (this->_spghost == spghost) &&
+               (this->_sporder == sporder);
+    }
+    
 };
 }
 

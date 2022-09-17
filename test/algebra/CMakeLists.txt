@@ -4,8 +4,8 @@ set(This Algebra)
 
 set(Sources
     # test_solver_jacobi.cpp
-    # test_multi_array.cpp
-    test_linear_polynomial.cpp
+    test_multi_array.cpp
+    # test_linear_polynomial.cpp
     # test_matrix_sparse.cpp
 )
 

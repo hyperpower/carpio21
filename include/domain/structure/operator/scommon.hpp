@@ -22,10 +22,7 @@ public:
 
     typedef BoundaryIndex BI;
     typedef std::shared_ptr<BI> spBI;
-    // typedef ApplyBCImplement_<FIELD, 
-    //                           DIM, ValueType,
-    //                           GRID, GHOST, ORDER, 
-    //                           StructureTag> ApplyBC;
+    
 protected:
     spBI _spbi;
 public:

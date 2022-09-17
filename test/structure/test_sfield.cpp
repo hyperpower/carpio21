@@ -65,7 +65,7 @@ TEST(field, initial){
 
 
 
-TEST(field, coutour){
+TEST(field, coutour_DISABLED){
 	const std::size_t dim = 2;
 	typedef SGridUniform_<dim> Grid;
 	typedef std::shared_ptr<Grid> spGrid;
@@ -108,4 +108,41 @@ TEST(field, coutour){
     gnu.set_terminal_png(OUTPUTPATH + "FieldCenterContour", 
 	                    fig_width, fig_height);
 	gnu.splot();
+}
+
+TEST(field, different_type){
+	const std::size_t dim = 2;
+	typedef SGridUniform_<dim> Grid;
+	typedef std::shared_ptr<Grid> spGrid;
+
+	typedef SGhostRegular_<dim, Grid> Ghost;
+	typedef std::shared_ptr<Ghost> spGhost;
+
+	typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+	typedef std::shared_ptr<Order> spOrder;
+
+	typedef LinearPolynomial_<double, typename Grid::Index> Exp;
+    typedef SFieldCenter_<dim, double, Grid, Ghost, Order> FieldV;
+    typedef SFieldCenter_<dim, Exp, Grid, Ghost, Order>    FieldExp;
+	
+	Point_<Vt, dim> pmin(0, 0, 0);
+	Point_<Vt, dim> pmax(1, 1, 1);
+	int n = 10;
+	spGrid spgrid(new Grid(pmin, {n, n}, pmax.x()/double(n), 2));
+
+	spGhost spghost(new Ghost(spgrid));
+
+	spOrder sporder(new Order(spgrid,spghost));
+
+    FieldV   fv(spgrid, spghost, sporder);
+	fv.assign(2);
+    FieldExp fexp(spgrid, spghost, sporder);
+	
+	typename Grid::Index idx(1,2);
+	std::cout << "fv(" << idx << ")    = " << fv(idx) << std::endl; 
+	std::cout << "fexp(" << idx << ")  = " << fexp(idx) << std::endl; 
+
+	auto res = fexp + fv;
+
+	std::cout << "res(" << idx << ")  = " << res(idx) << std::endl; 
 }
