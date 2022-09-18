@@ -141,7 +141,12 @@ public:
         _arr *= rhs;
         return *this;
     }
-
+    template<class VT2>
+    Self& operator*=(const SField_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+        ASSERT(this->is_compatible(rhs.spgrid(), rhs.spghost(), rhs.sporder()));
+        _arr *= rhs.data();
+        return *this;
+    }
     Self& operator/=(const Self& rhs) {
         ASSERT(is_compatible(rhs));
         _arr /= rhs._arr;

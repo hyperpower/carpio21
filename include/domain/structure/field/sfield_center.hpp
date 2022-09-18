@@ -125,6 +125,11 @@ public:
         Base::operator*=(rhs);
         return *this;
     }
+    template<class VT2>
+    Self& operator*=(const SFieldCenter_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+        Base::operator*=(rhs);
+        return *this;
+    }
     Self& operator/=(const Self& rhs){
         Base::operator/=(Base(rhs));
         return *this;
@@ -161,6 +166,20 @@ public:
         Self res(this->_spgrid, this->_spghost, this->_sporder);
         return res;
     }
+    Self new_inverse_volume() const{
+        Self res(this->_spgrid, this->_spghost, this->_sporder);
+        for(auto& idx : (*this->_sporder)){
+            res(idx) = 1.0 / res.grid().volume(idx);
+        }
+        return res;
+    }
+    Self new_volume() const{
+        Self res(this->_spgrid, this->_spghost, this->_sporder);
+        for(auto& idx : (*this->_sporder)){
+            res(idx) = res.grid().volume(idx);
+        }
+        return res;
+    }
 protected:
     void _initial_arr(){
         // make data by order
@@ -192,11 +211,18 @@ operator-(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs,
     lhs -= rhs;
     return lhs;
 }
+template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator*(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
+          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
+    lhs *= rhs;
+    return lhs;
+}
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
 operator*(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
           const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
-    lhs += rhs;
+    lhs *= rhs;
     return lhs;
 }
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>

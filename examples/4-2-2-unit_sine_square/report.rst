@@ -25,7 +25,13 @@ This test is in [Barad2005]_.
 Second Order Finite Volume Method
 ==================================
 
+The simple Second Order FVM is applied on this problem. 
 
+.. figure:: fig/Poisson_SolutionContour.png
+   :alt: Fig of Exact Solution
+   :align: center 
+
+   Second Order Solution.
 
 
 

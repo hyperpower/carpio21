@@ -40,7 +40,6 @@ public:
     Laplace_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
             this->new_field("phi");
-            this->_configs["solver"] = this->_init_solver();
     }
 
     virtual std::string name() const{
@@ -54,6 +53,7 @@ public:
     };
 
     virtual int initialize(){
+        this->_configs["solver"] = this->_init_solver();
         return 0;
     }; 
 

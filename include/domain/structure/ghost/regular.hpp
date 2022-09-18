@@ -26,6 +26,7 @@ public:
     typedef SIndex_<DIM> Index;
     typedef GRID Grid;
     typedef std::shared_ptr<Grid> spGrid;
+    typedef SGhostRegularTag Tag;
 
 protected:
     spGrid _grid;

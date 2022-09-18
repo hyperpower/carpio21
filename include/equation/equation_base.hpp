@@ -305,7 +305,7 @@ protected:
             }
         } else {
             // default solver
-            spsolver = spSolver(new Solver_Jacobi(500, 1e-6));
+            spsolver = spSolver(new Solver_Jacobi(500, 1e-7));
         }
         return spsolver;
     }

@@ -113,7 +113,7 @@ TEST(equation, Poisson){
     typedef SGhostRegular_<dim, Grid> Ghost;
     typedef SOrderXYZ_<dim, Grid, Ghost> Order;
 
-    std::shared_ptr<Grid>  spgrid(new Grid(p,10, 1, 2));
+    std::shared_ptr<Grid>  spgrid(new Grid(p, 80, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
     std::shared_ptr<Order> sporder(new Order(spgrid, spghost));
 
@@ -129,21 +129,21 @@ TEST(equation, Poisson){
 	typedef BoundaryCondition BC;
 	typedef std::shared_ptr<BoundaryCondition> spBC;
 	spBI spbi(new BoundaryIndex());
-	// spBC spbcym(new BoundaryConditionValue(BC::_BC2_, 0.0));
-	// spbi->insert(0, spbcym);
-	// spbi->insert(1, spbcym);
-	// spbi->insert(2, spbcym);
-	// spbi->insert(3, spbcxm);
+	spBC spbcp(new BoundaryConditionValue(BC::_BC3_, 0.0));
+	spbi->insert(0, spbcp);
+	spbi->insert(1, spbcp);
+	spbi->insert(2, spbcp);
+	spbi->insert(3, spbcp);
 	equ.set_boundary_index("phi", spbi);
 
     // Set solver
-	equ.set_solver("Jacobi", 100, 1e-4);
+	equ.set_solver("Jacobi", 10000, 1e-15);
 
     // Set source
     equ.set_source([](typename Domain::ValueType x,
                       typename Domain::ValueType y,
                       typename Domain::ValueType z){
-                        return -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+                        return  -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
                       });
     // Add events
 	typedef Event_<Domain> Event;
@@ -164,5 +164,23 @@ TEST(equation, Poisson){
 	gnu.add(ToGnuplotActorContour(equ.field("phi")));
     gnu.set_terminal_png(OUTPUTPATH + "Poisson_SolutionContour", fig_width, fig_height);
 	gnu.plot();
+
+    auto& phi = equ.field("phi");
+
+    auto exact = equ.field("phi").new_compatible();
+    exact.assign([](typename Domain::ValueType x,
+                    typename Domain::ValueType y,
+                    typename Domain::ValueType z){
+        return std::sin(2.0 * _PI_ * x) * std::sin(2.0 * _PI_ * y);
+    });
+    auto error = exact - phi;
+
+    std::cout << "phi   = " << phi(5,5) << std::endl;
+    std::cout << "exact = " << exact(5,5) << std::endl;
+    std::cout << "error = " << error(5,5) << std::endl;
+
+    std::cout << "Norm1 = " << Norm1(error) << std::endl;
+    std::cout << "Norm2 = " << Norm2(error) << std::endl;
+    std::cout << "NormI = " << NormInf(error) << std::endl;
 
 }

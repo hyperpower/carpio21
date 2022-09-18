@@ -51,7 +51,7 @@ public:
     virtual inline Vt hs_(St, Idx) const {return 0;};
     virtual inline Vt hs_(St, Index) const {return 0;};
     // volume ==================================
-    virtual inline Vt volume(Index) const {return 0;};
+    virtual inline Vt volume(const Index&) const {return 0;};
     // center ==================================
     virtual Point c (Idx i, Idx j = 0, Idx k = 0)     const {return Point();}
     virtual Point c (const Index&)              const {return Point();}

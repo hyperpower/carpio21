@@ -16,13 +16,13 @@ FIELD Laplacian(const FIELD& field, BI bi, const std::string& method){
                         typename FIELD::Order,
                         typename FIELD::Tag
                         > imp;
-    std::cout << "[  Laplace ] field, bi" << std::endl;
+    // std::cout << "[  Laplace ] field, bi" << std::endl;
     imp.set_method(method);
     return imp.execute(field, bi);
 }
 template<class FIELD, class BI>
 FIELD Laplacian(const FIELD& field, BI bi){
-    std::cout << "Laplacian field with bi" << std::endl;
+    // std::cout << "Laplacian field with bi" << std::endl;
     LaplacianImplement_<FIELD,   FIELD::Dim,
                         typename FIELD::ValueType,
                         typename FIELD::Grid, 
@@ -34,7 +34,7 @@ FIELD Laplacian(const FIELD& field, BI bi){
 }
 template<class FIELD>
 FIELD Laplacian(const FIELD& field){
-    std::cout << "Laplacian field NO bi" << std::endl;
+    // std::cout << "Laplacian field NO bi" << std::endl;
     LaplacianImplement_<FIELD,   FIELD::Dim,
                         typename FIELD::ValueType,
                         typename FIELD::Grid, 
@@ -45,6 +45,30 @@ FIELD Laplacian(const FIELD& field){
     return imp.execute(field);
 }
 
+template<class FIELD>
+typename FIELD::ValueType Norm1(const FIELD& field,typename FIELD::Tag);
+
+template<class FIELD>
+typename FIELD::ValueType Norm1(const FIELD& field){
+    typename FIELD::Tag t; 
+    return Norm1(field, t);
+}
+template<class FIELD>
+typename FIELD::ValueType Norm2(const FIELD& field,typename FIELD::Tag);
+
+template<class FIELD>
+typename FIELD::ValueType Norm2(const FIELD& field){
+    typename FIELD::Tag t; 
+    return Norm2(field, t);
+}
+template<class FIELD>
+typename FIELD::ValueType NormInf(const FIELD& field,typename FIELD::Tag);
+
+template<class FIELD>
+typename FIELD::ValueType NormInf(const FIELD& field){
+    typename FIELD::Tag t; 
+    return NormInf(field, t);
+}
 // Interpolate
 template<class FIELD, class BDYIDX>
 typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){
@@ -55,7 +79,7 @@ typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){
 // BuildMatrix
 template<class FIELD, class MAT, class ARR>
 int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){
-    std::cout << "[   INFO   ] Fuction Build Matix" << std::endl;
+    // std::cout << "[   INFO   ] Fuction Build Matix" << std::endl;
     BuildMatrixImplement_<FIELD, FIELD::Dim,
                         typename FIELD::ValueType,
                         typename FIELD::Grid, 

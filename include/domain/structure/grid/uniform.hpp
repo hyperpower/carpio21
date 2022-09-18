@@ -113,10 +113,9 @@ public:
         return _cs * 0.5;
     };
     // volume ==================================
-    inline Vt volume(Index idx) const {
+    inline Vt volume(const Index& idx) const {
         Vt res = 1.0;
-        FOR_EACH_DIM
-        {
+        FOR_EACH_DIM{
             res *= _cs;
         }
         return res;

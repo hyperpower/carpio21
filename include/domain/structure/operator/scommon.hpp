@@ -39,7 +39,24 @@ public:
 
 };
 
-
+template<class FIELD,
+        typename std::enable_if<
+            std::is_base_of<typename FIELD::Ghost::Tag, SGhostRegularTag>::value, bool>::type = true>
+typename FIELD::ValueType Norm1(const FIELD& field, SFieldCenterTag){
+    return field.data().norm1();
+}
+template<class FIELD,
+        typename std::enable_if<
+            std::is_base_of<typename FIELD::Ghost::Tag, SGhostRegularTag>::value, bool>::type = true>
+typename FIELD::ValueType Norm2(const FIELD& field, SFieldCenterTag){
+    return field.data().norm2();
+}
+template<class FIELD,
+        typename std::enable_if<
+            std::is_base_of<typename FIELD::Ghost::Tag, SGhostRegularTag>::value, bool>::type = true>
+typename FIELD::ValueType NormInf(const FIELD& field, SFieldCenterTag){
+    return field.data().norminf();
+}
 }
 
 

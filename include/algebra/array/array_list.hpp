@@ -538,6 +538,12 @@ public:
 	    MinusEqual(this->size(), this->m_p, a.data());
         return *this;
     }
+    template<class VT2>
+    ref_Self operator*=(const ArrayListV_<VT2>& a){
+        ASSERT(this->size() == a.size());
+	    MultiplyEqual(this->size(), this->m_p, a.data());
+        return *this;
+    }
     ref_Self operator-=(const Self& a);
     ref_Self operator*=(const Self& a);
     ref_Self operator/=(const Self& a);

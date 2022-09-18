@@ -33,7 +33,7 @@ public:
                 // std::cout << f(idx) << std::endl;
             // }
             f(idx) = _execute_local(f, idx, bi, time);
-            // if(idx == GRID::Index(0,0)){
+            // if(idx == GRID::Index(4,4)){
                 // std::cout <<"----" << idx << " after  --------" <<std::endl;
                 // std::cout << f(idx) << std::endl;
             // }
@@ -69,7 +69,7 @@ protected:
                       const BI& bi,
                       const Vt& time = 0.0) const{
         Exp res(f(idx).value());
-        GRID::Index idxtest(0,9);
+        // GRID::Index idxtest(0,9);
         for (auto& t : f(idx)) {
 		    auto idxg = t.first;
 		    if(f.ghost().is_ghost(idxg)){
@@ -81,6 +81,8 @@ protected:
                     res += _value_type1(f, *spbc, idx, idxg, axe, ori, time) * t.second;
                 }else if(spbc->type() == BC::_BC2_){
                     res += _value_type2(f, *spbc, idx, idxg, axe, ori, time) * t.second;
+                }else if(spbc->type() == BC::_BC3_){
+                    res += _value_type3(f, *spbc, idx, idxg, axe, ori, time) * t.second;
                 }
             }else{
                 res.insert(t.second, t.first);
@@ -159,7 +161,25 @@ protected:
         Exp expx(idxb);
         return expx - vbc * (dx + dg);
     } 
-
+    Exp _value_type3(const Field&       fc,
+                     const BC&          bc,
+                     const Index&       idxc,
+                     const Index&       idxg,
+                     const St&          axe,
+                     const St&          ori,
+                     const Vt&          time = 0.0) const{
+        // only works for regular ghost
+        auto& grid = fc.grid();
+        auto  n    = grid.n(axe);
+        auto ig    = idxg[axe];
+        Index idxp(idxg);
+        if (ig >= n){
+            idxp[axe] = ig % n;
+        }else if(ig < 0){
+            idxp[axe] = n - std::abs(ig) % n;
+        }
+        return Exp(idxp);
+    } 
 };
 
 // BC Implement 

@@ -15,7 +15,7 @@ template<class D>
 class Poisson_: public Laplace_<D>{
 public:
     typedef D Domain;
-    typedef Poisson_<D>             Self;
+    typedef Poisson_<D>        Self;
     typedef Laplace_<D>        Base;
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
@@ -57,6 +57,7 @@ public:
     };
 
     virtual int initialize(){
+        Base::initialize();
         return 0;
     }; 
 
@@ -70,7 +71,10 @@ public:
         auto expf     = this->new_field_exp();
         auto bis      = this->get_boundary_index("phi");
 
-        auto res = Laplacian((*expf), (*bis)) - *(this->_fields["source"]);
+        auto res = Laplacian((*expf), (*bis)) - (*(this->_fields["source"]) * phi.new_volume());
+
+        // typename Domain::Index itest(0,9);
+        // std::cout << "res(" << itest << ") = " << res(itest) << std::endl;
 
         Mat a;
         Arr b;

@@ -19,6 +19,8 @@ namespace carpio{
 ///
 //z
 
+struct SGhostSubdivisionTag:  public SGhostRegularTag{};
+
 template<St DIM, class GRID>
 class SGhostRegularSubdivision_ : public SGhostRegular_<DIM, GRID>{
 public:
@@ -29,7 +31,7 @@ public:
     typedef SIndex_<DIM>              Index;
     typedef GRID                      Grid;
     typedef std::shared_ptr<Grid>   spGrid;
-
+    typedef SGhostSubdivisionTag       Tag;
     // input 1. Regular ID
     //       2. x,y,z
     // return  Regular Subdivision ID

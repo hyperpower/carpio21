@@ -27,7 +27,7 @@ public:
     typedef std::shared_ptr<BI> spBI;
 public:
     LaplacianImplement_(){
-        std::cout << "Laplacian Exp Structure" << std::endl;
+        // std::cout << "Laplacian Exp Structure" << std::endl;
     };
 
     template<class ANY>
