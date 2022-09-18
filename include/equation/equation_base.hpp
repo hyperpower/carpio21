@@ -186,7 +186,13 @@ public:
         }
         return false;
     }
-
+    const FieldCenter& field(const std::string& key) const{
+        if(this->has_field(key)){
+            return *(this->_fields.at(key));
+        }else{
+            throw std::invalid_argument( key + "is not fields" );
+        }
+    }
     bool has_flag(const std::string& key) const {
         auto it = this->_configs.find(key);
         if (it != this->_configs.end()) {
@@ -299,7 +305,7 @@ protected:
             }
         } else {
             // default solver
-            spsolver = spSolver(new Solver_Jacobi(500, 1e-4));
+            spsolver = spSolver(new Solver_Jacobi(500, 1e-6));
         }
         return spsolver;
     }

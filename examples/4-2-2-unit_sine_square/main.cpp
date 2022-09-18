@@ -7,7 +7,6 @@
 using namespace carpio;
 
 const std::string OUTPUTPATH = "./fig/";
-
 const int fig_width  = 800;
 const int fig_height = 600;
 

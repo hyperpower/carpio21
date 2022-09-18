@@ -5,6 +5,10 @@
 
 using namespace carpio;
 
+const std::string OUTPUTPATH = "./fig/";
+const int fig_width  = 800;
+const int fig_height = 600;
+
 TEST(equation, equation_base){
     std::cout << "Equation Test"<<std::endl;
     const int dim = 2;
@@ -85,6 +89,16 @@ TEST(equation, laplace){
 	equ.add_event("OutputTime", spetime);
 
     equ.run();
-
+    
+    Gnuplot gnu;
+	gnu.set_xrange(-0.1, 1.1);
+	gnu.set_yrange(-0.1, 1.1);
+	gnu.set_ylabel("y");
+	gnu.set_xlabel("x");
+	gnu.set_equal_aspect_ratio();
+	gnu.set_palette_blue_red();
+	gnu.add(ToGnuplotActorContour(equ.field("phi")));
+    gnu.set_terminal_png(OUTPUTPATH + "SolutionContour", fig_width, fig_height);
+	gnu.plot();
 
 }

@@ -202,6 +202,10 @@ inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
     res /= rhs;
     return res;
 }
+
+
+
+
 }
 
 #endif

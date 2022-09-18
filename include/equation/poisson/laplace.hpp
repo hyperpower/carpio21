@@ -67,14 +67,17 @@ public:
         auto expf     = this->new_field_exp();
         auto bis      = this->get_boundary_index("phi");
 
-        Laplacian((*expf), (*bis));
+        auto res = Laplacian((*expf), (*bis));
 
+        std::cout << "res(0,0) = " << res(9,9) << std::endl;
+        
         Mat a;
         Arr b;
-        BuildMatrix((*expf), a, b);
+        BuildMatrix(res, a, b);
         // prepare x
         Arr x = phi.to_array();
         this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        std::cout << "return code = " << any_cast<int>(this->_configs["solver_return_code"]) << std::endl;
         phi.assign(x);
 //        x.show();
         return 0;

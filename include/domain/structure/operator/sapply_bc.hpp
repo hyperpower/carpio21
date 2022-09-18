@@ -28,9 +28,15 @@ public:
 
     int execute(FIELD& f, const BI& bi, const Vt& time = 0.0) const{
         for(auto& idx : f.order()){
+            // if(idx == GRID::Index(0,0)){
+                // std::cout <<"----" << idx << " before --------" <<std::endl;
+                // std::cout << f(idx) << std::endl;
+            // }
             f(idx) = _execute_local(f, idx, bi, time);
-            // std::cout << idx << "--------" <<std::endl;
-            // std::cout << f(idx) << std::endl;
+            // if(idx == GRID::Index(0,0)){
+                // std::cout <<"----" << idx << " after  --------" <<std::endl;
+                // std::cout << f(idx) << std::endl;
+            // }
         }
         return 0;
     }
@@ -62,27 +68,45 @@ protected:
                       const Index& idx, 
                       const BI& bi,
                       const Vt& time = 0.0) const{
-        auto& exp   = f(idx);
-        for (auto& t : exp) {
+        Exp res;
+        for (auto& t : f(idx)) {
+            if(idx == GRID::Index(9,9)){
+                std::cout << "first = " << t.first << std::endl;
+            }
 		    auto idxg = t.first;
 		    if(f.ghost().is_ghost(idxg)){
-                // std::cout << idxg << std::endl;
                 auto axe  = GetDeltaAxe(idx, idxg);
-                // std::cout << "axe = " << axe << std::endl;
                 auto ori  = GetDeltaOrient(idx, idxg);
                 // std::cout << "ori = " << ToString(ori) << std::endl;
                 auto bid  = f.ghost().boundary_id(idx, idxg, axe, ori);
                 auto spbc = bi.find(bid);
+                // if(idx == GRID::Index(9,9)){
+                    // std::cout << "axe = " << axe << std::endl;
+                    // std::cout << "ghost " << idxg << std::endl;
+                    // std::cout << "bid   " << bid << std::endl;
+                // }
                 if(spbc->type() == BC::_BC1_){
-                    // std::cout << "Bc1" << std::endl;
-                    return _value_type1(f, *spbc, idx, idxg, axe, ori, time);
+                    if(idx == GRID::Index(9,9)){
+                        std::cout << "t.second = " << t.second<< std::endl;
+                        std::cout << "res t = " << res << std::endl;
+                        std::cout << "------------\n";
+                    }
+                    res += _value_type1(f, *spbc, idx, idxg, axe, ori, time) * t.second;
+                    if(idx == GRID::Index(9,9)){
+                        std::cout << "vt1   = " << _value_type1(f, *spbc, idx, idxg, axe, ori, time) << std::endl;
+                        std::cout << "res t = " << res << std::endl;
+                    }
+
                 }else if(spbc->type() == BC::_BC2_){
                     // std::cout << "Bc2" << std::endl;
-                    return _value_type2(f, *spbc, idx, idxg, axe, ori, time);
+                    res += _value_type2(f, *spbc, idx, idxg, axe, ori, time) * t.second;
                 }
+            }else{
+                res[t.first] = t.second;
             }
+
         }
-        return exp;
+        return res;
     }
 
     Exp _value_type1(const Field&       fc,
@@ -94,15 +118,15 @@ protected:
                      const Vt&          time = 0.0) const{
         auto oori = Opposite(Orientation(ori));  // opposite orientation
         auto idxb = idxg.shift(axe, oori);
-        int step = 0;
+        // int step = 0;
         while (fc.ghost().is_ghost(idxb)) {
             Shift(idxb, axe, oori);
-            step++;
+            // step++;
         }
         auto fp = fc.grid().f(axe, ori, idxb);   // face point
-//        for (int i = 0; i < step; ++i) {
-//            Shift(idxb, axe, oori);
-//        }
+        // for (int i = 0; i < step; ++i) {
+        //    Shift(idxb, axe, oori);
+        // }
         ASSERT(fc.ghost().is_normal(idxb));
         //  idxb   face  ghost
         // ---x-----|-----g-----

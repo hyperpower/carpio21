@@ -355,7 +355,7 @@ public:
     typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
     typedef typename GRID::Index  Index;
     static Poly InitAValue(const Index& index){
-        return Poly(index);
+        return Poly();
     }
 };
 
