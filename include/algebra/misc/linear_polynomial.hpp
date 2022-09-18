@@ -96,6 +96,15 @@ public:
 		this->_trim_zero();
 		return *this;
 	}
+	ref_Self insert(const Coe& c, const Term& t){
+		if (this->find(t) != this->end()) {
+			// has the item;
+			this->operator [](t) += c;
+		} else {
+			this->operator [](t) = c;
+		}
+		return *this;
+	}
 	ref_Self operator-=(const Coe& a){
 		this->_num -= a;
 		return *this;

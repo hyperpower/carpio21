@@ -36,6 +36,10 @@ public:
     typedef Jacobi_<Vt> Solver_Jacobi;
     typedef SOR_<Vt>    Solver_SOR;
     typedef CG_<Vt>     Solver_CG;
+
+    typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
+    typedef std::function<Vt(Vt, Vt, Vt)> FunXYZ_Value;
+
 public:
     Poisson_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
@@ -66,11 +70,11 @@ public:
         auto expf     = this->new_field_exp();
         auto bis      = this->get_boundary_index("phi");
 
-        Laplacian((*expf), (*bis)) + *(this->_fields["source"]);
+        auto res = Laplacian((*expf), (*bis)) - *(this->_fields["source"]);
 
         Mat a;
         Arr b;
-        BuildMatrix((*expf), a, b);
+        BuildMatrix(res, a, b);
         // prepare x
         Arr x = phi.to_array();
         this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
@@ -84,6 +88,15 @@ public:
     }
     void set_source(spFieldCenter spsource){
         this->_fields["source"] = spsource;
+    }
+
+    void set_source(FunXYZT_Value fun){
+        auto& source = *(this->_fields["source"]);
+        source.assign(fun);
+    }
+    void set_source(FunXYZ_Value fun){
+        auto& source = *(this->_fields["source"]);
+        source.assign(fun);
     }
 
 

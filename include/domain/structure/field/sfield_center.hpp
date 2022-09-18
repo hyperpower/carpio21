@@ -35,6 +35,7 @@ public:
     typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
+    typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;
 public:
     SFieldCenter_(spGrid spg, spGhost spgh){
         this->_spgrid  = spg;
@@ -111,6 +112,11 @@ public:
         Base::operator-=(rhs);
         return *this;
     }
+    template<class VT2>
+    Self& operator-=(const SFieldCenter_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+        Base::operator-=(rhs);
+        return *this;
+    }
     Self& operator*=(const Self& rhs){
         Base::operator*=(Base(rhs));
         return *this;
@@ -142,6 +148,14 @@ public:
                                          cp.value(_Z_), t);
         }
     }
+    void assign(FunXYZ_Value fun){
+        for(auto& idx : (*this->_sporder)){
+            auto cp = this->_spgrid->c(idx);
+            this->operator ()(idx) = fun(cp.value(_X_),
+                                         cp.value(_Y_),
+                                         cp.value(_Z_));
+        }
+    }
     // return a new scalar with compatible gird, ghost and order
     Self new_compatible() const{
         Self res(this->_spgrid, this->_spghost, this->_sporder);
@@ -169,6 +183,13 @@ inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
 operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
           const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
     lhs += rhs;
+    return lhs;
+}
+template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator-(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
+          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
+    lhs -= rhs;
     return lhs;
 }
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>

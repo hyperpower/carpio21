@@ -68,41 +68,22 @@ protected:
                       const Index& idx, 
                       const BI& bi,
                       const Vt& time = 0.0) const{
-        Exp res;
+        Exp res(f(idx).value());
+        GRID::Index idxtest(0,9);
         for (auto& t : f(idx)) {
-            if(idx == GRID::Index(9,9)){
-                std::cout << "first = " << t.first << std::endl;
-            }
 		    auto idxg = t.first;
 		    if(f.ghost().is_ghost(idxg)){
                 auto axe  = GetDeltaAxe(idx, idxg);
                 auto ori  = GetDeltaOrient(idx, idxg);
-                // std::cout << "ori = " << ToString(ori) << std::endl;
                 auto bid  = f.ghost().boundary_id(idx, idxg, axe, ori);
                 auto spbc = bi.find(bid);
-                // if(idx == GRID::Index(9,9)){
-                    // std::cout << "axe = " << axe << std::endl;
-                    // std::cout << "ghost " << idxg << std::endl;
-                    // std::cout << "bid   " << bid << std::endl;
-                // }
                 if(spbc->type() == BC::_BC1_){
-                    if(idx == GRID::Index(9,9)){
-                        std::cout << "t.second = " << t.second<< std::endl;
-                        std::cout << "res t = " << res << std::endl;
-                        std::cout << "------------\n";
-                    }
                     res += _value_type1(f, *spbc, idx, idxg, axe, ori, time) * t.second;
-                    if(idx == GRID::Index(9,9)){
-                        std::cout << "vt1   = " << _value_type1(f, *spbc, idx, idxg, axe, ori, time) << std::endl;
-                        std::cout << "res t = " << res << std::endl;
-                    }
-
                 }else if(spbc->type() == BC::_BC2_){
-                    // std::cout << "Bc2" << std::endl;
                     res += _value_type2(f, *spbc, idx, idxg, axe, ori, time) * t.second;
                 }
             }else{
-                res[t.first] = t.second;
+                res.insert(t.second, t.first);
             }
 
         }
@@ -118,28 +99,29 @@ protected:
                      const Vt&          time = 0.0) const{
         auto oori = Opposite(Orientation(ori));  // opposite orientation
         auto idxb = idxg.shift(axe, oori);
-        // int step = 0;
+        int step = 0;
         while (fc.ghost().is_ghost(idxb)) {
             Shift(idxb, axe, oori);
-            // step++;
+            step++;
         }
         auto fp = fc.grid().f(axe, ori, idxb);   // face point
-        // for (int i = 0; i < step; ++i) {
-        //    Shift(idxb, axe, oori);
-        // }
+        auto idxsym = idxb;
+        for (int i = 0; i < step; ++i) {
+           Shift(idxsym, axe, oori);
+        }
         ASSERT(fc.ghost().is_normal(idxb));
         //  idxb   face  ghost
         // ---x-----|-----g-----
         //    +--dx-+--dg-+
-        // equation:
-        //  vx - vg     vbc - vx
-        // --------- = ----------  ==> vx - vg = (vbc - vx) * (dx + dg) / dx;
-        //  dx + dg        dx          vg = vx - (vbc - vx) * (dx + dg) / dx;
-        Vt dx = std::abs(fc.grid().c_(axe, idxb) - fp[axe]);
+        // equation: P orientation
+        //  vx - vg     vx - vbc
+        // --------- = ----------  ==> vx - vg = (vx - vbc) * (dx + dg) / dx;
+        //  dx + dg        dx          vg = vx - (vx - vbc) * (dx + dg) / dx;
+        Vt dx = std::abs(fc.grid().c_(axe, idxsym) - fp[axe]);
         Vt dg = std::abs(fc.grid().c_(axe, idxg) - fp[axe]);
         Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-        Exp expx(idxb);
-        return expx + (vbc - expx) * (dx + dg) / dx;
+        Exp expx(idxsym);
+        return expx - (expx - vbc) * (dx + dg) / dx;
     }
 
     Exp _value_type2(
