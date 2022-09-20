@@ -33,7 +33,7 @@ The simple Second Order FVM is applied on this problem.
 
    Second Order Solution.
 
-
+.. include:: fig/table.txt
 
 Field Face
 ===================
