@@ -113,7 +113,7 @@ TEST(equation, Poisson){
     typedef SGhostRegular_<dim, Grid> Ghost;
     typedef SOrderXYZ_<dim, Grid, Ghost> Order;
 
-    std::shared_ptr<Grid>  spgrid(new Grid(p, 80, 1, 2));
+    std::shared_ptr<Grid>  spgrid(new Grid(p, 10, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
     std::shared_ptr<Order> sporder(new Order(spgrid, spghost));
 
@@ -137,7 +137,7 @@ TEST(equation, Poisson){
 	equ.set_boundary_index("phi", spbi);
 
     // Set solver
-	equ.set_solver("Jacobi", 10000, 1e-15);
+	equ.set_solver("Jacobi", 10000, 1e-12);
 
     // Set source
     equ.set_source([](typename Domain::ValueType x,
@@ -173,6 +173,12 @@ TEST(equation, Poisson){
                     typename Domain::ValueType z){
         return std::sin(2.0 * _PI_ * x) * std::sin(2.0 * _PI_ * y);
     });
+
+    // 
+    auto spsolver = equ.get_solver();
+    std::cout << "solver residual = " << spsolver->residual() << std::endl;
+    std::cout << "solver iter     = " << spsolver->num_iter() << std::endl;
+
     auto error = exact - phi;
 
     std::cout << "phi   = " << phi(5,5) << std::endl;
@@ -182,5 +188,15 @@ TEST(equation, Poisson){
     std::cout << "Norm1 = " << Norm1(error) << std::endl;
     std::cout << "Norm2 = " << Norm2(error) << std::endl;
     std::cout << "NormI = " << NormInf(error) << std::endl;
+
+    auto fs = equ.field("source");
+    std::cout << "source = " << fs(Grid::Index(0,0)) << std::endl;
+    
+    auto fr = Laplacian(equ.field("phi"), *spbi) - Integral(equ.field("source"));
+
+    std::cout << "Norm1 fr = " << Norm1(fr) << std::endl;
+    std::cout << "Norm2 fr = " << Norm2(fr) << std::endl;
+    std::cout << "NormI fr = " << NormInf(fr) << std::endl;
+
 
 }

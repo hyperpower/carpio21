@@ -71,7 +71,7 @@ public:
         auto expf     = this->new_field_exp();
         auto bis      = this->get_boundary_index("phi");
 
-        auto res = Laplacian((*expf), (*bis)) - (*(this->_fields["source"]) * phi.new_volume());
+        auto res = Laplacian((*expf), (*bis)) - Integral(*(this->_fields["source"]));
 
         // typename Domain::Index itest(0,9);
         // std::cout << "res(" << itest << ") = " << res(itest) << std::endl;
@@ -84,7 +84,7 @@ public:
         this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
         phi.assign(x);
 //        x.show();
-        return 0;
+        return any_cast<int>(this->_configs["solver_return_code"]);
     }
     
     void set_phi(spFieldCenter spphi){

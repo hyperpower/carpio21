@@ -69,6 +69,15 @@ typename FIELD::ValueType NormInf(const FIELD& field){
     typename FIELD::Tag t; 
     return NormInf(field, t);
 }
+
+template<class FIELD>
+FIELD Integral(const FIELD& field,typename FIELD::Tag);
+
+template<class FIELD>
+FIELD Integral(const FIELD& field){
+    typename FIELD::Tag t; 
+    return Integral(field, t);
+}
 // Interpolate
 template<class FIELD, class BDYIDX>
 typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){

@@ -57,6 +57,15 @@ template<class FIELD,
 typename FIELD::ValueType NormInf(const FIELD& field, SFieldCenterTag){
     return field.data().norminf();
 }
+template<class FIELD>
+FIELD Integral(const FIELD& field, SFieldCenterTag){
+    FIELD res(field);
+    auto& grid = res.grid();
+    for(auto& idx : res.order()){
+        res(idx) = res(idx) * grid.volume(idx);
+    }
+    return res;
+}
 }
 
 

@@ -215,6 +215,11 @@ public:
             this->_configs["SOR_omega"] = any;
         }
     }
+
+    spSolver get_solver(){
+        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        return spsolver;
+    }
     
     bool has_boundary_index(const std::string& key) const {
         auto it = this->_bis.find(key);
