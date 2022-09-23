@@ -1196,17 +1196,19 @@ template<typename X,
     && IsContainer<X>::value,
     bool>::type = true>
 auto ToGnuplotActor(const X& x, 
-            const std::string &pcmd = "using 1 title \"\" ",
+            const std::string &pcmd = "using 1:2 title \"\" ",
             const std::string& scmd = ""){
     GnuplotActor actor;
     actor.command(pcmd);
     actor.style(scmd);
+    int n = 0;
     auto xiter = x.begin();
     for (; xiter != x.end();) {
         std::ostringstream sst;
-        sst << (*xiter);
+        sst <<n << " " << (*xiter);
         actor.data().push_back(sst.str());
         xiter++;
+        n++;
     }
     return actor;
 }

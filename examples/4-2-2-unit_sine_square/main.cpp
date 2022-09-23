@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <memory> 
 #include <string>
 #include "geometry/geometry.hpp"
@@ -37,6 +38,33 @@ void PlotFieldAsContour(const std::string& ffn, const Field& f){
 	gnu.plot();
 }
 
+void PlotResidual(const std::string& ffn, 
+                  std::vector<int>& ln,
+                  const std::list<std::list<double> >& lr){
+    const std::string OUTPUTPATH = "./fig/";
+    const int fig_width  = 800;
+    const int fig_height = 600;
+    Gnuplot gnu;
+    gnu.set_ylogscale();
+	// gnu.set_xrange(-0.1, 1.1);
+	// gnu.set_yrange(-0.1, 1.1);
+	gnu.set_ylabel("Residual");
+	gnu.set_xlabel("Number of iteration");
+	// gnu.set_equal_aspect_ratio();
+	// gnu.set_palette_blue_red();
+    auto itern = ln.begin();
+    auto iterr = lr.begin();
+    for(;itern != ln.end();){
+        auto a = ToGnuplotActor(*iterr);
+        a.title("Mesh n = " + ToString(*itern));
+        a.style("with lines lw 2");
+	    gnu.add(a);
+        itern++;
+        iterr++;
+    }
+    gnu.set_terminal_png(OUTPUTPATH + ffn, fig_width, fig_height);
+	gnu.plot();
+}
 void ExactSolution(){
     Point_<Vt, dim> pmin(0, 0, 0);
     Point_<Vt, dim> pmax(1, 1, 1);
@@ -59,7 +87,11 @@ void ExactSolution(){
     PlotFieldAsContour("ExactSolutionContour", a);
 }
 
-void PoissonSolver(int n, std::list<double>& l1, std::list<double>& l2, std::list<double>& li){
+void PoissonSolver(int n, 
+                   std::list<double>& l1, 
+                   std::list<double>& l2, 
+                   std::list<double>& li,
+                   std::list<std::list<double> >& lr){
     std::cout << "[  Poisson ] Solver"<<std::endl;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;
     std::cout << "[   INFO   ] n   = " << n << std::endl;
@@ -88,7 +120,7 @@ void PoissonSolver(int n, std::list<double>& l1, std::list<double>& l2, std::lis
 	equ.set_boundary_index("phi", spbi);
 
     // Set solver
-	equ.set_solver("Jacobi", 10000, 1e-15);
+	equ.set_solver("Jacobi", 10000, 1e-12);
 
     // Set source
     equ.set_source([](typename Domain::ValueType x,
@@ -106,6 +138,10 @@ void PoissonSolver(int n, std::list<double>& l1, std::list<double>& l2, std::lis
     equ.run();
     
     PlotFieldAsContour("Poisson_SolutionContour" + ToString(n), equ.field("phi"));
+
+    //residual 
+    auto spsolver = equ.get_solver();
+    lr.push_back(spsolver->get_residual_array());
 
     // error
     auto exact = equ.field("phi").new_compatible();
@@ -130,11 +166,16 @@ void PoissonSolver(int n, std::list<double>& l1, std::list<double>& l2, std::lis
 
 int main(int argc, char** argv) {
     ExactSolution();
-    std::vector<int> vn = {10, 20, 40, 80, 160};
+    std::vector<int> vn = {10, 20, 40, 80};
     std::list<double> l1,l2,li;
+    std::list<std::list<double> > lr;
     for(auto& n : vn){
-        PoissonSolver(n, l1, l2, li);
+        PoissonSolver(n, l1, l2, li, lr);
     }
+    // output to a file
+    std::ofstream fout("./fig/error_table.txt",std::ios::out);
+
+    tfm::format(fout, "n,norm1,norm2,norm inf\n");
     auto itervn = vn.begin();
     auto iterl1 = l1.begin();
     auto iterl2 = l2.begin();
@@ -143,9 +184,16 @@ int main(int argc, char** argv) {
         tfm::format(std::cout,
                     "n: %8d N1: %10.5e N2: %10.5e Ni: %10.5e\n",
                     *itervn, *iterl1, *iterl2, *iterli);
+        tfm::format(fout,
+                    "%8d,%10.5e,%10.5e,%10.5e\n",
+                    *itervn, *iterl1, *iterl2, *iterli);
         itervn++;
         iterl1++;
         iterl2++;
         iterli++;
     }
+    fout.close();
+
+    // plot residual
+    PlotResidual("residual", vn, lr);
 }

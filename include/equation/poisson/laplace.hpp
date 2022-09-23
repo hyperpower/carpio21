@@ -67,7 +67,7 @@ public:
         auto expf     = this->new_field_exp();
         auto bis      = this->get_boundary_index("phi");
 
-        auto res = Laplacian((*expf), (*bis));
+        auto res = IntLaplacian((*expf), (*bis));
 
         Mat a;
         Arr b;

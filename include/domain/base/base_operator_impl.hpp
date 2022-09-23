@@ -14,10 +14,10 @@ namespace carpio{
 template<class FIELD, St DIM, class VT, 
          class GRID, class GHOST, class ORDER, 
          class TRAIT>
-class LaplacianImplement_{
+class IntLaplacianImplement_{
 public:
-    LaplacianImplement_(){
-        std::cout << "Laplacian Implement" << std::endl;
+    IntLaplacianImplement_(){
+        std::cout << "IntLaplacian Implement" << std::endl;
     };
 
     template<class ANY>

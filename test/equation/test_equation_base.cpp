@@ -192,7 +192,7 @@ TEST(equation, Poisson){
     auto fs = equ.field("source");
     std::cout << "source = " << fs(Grid::Index(0,0)) << std::endl;
     
-    auto fr = Laplacian(equ.field("phi"), *spbi) - Integral(equ.field("source"));
+    auto fr = IntLaplacian(equ.field("phi"), *spbi) - IntVolume(equ.field("source"));
 
     std::cout << "Norm1 fr = " << Norm1(fr) << std::endl;
     std::cout << "Norm2 fr = " << Norm2(fr) << std::endl;

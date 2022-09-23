@@ -38,8 +38,7 @@ html_sidebars = {
 }
 html_theme = 'alabaster'
 html_theme_options = {
-    # "globaltoc_maxdepth": -1,
-    # "sidebar_collapse" : False,
+    "font_family": '"Times New Roman", Times, serif;',
 }
 page_width = 800
 # html_theme_path = ['themes']
@@ -51,5 +50,4 @@ page_width = 800
 # html_domain_indices = False
 # html_use_index = False
 # html_show_sphinx = False
-# htmlhelp_basename = 'MusicforGeeksandNerdsdoc'
 html_show_sourcelink = False

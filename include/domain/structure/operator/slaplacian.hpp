@@ -13,7 +13,7 @@ namespace carpio{
 // Linear Poly 
 
 template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
-class LaplacianImplement_<
+class IntLaplacianImplement_<
     FIELD, DIM, 
     LinearPolynomial_<Vt, typename GRID::Index>, 
     GRID, GHOST, ORDER, SFieldCenterTag>: 
@@ -26,8 +26,8 @@ public:
     typedef BoundaryIndex BI;
     typedef std::shared_ptr<BI> spBI;
 public:
-    LaplacianImplement_(){
-        // std::cout << "Laplacian Exp Structure" << std::endl;
+    IntLaplacianImplement_(){
+        // std::cout << "IntLaplacian Exp Structure" << std::endl;
     };
 
     template<class ANY>
@@ -79,7 +79,7 @@ public:
 
 
 template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
-class LaplacianImplement_<
+class IntLaplacianImplement_<
     FIELD, DIM, Vt,
     GRID, GHOST, ORDER, SFieldCenterTag>: 
     public SOperatorCommon_<FIELD, DIM, Vt, GRID, GHOST, ORDER>{     
@@ -94,8 +94,8 @@ public:
     typedef BoundaryIndex BI;
     typedef std::shared_ptr<BI> spBI;
 public:
-    LaplacianImplement_(){
-        // std::cout << "Laplacian Exp Structure" << std::endl;
+    IntLaplacianImplement_(){
+        // std::cout << "IntLaplacian Exp Structure" << std::endl;
     };
 
     template<class ANY>

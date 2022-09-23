@@ -26,14 +26,66 @@ Second Order Finite Volume Method
 ==================================
 
 The simple Second Order FVM is applied on this problem. 
+The :math:`\phi_{\text{error}}` is obtained by
 
-.. figure:: fig/Poisson_SolutionContour.png
+.. math::
+   \phi_{\text{error}} = \phi_{\text{exact}} - \phi_{\text{compute}}
+
+where, :math:`\phi_{\text{exact}}` is exact solution. :math:`\phi_{\text{compute}}` is compute solution.
+
+.. image:: fig/Poisson_SolutionContour10.png
+   :width: 49%
+.. image:: fig/Poisson_ErrorContour10.png
+   :width: 49%
+.. figure:: fig/0.svg
    :alt: Fig of Exact Solution
    :align: center 
 
-   Second Order Solution.
+   Solution in 10x10 mesh (Left: Solution, Right: Error).
 
-.. include:: fig/table.txt
+
+.. image:: fig/Poisson_SolutionContour20.png
+   :width: 49%
+.. image:: fig/Poisson_ErrorContour20.png
+   :width: 49%
+.. figure:: fig/0.svg
+   :alt: Fig of Exact Solution
+   :align: center 
+   
+   Solution in 20x20 mesh (Left: Solution, Right: Error).
+
+
+.. image:: fig/Poisson_SolutionContour40.png
+   :width: 49%
+.. image:: fig/Poisson_ErrorContour40.png
+   :width: 49%
+.. figure:: fig/0.svg
+   :alt: Fig of Exact Solution
+   :align: center 
+   
+   Solution in 40x40 mesh (Left: Solution, Right: Error).
+
+
+.. image:: fig/Poisson_SolutionContour80.png
+   :width: 49%
+.. image:: fig/Poisson_ErrorContour80.png
+   :width: 49%
+.. figure:: fig/0.svg
+   :alt: Fig of Exact Solution
+   :align: center 
+   
+   Solution in 80x80 mesh (Left: Solution, Right: Error).
+
+.. figure:: fig/residual.png
+   :align: center 
+
+   Solver residual on each mesh.
+
+.. csv-table:: Error Norm in different mesh resolutions.
+   :file: fig/error_table.txt
+   :header-rows: 1
+
+
 
 Field Face
 ===================

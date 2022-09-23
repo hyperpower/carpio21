@@ -71,7 +71,7 @@ public:
         auto expf     = this->new_field_exp();
         auto bis      = this->get_boundary_index("phi");
 
-        auto res = Laplacian((*expf), (*bis)) - Integral(*(this->_fields["source"]));
+        auto res = IntLaplacian((*expf), (*bis)) - IntVolume(*(this->_fields["source"]));
 
         // typename Domain::Index itest(0,9);
         // std::cout << "res(" << itest << ") = " << res(itest) << std::endl;
