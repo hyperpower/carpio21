@@ -119,7 +119,7 @@ public:
             // events before calculation
             initialize();
             run_events(this->_time->current_step(), //
-                       this->_time->current_step(),    //
+                       this->_time->current_time(),    //
                        Event::START);
             // loop
             while (!this->_time->is_end() && (!_stop->is_stop())) {
@@ -183,6 +183,8 @@ public:
     virtual void set_time_term(St n, Vt dt, Vt tau = 1){
         this->_time = spTimeControl(
                            new TimeControl( n, dt, tau));
+        this->_stop = spStopControl(
+                           new StopControl());
     }
 
     virtual void set_time_scheme(
@@ -212,7 +214,7 @@ public:
             throw std::invalid_argument( key + "is not fields" );
         }
     }
-    bool has_flag(const std::string& key) const {
+    bool has_config(const std::string& key) const {
         auto it = this->_configs.find(key);
         if (it != this->_configs.end()) {
             return true;
@@ -313,7 +315,7 @@ protected:
     virtual spSolver _init_solver() {
         // initial solver
         spSolver spsolver;
-        if (this->has_flag("set_solver")) {
+        if (this->has_config("set_solver")) {
             std::string sn = any_cast<std::string>(
                     this->_configs["set_solver"]);
             Vt  tol      = any_cast<Vt>(this->_configs["set_solver_tolerence"]);
@@ -323,7 +325,7 @@ protected:
             } else if (sn == "CG") {
                 spsolver = spSolver(new Solver_CG(max_iter, tol));
             } else if (sn == "SOR") {
-                ASSERT(this->has_flag("SOR_omega"));
+                ASSERT(this->has_config("SOR_omega"));
                 Vt omega = any_cast<Vt>(this->_configs["SOR_omega"]);
                 spsolver = spSolver(new Solver_SOR(max_iter, tol, omega));
             }

@@ -19,12 +19,12 @@ public:
     typedef EquationBase_<D>        Base;
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
-    typedef typename Domain::Grid         Grid;
-    typedef typename Domain::spGrid      spGrid;
+    typedef typename Domain::Grid        Grid;
+    typedef typename Domain::spGrid     spGrid;
     typedef typename Domain::Ghost       Ghost;
-    typedef typename Domain::spGhost     spGhost;
+    typedef typename Domain::spGhost   spGhost;
     typedef typename Domain::Order       Order;
-    typedef typename Domain::spOrder     spOrder;
+    typedef typename Domain::spOrder   spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
     typedef std::shared_ptr<FieldCenter> spFieldCenter;
 
@@ -68,6 +68,10 @@ public:
     virtual int initialize(){
         this->_configs["solver"] = this->_init_solver();
         if(this->_time != nullptr){
+            // set default time scheme
+            if(!this->has_config("set_time_scheme")){
+                this->_configs["set_time_scheme"] = std::string("explicit");
+            }
             auto& phi = *(this->_fields["phi"]);
             this->_fields["inverse_volume"] = std::make_shared<FieldCenter>(phi.new_inverse_volume());
         }
@@ -97,14 +101,6 @@ public:
 //        x.show();
         return 0;
     }
-
-    // virtual void run_events(St step, Vt t, int fob) {
-    //     for (auto& event : this->_events) {
-    //         if (event.second->do_execute(step, t, fob)) {
-    //             event.second->execute(step, t, fob, this);
-    //         }
-    //     }
-    // }
 
     void set_phi(spFieldCenter spphi){
         this->_fields["phi"] = spphi;

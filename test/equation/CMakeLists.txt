@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.0)
 set(This Equation)
 
 set(Sources
-    test_equation_base.cpp
+    # test_equation_base.cpp
+    test_poisson.cpp
 )
 
 add_executable(${This} ${Sources})
