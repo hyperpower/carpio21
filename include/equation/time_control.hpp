@@ -8,14 +8,12 @@
 
 namespace carpio {
 
-template<St DIM>
+template<class D>
 class TimeControl_ {
 public:
-    static const St Dim = DIM;
-
-    typedef TimeControl_<Dim> Self;
-    typedef TimeControl_<Dim>& ref_Self;
-    typedef TimeControl_<Dim>* pSelf;
+    typedef TimeControl_<D> Self;
+    typedef TimeControl_<D>& ref_Self;
+    typedef TimeControl_<D>* pSelf;
     typedef std::shared_ptr<Self> spTime;
 
 protected:

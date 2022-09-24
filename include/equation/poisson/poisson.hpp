@@ -52,7 +52,7 @@ public:
 
     virtual ~Poisson_(){};
 
-    virtual int run_one_step(St step){
+    virtual int run_one_step(St step, Vt time){
         return 0;
     };
 

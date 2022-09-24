@@ -48,7 +48,7 @@ public:
     typedef std::map<std::string, spBoundaryIndex> BIs;
     typedef std::map<std::string, spEvent>         Events;
 
-    typedef TimeControl_<D::Dim> TimeControl;
+    typedef TimeControl_<D> TimeControl;
     typedef std::shared_ptr<TimeControl> spTimeControl;
 
     typedef StopControl_<D> StopControl;
@@ -92,7 +92,7 @@ public:
 
     virtual ~EquationBase_(){};
 
-    virtual int run_one_step(St step) = 0;
+    virtual int run_one_step(St step, Vt time) = 0;
 
     virtual int initialize() = 0; 
 
@@ -130,7 +130,8 @@ public:
                            Event::BEFORE);
 
                 // run one step =================
-                run_one_step(this->_time->current_step());
+                run_one_step(this->_time->current_step(),
+                             this->_time->current_time());
                 // ==============================
 
                 // events after each step
@@ -177,6 +178,24 @@ public:
 
     virtual const TimeControl& time_control() const{
         return *(this->_time);
+    }
+
+    virtual void set_time_term(St n, Vt dt, Vt tau = 1){
+        this->_time = spTimeControl(
+                           new TimeControl( n, dt, tau));
+    }
+
+    virtual void set_time_scheme(
+            const std::string& name,
+            const Vt&          v = 0.5){
+        ASSERT(name == "explicit"
+            || name == "implicit"
+            || name == "CN"
+            || name == "CNgeneral");
+        this->_configs["set_time_scheme"] = name;
+        if(name == "CNgeneral"){
+            this->_configs["cn_omega"] = v;
+        }
     }
 
     bool has_field(const std::string& key) const {

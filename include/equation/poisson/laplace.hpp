@@ -48,12 +48,29 @@ public:
 
     virtual ~Laplace_(){};
 
-    virtual int run_one_step(St step){
-        return 0;
-    };
+    virtual int run_one_step(St step, Vt time){
+        auto name = any_cast<std::string>(this->_configs["set_time_scheme"]);
+        if(name == "explicit"){
+            _one_step_explicit(step, time);
+        }else if(name == "implicit"){
+            // _one_step_implicit(step);
+        }else if(name == "CN"){
+            // _one_step_cn(step);
+        }else if(name == "CNgeneral"){
+            // _one_step_cng(step);
+        }else{
+            std::cout <<" >! Unknown time scheme " << name << std::endl;
+            SHOULD_NOT_REACH;
+        }
+        return -1;
+    }
 
     virtual int initialize(){
         this->_configs["solver"] = this->_init_solver();
+        if(this->_time != nullptr){
+            auto& phi = *(this->_fields["phi"]);
+            this->_fields["inverse_volume"] = std::make_shared<FieldCenter>(phi.new_inverse_volume());
+        }
         return 0;
     }; 
 
@@ -93,6 +110,17 @@ public:
         this->_fields["phi"] = spphi;
     }
 
+protected:
+    virtual int _one_step_explicit(St step, Vt time){
+        auto& phi  = *(this->_fields["phi"]);
+        auto& invv = *(this->_fields["inverse_volume"]);
+        auto  bis  = this->get_boundary_index("phi");
+        Vt    dt   = this->_time->dt();
+
+        phi = IntLaplacian(phi, (*bis), time) * dt * invv + phi;
+
+        return 0;
+    }
 
 };
 
