@@ -467,6 +467,11 @@ public:
 
     }
 
+    inline Gnuplot& test(){
+        cmd("test");
+        return *this;
+    }
+
     /// turns grid on/off
     inline Gnuplot& set_grid() {
         cmd("set grid");

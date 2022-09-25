@@ -39,7 +39,7 @@ void PlotFieldAsContour(const std::string& ffn, const Field& f){
 }
 
 void PlotResidual(const std::string& ffn, 
-                  std::vector<int>& ln,
+                  const std::vector<int>& ln,
                   const std::list<std::list<double> >& lr){
     const std::string OUTPUTPATH = "./fig/";
     const int fig_width  = 800;
@@ -65,6 +65,73 @@ void PlotResidual(const std::string& ffn,
     gnu.set_terminal_png(OUTPUTPATH + ffn, fig_width, fig_height);
 	gnu.plot();
 }
+std::list<double> Reference(int order,
+               const std::vector<int>& ln,
+               const std::list<double>& l1){
+    std::list<double> res;
+    res.push_back(l1.front());
+    auto itern = ln.begin();
+    itern++;
+    for(;itern != ln.end();itern++){
+        auto nm = *(std::prev(itern));
+        auto n  = (*itern);
+        auto v  = res.back() / std::pow(double(n) / double(nm), double(order));
+        res.push_back(v);
+    }
+    return res;
+}
+void PlotError(const std::string& ffn,
+               const std::vector<int>& ln,
+               const std::list<double> & l1,
+               const std::list<double> & l2,
+               const std::list<double> & li
+               ){
+    const std::string OUTPUTPATH = "./fig/";
+    const int fig_width  = 800;
+    const int fig_height = 600;
+    Gnuplot gnu;
+    gnu.set_xlogscale();
+    gnu.set_ylogscale();
+	gnu.set_ylabel("Norm");
+	gnu.set_xlabel("1/n");
+    gnu.set_yformat("10^{%L}");
+	// gnu.set_equal_aspect_ratio();
+	// gnu.set_palette_blue_red();
+    std::list<double> lh;
+    for(auto& n:ln){
+        lh.push_back(1.0/n);
+    }
+    auto a1 = ToGnuplotActor(lh, l1);
+    a1.title("L1-Norm");
+    a1.style("with linespoints lw 2 pt 7");
+    auto a2 = ToGnuplotActor(lh, l2);
+    a2.title("L2-Norm");
+    a2.style("with linespoints lw 2 pt 7");
+    auto ai = ToGnuplotActor(lh, li);
+    ai.title("Linf-Norm");
+    ai.style("with linespoints lw 2 pt 7");
+    gnu.add(a1);
+    gnu.add(a2);
+    gnu.add(ai);
+
+    auto l1ref = Reference(1, ln, l2);
+    auto a1r = ToGnuplotActor(lh, l1ref);
+    a1r.title("1 Order");
+    a1r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
+
+    auto l2ref = Reference(2, ln, li);
+    auto a2r = ToGnuplotActor(lh, l2ref);
+    a2r.title("2 Order");
+    a2r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
+
+    gnu.add(a1r);
+    gnu.add(a2r);
+
+    gnu.set_terminal_png(OUTPUTPATH + ffn, fig_width, fig_height);
+    // gnu.test();
+	gnu.plot();
+}
+
 void ExactSolution(){
     Point_<Vt, dim> pmin(0, 0, 0);
     Point_<Vt, dim> pmax(1, 1, 1);
@@ -159,7 +226,7 @@ void PoissonSolver(int n,
     l2.push_back(Norm2(error));
     li.push_back(NormInf(error));
 
-    // std::cout << "[ Norm 1  ]  = " << l1.back() << std::endl;
+    // std::cout << "[ Error 1  ]  = " << error(Domain::Index(0,0)) << std::endl;
     // std::cout << "[ Norm 2  ]  = " << l2.back() << std::endl;
     // std::cout << "[ Norm Inf]  = " <<  << std::endl;
 }
@@ -175,7 +242,7 @@ int main(int argc, char** argv) {
     // output to a file
     std::ofstream fout("./fig/error_table.txt",std::ios::out);
 
-    tfm::format(fout, "n,norm1,norm2,norm inf\n");
+    tfm::format(fout, "n,L1-Norm,L2-Norm,Linf-Norm\n");
     auto itervn = vn.begin();
     auto iterl1 = l1.begin();
     auto iterl2 = l2.begin();
@@ -196,4 +263,5 @@ int main(int argc, char** argv) {
 
     // plot residual
     PlotResidual("residual", vn, lr);
+    PlotError("error", vn, l1, l2, li);
 }
