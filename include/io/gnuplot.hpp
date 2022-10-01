@@ -737,7 +737,13 @@ public:
 
         return *this;
     }
+    Gnuplot& set_key(const std::string& c) {
+        std::ostringstream cmdstr;
+        cmdstr << "set key " << c;
+        cmd(cmdstr.str());
 
+        return *this;
+    }
     Gnuplot& set_palette_blue_red() {
         std::ostringstream cmdstr;
         cmdstr

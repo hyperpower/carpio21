@@ -127,10 +127,8 @@ The simple Second Order FVM is applied on this problem.
    
 
 
-Field Face
+Reference
 ===================
-
-The data store on the face of grid cell.
 
 
 .. [Barad2005] Barad, M., & Colella, P. (2005).

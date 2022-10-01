@@ -77,7 +77,7 @@ Triangle intersection method
 - 如果他们相交，结果是什么?
 
 .. jupyter-execute:: ./fig1_tt_ply.py
-   :hide-code:
+    :hide-code:
 
 上图为三维坐标系下的两个三角形。
 

@@ -114,20 +114,27 @@ void PlotError(const std::string& ffn,
     gnu.add(a2);
     gnu.add(ai);
 
-    auto l1ref = Reference(1, ln, l2);
+    auto l1ref = Reference(2, ln, l1);
     auto a1r = ToGnuplotActor(lh, l1ref);
-    a1r.title("1 Order");
+    // a1r.title("2 Order");
     a1r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
 
-    auto l2ref = Reference(2, ln, li);
+    auto l2ref = Reference(2, ln, l2);
     auto a2r = ToGnuplotActor(lh, l2ref);
-    a2r.title("2 Order");
+    a2r.title("2 Order Reference");
     a2r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
+
+    auto liref = Reference(2, ln, li);
+    auto air = ToGnuplotActor(lh, liref);
+    // a2r.title("2 Order");
+    air.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
 
     gnu.add(a1r);
     gnu.add(a2r);
+    gnu.add(air);
 
     gnu.set_terminal_png(OUTPUTPATH + ffn, fig_width, fig_height);
+    gnu.set_key("top left");
     // gnu.test();
 	gnu.plot();
 }
@@ -222,8 +229,8 @@ void PoissonSolver(int n,
     
     PlotFieldAsContour("Poisson_ErrorContour"+ ToString(n), error);
 
-    l1.push_back(Norm1(error));
-    l2.push_back(Norm2(error));
+    l1.push_back(Norm1(IntVolume(error)));
+    l2.push_back(Norm2(error)/n);
     li.push_back(NormInf(error));
 
     // std::cout << "[ Error 1  ]  = " << error(Domain::Index(0,0)) << std::endl;
