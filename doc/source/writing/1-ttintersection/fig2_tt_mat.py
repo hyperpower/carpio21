@@ -3,7 +3,14 @@
 
 import matplotlib.pyplot as plt
 
+from os.path import abspath, join, dirname
+import os, sys
 # %matplotlib inline
+
+
+_PATH_THIS_ = abspath((dirname(__file__)))
+
+
 
 cblue = "#4285F4"
 
@@ -50,5 +57,5 @@ plt.axis('off')
 plt.tight_layout()
 
 # plt.show()
-plt.savefig("./source/writing/1-ttintersection/fig2_tt.png")
+plt.savefig(join(_PATH_THIS_, "fig2_tt.png"))
 # plt.savefig("./fig2_tt.png")
