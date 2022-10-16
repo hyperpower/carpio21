@@ -251,8 +251,6 @@ inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
 }
 
 
-
-
 }
 
 #endif

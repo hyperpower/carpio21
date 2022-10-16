@@ -113,7 +113,7 @@ TEST(equation, Poisson){
     typedef SGhostRegular_<dim, Grid> Ghost;
     typedef SOrderXYZ_<dim, Grid, Ghost> Order;
 
-    std::shared_ptr<Grid>  spgrid(new Grid(p, 80, 1, 2));
+    std::shared_ptr<Grid>  spgrid(new Grid(p, 10, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
     std::shared_ptr<Order> sporder(new Order(spgrid, spghost));
 
