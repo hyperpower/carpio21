@@ -35,14 +35,15 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    'sphinx.ext.mathbase',
+    # 'sphinx.ext.mathbase',
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.intersphinx',
     'matplotlib.sphinxext.plot_directive',
-    'jupyter_sphinx.execute'
+    # 'jupyter_sphinx.execute'
+    'sphinx_exec_code',
     #'breathe' 
     # 'exhale'
 ]

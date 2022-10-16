@@ -17,8 +17,9 @@ Restructure examples
    :numbered:
    :maxdepth: 1
    
-   example
    writing/1-ttintersection/ttintersection
+   writing/2-poisson/poisson
+   example
 
 
 

@@ -56,7 +56,10 @@ public:
                 return _value_type1(fc, *spbc, idxc, idxg, axe, ori, time);
             } else if (spbc->type() == BC::_BC2_) {
                 return _value_type2(fc, *spbc, idxc, idxg, axe, ori, time);
+            }else if(spbc->type() == BC::_BC3_){
+                return _value_type3(f, *spbc, idx, idxg, axe, ori, time) * t.second;
             }
+
         } else {
             return Exp(idxg);
         }
@@ -101,7 +104,7 @@ protected:
                      const Vt&          time = 0.0) const{
         auto oori = Opposite(Orientation(ori));  // opposite orientation
         auto idxb = idxg.shift(axe, oori);
-        int step = 0;
+        int step  = 0;
         while (fc.ghost().is_ghost(idxb)) {
             Shift(idxb, axe, oori);
             step++;
@@ -138,15 +141,16 @@ protected:
         // walk back
         auto oori = Opposite(Orientation(ori));
         auto idxb = idxg.shift(axe, oori);
-        int step  = 0;
+        // int step  = 0;
         while (fc.ghost().is_ghost(idxb)) {
             Shift(idxb, axe, oori);
-            step++;
+            // step++;
         }
         auto fp = fc.grid().f(axe, ori, idxb);
-//        for (int i = 0; i < step; ++i) {
-//            Shift(idxb, axe, oori);
-//        }
+        // auto idxsym = idxb;
+        // for (int i = 0; i < step; ++i) {
+        //    Shift(idxsym, axe, oori);
+        // }
         ASSERT(fc.ghost().is_normal(idxb));
         //  idxb   face  ghost
         // ---x-----|-----g-----
@@ -198,7 +202,7 @@ public:
     typedef typename GRID::Index Index;
 public:
     ApplyBCImplement_(){
-        std::cout << "Apply BC Vt construct" << std::endl;
+        // std::cout << "Apply BC Vt construct" << std::endl;
     };
 
     Vt value(
@@ -216,6 +220,8 @@ public:
                 return this->_value_type1(fc, *spbc, idxc, idxg, axe, ori, time);
             }else if(spbc->type() == BC::_BC2_){
                 return this->_value_type2(fc, *spbc, idxc, idxg, axe, ori, time);
+            }else if(spbc->type() == BC::_BC3_){
+                return this->_value_type3(fc, *spbc, idxc, idxg, axe, ori, time);
             }
         }else{
             return fc(idxg);
@@ -235,15 +241,16 @@ protected:
         // walk back
         auto oori = Opposite(Orientation(ori));  // opposite oritation
         auto idxb = idxg.shift(axe, oori);
-//        int  step = 0;
+    //    int  step  = 0;
         while(fc.ghost().is_ghost(idxb)){ // find nearest normal cell
             Shift(idxb, axe, oori);
-//            step++;
+        //    step++;
         }
         auto fp = fc.grid().f(axe, ori, idxb);   // face point
-//        for(int i = 0; i < step; ++i){
-//            Shift(idxb, axe, oori);
-//        }
+        // auto idxsym = idxb;
+        // for(int i = 0; i < step; ++i){
+        //    Shift(idxsym, axe, oori);
+        // }
         ASSERT(fc.ghost().is_normal(idxb));
         //  idxb   face  ghost
         // ---x-----|-----g-----
@@ -278,10 +285,10 @@ protected:
         // walk back
         auto oori = Opposite(Orientation(ori));
         auto idxb = idxg.shift(axe, oori);
-        int step  = 0;
+        // int step  = 0;
         while(fc.ghost().is_ghost(idxb)){
             Shift(idxb, axe, oori);
-            step++;
+            // step++;
         }
         auto fp = fc.grid().f(axe, ori, idxb);
 //        for(int i = 0; i < step; ++i){
@@ -301,7 +308,25 @@ protected:
         Vt vx = fc(idxb);
         return vx - vbc * (dx + dg);
     }
-
+    Vt _value_type3(const Field&       fc,
+                     const BC&          bc,
+                     const Index&       idxc,
+                     const Index&       idxg,
+                     const St&          axe,
+                     const St&          ori,
+                     const Vt&          time = 0.0) const{
+        // only works for regular ghost
+        auto& grid = fc.grid();
+        auto  n    = grid.n(axe);
+        auto ig    = idxg[axe];
+        Index idxp(idxg);
+        if (ig >= n){
+            idxp[axe] = ig % n;
+        }else if(ig < 0){
+            idxp[axe] = n - std::abs(ig) % n;
+        }
+        return fc(idxp);
+    } 
 };
 
 

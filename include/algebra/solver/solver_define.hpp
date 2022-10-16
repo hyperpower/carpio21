@@ -71,14 +71,8 @@ public:
 		return this->_residual;
 	}
 
-	Arr get_residual_array() const{
-		Arr res(this->_lresid.size());
-		St i = 0;
-		for(auto& val : this->_lresid){
-			res[i] = val;
-			++i;
-		}
-		return res;
+	const Listr& get_residual_array() const{
+		return this->_lresid;
 	}
 
 	virtual ~Solver_() {

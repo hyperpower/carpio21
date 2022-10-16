@@ -467,6 +467,11 @@ public:
 
     }
 
+    inline Gnuplot& test(){
+        cmd("test");
+        return *this;
+    }
+
     /// turns grid on/off
     inline Gnuplot& set_grid() {
         cmd("set grid");
@@ -732,7 +737,13 @@ public:
 
         return *this;
     }
+    Gnuplot& set_key(const std::string& c) {
+        std::ostringstream cmdstr;
+        cmdstr << "set key " << c;
+        cmd(cmdstr.str());
 
+        return *this;
+    }
     Gnuplot& set_palette_blue_red() {
         std::ostringstream cmdstr;
         cmdstr
@@ -1189,6 +1200,29 @@ auto ToGnuplotActor(const X& x, const Y& y,
     return actor;
 }
 
+template<typename X, 
+    typename std::enable_if<
+       (! HasTag<X>::value)   //no tag
+    && std::is_arithmetic<typename X::value_type>::value
+    && IsContainer<X>::value,
+    bool>::type = true>
+auto ToGnuplotActor(const X& x, 
+            const std::string &pcmd = "using 1:2 title \"\" ",
+            const std::string& scmd = ""){
+    GnuplotActor actor;
+    actor.command(pcmd);
+    actor.style(scmd);
+    int n = 0;
+    auto xiter = x.begin();
+    for (; xiter != x.end();) {
+        std::ostringstream sst;
+        sst <<n << " " << (*xiter);
+        actor.data().push_back(sst.str());
+        xiter++;
+        n++;
+    }
+    return actor;
+}
 
 
 }

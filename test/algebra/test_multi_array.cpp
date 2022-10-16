@@ -58,9 +58,10 @@ TEST(array, openmp){
 //  a.show();
 }
 
-TEST(multi_array, openmp){
+TEST(array, std_valarray){
 	// test std::array 
 	// std::array is slower for debug mode
+	std::cout << "test std::valarray" << std::endl;
 	std::valarray<double> a(2.0, 1e7), b(1.0, 1e7);
 	tick_t start = Clock::Tick();
 	b = a + b - a * b + 5.0 * a;

@@ -5,7 +5,7 @@
 #include "algebra/solver/jacobi.hpp"
 #include "gtest/gtest.h"
 
-#include "algebra/io/gnuplot_actor_a.hpp"
+#include "io/gnuplot.hpp"
 
 using namespace carpio;
 
@@ -42,8 +42,8 @@ TEST(matrxi_sparse, matrix_write){
     mm_read_array("./test/input_files/mm/cavity01_rhs1.mtx", arr);
     std::cout << "array size  = " << arr.size() << std::endl;
 
-    MakeDir("./test_output/");
-    mm_write_mtx_sparse("./test_output/mat.mtx", mat);
+    MakeDir("./fig/");
+    mm_write_mtx_sparse("./fig/mat.mtx", mat);
 }
 
 TEST(matrxi_sparse, matrix_jacobi){
@@ -78,13 +78,13 @@ TEST(matrxi_sparse, matrix_jacobi){
     std::cout << "tol      = " << solver.residual() << std::endl;
     //gnuplot_show_ylog(lr);
     // out put --------------------------------------------
-    MakeDir("./test_output/");
-    mm_write_array("./test_output/x.txt", x);
+    MakeDir("./fig/");
+    mm_write_array("./fig/x.txt", x);
     Gnuplot gnu;
     gnu.set_ylogscale();
     gnu.set_xlabel("Iterations, Number of Iterates");
     gnu.set_ylabel("Residual, r = |Ax-b|/|b|");
-    gnu.add(GnuplotActor::Lines(solver.get_residual_array()));
-    gnu.set_terminal_png("./test_output/JacobiResidual", 800, 600);
+    gnu.add(ToGnuplotActor(solver.get_residual_array()));
+    gnu.set_terminal_png("./fig/JacobiResidual", 800, 600);
     gnu.plot();
 }

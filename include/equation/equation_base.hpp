@@ -48,7 +48,7 @@ public:
     typedef std::map<std::string, spBoundaryIndex> BIs;
     typedef std::map<std::string, spEvent>         Events;
 
-    typedef TimeControl_<D::Dim> TimeControl;
+    typedef TimeControl_<D> TimeControl;
     typedef std::shared_ptr<TimeControl> spTimeControl;
 
     typedef StopControl_<D> StopControl;
@@ -92,7 +92,7 @@ public:
 
     virtual ~EquationBase_(){};
 
-    virtual int run_one_step(St step) = 0;
+    virtual int run_one_step(St step, Vt time) = 0;
 
     virtual int initialize() = 0; 
 
@@ -119,7 +119,7 @@ public:
             // events before calculation
             initialize();
             run_events(this->_time->current_step(), //
-                       this->_time->current_step(),    //
+                       this->_time->current_time(),    //
                        Event::START);
             // loop
             while (!this->_time->is_end() && (!_stop->is_stop())) {
@@ -130,7 +130,8 @@ public:
                            Event::BEFORE);
 
                 // run one step =================
-                run_one_step(this->_time->current_step());
+                run_one_step(this->_time->current_step(),
+                             this->_time->current_time());
                 // ==============================
 
                 // events after each step
@@ -179,6 +180,26 @@ public:
         return *(this->_time);
     }
 
+    virtual void set_time_term(St n, Vt dt, Vt tau = 1){
+        this->_time = spTimeControl(
+                           new TimeControl( n, dt, tau));
+        this->_stop = spStopControl(
+                           new StopControl());
+    }
+
+    virtual void set_time_scheme(
+            const std::string& name,
+            const Vt&          v = 0.5){
+        ASSERT(name == "explicit"
+            || name == "implicit"
+            || name == "CN"
+            || name == "CNgeneral");
+        this->_configs["set_time_scheme"] = name;
+        if(name == "CNgeneral"){
+            this->_configs["cn_omega"] = v;
+        }
+    }
+
     bool has_field(const std::string& key) const {
         auto it = this->_fields.find(key);
         if (it != this->_fields.end()) {
@@ -193,7 +214,7 @@ public:
             throw std::invalid_argument( key + "is not fields" );
         }
     }
-    bool has_flag(const std::string& key) const {
+    bool has_config(const std::string& key) const {
         auto it = this->_configs.find(key);
         if (it != this->_configs.end()) {
             return true;
@@ -214,6 +235,11 @@ public:
         if (name == "SOR") {
             this->_configs["SOR_omega"] = any;
         }
+    }
+
+    spSolver get_solver(){
+        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        return spsolver;
     }
     
     bool has_boundary_index(const std::string& key) const {
@@ -289,7 +315,7 @@ protected:
     virtual spSolver _init_solver() {
         // initial solver
         spSolver spsolver;
-        if (this->has_flag("set_solver")) {
+        if (this->has_config("set_solver")) {
             std::string sn = any_cast<std::string>(
                     this->_configs["set_solver"]);
             Vt  tol      = any_cast<Vt>(this->_configs["set_solver_tolerence"]);
@@ -299,7 +325,7 @@ protected:
             } else if (sn == "CG") {
                 spsolver = spSolver(new Solver_CG(max_iter, tol));
             } else if (sn == "SOR") {
-                ASSERT(this->has_flag("SOR_omega"));
+                ASSERT(this->has_config("SOR_omega"));
                 Vt omega = any_cast<Vt>(this->_configs["SOR_omega"]);
                 spsolver = spSolver(new Solver_SOR(max_iter, tol, omega));
             }

@@ -7,43 +7,32 @@
 
 namespace carpio{
 
+// template<class FIELD, class BI>
+// FIELD IntLaplacian(const FIELD& field, BI bi, const std::string& method){
+//     IntLaplacianImplement_<FIELD,   FIELD::Dim,
+//                         typename FIELD::ValueType,
+//                         typename FIELD::Grid, 
+//                         typename FIELD::Ghost,
+//                         typename FIELD::Order,
+//                         typename FIELD::Tag
+//                         > imp;
+//     // std::cout << "[  Laplace ] field, bi" << std::endl;
+//     imp.set_method(method);
+//     return imp.execute(field, bi);
+// }
 template<class FIELD, class BI>
-FIELD Laplacian(const FIELD& field, BI bi, const std::string& method){
-    LaplacianImplement_<FIELD,   FIELD::Dim,
+FIELD IntLaplacian(const FIELD& field, BI bi, double t=0.0){
+    // std::cout << "IntLaplacian field with bi" << std::endl;
+    IntLaplacianImplement_<FIELD,   FIELD::Dim,
                         typename FIELD::ValueType,
                         typename FIELD::Grid, 
                         typename FIELD::Ghost,
                         typename FIELD::Order,
                         typename FIELD::Tag
                         > imp;
-    // std::cout << "[  Laplace ] field, bi" << std::endl;
-    imp.set_method(method);
-    return imp.execute(field, bi);
+    return imp.execute(field, bi, t);
 }
-template<class FIELD, class BI>
-FIELD Laplacian(const FIELD& field, BI bi){
-    // std::cout << "Laplacian field with bi" << std::endl;
-    LaplacianImplement_<FIELD,   FIELD::Dim,
-                        typename FIELD::ValueType,
-                        typename FIELD::Grid, 
-                        typename FIELD::Ghost,
-                        typename FIELD::Order,
-                        typename FIELD::Tag
-                        > imp;
-    return imp.execute(field, bi);
-}
-template<class FIELD>
-FIELD Laplacian(const FIELD& field){
-    // std::cout << "Laplacian field NO bi" << std::endl;
-    LaplacianImplement_<FIELD,   FIELD::Dim,
-                        typename FIELD::ValueType,
-                        typename FIELD::Grid, 
-                        typename FIELD::Ghost,
-                        typename FIELD::Order,
-                        typename FIELD::Tag
-                        > imp;
-    return imp.execute(field);
-}
+
 
 template<class FIELD>
 typename FIELD::ValueType Norm1(const FIELD& field,typename FIELD::Tag);
@@ -68,6 +57,15 @@ template<class FIELD>
 typename FIELD::ValueType NormInf(const FIELD& field){
     typename FIELD::Tag t; 
     return NormInf(field, t);
+}
+
+template<class FIELD>
+FIELD IntVolume(const FIELD& field,typename FIELD::Tag);
+
+template<class FIELD>
+FIELD IntVolume(const FIELD& field){
+    typename FIELD::Tag t; 
+    return IntVolume(field, t);
 }
 // Interpolate
 template<class FIELD, class BDYIDX>

@@ -226,7 +226,15 @@ operator*(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs,
     return lhs;
 }
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator*(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+          const VT& rhs){
+    lhs *= rhs;
+    return lhs;
+}
+template<St DIM, class VT, class GRID, class GHOST, class ORDER>
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator/(
           SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
     const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
     lhs /= rhs;
@@ -234,7 +242,8 @@ inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
 }
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator/(
     SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
     lhs /= rhs;
     return lhs;
