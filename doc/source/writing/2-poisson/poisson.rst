@@ -37,13 +37,64 @@ Therefore, we can generate :math:`\Phi_k(x)` by :math:`\phi_(x_i)`
 :math:`\Phi_k(x)` proximates :math:`\phi(x)` at :math:`x = x_{i+1}`,
 
 .. math::
-    \Phi_k(x_{i+1}) &\approx \phi(x_{i+1}) \\
+     \phi(x_{i+1}) &\approx \Phi_k(x_{i+1})\\
       &=\phi(x_i) +\phi^{\prime}(x_i)(x_{i+1}-x_i) \\
          &+\frac{\phi^{\prime \prime}(x_i)}{2 !}(x_{i+1}-x_i)^2
          +\ldots
          +\frac{\phi^{(k)}(x_i)}{k !}(x_{i+1}-x_i)^k
     
-where,
+where, :math:`h = x_{i+1}-x_i` in a uniform grid. 
+
+.. math::
+     \phi(x_{i+1}) &\approx \Phi_k(x_{i+1})\\
+      &=\phi(x_i) +\phi^{\prime}(x_i) h 
+         +\frac{\phi^{\prime \prime}(x_i)}{2}h^2
+         +\frac{\phi^{\prime \prime \prime}(x_i)}{3 !}h^3 + \ldots
+
+:math:`\Phi_k(x_{i-1})` obtained in the same way.
+
+.. math::
+     \phi(x_{i-1}) &\approx \Phi_k(x_{i-1})\\
+      &=\phi(x_i) - \phi^{\prime}(x_i) h 
+         +\frac{\phi^{\prime \prime}(x_i)}{2}h^2
+         -\frac{\phi^{\prime \prime \prime}(x_i)}{3 !}h^3 + \ldots
+
+derivatives on cell face, :math:`\frac{d \phi}{d x}_{x + \frac{1}{2}}`, can be obtained by,
+
+.. math::
+    \frac{\partial \phi}{\partial x}_{i + \frac{1}{2}} & \approx 
+    (\Phi_k(x_{i+1}) - \Phi_k(x_i)) / h \\
+    & = \phi^{\prime}(x_i)
+        +\frac{\phi^{\prime \prime}(x_i)}{2}h
+        +\frac{\phi^{\prime \prime \prime}(x_i)}{3 !}h^2 + \ldots
+
+.. math::
+    \frac{\partial \phi}{\partial x}_{i - \frac{1}{2}} & \approx
+    (\Phi_k(x_{i}) - \Phi_k(x_{i-1})) / h \\
+    &= \phi^{\prime}(x_i) 
+       - \frac{\phi^{\prime \prime}(x_i)}{2}h
+       + \frac{\phi^{\prime \prime \prime}(x_i)}{3 !}h^2 + \ldots
+
+Therefore,
+
+.. math::
+    \frac{\partial^2 \phi}{\partial x^2}_{i} & \approx
+    (\Phi_k(x_{i+1}) - \Phi_k(x_i) - \Phi_k(x_i) + \Phi_k(x_{i-1})) / h^2 \\
+    &= (\phi^{\prime}(x_i)
+       + \frac{\phi^{\prime \prime}(x_i)}{2}h
+       + \frac{\phi^{\prime \prime \prime}(x_i)}{3 !}h^2
+       - \phi^{\prime}(x_i) 
+       + \frac{\phi^{\prime \prime}(x_i)}{2}h
+       - \frac{\phi^{\prime \prime \prime}(x_i)}{3 !}h^2 + \ldots) / h \\
+    &= (\phi^{(2)}(x_i) h + 2 \frac{\phi^{(4)}(x_i)}{4!} h^3 + \ldots) / h \\
+    &= \phi^{(2)}(x_i)  + \frac{\phi^{(4)}(x_i)}{12} h^2 + \ldots \\
+    &= \phi^{(2)}(x_i)  + \frac{h^2}{12} \phi^{(4)}(x_i) + \frac{h^4}{360} \phi^{(6)}(x_i)\ldots
+
+Similar partial derivative of :math:`\phi` at grid point :math:`ijk` in y- and z- directions.
+
+.. math::
+    \frac{\partial^2 \phi}{\partial x^2}_{ijk} \approx 
+     \phi^{(2)}_{ijk} + \frac{h^2}{12} \phi^{(4)}(x_i) + \frac{h^4}{360} \phi^{(6)}(x_i)\ldots
 
 
 2-Order Scheme

@@ -76,7 +76,8 @@ Triangle intersection method
 - 三角形 :math:`U` 是否与 :math:`V` 相交?
 - 如果他们相交，结果是什么?
    
-
+.. jupyter-execute:: fig1_tt_ply.py
+    :hide-code:
 
 上图为三维坐标系下的两个三角形。
 

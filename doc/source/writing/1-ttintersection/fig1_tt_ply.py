@@ -16,7 +16,7 @@ else:
 from plotly_helper import *
 # sys.path.append(p)
 
-_PATH_THIS_ = abspath((dirname(__file__)))
+# _PATH_THIS_ = abspath((dirname(__file__)))
 
 # data part
 t1 = [
@@ -131,6 +131,6 @@ fig.update_layout(
 )
 
 
-# fig.write_image("fig1.png")
-fig.write_html(join(_PATH_THIS_, "fig1_tt.div"),full_html=False)
+# fig.write_html("fig1.html")
+# fig.write_html(join(_PATH_THIS_, "fig1_tt.div"),full_html=False)
 # fig.show()
