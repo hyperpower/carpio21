@@ -104,6 +104,12 @@ Let us introduce the operator :math:`\delta^2_x \phi` , which represents the cen
 
     \frac{\partial^2 \phi}{\partial x^2} \mid _{ijk} = \delta^2_x \phi_{ijk} + O(h^2)
 
+.. math::
+   :label: delta2xdefine
+
+    \delta^2_x \phi_{ijk} &= \frac{(\phi_{i+1,j,k} - \phi_{i,j,k}) / h - (\phi_{i,j,k} - \phi_{i-1,j,k}) / h }{h} \\
+    &= \frac{\phi_{i+1,j,k} - 2 \phi_{i,j,k} + \phi_{i-1,j,k}}{h^2} 
+
 
 Similar partial derivative of :math:`\phi` at grid point :math:`ijk` in y- and z- directions.
 

@@ -57,4 +57,3 @@ TEST(test_plotly, test2) {
     plotly.write("./fig/out", "png");
     
 }
-
