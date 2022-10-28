@@ -108,6 +108,14 @@ public:
         // Py_DecRef(pov); 
         return dict;
     }
+    PyObject* dict_set(PyObject* dict, const std::string& key, const int& val){
+        PyObject* pok    = Py_BuildValue("s", key.c_str()); 
+        PyObject* pov    = Py_BuildValue("i", val);
+        PyDict_SetItem(dict, pok, pov);
+        Py_DecRef(pok); 
+        // Py_DecRef(pov); 
+        return dict;
+    }
     PyObject* dict_set(PyObject* dict, const std::string& key, const std::string& val){
         PyObject* pok    = Py_BuildValue("s", key.c_str()); 
         PyObject* pov    = Py_BuildValue("s", val.c_str());

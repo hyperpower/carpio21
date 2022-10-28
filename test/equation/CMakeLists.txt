@@ -9,9 +9,23 @@ set(Sources
 
 add_executable(${This} ${Sources})
 
+find_package(Python COMPONENTS Interpreter Development)
+
+IF(Python_FOUND)
+  INCLUDE_DIRECTORIES("${Python_INCLUDE_DIRS}")
+ELSE()
+  MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
+ENDIF()
+
 target_link_libraries(${This} PUBLIC
     gtest_main
 )
+
+if(Python_FOUND)
+  target_link_libraries(${This} PUBLIC ${Python_LIBRARIES})
+ELSE()
+  MESSAGE(FATAL_ERROR "Unable to link python libraries")
+ENDIF()
 
 add_test(
     NAME ${This}

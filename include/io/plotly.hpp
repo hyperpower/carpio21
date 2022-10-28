@@ -570,6 +570,12 @@ public:
         _py->call_method(this->_trace, "update", dict); 
         Py_DECREF(dict);
     }
+    void update(const std::string& key, const int& val){
+        pPO dict = PyDict_New();
+        dict = _py->dict_set(dict, key, val);
+        _py->call_method(this->_trace, "update", dict); 
+        Py_DECREF(dict);
+    }
     void update_true(const std::string& key){
         pPO dict = PyDict_New();
         dict = _py->dict_set(dict, key, Py_True);
@@ -597,7 +603,7 @@ public:
     template<class CONTAINER, ENABLE_IF_1D_ARITHMATIC(CONTAINER)> 
     void data(const CONTAINER& con, const std::string& name,int jump = 0){
         PyObject* l = _py->to_list(con, jump);
-        PyObject_SetAttrString(this->_trace, name, l);
+        PyObject_SetAttrString(this->_trace, name.c_str(), l);
     }
     template<class CONTAINER, ENABLE_IF_1D_ARITHMATIC(CONTAINER)> 
     void data_x(const CONTAINER& con, int jump = 0){

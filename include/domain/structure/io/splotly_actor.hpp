@@ -4,6 +4,7 @@
 #include "domain/base/base_plotly_actor.hpp"
 #include "domain/structure/grid/sgrid.hpp"
 #include "domain/structure/grid/uniform.hpp"
+#include "domain/structure/field/sfield_center.hpp"
 #include "s_stringify.hpp"
 
 namespace carpio{
@@ -73,6 +74,21 @@ auto _ToPlotlyActorPoints(const ANY& a, SGridTag){
     Tag t;
     DimTag dtag;
     return _ToPlotlyActorPointsDim(a, t, dtag); 
+}
+template<class ANY>
+auto _ToPlotlyActorVolume(const ANY& f, SFieldCenterTag){
+    PlotlyActor actor("Volume");
+    std::list<typename ANY::Grid::Point> list;
+    std::list<double> lvalue;
+
+    for(auto& index : f.order()){
+        auto pc   = f.grid().c(index);
+        list.emplace_back(pc);
+        lvalue.emplace_back(f(index));
+    }
+    actor.data_xyz(list);
+    actor.data(lvalue, std::string("value"));
+    return actor;
 }
 
 }

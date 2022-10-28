@@ -28,6 +28,16 @@ PlotlyActor ToPlotlyActorPoints(const ANY& a){
     Tag t;
     return _ToPlotlyActorPoints(a, t); 
 }
+template<class ANY,
+        typename std::enable_if<
+            std::is_base_of<DomainTag, typename ANY::Tag>::value,
+        bool>::type = true >
+PlotlyActor ToPlotlyActorVolume(const ANY& a){
+    typedef typename ANY::Tag Tag;
+    Tag t;
+    return _ToPlotlyActorVolume(a, t); 
+}
+
 }
 
 #endif

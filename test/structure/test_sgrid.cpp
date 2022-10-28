@@ -21,7 +21,6 @@ TEST(sgrid, initial){
 	spGridUniform spsg(new GridUniform(pmin, {10, 10}, 0.3, 2));
 
 	
-
 	Gnuplot gnu;
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 3.5);
