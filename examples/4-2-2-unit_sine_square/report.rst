@@ -22,9 +22,13 @@ This test is in [Barad2005]_.
 
    Exact Solution.
 
-Numerical Error
+
+
+Convergence Test
 =======================
 
+Rate of Convergence
+^^^^^^^^^^^^^^^^^^^^^^^
 
 The error :math:`E` is obtained by
 
@@ -61,6 +65,29 @@ line with slop :math:`m`. If the cell size :math:`h` reduced to :math:`h/2`,
 
    m = \log_2 \frac{E_h}{E_{h/2}}
 
+Norm
+^^^^^^^^^^^^^^^^^^^^^^
+
+Given a computational domain :math:`\Omega` whose resolution is :math:`h`, :math:`V_i` is cell volume. :math:`V_{\Omega}` is the volume of the whole domain.
+
+
+.. math::
+   :label: norm1
+
+   \|E\|_1=\frac{1}{V_{\Omega}} \int_{\Omega}\left|E_i\right| d V=\frac{1}{V_{\Omega}} \sum_{i \in \Omega}\left|E_i\right| V_i
+
+.. math::
+   :label: norm2
+
+   \|E\|_2=\left(\frac{1}{V_{\Omega}} \int_{\Omega}\left|E_i\right|^2 d V\right)^{\frac{1}{2}}
+   =\left(\frac{1}{V_{\Omega}} \sum_{i \in \Omega}\left|E_i\right|^2V_i\right)^{\frac{1}{2}}
+
+.. math::
+   :label: norminf
+
+   \|E\|_{\infty}=\max _{i \in \Omega}\left|E_i\right|
+
+Definition can be found in [Devendran2017]_.
 
 
 Second Order Finite Volume Method
@@ -135,3 +162,9 @@ Reference
            A fourth-order accurate local refinement method for Poisson's equation. 
            Journal of Computational Physics, 209(1), 1-18.
            https://doi.org/10.1016/j.jcp.2005.02.027
+
+
+.. [Devendran2017] Devendran, D., Graves, D. T., Johansen, H., & Ligocki, T. (2017). 
+                   A fourth-order cartesian grid embedded boundary method for poisson’s equation. 
+                   Communications in Applied Mathematics and Computational Science, 12(1), 51–79. 
+                   https://doi.org/10.2140/camcos.2017.12.51

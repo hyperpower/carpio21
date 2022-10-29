@@ -11,6 +11,7 @@ set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 # location of header files
 INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/../../include
+    ${PROJECT_SOURCE_DIR}/../cpptools
 )
 
 add_executable(main ${SOURCE_FILES})

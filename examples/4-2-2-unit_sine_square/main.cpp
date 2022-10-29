@@ -6,6 +6,7 @@
 #include "domain/structure/structure.hpp"
 #include "equation/equation.hpp"
 
+
 using namespace carpio;
 
 const std::size_t dim = 2;
@@ -228,13 +229,9 @@ void PoissonSolver(int n,
     
     PlotFieldAsContour("Poisson_ErrorContour"+ ToString(n), error);
 
-    l1.push_back(Norm1(IntVolume(error)));
-    l2.push_back(Norm2(error)/n);
+    l1.push_back(Norm1(error));
+    l2.push_back(Norm2(error));
     li.push_back(NormInf(error));
-
-    // std::cout << "[ Error 1  ]  = " << error(Domain::Index(0,0)) << std::endl;
-    // std::cout << "[ Norm 2  ]  = " << l2.back() << std::endl;
-    // std::cout << "[ Norm Inf]  = " <<  << std::endl;
 }
 
 int main(int argc, char** argv) {

@@ -59,7 +59,7 @@ void PlotFieldAsVolume(const std::string& fn, const Field& a){
     actor.update("surface_count", int(21));
     // actor.update_true("showlegend");
     plotly.add(actor);
-    plotly.write(OUTPUTPATH + fn, "html");
+    plotly.write(OUTPUTPATH + fn, "div");
 }
 
 void PlotResidual(const std::string& ffn, 
@@ -234,9 +234,6 @@ void PoissonSolver(int n,
 
     equ.run();
     
-    // PlotFieldAsVolume("Poisson_SolutionContour" + ToString(n), equ.field("phi"));
-    // // PlotFieldAsContour("Poisson_SolutionContour" + ToString(n), equ.field("phi"));
-
     //residual 
     auto spsolver = equ.get_solver();
     lr.push_back(spsolver->get_residual_array());
@@ -250,16 +247,10 @@ void PoissonSolver(int n,
         return std::sin(_PI_ * x) * std::sin(_PI_ * y)* std::sin(_PI_ * z);
     });
     auto error = exact - equ.field("phi");
-    
-    // PlotFieldAsContour("Poisson_ErrorContour"+ ToString(n), error);
 
-    l1.push_back(Norm1(IntVolume(error)));
-    l2.push_back(Norm2(error)/std::sqrt(std::pow(n, dim)));
+    l1.push_back(Norm1(error));
+    l2.push_back(Norm2(error));
     li.push_back(NormInf(error));
-
-    // std::cout << "[ Error 1  ]  = " << error(Domain::Index(0,0)) << std::endl;
-    // std::cout << "[ Norm 2  ]  = " << l2.back() << std::endl;
-    // std::cout << "[ Norm Inf]  = " <<  << std::endl;
 }
 
 void OutputError(
