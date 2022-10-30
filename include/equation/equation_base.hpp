@@ -284,6 +284,10 @@ public:
             _stop->add_condition(std::dynamic_pointer_cast<EventCondition>(spe));
         }
     }
+
+    void set_method(const std::string& name){
+        this->_configs["method"] = name;
+    }
     
 protected:
     void new_field(const std::string& name){

@@ -11,7 +11,7 @@ const std::string OUTPUTPATH = "./fig/";
 const int fig_width  = 800;
 const int fig_height = 600;
 
-TEST(equation, DISABLED_explicit_run){
+TEST(equation, explicit_run){
     std::cout << "[  Laplace ] Test"<<std::endl;
     const int dim = 2;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;
@@ -86,7 +86,7 @@ TEST(equation, DISABLED_explicit_run){
 
 }
 
-TEST(equation, explicit_3d){
+TEST(equation, DISABLED_explicit_3d){
     std::cout << "[  Laplace ] Test"<<std::endl;
     const int dim = 3;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;

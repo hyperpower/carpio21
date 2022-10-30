@@ -43,7 +43,7 @@ public:
             int istep = -1, int flag = 0) :
          _sn(sname),
          Event(is, ie, istep, flag) {
-        _format = "%s_%d_%8.4e.png";
+        _format = "%s_%d_%8.4e";
         _path   = "./";
 
         _spgnu         = std::shared_ptr<Gnuplot>(new Gnuplot());
@@ -61,7 +61,7 @@ public:
                 int istep = -1, int flag = 0) :
              _sn(sname),
              Event(is, ie, istep, flag) {
-            _format = "%s_%d_%8.4e.png";
+            _format = "%s_%d_%8.4e";
             _path   = "./";
 
             _spgnu         = std::shared_ptr<Gnuplot>(new Gnuplot());

@@ -41,6 +41,15 @@ public:
 
     // void set(const int& other){std::cout << "int" << std::endl;}
 };
+template<class FIELD, St DIM, class VT, 
+         class GRID, class GHOST, class ORDER, 
+         class TRAIT>
+class LaplacianImplement_{
+public:
+    LaplacianImplement_(){
+        std::cout << "Laplacian Implement" << std::endl;
+    };
+};
 template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
 class ApplyBCImplement_{
 public:

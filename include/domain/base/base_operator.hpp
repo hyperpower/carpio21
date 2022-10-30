@@ -30,9 +30,21 @@ FIELD IntLaplacian(const FIELD& field, BI bi, double t=0.0){
                         typename FIELD::Order,
                         typename FIELD::Tag
                         > imp;
-    return imp.execute(field, bi, t);
+    return imp.execute(field, bi, t); 
 }
-
+// Laplacian Finite Difference Method
+template<class FIELD, class BI>
+FIELD Laplacian(const FIELD& field, BI bi, double t=0.0){
+    // std::cout << "IntLaplacian field with bi" << std::endl;
+    LaplacianImplement_<FIELD,   FIELD::Dim,
+                        typename FIELD::ValueType,
+                        typename FIELD::Grid, 
+                        typename FIELD::Ghost,
+                        typename FIELD::Order,
+                        typename FIELD::Tag
+                        > imp;
+    return imp.execute(field, bi, t); 
+}
 
 template<class FIELD>
 typename FIELD::ValueType Norm1(const FIELD& field,typename FIELD::Tag);

@@ -66,6 +66,33 @@ public:
     }; 
 
     virtual int solve(){
+        if(this->has_config("method")){
+            auto m = any_cast<std::string>(this->_configs["method"]);
+            if(m == "finite_volume_2"){
+                return _solve_finite_volume_2();
+            }
+        } else{
+            return _solve_finite_volume_2();
+        }
+    }
+    
+    void set_phi(spFieldCenter spphi){
+        this->_fields["phi"] = spphi;
+    }
+    void set_source(spFieldCenter spsource){
+        this->_fields["source"] = spsource;
+    }
+
+    void set_source(FunXYZT_Value fun){
+        auto& source = *(this->_fields["source"]);
+        source.assign(fun);
+    }
+    void set_source(FunXYZ_Value fun){
+        auto& source = *(this->_fields["source"]);
+        source.assign(fun);
+    }
+protected:
+    int _solve_finite_volume_2(){
         FieldCenter&    phi  = *(this->_fields["phi"]);
         auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
         auto expf     = this->new_field_exp();
@@ -86,23 +113,6 @@ public:
 //        x.show();
         return any_cast<int>(this->_configs["solver_return_code"]);
     }
-    
-    void set_phi(spFieldCenter spphi){
-        this->_fields["phi"] = spphi;
-    }
-    void set_source(spFieldCenter spsource){
-        this->_fields["source"] = spsource;
-    }
-
-    void set_source(FunXYZT_Value fun){
-        auto& source = *(this->_fields["source"]);
-        source.assign(fun);
-    }
-    void set_source(FunXYZ_Value fun){
-        auto& source = *(this->_fields["source"]);
-        source.assign(fun);
-    }
-
 
 };
 
