@@ -11,6 +11,7 @@ const std::string OUTPUTPATH = "./fig/";
 const int fig_width  = 800;
 const int fig_height = 600;
 
+
 TEST(equation, explicit_run){
     std::cout << "[  Laplace ] Test"<<std::endl;
     const int dim = 2;
@@ -30,9 +31,10 @@ TEST(equation, explicit_run){
     typedef StructureDomain_<dim, Grid, Ghost, Order> Domain;
 
     typedef Laplace_<Domain> Laplace;
+    typedef Poisson_<Domain> Poisson;
 
     // Define the equation
-    Laplace equ(spgrid, spghost, sporder);
+    Poisson equ(spgrid, spghost, sporder);
 
     // Set boundary condition
     typedef std::shared_ptr<BoundaryIndex> spBI;
@@ -48,10 +50,12 @@ TEST(equation, explicit_run){
     equ.set_boundary_index("phi", spbi);
 
     // Set time term
-    equ.set_time_term(50, 1e-3);
+    // equ.set_time_term(50, 1e-3);
 
     // Set solver
     equ.set_solver("Jacobi", 1000, 1e-4);
+
+    equ.set_space_scheme("finite_difference_2");
 
 
     // Add events
@@ -83,6 +87,18 @@ TEST(equation, explicit_run){
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
 
     equ.run();
+
+    Gnuplot gnu;
+	gnu.set_xrange(-0.1, 1.1);
+	gnu.set_yrange(-0.1, 1.1);
+	gnu.set_ylabel("y");
+	gnu.set_xlabel("x");
+	gnu.set_equal_aspect_ratio();
+	gnu.set_palette_blue_red();
+	gnu.add(ToGnuplotActorContour(equ.field("phi")));
+    gnu.set_terminal_png(OUTPUTPATH + "phi", fig_width, fig_height);
+	gnu.plot();
+
 
 }
 

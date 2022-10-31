@@ -66,11 +66,15 @@ public:
     }; 
 
     virtual int solve(){
-        if(this->has_config("method")){
-            auto m = any_cast<std::string>(this->_configs["method"]);
+        if(this->has_config("space_scheme")){
+            auto m = any_cast<std::string>(this->_configs["space_scheme"]);
             if(m == "finite_volume_2"){
                 return _solve_finite_volume_2();
             }
+            if(m == "finite_difference_2"){
+                return _solve_finite_difference_2();
+            }
+            return 0;
         } else{
             return _solve_finite_volume_2();
         }
@@ -110,10 +114,26 @@ protected:
         Arr x = phi.to_array();
         this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
         phi.assign(x);
-//        x.show();
         return any_cast<int>(this->_configs["solver_return_code"]);
     }
 
+    int _solve_finite_difference_2(){
+        FieldCenter&    phi  = *(this->_fields["phi"]);
+        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        auto expf     = this->new_field_exp();
+        auto bis      = this->get_boundary_index("phi");
+
+        auto res = Laplacian((*expf), (*bis)) - (*(this->_fields["source"]));
+
+        Mat a;
+        Arr b;
+        BuildMatrix(res, a, b);
+        // prepare x
+        Arr x = phi.to_array();
+        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        phi.assign(x);
+        return any_cast<int>(this->_configs["solver_return_code"]);
+    }
 };
 
 

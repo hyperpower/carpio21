@@ -285,8 +285,8 @@ public:
         }
     }
 
-    void set_method(const std::string& name){
-        this->_configs["method"] = name;
+    void set_space_scheme(const std::string& name){
+        this->_configs["space_scheme"] = name;
     }
     
 protected:

@@ -50,6 +50,15 @@ public:
         std::cout << "Laplacian Implement" << std::endl;
     };
 };
+template<class FIELD, St DIM, class VT, 
+         class GRID, class GHOST, class ORDER, 
+         class TRAIT>
+class L4AlterImplement_{
+public:
+    L4AlterImplement_(){
+        std::cout << "Laplacian Implement" << std::endl;
+    };
+};
 template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER, class TRAIT>
 class ApplyBCImplement_{
 public:

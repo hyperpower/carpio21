@@ -75,6 +75,9 @@ public:
             auto& phi = *(this->_fields["phi"]);
             this->_fields["inverse_volume"] = std::make_shared<FieldCenter>(phi.new_inverse_volume());
         }
+        if(! this->has_config("space_scheme")){  // set default space scheme
+            this->set_space_scheme("finite_volume_2");  
+        }
         return 0;
     }; 
 
