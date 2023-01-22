@@ -277,7 +277,7 @@ void Uniform3(){
 
 
 int main(int argc, char** argv) {
-	std::cout << "here" << std::endl;
+	std::cout << "-------- Main ------" << std::endl;
     Uniform1();
     Uniform2();
 	Uniform3();
