@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "utility/binary_tree.hpp"
+#include "utility/avl_tree.hpp"
 #include "geometry/geometry.hpp"
 #include "io/gnuplot.hpp"
 
@@ -17,6 +18,9 @@ namespace carpio {
 
 typedef TreeNode_<int, 2> Node;
 typedef SortedBinaryTree_<Node> BinaryTree;
+
+
+typedef AvlTree_<Node> AvlTree;
 
 void AddNode(
     int order, Gnuplot& gnu,
@@ -108,6 +112,7 @@ std::ostream& operator<<(std::ostream& stream, const PlotInfo& v) {
 
 typedef TreeNode_<PlotInfo, 2> PlotNode;
 typedef SortedBinaryTree_<PlotNode> PlotTree;
+typedef AvlTree_<PlotNode> PlotAvlTree;
 
 void visit_plus_x(PlotTree::pNode pn, double v){
     pn->value.x += v;
@@ -132,8 +137,10 @@ bool IncreaseX(PlotTree& tree, PlotTree::pNode pn, int d){
     if(nei != nullptr){
         if(nei->value.x == pn->value.x){
             auto ca = tree.common_ancestor(pn, d);
-            ca->right_child->pre_order(visit_plus_x, 1.0);
-            ca->left_child->pre_order(visit_plus_x, -1.0);
+            if(ca != nullptr){
+                ca->right_child->pre_order(visit_plus_x, 1.0);
+                ca->left_child->pre_order(visit_plus_x, -1.0);
+            }
             return true;
         }
     }
@@ -141,7 +148,7 @@ bool IncreaseX(PlotTree& tree, PlotTree::pNode pn, int d){
 }
 void UpdateXY(PlotTree& tree, PlotTree::pNode pn){
     // increase y by father
-    if(pn->father != nullptr){
+    if(pn->father != nullptr || pn != tree.root()){
         pn->value.y = pn->father->value.y - 2;
         pn->value.x = pn->father->value.x;
     }
@@ -157,6 +164,28 @@ void UpdateXY(PlotTree& tree, PlotTree::pNode pn){
         // std::cout << *pn << std::endl;
         // std::cout << "--------------" << std::endl;
     }
+}
+
+void Update(PlotTree& tree, PlotTree::pNode pn){
+    // increase y by father
+    if (pn == nullptr){
+        return;
+    }
+    if(pn->father != nullptr && pn != tree.root()){
+        pn->value.y = pn->father->value.y - 2;
+        // pn->value.x = pn->father->value.x;
+    }else{
+        pn->value.y = 0;
+        pn->value.x = 0;
+    }
+    // increase x by neighbor
+    bool ur, ul;
+    do{
+        ur = IncreaseX(tree, pn, PlotTree::Node::_RIGHT_);
+        ul = IncreaseX(tree, pn, PlotTree::Node::_LEFT_);
+    }while(ur || ul);
+    Update(tree, pn->left_child);
+    Update(tree, pn->right_child);
 }
 
 TEST(binary_tree, plot){
@@ -209,34 +238,78 @@ void visit(BinaryTree::pNode pn, int& count){
     count++;
 }
 
+void output_node(const PlotAvlTree::pNode pn){
+    if(pn == nullptr){
+        std::cout << " cur  =  null" << std::endl;
+        return;
+    }
+    std::cout << "cur.value   = " << pn->value << std::endl;
+    if (pn->father == nullptr){
+        std::cout << "father      = null \n";
+    }else{
+        std::cout << "father.value= " << pn->father->value << std::endl;
+    }
+    if (pn->left_child == nullptr){
+        std::cout << "left        = null \n";
+    }else{
+        std::cout << "left.value  = " << pn->left_child->value << std::endl;
+    }
+    if (pn->right_child == nullptr){
+        std::cout << "right       = null \n";
+    }else{
+        std::cout << "right.value = " << pn->right_child->value << std::endl;
+    }
+}
 
-TEST(binary_tree, sorted){
 
-    BinaryTree tree;
-    BinaryTree t2;
+TEST(avl_tree, basic){
 
-    t2 = tree;
+    PlotAvlTree tree;
+    tree.insert({3, 0, 0});
+    auto pn = tree.insert({4, 0, 0});
+    std::cout << "is right = " << pn->is_right_child() << std::endl;
+    tree.insert({2, 0, 0});
+    tree.insert({1, 0, 0});
+    tree.insert({5, 0, 0});
+    tree.insert({0.5, 0, 0});
+    tree.insert({4.1, 0, 0});
+    tree.insert({2.1, 0, 0});
+    tree.insert({1.1, 0, 0});
+    tree.insert({4.14, 0, 0});
+    tree.insert({4.15, 0, 0});
+    output_node(tree.root()->left_child);
+    // std::cout << tree.root()->value << std::endl;
+    // std::cout << tree.root()->left_child->value << std::endl;
+    // std::cout << tree.root()->right_child->value << std::endl;
+    // std::cout << tree.root()->left_child->left_child->value << std::endl;
+    // std::cout << tree.root()->left_child->right_child->value << std::endl;
 
-    tree.insert(3);
-    tree.insert(5);
-    tree.insert(2);
-    tree.insert(1);
-    // tree.insert(3);
-    tree.insert(4);
+    Update(tree, tree.root());
+    // UpdateXY(tree, tree.insert({2.5, 0, 0}));
+    // UpdateXY(tree, tree.insert({3.5, 0, 0}));
+    // UpdateXY(tree, tree.insert({3.1, 0, 0}));
+    // UpdateXY(tree, tree.insert({3.6, 0, 0}));
+    // UpdateXY(tree, tree.insert({2.4, 0, 0}));
+    // UpdateXY(tree, tree.insert({2.6, 0, 0}));
+    // UpdateXY(tree, tree.insert({2.7, 0, 0}));
+    // UpdateXY(tree, tree.insert({3.65, 0, 0}));
 
-    std::cout << "tree is empty " << tree.empty() << std::endl;
-    std::cout << "height = " << tree.height() << std::endl;
-    ASSERT_EQ(tree.empty(), 0);
-    int c =0;
-    tree.pre_order(visit, c);
-    auto pn = tree.root();
-    pn = pn->child(1);
-    std::cout << "pn child(1) = " << pn->value << std::endl;
-    std::cout << "pn child(1) has sibling = " << pn->has_sibling() << std::endl;
-    std::cout << "pn child(1) neighbor  = " << tree.neighbor(pn,0)->value << std::endl;
+    // find
+    // auto pf = tree.find(3.1);
+    // std::cout << "find = " << *pf << std::endl;
+    
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/plot_avl_tree");
+    // gnu.set_xrange(-10, 10);
+    // gnu.set_yrange(-10, 1);
+    gnu.set_equal_aspect_ratio();
+    int order = 1;
+    tree.pre_order(visit_add_node, gnu, order);
+    // AddNodeEmphi(100, gnu, pf->value.x, pf->value.y, "aa"); 
+    gnu.plot();
+
 
     // test find
-    
 }
 
 

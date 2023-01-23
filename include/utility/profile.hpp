@@ -20,7 +20,7 @@ struct FunctionInfo{
     std::list<tick_t> lstart;
     std::list<tick_t> lend;
 
-    double sum(){
+    double sum() const{
         auto istart = lstart.begin();
         auto iend   = lend.begin();
         double dt = 0;
@@ -31,7 +31,7 @@ struct FunctionInfo{
         }
         return dt;
     }
-    void show_sum(){
+    void show_sum() const{
         auto calls = lstart.size();
         double ms = this->sum();
         std::string date = tfm::format("%25s :  %10d   %.3f\n",
@@ -98,10 +98,16 @@ public:
         _cur_tick.pop_back();
     }
 
-    void show_list(){
+    void show_list() const{
         for(auto& info: _list){
             info.show_sum();
         }
+    }
+
+    void clean(){
+        _cur_name.clear();
+        _cur_tick.clear();
+        _list.clear();
     }
 
     static Profile *Get();
@@ -131,8 +137,11 @@ inline void ProfileEnd(){
 inline void ProfileListShow(){
     auto p = Profile::Get();
     p->show_list();
-    
+}
 
+inline void ProfileClean(){
+    auto p = Profile::Get();
+    p->clean();
 }
 
 }

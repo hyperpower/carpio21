@@ -271,7 +271,7 @@ protected:
 inline int find_element(const std::string key, std::vector<PlyElement> & list) {
     for (size_t i = 0; i < list.size(); ++i) {
         if (list[i].name == key) {
-            return i;
+            return int(i);
         }
     }
     return -1;
@@ -305,8 +305,8 @@ public:
     void read(std::istream & is) {
         read_internal(is);
     }
-    void write(std::ostream & os, bool isBinary) {
-        if (isBinary) {
+    void write(std::ostream & os, bool is_binary) {
+        if (is_binary) {
             write_binary_internal(os);
         } else {
             write_ascii_internal(os);

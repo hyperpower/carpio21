@@ -181,6 +181,7 @@ TEST(segment, multi){
     ProfileEnd();
     ProfileEnd();
     ProfileListShow();
+    ProfileClean();
     
     // show =================
     Gnuplot gnu;
@@ -217,6 +218,7 @@ TEST(segment, sweep_line){
     // inter.print_event_queue();
     ProfileEnd();
     ProfileListShow();
+    ProfileClean();
     // IntersectionRet<Segment, Segment> ret;
     // ret.geo1;
     // show =================

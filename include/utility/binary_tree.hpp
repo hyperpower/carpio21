@@ -245,6 +245,15 @@ public:
     }
 };
 
+
+template<typename TYPE>
+typename TreeNode_<TYPE, 2>::size_type Height(const TreeNode_<TYPE, 2>* cur){
+    if (cur == nullptr)
+        return 0;
+    else
+        return 1 + std::max<typename TreeNode_<TYPE, 2>::size_type>(Height(cur->left_child), Height(cur->right_child));
+}
+
 template<typename TYPE>
 std::ostream& operator<<(std::ostream& stream, const TreeNode_<TYPE, 2>& node) {
     if(node.father == nullptr){
@@ -268,6 +277,8 @@ std::ostream& operator<<(std::ostream& stream, const TreeNode_<TYPE, 2>& node) {
     stream << "value  = " << node.value; 
 	return stream;
 }
+
+
 //===============================================
 //concept{
     //require public member : value
@@ -404,7 +415,7 @@ public:
         } else if (cur->father != nullptr && cur->father != this->_end){
             ca = cur->father;
         } else {
-            ca = cur;
+            ca = nullptr;
         }
         pNode pt = nullptr;
         if (ca != nullptr && cur->father != nullptr && cur->father == ca) {
@@ -426,7 +437,7 @@ public:
         } else if (cur->father != nullptr && cur->father != this->_end){
             ca = cur->father;
         } else {
-            ca = cur;
+            ca = nullptr;
         }
         return ca;
     }
