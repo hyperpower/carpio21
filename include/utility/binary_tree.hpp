@@ -53,16 +53,16 @@ public:
     }
 
     ~TreeNode_(){
-        this->destory(this->left_child);
-        this->destory(this->right_child);
-        if(this->father != nullptr){
-            if(this == this->father->left_child){
-                this->father->left_child = nullptr;
-            }
-            if(this == this->father->right_child){
-                this->father->right_child = nullptr;
-            }
-        }
+        // this->destory(this->left_child);
+        // this->destory(this->right_child);
+        // if(this->father != nullptr){
+            // if(this == this->father->left_child){
+                // this->father->left_child = nullptr;
+            // }
+            // if(this == this->father->right_child){
+                // this->father->right_child = nullptr;
+            // }
+        // }
     }
     pNode child(int idx){
         switch (idx)
@@ -112,19 +112,30 @@ public:
         }
         return nullptr;
     }
-    pNode leftmost(){
+    pNode left_most(){
         pNode cur = this;
         while (cur->left_child != nullptr)
             cur = cur->left_child;
         return cur;
     }
-    pNode rightmost(){
+    pNode right_most(){
         pNode cur = this;
         while (cur->right_child != nullptr)
             cur = cur->right_child;
         return cur;
     }
-
+    cpNode left_most() const{
+        cpNode cur = this;
+        while (cur->left_child != nullptr)
+            cur = cur->left_child;
+        return cur;
+    }
+    cpNode right_most() const{
+        cpNode cur = this;
+        while (cur->right_child != nullptr)
+            cur = cur->right_child;
+        return cur;
+    }
     size_type height() const{
         return 1 + std::max<size_type>(this->height(this->left_child), this->height(this->right_child));
     }
@@ -190,6 +201,10 @@ public:
 	}
     bool has_child() const{
         return !(this->is_leaf());
+    }
+    bool has_children() const{
+        return this->left_child != nullptr 
+                && this->right_child != nullptr;
     }
     bool has_child(int d) const{
         if(d == _LEFT_){
@@ -317,6 +332,14 @@ protected:
 	    }
     }
     template <typename Callable, typename... Args>
+    void _pre_order(cpNode current, Callable &&op, Args &&... args) const{
+	    if (current != nullptr) {
+	    	std::invoke(op, current, args...);
+	    	_pre_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_pre_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    }
+    }
+    template <typename Callable, typename... Args>
     void _in_order(pNode current, Callable &&op, Args &&... args){
 	    if (current != nullptr) {
 	    	_in_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
@@ -325,7 +348,23 @@ protected:
 	    }
     }
     template <typename Callable, typename... Args>
+    void _in_order(cpNode current, Callable &&op, Args &&... args) const{
+	    if (current != nullptr) {
+	    	_in_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	std::invoke(op, current, args...);
+	    	_in_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    }
+    }
+    template <typename Callable, typename... Args>
     void _post_order(pNode current, Callable &&op, Args &&... args){
+	    if (current != nullptr) {
+	    	_post_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	_post_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
+	    	std::invoke(op, current, args...);
+	    }
+    }
+    template <typename Callable, typename... Args>
+    void _post_order(cpNode current, Callable &&op, Args &&... args) const{
 	    if (current != nullptr) {
 	    	_post_order(current->left_child, std::forward<Callable>(op), std::forward<Args>(args)...);
 	    	_post_order(current->right_child, std::forward<Callable>(op), std::forward<Args>(args)...);
@@ -385,6 +424,10 @@ public:
     }
     template <typename Callable, typename... Args>
     void in_order(Callable &&op, Args &&... args){
+        this->_in_order(this->root(), std::forward<Callable>(op), std::forward<Args>(args)...);
+    }
+    template <typename Callable, typename... Args>
+    void in_order(Callable &&op, Args &&... args) const{
         this->_in_order(this->root(), std::forward<Callable>(op), std::forward<Args>(args)...);
     }
     template <typename Callable, typename... Args>

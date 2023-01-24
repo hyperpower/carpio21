@@ -11,6 +11,7 @@
 
 #include "utility/binary_tree.hpp"
 #include "utility/avl_tree.hpp"
+#include "utility/random.hpp"
 #include "geometry/geometry.hpp"
 #include "io/gnuplot.hpp"
 
@@ -135,7 +136,8 @@ void visit_add_node(PlotTree::pNode pn, Gnuplot& gnu, int& order){
 bool IncreaseX(PlotTree& tree, PlotTree::pNode pn, int d){
     auto nei = tree.neighbor(pn, d);
     if(nei != nullptr){
-        if(nei->value.x == pn->value.x){
+        if((d == PlotTree::Node::_RIGHT_ && nei->value.x <= pn->value.x) ||
+           (d == PlotTree::Node::_LEFT_  && nei->value.x >= pn->value.x)){
             auto ca = tree.common_ancestor(pn, d);
             if(ca != nullptr){
                 ca->right_child->pre_order(visit_plus_x, 1.0);
@@ -238,6 +240,28 @@ void visit(BinaryTree::pNode pn, int& count){
     count++;
 }
 
+void visit_print(PlotAvlTree::pNode pn, int& count){
+    std::cout << pn->value << std::endl;
+    count++;
+}
+
+void visit_to_array(PlotAvlTree::cpNode pn, std::list<double>& l){
+    l.push_back(pn->value.value);
+}
+
+bool IsOrderIncrease(const PlotAvlTree& tree){
+    std::list<double> lv;
+    tree.in_order(visit_to_array, lv);
+
+    for(auto iter = lv.begin(); iter != lv.end(); iter++){
+        auto next = std::next(iter);
+        if(next != lv.end() && *next < *iter){
+            return false;
+        }
+    }
+    return true;
+}
+
 void output_node(const PlotAvlTree::pNode pn){
     if(pn == nullptr){
         std::cout << " cur  =  null" << std::endl;
@@ -265,26 +289,44 @@ void output_node(const PlotAvlTree::pNode pn){
 TEST(avl_tree, basic){
 
     PlotAvlTree tree;
-    tree.insert({3, 0, 0});
-    auto pn = tree.insert({4, 0, 0});
-    std::cout << "is right = " << pn->is_right_child() << std::endl;
+    tree.insert({4, 0, 0});
     tree.insert({2, 0, 0});
+    tree.insert({3, 0, 0});
     tree.insert({1, 0, 0});
-    tree.insert({5, 0, 0});
+    // tree.insert({1.1, 0, 0});
     tree.insert({0.5, 0, 0});
-    tree.insert({4.1, 0, 0});
-    tree.insert({2.1, 0, 0});
-    tree.insert({1.1, 0, 0});
+    tree.insert({0.11, 0, 0});
+    tree.insert({5, 0, 0});
+    tree.insert({0.15, 0, 0});
     tree.insert({4.14, 0, 0});
-    tree.insert({4.15, 0, 0});
-    output_node(tree.root()->left_child);
+    tree.insert({4.1, 0, 0});
+    tree.insert({4.16, 0, 0});
+    tree.insert({0.21, 0, 0});
+    tree.insert({0.2, 0, 0});
+    tree.insert({0.3, 0, 0});
+    // output_node(tree.root()->left_child->left_child);
     // std::cout << tree.root()->value << std::endl;
     // std::cout << tree.root()->left_child->value << std::endl;
     // std::cout << tree.root()->right_child->value << std::endl;
     // std::cout << tree.root()->left_child->left_child->value << std::endl;
     // std::cout << tree.root()->left_child->right_child->value << std::endl;
+    // tree.erase({1.1, 0, 0});
+    // tree.erase({4, 0, 0});
+    // tree.erase({5, 0, 0});
+    tree.erase({0.21, 0, 0});
 
     Update(tree, tree.root());
+    Update(tree, tree.root());
+    bool incr = IsOrderIncrease(tree);
+    std::cout << "Is Increase = " << incr << std::endl;
+    ASSERT_EQ(incr, 1);
+    // find
+    auto fp = tree.find(4.1);
+    output_node(fp);
+
+
+    int count = 0;
+    // tree.in_order(visit_print, count);
     // UpdateXY(tree, tree.insert({2.5, 0, 0}));
     // UpdateXY(tree, tree.insert({3.5, 0, 0}));
     // UpdateXY(tree, tree.insert({3.1, 0, 0}));
@@ -311,7 +353,39 @@ TEST(avl_tree, basic){
 
     // test find
 }
+TEST(avl_tree, random){
+    
+    PlotAvlTree tree;
+    int num = 20;
+    double vmin = -100;
+    double vmax = 100;
+    for (int i = 0; i< num ; i++){
+        double v = Random::nextDouble(vmin, vmax);
+        tree.insert({v, 0, 0});
+    }
+    Update(tree, tree.root());
+    Update(tree, tree.root());
+    Update(tree, tree.root());
 
+    bool incr = IsOrderIncrease(tree);
+    std::cout << "Is Increase = " << incr << std::endl;
+    ASSERT_EQ(incr, 1);
+    
+    bool isb  = tree.is_balanced();
+    std::cout << "Is balanced = " << isb << std::endl;
+    ASSERT_EQ(isb, 1);
+    
+
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/plot_avl_tree_r");
+    // gnu.set_xrange(-10, 10);
+    // gnu.set_yrange(-10, 1);
+    gnu.set_equal_aspect_ratio();
+    int order = 1;
+    tree.pre_order(visit_add_node, gnu, order);
+    // AddNodeEmphi(100, gnu, pf->value.x, pf->value.y, "aa"); 
+    gnu.plot();
+}
 
 }
 
