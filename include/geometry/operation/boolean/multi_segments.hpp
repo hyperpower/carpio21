@@ -234,6 +234,7 @@ protected:
     typedef std::priority_queue<Event,std::vector<Event>, EventGreatEqual> EventQueue;
 
     struct GeoComponent{
+        typedef SegmentTag Tag;
         const Geo* geo1;
         double     key_value;
 
@@ -246,6 +247,7 @@ protected:
             key_value = (*g)[0].y() + 1e-5 * (*g)[0].x();            
         }
     };
+
     class GeoComponentGreatEqual {
         public:
         // Comparator function
@@ -411,7 +413,6 @@ public:
     }
 
 };
-
  
 template<class CONTAINER, 
         typename std::enable_if<
@@ -430,7 +431,6 @@ auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
         IntersectionSweepLineSimple_<typename CONTAINER::value_type> inter(con);
         return inter.execute();
     }
-    // return ListInterRet(); 
 }
 }
 
