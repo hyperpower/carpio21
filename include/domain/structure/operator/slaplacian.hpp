@@ -276,7 +276,8 @@ class L4AlterImplement_<
     FIELD, DIM, 
     LinearPolynomial_<Vt, typename SGridUniform_<DIM>::Index>, 
     SGridUniform_<DIM>, 
-    GHOST, ORDER, SFieldCenterTag>: public SOperatorCommon_<FIELD, DIM, Vt, SGridNonUniform_<DIM>, GHOST, ORDER>{         
+    GHOST, ORDER, SFieldCenterTag>: 
+    public SOperatorCommon_<FIELD, DIM, LinearPolynomial_<Vt, typename SGridUniform_<DIM>::Index>, SGridNonUniform_<DIM>, GHOST, ORDER>{         
 public:
     typedef SFieldCenterTag Tag;
     typedef Vt ValueType;
@@ -288,10 +289,16 @@ public:
     
     typedef BoundaryIndex BI;
     typedef std::shared_ptr<BI> spBI;
+protected:
+    std::string _method;
+
 public:
     L4AlterImplement_(){
         std::cout << "L4Alter" << std::endl;
     };
+    void set(const std::string& m){
+        this->_method = m;
+    }
     FIELD execute(const FIELD& f, const BI& bi, const Vt& time = 0.0) const{
         // std::cout << "Laplace Vt " << std::endl;
         FIELD res(f);
@@ -320,7 +327,79 @@ public:
         return res;
     }
 };
+   
+template<class FIELD, St DIM, class GHOST, class ORDER>
+class L4AlterImplement_<
+    FIELD, DIM, 
+    Vt, 
+    SGridUniform_<DIM>, 
+    GHOST, ORDER, SFieldCenterTag>:
+    public SOperatorCommon_<FIELD, DIM, Vt, SGridNonUniform_<DIM>, GHOST, ORDER>{         
+public:
+    typedef SFieldCenterTag Tag;
+    typedef Vt ValueType;
+    typedef SGridUniform_<DIM> Grid;
+    typedef ApplyBCImplement_<FIELD, DIM, Vt, Grid, GHOST, ORDER, SFieldCenterTag> ApplyBC;
+    typedef typename Grid::Index Index;
+    typedef FIELD Field;
+    
+    typedef BoundaryIndex BI;
+    typedef std::shared_ptr<BI> spBI;
+protected:
+    std::string _method;
 
+public:
+    L4AlterImplement_(){
+        std::cout << "L4Alter" << std::endl;
+    };
+    void set(const std::string& m){
+        this->_method = m;
+    }
+    FIELD execute(const FIELD& f, const BI& bi, const Vt& time = 0.0) const{
+        // std::cout << "Laplace Vt " << std::endl;
+        FIELD res(f);
+        const auto& grid = res.grid();
+        const Vt&   h    = grid.s();   // cell size
+        for (auto& idx : res.order()) {
+            std::array<Vt, DIM> arr;
+            for(St d1=0; d1< DIM;++d1){
+                St d2 = (d1+1) % DIM;
+
+                Index idxp = idx.p(d1);
+                Index idxm = idx.m(d1);
+
+                
+
+                
+            }
+            FOR_EACH_DIM
+            {
+                res(idx) += arr[d];
+            }
+        }
+
+        return res;
+    }
+
+protected:
+    ValueType _L2OnD(const Index &idxc, 
+                     const FIELD &phi, 
+                     const BI &bi, 
+                     const Vt time = 0.0) const{
+        ApplyBC abc;
+        Index idxp = idxc.p(d);
+        Index idxm = idxc.m(d);
+        const Vt h = phi.grid().s();   // cell size
+
+        Vt dfdx_p, dfdx_m;
+        Vt phi_m = abc.value(phi, bi, idx, idxm, d, _M_, time);
+        Vt phi_p = abc.value(phi, bi, idx, idxp, d, _P_, time);
+
+        dfdx_m = (phi(idx) - phi_m) / h;
+        dfdx_p = (phi_p - phi(idx)) / h;
+        return (dfdx_p - dfdx_m) / h;
+    }
+};
 }
 
 

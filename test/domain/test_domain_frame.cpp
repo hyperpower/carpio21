@@ -29,7 +29,9 @@ TEST(domain, initial){
 
     bi.show();
 
-    auto lap = IntLaplacian(f, bi);
+    // auto lap = IntLaplacian(f, bi);
+    auto lap = L4Alter(f, bi);
+
     // for(auto& idx : lap.order()){
         // std::cout << idx << " --------" << std::endl;
         // std::cout << lap(idx) << " --------" << std::endl;

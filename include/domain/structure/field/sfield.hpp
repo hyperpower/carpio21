@@ -341,7 +341,6 @@ template<St DIM,
          class ORDER>
 class _DataInitial_<DIM, Vt, GRID, GHOST, ORDER>{
 public:
-    typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
     typedef typename GRID::Index  Index;
 
     static Vt InitAValue(const Index&){

@@ -94,6 +94,9 @@ public:
     };
 
     // size ===================================
+    inline Vt s() const{
+        return _cs;
+    }
     // The size for each cells are same
     inline Vt s_(St dim, Idx i) const{
         return _cs;
