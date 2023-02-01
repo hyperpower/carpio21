@@ -8,6 +8,7 @@
 
 #include "segment_segment.hpp"
 #include "utility/profile.hpp"
+#include "utility/avl_tree.hpp"
 
 
 namespace carpio{
@@ -234,6 +235,7 @@ protected:
     typedef std::priority_queue<Event,std::vector<Event>, EventGreatEqual> EventQueue;
 
     struct GeoComponent{
+        typedef SegmentTag Tag;
         const Geo* geo1;
         double     key_value;
 
@@ -246,6 +248,7 @@ protected:
             key_value = (*g)[0].y() + 1e-5 * (*g)[0].x();            
         }
     };
+
     class GeoComponentGreatEqual {
         public:
         // Comparator function
@@ -412,6 +415,84 @@ public:
 
 };
 
+template<class GEO>
+struct GeoComponent_{
+        typedef GEO Geo;
+        const Geo* geo1;
+        double  sweep_x;
+        double  value_y;
+
+        GeoComponent_():geo1(nullptr), sweep_x(0), value_y(0){};
+
+        GeoComponent_(const Geo* geo, double x, double y): 
+             geo1(geo), sweep_x(x), value_y(y){};
+    };
+
+template<class VALUE>
+class GeoStatus_: public AvlTree_<TreeNode_<VALUE,2> >{
+public:
+    typedef AvlTree_<TreeNode_<VALUE, 2> > Base;
+    typedef GeoStatus_<VALUE> Self;
+
+    typedef VALUE value_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
+    typedef typename Base::Node Node;
+
+    typedef Node*        pNode;
+    typedef const Node* cpNode;
+
+public:
+    GeoStatus_(): Base(){}
+
+    template<class COMPFUN>
+    pNode insert(reference value, COMPFUN cfun){
+        pNode res = nullptr;
+        if(this->empty()){
+            this->root(new Node(value));
+            return this->root();
+        }else{
+            res = _insert(this->_end->left_child, value, cfun);
+        }
+        return res;
+    }
+
+
+    template<class COMPFUN>
+    pNode _insert(pNode& cur, reference value, COMPFUN cfun){
+        pNode res = nullptr;
+        if (cur == nullptr) {
+            cur = new Node(value);
+            return cur;
+        } else if (cfun(value, cur->value)) {  // value < cur-value 
+            res = _insert(cur->left_child, value, cfun);
+            cur->left_child->father = cur;
+            if (!(this->_is_balanced(cur))){
+                if (cfun(value, cur->left_child->value)){
+                    this->_right_rotate(cur);
+                }else{
+                    this->_LR_rotate(cur);
+                }
+            }
+        } else if (cfun(cur->value, value)){   // cur->value < value
+            res = _insert(cur->right_child, value, cfun);
+            cur->right_child->father = cur;
+            if (!(this->_is_balanced(cur))){
+                if (cfun(cur->right_child->value, value)){
+                    this->_left_rotate(cur);
+                }else{
+                    this->_RL_rotate(cur);
+                }
+            }
+        } else {
+            return nullptr;
+        }
+        return res;
+    }
+};
+
  
 template<class CONTAINER, 
         typename std::enable_if<
@@ -430,7 +511,6 @@ auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
         IntersectionSweepLineSimple_<typename CONTAINER::value_type> inter(con);
         return inter.execute();
     }
-    // return ListInterRet(); 
 }
 }
 

@@ -1,7 +1,7 @@
 #ifndef _INTERPOLATE_HPP_
 #define _INTERPOLATE_HPP_
 
-#include <type_define.hpp>
+#include "type_define.hpp"
 #include <utility>
 #include <map>
 
@@ -24,7 +24,8 @@ struct AInterpolate_ {
 
     ///
     template<class DIM, class POI, class ARR>
-    static VT Linear_all(const DIM& dim, const POI& p, const POI& p1,
+    static VT Linear_all(const DIM& dim, 
+                         const POI& p, const POI& p1,
                          const POI& p2,
                          const ARR& av) {
         if (dim == 1) {

@@ -4,6 +4,7 @@
  *  Created on: Jun 15, 2018
  *      Author: zhou
  */
+#include <functional>
 
 #include "geometry/geometry.hpp"
 #include "utility/random.hpp"
@@ -181,6 +182,7 @@ TEST(segment, multi){
     ProfileEnd();
     ProfileEnd();
     ProfileListShow();
+    ProfileClean();
     
     // show =================
     Gnuplot gnu;
@@ -217,6 +219,7 @@ TEST(segment, sweep_line){
     // inter.print_event_queue();
     ProfileEnd();
     ProfileListShow();
+    ProfileClean();
     // IntersectionRet<Segment, Segment> ret;
     // ret.geo1;
     // show =================
@@ -235,4 +238,42 @@ TEST(segment, sweep_line){
         count++;
     }
     gnu.plot();
+}
+
+typedef GeoComponent_<Seg2> GeoComponent;
+typedef GeoStatus_<GeoComponent> GeoStatus;
+
+void visit_output(GeoStatus::cpNode pn){
+    std::cout << "x = " << pn->value.sweep_x << " y = " << pn->value.value_y << std::endl;
+}
+
+TEST(segment, geo_status_b){
+
+    typedef std::function<bool(GeoComponent&, GeoComponent&)> CompareFun;
+
+    double cur_x =1.2;
+
+    CompareFun cfun = [&cur_x](GeoComponent& a, GeoComponent& b){
+        a.sweep_x = cur_x;
+        return a.value_y < b.value_y;
+    };
+
+    GeoStatus status;
+
+    GeoComponent gc1(nullptr, 1, 2);
+    status.insert(gc1, cfun);
+    GeoComponent gc2(nullptr, 1, 3);
+    status.insert(gc2, cfun);
+    GeoComponent gc3(nullptr, 1, 1.5);
+    status.insert(gc3, cfun);
+
+    cur_x = 0.1;
+    GeoComponent gc4(nullptr, 1, 1.3);
+    status.insert(gc4, cfun);
+
+
+    status.in_order(visit_output);
+
+
+
 }
