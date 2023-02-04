@@ -634,7 +634,7 @@ public:
         ASSERT(tag > 0);
         std::ostringstream cmdstr;
         cmdstr << "set label " << tag << " \"" << label << "\" at first " << x
-                << ",second " << y << " " << append;
+                << ", " << y << " " << append;
         cmd(cmdstr.str());
         return *this;
     }

@@ -86,7 +86,7 @@ public:
     }
 
     Self& operator=(const Self& o){
-        if(this = &o){
+        if(this == &o){
             return *this;
         }
         geo1 = o.geo1;

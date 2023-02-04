@@ -2,9 +2,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import os, sys
 import numpy as np
-import string
-import math
-import operator
 
 import multiprocessing
 from multiprocessing import Pool

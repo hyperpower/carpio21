@@ -9,6 +9,7 @@
 #define _BINARYTREE_HPP_
 
 #include <algorithm>
+#include <functional>
 #include "type_define.hpp"
 // #include "Iterator.h"
 

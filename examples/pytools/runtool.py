@@ -124,6 +124,8 @@ class Runer:
             cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
         elif platform.system() == "Linux":
             cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
+        elif platform.system() == "Darwin":
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
         print(cmd)
         os.system(cmd)
 
@@ -165,7 +167,11 @@ class Runer:
         current = os.getcwd()
         os.chdir(self._path.this)
         if os.path.isfile("./plot.py"):
-            os.system("python ./plot.py")
+            if platform.system() == "Windows":
+                os.system("python3 ./plot.py")
+            # exec(open('./plot.py').read())
+            elif platform.system() == "Darwin":
+                os.system("python3 ./plot.py")
         os.chdir(current)
         pass
 

@@ -201,7 +201,7 @@ public:
         return v;
     }
 
-    std::string& to_string(PyObject* obj) const{
+    std::string to_string(PyObject* obj) const{
         // pPO to string
         PyObject* repr = PyObject_Repr(obj);
         PyObject* cstr = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");

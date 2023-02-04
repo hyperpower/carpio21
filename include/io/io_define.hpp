@@ -8,12 +8,15 @@
     //linux code goes here
     #include <unistd.h>
     #include <sys/stat.h> 
-#else // _WIN32
+#elif _WIN32 || _WIN64
     // windows code goes here
     #include <io.h>
     #include <process.h>
     #include <windows.h>
     #include <direct.h>
+#elif __APPLE__
+    #include <unistd.h>
+    #include <sys/stat.h> 
 #endif
 
 #include <string>
@@ -252,8 +255,8 @@ inline bool MakeDir(std::string dir) {
     }else{
         return false;
     }
-#elif defined __GNUC__
-    mkdir(dir.data(), 0777);
+#else // defined __GNUC__
+    return (0 == mkdir(dir.data(), 0777));
 #endif
 }
 

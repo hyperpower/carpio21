@@ -1,5 +1,5 @@
 #ifndef _BBTREE_HPP_
-#define _BBTEEE_HPP_
+#define _BBTREE_HPP_
 
 #include "geometry/geometry_define.hpp"
 #include "bbnode.hpp"

@@ -7,6 +7,8 @@
 #include <sstream>
 #include <iostream>
 #include <cmath>
+#include <type_traits>
+
 
 namespace carpio {
 
@@ -33,7 +35,7 @@ public:
 template<class CONTAINER, 
          typename std::enable_if<
             IsContainer<CONTAINER>::value
-        &&  std::is_arithmetic_v<typename CONTAINER::value_type>, bool>::type = true>
+        &&  std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
 void Normalize(CONTAINER& con){
     double n = 0;
     for (auto& v : con) {

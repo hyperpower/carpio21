@@ -536,7 +536,7 @@ template<typename ANY, typename CONTAINER,
 auto ToGnuplotActor(const ANY& geo, const CONTAINER& con){
     typedef std::shared_ptr<GnuplotActor> spActor;
     GnuplotActor actor;
-    MakeGnuplotActor(actor, geo, con,ANY::Tag());    
+    MakeGnuplotActor(actor, geo, con, typename ANY::Tag());    
     return actor;
 }
 template<typename ANY,
@@ -546,7 +546,7 @@ template<typename ANY,
 auto ToGnuplotActorAsVector(const ANY& geo){
     typedef std::shared_ptr<GnuplotActor> spActor;
     GnuplotActor actor;
-    MakeGnuplotActorAsVector(actor, geo, ANY::Tag());    
+    MakeGnuplotActorAsVector(actor, geo, typename ANY::Tag());    
     return actor;
 }
 

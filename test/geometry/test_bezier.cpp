@@ -28,7 +28,7 @@ typedef PointChain_<double, 2> PC;
 void add_bezier_curve(Gnuplot& gnu, std::shared_ptr<BC> spc){
     auto a_line = GA::Lines(spc->begin(), spc->end(), 4);
     a_line->command() = "using 1:2:3 title \"Bezier Curve\" ";
-    a_line->style()   = "with lines lw 2 lc 0";
+    a_line->style()   = "with lines lw 2 lc 0"; 
     gnu.add(a_line);
 
     auto a_cp = GA::Points(spc->begin(),
@@ -57,7 +57,7 @@ void add_bezier_curve(Gnuplot& gnu, std::shared_ptr<BC> spc){
     
 TEST(bezier, mkdir){
     // Do not disable this test
-    MakeDir("./test_output/");
+    MakeDir("./fig/");
 }
 
 
@@ -84,7 +84,7 @@ TEST(bezier, first){
 //	for (auto& p : curve){
 //		std::cout << " P = " << p << std::endl;
 //	}
-    gnu.set_terminal_png("./test_output/bezier_first");
+    gnu.set_terminal_png("./fig/bezier_first");
     gnu.set("key left top");
 
     add_bezier_curve(gnu, spc);
@@ -100,7 +100,7 @@ TEST(bezier, second){
     std::shared_ptr<BC> spc(new BC2(s, c, e, 50));
 
     Gnuplot gnu;
-    gnu.set_terminal_png("./test_output/bezier_second.png");
+    gnu.set_terminal_png("./fig/bezier_second");
     gnu.set_xrange(-0.5, 1.5);
     gnu.set_yrange(-0.5, 1.5);
 //	int count = 1;
@@ -132,7 +132,7 @@ TEST(bezier, cubic){
     std::shared_ptr<BC> spc(new BC3(s, c1, c2, e, 50));
 
     Gnuplot gnu;
-    gnu.set_terminal_png("./test_output/bezier_cubic.png");
+    gnu.set_terminal_png("./fig/bezier_cubic.png");
     gnu.set_xrange(-0.5, 1.5);
     gnu.set_yrange(-0.5, 1.5);
 
@@ -154,7 +154,7 @@ TEST(bezier, high){
     std::shared_ptr<BC> spc(new BCH(l, 50, "bernstein"));
 
     Gnuplot gnu;
-    gnu.set_terminal_png("./test_output/bezier_high.png");
+    gnu.set_terminal_png("./fig/bezier_high.png");
     gnu.set_xrange(-0.5, 1.5);
     gnu.set_yrange(-0.5, 1.5);
 

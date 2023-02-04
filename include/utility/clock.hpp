@@ -264,10 +264,7 @@ public:
 			ddwTimerFrequency.HighPart = (unsigned long)-1;
 			ddwTimerFrequency.LowPart = (unsigned long)-1;
 		}
-
 		return ddwTimerFrequency.QuadPart;
-#elif defined(__APPLE__)
-		return ticksPerSecond;
 #elif defined(_POSIX_MONOTONIC_CLOCK)
 		return 1000 * 1000 * 1000;
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)

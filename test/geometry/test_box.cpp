@@ -132,7 +132,7 @@ TEST(box, box3_vs_plane){
     gnu.set_ticslevel();
     // gnu.set_terminal_png("./fig/line_box_normal3");
     auto spbox1 = ToGnuplotActor(box1);
-    spbox1->style() = "with lines lw 2 lc 8";
+    spbox1.style() = "with lines lw 2 lc 8";
     gnu.add(spbox1);
 
     // gnu.splot();

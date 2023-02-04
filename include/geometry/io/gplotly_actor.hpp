@@ -249,7 +249,7 @@ auto MakePlotlyActor(BoxTag, const ANY& box, const std::string& type ="auto"){
 
 template<typename ANY, ENABLE_IF(ANY, IsGeometry)>
 auto ToPlotlyActor(const ANY& geo, const std::string& type ="auto"){
-    return MakePlotlyActor( ANY::Tag(), geo, type);    
+    return MakePlotlyActor( typename ANY::Tag(), geo, type);    
 }
 template<typename ANY,
         typename std::enable_if<
@@ -267,7 +267,7 @@ template<typename ANY, typename CONTAINER,
          && IsContainer<CONTAINER>::value,
         bool>::type = true >
 auto ToPlotlyActor(const ANY& geo, const CONTAINER& con1, const CONTAINER& con2, const std::string& type ="auto"){
-    return MakePlotlyActor( ANY::Tag(), geo, con1, con2, type);    
+    return MakePlotlyActor(typename ANY::Tag(), geo, con1, con2, type);    
 }
 // template<typename ANY, ENABLE_IF_CONTAINS(ANY, IsGeometry)>
 // auto ToPlotlyActor(const ANY& geo, const std::string& type ="auto"){
