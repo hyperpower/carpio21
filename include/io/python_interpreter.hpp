@@ -47,6 +47,7 @@ protected:
 #else
         PySys_SetArgv(argc, (char **)(argv));
 #endif
+
     }
     ~PythonInterpreter() {
         Py_Finalize();
@@ -54,6 +55,9 @@ protected:
 public:
     PyObject* import(const std::string& name) const{
         PyObject* po_name = PyUnicode_FromString(name.c_str());
+        if(po_name == nullptr){
+            std::cout << "po name" << std::endl;
+        }
         PyObject* pkg     = PyImport_Import(po_name);
         Py_DECREF(po_name);
         if (!pkg) {

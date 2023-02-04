@@ -111,7 +111,15 @@ class Runer:
 
     def cmake(self):
         path_build = os.path.join(self._path.this, "build")
-        cmd = f"cmake -S \"{self._path.this}\"" \
+        if platform.system() == "Darwin":
+            cmd = f"cmake --no-warn-unused-cli" \
+                  f" -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE" \
+                  f" -DCMAKE_BUILD_TYPE:STRING=Release" \
+                  f" -S \"{self._path.this}\"" \
+                  f" -B \"{path_build}\"" \
+                  f" -G \"Unix Makefiles\""
+        else:
+            cmd = f"cmake -S \"{self._path.this}\"" \
               f" -B \"{path_build}\""
         print(cmd)
         # os.system(cmd)
