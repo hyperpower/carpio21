@@ -8,7 +8,7 @@
 namespace carpio {
 
 template<class T>
-struct IsZero_: std::unary_function<const T&, bool> {
+struct IsZero_ {
 	bool operator()(const T& number) const {
 		return IsCloseToZero(number);
 	}

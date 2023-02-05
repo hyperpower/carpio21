@@ -81,7 +81,7 @@ protected:
 		if (cur == nullptr)
 			return 0;
 		else
-			return 1 + std::max(_height(cur->lchild), _height(cur->rchild));
+			return 1 + std::max<St>(_height(cur->lchild), _height(cur->rchild));
 	}
 	St _level(const BBNode_<BOX>* cur) const {
 		if (cur == nullptr)

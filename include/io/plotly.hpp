@@ -862,8 +862,6 @@ public:
 protected:
 
     void _init() {    
-        _py->import("platform");
-        _py->import("scipy");
         this->_plotly    = _py->import("plotly");
         this->_plotly_go = _py->import("plotly.graph_objects");
 
