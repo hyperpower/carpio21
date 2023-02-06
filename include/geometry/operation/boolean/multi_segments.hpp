@@ -505,11 +505,11 @@ auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
     typedef IntersectionReturn_<Seg> InterRet;
     typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
     std::string m = ToLowerCase(method);
-    if (m == "" || m == "n2"){
-        return IntersectN2(con, SegmentTag());
-    }else if( m == "sweep_line_simple"){
+    if( m == "sweep_line_simple"){
         IntersectionSweepLineSimple_<typename CONTAINER::value_type> inter(con);
         return inter.execute();
+    }else{
+        return IntersectN2(con, SegmentTag());
     }
 }
 }

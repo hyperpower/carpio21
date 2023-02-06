@@ -57,7 +57,6 @@ IF(ENABLE_OPENMP)
   endif()
   find_package(OpenMP REQUIRED)
   # if (OPENMP_FOUND)
-    link_directories("/opt/homebrew/opt/libomp/lib/")
     # message(STATUS "OPENMPLIB = ${OPENMP_LIBRARIES}" )
     # link_directories("${OPENMP_LIBRARIES}")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -74,7 +73,6 @@ INCLUDE_DIRECTORIES(
 
 add_executable(main ${SOURCE_FILES})
 
-include_directories("/opt/homebrew/opt/libomp/include/")
 # target_link_directories(main PUBLIC "/opt/homebrew/opt/libomp/lib/")
 
 if(PYTHON_LIBRARIES)
@@ -84,5 +82,7 @@ ELSE()
 ENDIF()
 
 # if(OPENMP_FOUND)
+  include_directories("/opt/homebrew/opt/libomp/include/")
+  link_directories("/opt/homebrew/opt/libomp/lib/")
   target_link_libraries(main omp)
 # endif()

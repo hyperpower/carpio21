@@ -55,7 +55,7 @@ int ThreadPrint(int nt){
 // input singal task time in milliseconds
 // ouput wall time of parallel runing
 double TimeTest(double tt, int nt){
-    auto begin = std::chrono::high_resolution_clock::now();
+    auto begin = std::chrono::system_clock::now();
     omp_set_num_threads(nt);
 // #ifdef OPENMP
     // std::cout << "num thread = " << nt << std::endl;
@@ -71,7 +71,7 @@ double TimeTest(double tt, int nt){
 #endif
     }
 // #endif
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
     
     return elapsed.count();
