@@ -13,7 +13,7 @@ typedef mpq_class rat;
 #else 
 
 typedef int I;
-typedef long long rat;
+typedef double rat;
 
 #endif
 namespace ref{
@@ -65,7 +65,7 @@ public:
     slope.make(a.get_abscissa(), a.get_ordinate(), b.get_abscissa(), b.get_ordinate());
   };
 
-  Segment(const rat& xa, const rat& ya, const rat& xb, const rat& yb)
+  Segment(const rat& xa, const rat& xb, const rat& ya, const rat& yb)
     : left(xa, ya), right (xb, yb) {
     slope.make(xa,ya,xb,yb);
   };

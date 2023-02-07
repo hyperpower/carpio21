@@ -24,7 +24,8 @@ template <class T, class A> struct PriorityQueue_t {
 };
 
 
-template <class T, class A> class PriorityQueue : public PriorityQueue_t<T,A>::Type {
+template <class T, class A> 
+class PriorityQueue : public PriorityQueue_t<T,A>::Type {
 public:
   void push(const T& value) {
     std::vector<A> v; //empty vector
