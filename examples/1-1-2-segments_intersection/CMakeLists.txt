@@ -10,7 +10,13 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/)
 
-set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+set(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+
+set(SOURCE
+   ${SOURCE}
+   ${CMAKE_CURRENT_SOURCE_DIR}/ben-ott/bentley_ottmann.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/ben-ott/geometry.cpp
+)
 
 # python =======
 set(REQUIRED_PYTHON_VERSION 3.4)
@@ -32,8 +38,9 @@ INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/../../include
     ${PROJECT_SOURCE_DIR}/ben-ott
 )
+# link_directories(${PROJECT_SOURCE_DIR}/ben-ott)
 
-add_executable(main ${SOURCE_FILES})
+add_executable(main ${SOURCE})
 
 if(PYTHON_LIBRARIES)
   TARGET_LINK_LIBRARIES(main ${PYTHON_LIBRARIES})

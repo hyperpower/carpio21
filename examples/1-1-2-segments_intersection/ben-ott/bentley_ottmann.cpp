@@ -17,7 +17,7 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
     Event e_left(it->get_left()), e_right(it->get_right());
     queue.push(e_left, &(*it)), queue.push(e_right);
   }
-
+  
   // binary search tree : empty
   Point p_sweep(rat(I(0)),rat(I(0)));
   compare<Segment,Point> comp(&p_sweep);
@@ -84,7 +84,6 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
       compute_new_events(sl, s_b, p, queue); compute_new_events(sr, s_a, p, queue);
     }
   }
-      
   return inter;
 }
 
