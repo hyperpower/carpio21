@@ -3,6 +3,7 @@ import os
 import shutil
 import platform
 import sys
+import errno
 import argparse
 import time
 from path import *
@@ -33,22 +34,47 @@ def case_info(path, origianl_files):
 
     return info_dict
 
+def path_is_parent(parent_path, child_path):
+    # Smooth out relative path names, note: if you are concerned about symbolic links, you should use os.path.realpath too
+    parent_path = os.path.abspath(parent_path)
+    child_path = os.path.abspath(child_path)
+
+    # Compare the common path of the parent and child path with the common path of just the parent path. Using the commonpath method on just the parent path will regularise the path name in the same way as the comparison that deals with both paths, removing any trailing path separator
+    return os.path.commonpath([parent_path]) == os.path.commonpath([parent_path, child_path])
+
+def is_sub_path(subpath, paths):
+    for p in paths:
+        if path_is_parent(p, subpath):
+            return True
+    return False
+
 def clean(path, original_files):
     print("clean ====== ")
-    files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    dfs   = []
-    for f in files:
-        if f not in original_files:
-            dfs.append(f)
-    for df in dfs:
-        print("Remove file -> ", df)
-        os.remove(os.path.join(path,df))
-
-    dirs = [f for f in os.listdir(path) if os.path.isdir(os.path.join(path, f))]
-    for d in dirs:
-        print("Remove dir -> ", d)
-        shutil.rmtree(os.path.join(path, d))
-
+    ori_ff = []
+    ori_fd = []
+    for f in original_files:
+        fn = os.path.join(path, f)
+        if os.path.isfile(fn):
+            ori_ff.append(fn)
+        elif os.path.isdir(fn):
+            ori_fd.append(fn)
+    
+    for (dirpath, dirnames, filenames) in os.walk(path, topdown=False):
+        for name in filenames:
+            ff = os.path.join(dirpath, name)
+            if ff not in ori_ff and not is_sub_path(os.path.dirname(ff), ori_fd):
+                os.remove(ff)
+    
+    for (dirpath, dirnames, filenames) in os.walk(path, topdown=False):
+        for name in dirnames:
+            fd = os.path.join(dirpath, name)
+            if fd not in ori_fd:
+                try:
+                    os.rmdir(fd)
+                except OSError as e:
+                    if e.errno != errno.ENOTEMPTY:
+                        raise
+    
 
 def parse_args():
     parser=argparse.ArgumentParser(description="a script to do stuff")

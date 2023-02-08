@@ -8,6 +8,7 @@
 #include <memory>
 #include <iostream>
 #include <algorithm>
+#include <chrono>
 
 #include "type_define.hpp"
 #include "tinyformat.hpp"
@@ -16,16 +17,17 @@
 namespace carpio {
 
 struct FunctionInfo{
+    typedef std::chrono::time_point<std::chrono::system_clock> TimePoint;
     std::string name;
-    std::list<tick_t> lstart;
-    std::list<tick_t> lend;
+    std::list<TimePoint> lstart;
+    std::list<TimePoint> lend;
 
     double sum() const{
         auto istart = lstart.begin();
         auto iend   = lend.begin();
         double dt = 0;
         for(;(istart != lstart.end()) || (iend != lend.end());){
-            dt += Clock::TicksToMillisecondsD((*iend) - (*istart));
+            dt += std::chrono::duration_cast<std::chrono::milliseconds>((*iend) - (*istart)).count();
             istart++;
             iend++;
         }
@@ -47,7 +49,9 @@ private:
 
     // int level;
     std::list<std::string> _cur_name;
-    std::list<tick_t> _cur_tick;
+    typedef std::chrono::time_point<std::chrono::system_clock> TimePoint;
+
+    std::list<TimePoint> _cur_tick;
 
     std::list<FunctionInfo> _list;
 protected:
@@ -72,7 +76,7 @@ public:
 
     void probe_start(const std::string& name){
         // level++;
-	    _cur_tick.push_back(Clock::Tick());
+	    _cur_tick.push_back(std::chrono::system_clock::now());
         // auto nn = _cur_tick.size();
         std::string nn = name;
         _cur_name.push_back(nn);
@@ -92,7 +96,7 @@ public:
         auto pinfo = this->_find(cn);
         if (pinfo != this->_list.end()){
             pinfo->lstart.push_back(ct);
-            pinfo->lend.push_back(Clock::Tick());
+            pinfo->lend.push_back(std::chrono::system_clock::now());
         }
         _cur_name.pop_back();
         _cur_tick.pop_back();
