@@ -41,19 +41,24 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
       
       //it_ev->second : union of l_set, ir_set.first and ir_set.second
       vector_seg::iterator it_seg = l_set.begin();
-      for(; it_seg != l_set.end(); it_ev->second.push_back(*it_seg++));
-      for(it_seg = ir_set.first.begin(); it_seg != ir_set.first.end();
-          it_ev->second.push_back(*it_seg++));
-      for(it_seg = ir_set.second.begin(); it_seg != ir_set.second.end();
-          it_ev->second.push_back(*it_seg++));
+      for(; it_seg != l_set.end(); 
+            it_ev->second.push_back(*it_seg++));
+      for(  it_seg = ir_set.first.begin(); 
+            it_seg != ir_set.first.end();
+            it_ev->second.push_back(*it_seg++));
+      for(  it_seg = ir_set.second.begin();
+            it_seg != ir_set.second.end();
+            it_ev->second.push_back(*it_seg++));
       //std::cout << it_ev->second << "\n";
     }
     
 
     //delete ir_set.first and ir_set.second from btree
     vector_seg::iterator it_seg = ir_set.first.begin();
-    for(; it_seg != ir_set.first.end(); btree.erase(*it_seg++));
-    for(it_seg = ir_set.second.begin(); it_seg != ir_set.second.end();
+    for(; it_seg != ir_set.first.end(); 
+          btree.erase(*it_seg++));
+    for(it_seg = ir_set.second.begin(); 
+        it_seg != ir_set.second.end();
         btree.erase(*it_seg++));
         
     //update sl
@@ -151,7 +156,8 @@ std::pair<vector_seg, vector_seg> get_sets(const Point& p, BST<Segment,Point>::T
   if(btree.empty())
     return std::pair<vector_seg, vector_seg> (i,r);
   //create a segment of lentgh zero representing p :
-  rat x = p.get_abscissa(), y = p.get_ordinate();
+  rat x = p.get_abscissa(); 
+  rat y = p.get_ordinate();
   Segment* s = new Segment(x, y, x, y);
   
   
@@ -159,7 +165,8 @@ std::pair<vector_seg, vector_seg> get_sets(const Point& p, BST<Segment,Point>::T
   std::reverse_iterator<BST<Segment,Point>::Type::iterator> rit(it);
 
   Point q;
-  while(rit != btree.rend() && (*rit)->high(p) == y) {
+  while(rit != btree.rend() 
+    && (*rit)->high(p) == y) { // p is on segment
     if((*rit)->is_in(p))
       i.push_back(*rit);
     else if((*rit)->is_rend(p))

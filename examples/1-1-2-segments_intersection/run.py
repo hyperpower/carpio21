@@ -8,6 +8,7 @@ import runtool as RT
 FILE_ORIGINAL = [
     "main.cpp",
     "two_segments.hpp",
+    "multi_segments.hpp",
     "CMakeLists.txt",
     # "plot.py",
     "run.py",
