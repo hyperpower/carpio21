@@ -535,7 +535,7 @@ Point_<TYPE, DIM> Min(
         const Point_<TYPE, DIM>& b) {
     Point_<TYPE, DIM> res;
     for (St i = 0; i < DIM; i++) {
-        res[i] = std::min(a[i], b[i]);
+        res[i] = (std::min)(a[i], b[i]);
     }
     return res;
 }
@@ -548,7 +548,7 @@ Point_<TYPE, DIM> Max(
         const Point_<TYPE, DIM>& b) {
     Point_<TYPE, DIM> res;
     for (St i = 0; i < DIM; i++) {
-        res[i] = std::max(a[i], b[i]);
+        res[i] = (std::max)(a[i], b[i]);
     }
     return res;
 }

@@ -15,7 +15,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(STATUS "COMPILER is MSVC")
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
-    # set(cmake_cxx_standard 20)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-DNOMINMAX)
     # Force to always compile with W4

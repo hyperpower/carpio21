@@ -5,7 +5,7 @@
 #include "ben-ott/bentley_ottmann.hpp"
 
 
-int SegmentsPlot(const std::string& fn, const std::list<Segment2>& sl){
+void SegmentsPlot(const std::string& fn, const std::list<Segment2>& sl){
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/"+fn);
     gnu.set_xlabel("x");
@@ -32,7 +32,7 @@ auto GenerateSegmentsCase1(){
     lseg.push_back(Seg(2.8, 3.8, 1.5, 1.8));
     return lseg;
 }
-int MultiSegTestCase1(){
+void MultiSegTestCase1(){
     auto sl = GenerateSegmentsCase1<ref::Segment>();
     // SegmentsPlot("case1", sl);
     auto res = ref::bentley_ottmann(sl);
