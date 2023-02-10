@@ -76,20 +76,20 @@ bool Segment::intersect(const Segment& seg, Point& inter) const {
 
 rat Segment::high(const Point& p_sweep) const {
   static rat py, ly, ry;
-  if(slope.type == infty) {
-    py = p_sweep.get_ordinate(), ly = left.get_ordinate(),
-      ry = right.get_ordinate();
+  if(slope.type == infty) { // find max y if vertical
+    py = p_sweep.get_ordinate();
+    ly = left.get_ordinate();
+    ry = right.get_ordinate();
     if(py < ly)
       return ly;
     else if(py > ry)
       return ry;
     else
       return py;
-  }
-  else {
+  }else {
     static rat xa, xb, ya, yb;
-    xa = left.get_abscissa(), ya = left.get_ordinate(),
-      xb = right.get_abscissa(), yb = right.get_ordinate();
+    xa = left.get_abscissa(),  ya = left.get_ordinate(),
+    xb = right.get_abscissa(), yb = right.get_ordinate();
     
     return (yb - ya)/(xb - xa)*(p_sweep.get_abscissa() - xa) + ya;
   }
