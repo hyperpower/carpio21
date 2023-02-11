@@ -7,7 +7,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 set(Sources
     # test_bezier.cpp
     # test_box.cpp
-    test_box3.cpp
+    # test_box3.cpp
     # test_point.cpp
     # test_affine.cpp
     # test_point_chain.cpp
@@ -16,7 +16,7 @@ set(Sources
     # test_seg_tri.cpp
     # test_predicate.cpp
     # test_polygon_partition.cpp
-    # test_segment.cpp
+    test_segment.cpp
 )
 find_package(Python COMPONENTS Interpreter Development)
 

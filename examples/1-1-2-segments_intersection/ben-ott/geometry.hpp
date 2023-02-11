@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <iostream>
+#include "utility/rational.hpp"
+#include "geometry/objects/basic/point.hpp"
+#include "geometry/objects/basic/segment.hpp"
 // #include "integer_type.hpp"
 
 #if USE_BIGINT
@@ -13,12 +16,15 @@ typedef mpq_class rat;
 #else 
 
 typedef int I;
-typedef double rat;
+typedef tcb::rational<long> rat;
 
 #endif
 namespace ref{
   
 class Point {
+public:
+  typedef carpio::PointTag Tag;
+  static const short Dim = 2;
 private:
   rat x; 
   rat y; 
@@ -33,8 +39,34 @@ public:
   rat get_abscissa() const;
   rat get_ordinate() const;
   void assign(const rat&,const rat&);
+  
+  const rat& operator[](int index) const{
+    if(index == 0){
+      return x;
+    }else if (index == 1){
+      return y;
+    }else{
+      throw std::out_of_range("index");
+    }
+  }  //overload []
+  rat& operator[](int index){
+    if(index == 0){
+      return x;
+    }else if (index == 1){
+      return y;
+    }else{
+      throw std::out_of_range("index");
+    }
+  }
 };
 
+inline std::string ToString(const Point& p,const std::string& sep){
+        std::stringstream sstr;
+        sstr.precision(4);
+        sstr << std::scientific << p[0];
+        sstr << sep << p[1];
+        return sstr.str();
+    }
 
 enum slope_t {undef, rational, infty};
 
@@ -46,6 +78,9 @@ struct Slope {
 };
 
 class Segment {
+public:
+  typedef carpio::SegmentTag Tag;
+  static const short Dim = 2;
 private:
   Point left; 
   Point right; 
@@ -69,6 +104,24 @@ public:
     : left(xa, ya), right (xb, yb) {
     slope.make(xa,ya,xb,yb);
   };
+  const Point& operator[](int index) const{
+    if(index == 0){
+      return left;
+    }else if (index == 1){
+      return right;
+    }else{
+      throw std::out_of_range("index");
+    }
+  }  //overload []
+  Point& operator[](int index){
+    if(index == 0){
+      return left;
+    }else if (index == 1){
+      return right;
+    }else{
+      throw std::out_of_range("index");
+    }
+  }
   Point get_left() const;
   Point get_right() const;
   rat high(const Point&) const;
@@ -77,6 +130,7 @@ public:
   bool is_rend(const Point&) const;
   bool is_lend(const Point&) const;
   bool is_in(const Point&) const;
+  bool empty() const{return false;};
 };
 
 // Pretty-printing

@@ -14,8 +14,10 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
 
   std::vector<Segment>::iterator it;
   for(it = set.begin(); it != set.end(); it++) {
-    Event e_left(it->get_left()), e_right(it->get_right());
-    queue.push(e_left, &(*it)), queue.push(e_right);
+    Event e_left(it->get_left());
+    Event e_right(it->get_right());
+    queue.push(e_left, &(*it));
+    queue.push(e_right);
   }
   
   // binary search tree : empty
@@ -25,9 +27,12 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
 
   // treatment of events
   while(queue.size()) {
+    std::cout << " ------------- " << std::endl;
     // current event : p event on top of set
+    std::cout << "queue size = " << queue.size()<< std::endl;
     Event p = queue.top();
     Point point = p.get_point();
+    std::cout << "current point = "<<point << std::endl;
     vector_seg l_set = queue.begin()->second;    
     queue.pop();
     
@@ -35,6 +40,10 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
 
     //checking for intersection
     std::pair<vector_seg, vector_seg> ir_set = get_sets(point, btree);
+    std::cout << "l set size = " << l_set.size() << std::endl;
+    std::cout << "i set size = " << ir_set.first.size() << std::endl;
+    std::cout << "r set size = " << ir_set.second.size() << std::endl;
+    std::cout << "get set tree size  = " << btree.size() << std::endl;
     
     if(l_set.size() + ir_set.first.size() + ir_set.second.size() > 1) {
       map_event::iterator it_ev = (inter.insert(pair_event(p, vector_seg()))).first;
@@ -60,7 +69,8 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
     for(it_seg = ir_set.second.begin(); 
         it_seg != ir_set.second.end();
         btree.erase(*it_seg++));
-        
+    std::cout << "delete ir tree size  = " << btree.size() << std::endl;
+
     //update sl
     p_sweep.assign(point.get_abscissa(), point.get_ordinate());
     
@@ -69,17 +79,17 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
         btree.insert(*it_seg++));
     for(it_seg = ir_set.first.begin(); it_seg != ir_set.first.end();
         btree.insert(*it_seg++));
-    
+    std::cout << "tree size  = " << btree.size() << std::endl;
     //treat new events
     if(l_set.size() + ir_set.first.size() == 0) {
       //p is only the rightpoint of several segments
+      std::cout << "l + i == 0" << std::endl;
       Segment* s_a, * s_b;
       find_neighboors(point, btree, s_a, s_b); 
       
       compute_new_events(s_a, s_b, p, queue);
-    }
-    
-    else {
+    } else {
+      std::cout << "l + i != 0" << std::endl;
       vector_seg v(l_set.size() + ir_set.first.size());
       set_union(l_set.begin(), l_set.end(),
                 ir_set.first.begin(), ir_set.first.end(), v.begin());
@@ -88,6 +98,7 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
       
       compute_new_events(sl, s_b, p, queue); compute_new_events(sr, s_a, p, queue);
     }
+    std::cout << "tree size  = " << btree.size() << std::endl;
   }
   return inter;
 }
@@ -158,13 +169,24 @@ std::pair<vector_seg, vector_seg> get_sets(const Point& p, BST<Segment,Point>::T
   //create a segment of lentgh zero representing p :
   rat x = p.get_abscissa(); 
   rat y = p.get_ordinate();
-  Segment* s = new Segment(x, y, x, y);
+  Segment* s = new Segment(x, x, y, y);
+  std::cout << "get_set s " << *s << std::endl;
   
   
   BST<Segment,Point>::Type::iterator it = btree.upper_bound(s);
+  if(it != btree.end()){
+    std::cout << "get_set  it " << *(*it) << std::endl;
+  }else{
+    std::cout << "get_set  it null" << std::endl;
+  }
   std::reverse_iterator<BST<Segment,Point>::Type::iterator> rit(it);
+  if(rit != btree.rend()){
+    std::cout << "get_set rit " << *(*rit) << std::endl;
+  } else {
+    std::cout << "get_set rit null" << std::endl;
+  }
 
-  Point q;
+  // Point q;
   while(rit != btree.rend() 
     && (*rit)->high(p) == y) { // p is on segment
     if((*rit)->is_in(p))

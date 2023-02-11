@@ -491,7 +491,7 @@ PointToSegmentPosition OnWhichSide7(
 			}else if(p.x() < pe.x() && p.x() > ps.x()){
 				return _PS_IN_;
 			}else{
-				SHOULD_NOT_REACH;
+				throw std::logic_error("Invalid Location");
 			}
 		} else if (dx < 0) {
 			if (p.x() < pe.x()) {
@@ -501,7 +501,7 @@ PointToSegmentPosition OnWhichSide7(
 			} else if (p.x() > pe.x() && p.x() < ps.x()) {
 				return _PS_IN_;
 			} else {
-				SHOULD_NOT_REACH;
+				throw std::logic_error("Invalid Location");
 			}
 		} else { //equal to zero
 			TYPE dy = pe.y() - ps.y();
@@ -510,21 +510,17 @@ PointToSegmentPosition OnWhichSide7(
 					return _PS_OUT_END_;
 				} else if (p.y() < ps.y()) {
 					return _PS_OUT_START_;
-				} else if (p.y() < pe.y() && p.y() > ps.y()) {
-					return _PS_IN_;
 				} else {
-					SHOULD_NOT_REACH;
+					return _PS_IN_;
 				}
 			} else if (dy < 0) {
 				if (p.y() < pe.y()) {
 					return _PS_OUT_END_;
 				} else if (p.y() > ps.y()) {
 					return _PS_OUT_START_;
-				} else if (p.y() > pe.y() && p.y() < ps.y()) {
-					return _PS_IN_;
 				} else {
-					SHOULD_NOT_REACH;
-				}
+					return _PS_IN_;
+				} 
 			}else{
 				SHOULD_NOT_REACH;
 			}

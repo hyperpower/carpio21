@@ -10,12 +10,12 @@
 
 namespace carpio {
 
-template<typename TYPE, St DIM, class OBJ>
+template<typename TYPE, St DIM, class POINT>
 class AABBox_ : public Box_<TYPE, DIM> {
 public:
 	static const St Dim = DIM;
 	typedef Point_<TYPE, DIM> Point;
-	typedef AABBox_<TYPE, DIM, OBJ> Self;
+	typedef AABBox_<TYPE, DIM, POINT> Self;
 	typedef Box_<TYPE, DIM> Base;
 	typedef St size_type;
 	typedef TYPE Vt;
@@ -23,7 +23,7 @@ public:
 	typedef TYPE* pointer;
 	typedef const TYPE* const_pointer;
 	typedef const TYPE& const_reference;
-	typedef OBJ Object;
+	typedef POINT Object;
 	typedef Object* pObject;
 
 protected:
@@ -64,9 +64,9 @@ public:
 	}
 };
 
-template<typename TYPE, St DIM, class OBJ>
+template<typename TYPE, St DIM, class POINT>
 class AABBoxCompareLess_{
-	typedef AABBox_<TYPE, DIM, OBJ> Box;
+	typedef AABBox_<TYPE, DIM, POINT> Box;
 public:
 	bool operator()(const Box& a, const Box& b){
 		for(St d = 0; d < DIM; d++){
