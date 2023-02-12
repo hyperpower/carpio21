@@ -87,7 +87,8 @@ struct SegSlope_ {
         make(seg);
     }
 
-    void make(const TYPE& x0,const TYPE& y0,const TYPE& x1,const TYPE& y1){
+    void make(const TYPE& x0,const TYPE& y0,
+              const TYPE& x1,const TYPE& y1){
         if(x0 == x1)
             type = _INFINITY_;
         else {
@@ -223,7 +224,7 @@ public:
             //   they are adjacent in T. 
             //   Let R(p) denote the subset of segments found whose right endpoint is p, 
             //   and let C(p) denote the subset of segments found that contain p in their interior.
-
+            auto pair_rc = get_sets(p_sweep, status);
 
 
 
@@ -238,6 +239,11 @@ public:
         if(tree.empty()){
             return std::pair<List, List> (r, c);
         }
+        auto x = p.x();
+        auto y = p.y();
+        Segment s(x, x, y, y);
+
+        auto it = tree.upper_bound(&s);
 
 
 
