@@ -48,7 +48,13 @@ int MultiSegTestCase1(){
 }
 
 int TEST_DS(){
-   std::cout << std::is_pointer<std::shared_ptr<int> >::value << std::endl;
+    typedef IntersectionBenOtt_<double> Inter;
+    auto sl = GenerateSegmentsCase1<Segment_<double, 2> >();
+
+    Inter inter(sl);
+
+    inter.execute();
+
 
 }
 

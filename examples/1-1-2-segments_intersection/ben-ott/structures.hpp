@@ -20,6 +20,7 @@ struct BST {
   typedef std::set <T*, compare<T,Comp> > Type;
 };
 
+// BST<Segment,Point>::Type btree(comp);
 
 template <class T, class A> 
 struct PriorityQueue_t {
