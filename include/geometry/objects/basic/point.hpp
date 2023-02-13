@@ -148,6 +148,24 @@ public:
     void set(Axes a, Vt value){
         (*this)(a) = value;
     }
+    void x(const Vt& value){
+        (*this)(0) = value;
+    }
+    void y(const Vt& value){
+        if constexpr ( Dim > 1){
+            (*this)(1) = value;
+        }else{
+            throw std::out_of_range("not y");
+        }
+    }
+    void z(const Vt& value){
+        if constexpr ( Dim > 2){
+            (*this)(1) = value;
+        }else{
+            throw std::out_of_range("not z");
+        }
+    }
+
     const_reference x() const {
         return this->at(0);
     }

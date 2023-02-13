@@ -9,6 +9,7 @@
 #include "geometry/geometry.hpp"
 #include "utility/random.hpp"
 #include "utility/profile.hpp"
+#include "utility/rational.hpp"
 #include "gtest/gtest.h"
 
 using namespace carpio;
@@ -270,10 +271,26 @@ TEST(segment, geo_status_b){
     cur_x = 0.1;
     GeoComponent gc4(nullptr, 1, 1.3);
     status.insert(gc4, cfun);
-
-
     status.in_order(visit_output);
+}
 
 
+TEST(segment, rational){
+    using rational = tcb::rational<int>;
+
+    constexpr rational r1{};
+    static_assert(r1.num() == 0, "");
+    static_assert(r1.denom() == 1, "");
+    std::cout << r1 << std::endl;
+
+    rational r2;
+    ASSERT_EQ(r2.num(), 0);
+    ASSERT_EQ(r2.denom(), 1);
+
+    rational r3 = 3; 
+    std::cout << r3 << std::endl;
+    r2 = 2;
+    auto r4 = r2/ r3;
+    std::cout << r4 << std::endl;
 
 }

@@ -3,9 +3,10 @@
 
 #include "two_segments.hpp" 
 #include "ben-ott/bentley_ottmann.hpp"
+#include "ben-ott/ben_ott_structures.hpp"
 
-
-void SegmentsPlot(const std::string& fn, const std::list<Segment2>& sl){
+template<class LISTSEG>
+int SegmentsPlot(const std::string& fn, const LISTSEG& sl){
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/"+fn);
     gnu.set_xlabel("x");
@@ -18,6 +19,7 @@ void SegmentsPlot(const std::string& fn, const std::list<Segment2>& sl){
 
     gnu.add(a1);
     gnu.plot();
+    return 0;
 }
 template<class SEG_TYPE>
 auto GenerateSegmentsCase1(){
@@ -25,11 +27,13 @@ auto GenerateSegmentsCase1(){
     typedef std::vector<SEG_TYPE> ListSegment;
     ListSegment lseg;
     //                      x1   x2   y1   y2
-    lseg.push_back(Seg(1.0, 2.0, 1.0, 2.0));
-    lseg.push_back(Seg(1.1, 2.3, 2.5, 4.0));
-    lseg.push_back(Seg(2.1, 3.3, 3.5, 2.0));
-    lseg.push_back(Seg(1.8, 3.3, 2.5, 3.5));
-    lseg.push_back(Seg(2.8, 3.8, 1.5, 1.8));
+    lseg.push_back(Seg(0, 3, 1, 4));
+    lseg.push_back(Seg(1, 3, 3, 1));
+    lseg.push_back(Seg(2, 5, 2, 3));
+    // lseg.push_back(Seg(2.1, 3.3, 3.5, 2.0));
+    // lseg.push_back(Seg(1.8, 3.3, 2.5, 3.5));
+    // lseg.push_back(Seg(2.8, 3.8, 1.5, 1.8));
+    SegmentsPlot("case1", lseg);
     return lseg;
 }
 void MultiSegTestCase1(){
@@ -42,6 +46,17 @@ void MultiSegTestCase1(){
         auto& vs = m.second;
         std::cout << "x ="<<e.get_point().get_abscissa() << " y = " << e.get_point().get_ordinate() << std::endl;
     }
+}
+
+int TEST_DS(){
+    typedef IntersectionBenOtt_<double> Inter;
+    auto sl = GenerateSegmentsCase1<Segment_<double, 2> >();
+
+    Inter inter(sl);
+
+    inter.execute();
+
+    return 1;
 }
 
 

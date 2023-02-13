@@ -77,7 +77,8 @@ int main(int argc, char** argv) {
     MakeDir("./fig/");
 
     // two_segments_test();
-    MultiSegTestCase1();
+    // MultiSegTestCase1();
+    TEST_DS();
 
     // benchmark_test();
 }

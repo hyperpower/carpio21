@@ -70,7 +70,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/external/googletest)
 #     )
 # endif()
 
-# include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 enable_testing()
 

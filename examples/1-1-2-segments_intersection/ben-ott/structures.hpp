@@ -5,21 +5,25 @@
 #include <vector>
 #include <map>
 namespace ref{
-template <class T, class Comp> struct compare {
+template <class T, class Comp> 
+struct compare {
   Comp* comp; 
   compare(Comp* c) : comp(c) { }; 
 
-  bool operator() (T* a, T* b) {
+  bool operator() (const T* a, const T* b) const {
     return a->less(*b,*comp); 
   }
 };
 
-template <class T, class Comp> struct BST {
+template <class T, class Comp>
+struct BST {
   typedef std::set <T*, compare<T,Comp> > Type;
 };
 
+// BST<Segment,Point>::Type btree(comp);
 
-template <class T, class A> struct PriorityQueue_t {
+template <class T, class A> 
+struct PriorityQueue_t {
   typedef std::map<T, std::vector<A> > Type;
 };
 

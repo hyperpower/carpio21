@@ -15,6 +15,23 @@ struct SegmentTag: public GeometryTag {};
 
 template<typename TYPE, St DIM> class Box_;
 
+template<class ANY>
+struct IsSegment{
+private:
+	typedef char yes;
+    typedef long no;
+
+    template<class T, typename std::enable_if<
+            std::is_base_of<SegmentTag, typename T::Tag>::value, bool>::type = true > 
+    static yes  test(int i, typename T::Tag = typename T::Tag());
+    template<class T>
+    static no test(...);
+public:
+    static const bool value = sizeof(test<ANY>(0)) == sizeof(yes);
+
+	typedef typename std::integral_constant<bool, value>::type type;
+};
+
 template<typename TYPE, St DIM>
 class Segment_: public std::array< Point_<TYPE, DIM>, 2> {
 public:
@@ -87,7 +104,30 @@ public:
 		ASSERT( (i==0) || (i==1));
 		return this->operator [](i);
 	}
-
+	ref_Point p_less_x(){
+		return (pex() < psx()) ? p(1) : p(0);
+	}
+	const_ref_Point p_less_x() const{
+		return (pex() < psx()) ? p(1) : p(0);
+	}
+	ref_Point p_less_y(){
+		return (pey() < psy()) ? p(1) : p(0);
+	}
+	const_ref_Point p_less_y() const{
+		return (pey() < psy()) ? p(1) : p(0);
+	}
+	ref_Point p_greater_x(){
+		return (pex() < psx()) ? p(0) : p(1);
+	}
+	const_ref_Point p_greater_x() const{
+		return (pex() < psx()) ? p(0) : p(1);
+	}
+	ref_Point p_greater_y(){
+		return (pey() < psy()) ? p(0) : p(1);
+	}
+	const_ref_Point p_greater_y() const{
+		return (pey() < psy()) ? p(0) : p(1);
+	}
 	Point& ps() {
 		return this->at(0);
 	}
@@ -104,7 +144,6 @@ public:
 		return Point((pex() + psx()) * 0.5, (pey() + psy()) * 0.5,
 				(Dim == 3) ? ((pez() + psz()) * 0.5) : 0);
 	}
-
 	const_ref_Vt psx() const {
 		return this->ps().x();
 	}
@@ -318,6 +357,7 @@ public:
 						|| ((pey() <= pt.y) && (pt.y <= psy())));
 	}
 
+
 protected:
 	void _set_empty() {
 		ps().x() = 0.0;
@@ -491,7 +531,7 @@ PointToSegmentPosition OnWhichSide7(
 			}else if(p.x() < pe.x() && p.x() > ps.x()){
 				return _PS_IN_;
 			}else{
-				SHOULD_NOT_REACH;
+				throw std::logic_error("Invalid Location");
 			}
 		} else if (dx < 0) {
 			if (p.x() < pe.x()) {
@@ -501,7 +541,7 @@ PointToSegmentPosition OnWhichSide7(
 			} else if (p.x() > pe.x() && p.x() < ps.x()) {
 				return _PS_IN_;
 			} else {
-				SHOULD_NOT_REACH;
+				throw std::logic_error("Invalid Location");
 			}
 		} else { //equal to zero
 			TYPE dy = pe.y() - ps.y();
@@ -510,21 +550,17 @@ PointToSegmentPosition OnWhichSide7(
 					return _PS_OUT_END_;
 				} else if (p.y() < ps.y()) {
 					return _PS_OUT_START_;
-				} else if (p.y() < pe.y() && p.y() > ps.y()) {
-					return _PS_IN_;
 				} else {
-					SHOULD_NOT_REACH;
+					return _PS_IN_;
 				}
 			} else if (dy < 0) {
 				if (p.y() < pe.y()) {
 					return _PS_OUT_END_;
 				} else if (p.y() > ps.y()) {
 					return _PS_OUT_START_;
-				} else if (p.y() > pe.y() && p.y() < ps.y()) {
-					return _PS_IN_;
 				} else {
-					SHOULD_NOT_REACH;
-				}
+					return _PS_IN_;
+				} 
 			}else{
 				SHOULD_NOT_REACH;
 			}
