@@ -7,6 +7,7 @@
 #include "algebra/array/array_list.hpp"
 
 #include <memory>
+#include <iterator>
 
 namespace carpio {
 
@@ -20,7 +21,6 @@ inline std::string ToString(IntersectionTypeSS ss){
         case _SS_SAME_     :  return "SAME";     break;
         case _SS_INTERSECT_:  return "INTERSECT";break;
     }
-    SHOULD_NOT_REACH;
     return "ERROR IntersectionType";
 }
 
@@ -218,24 +218,51 @@ public:
     typedef GEO2 Geo2;
     typedef typename GEO1::Point Point;
     typedef IntersectionResultImplement_<GEO1, GEO2, SegmentTag, SegmentTag> Self;
+    typedef const GEO1* cpGeo;
+    typedef std::list<cpGeo> ListcpGeo;
 
-    const Geo1* geo1;
-    const Geo2* geo2;
+    // const Geo1* geo1;
+    // const Geo2* geo2;
 
     int type;
     Point point;
+    ListcpGeo list;
 
-    IntersectionResultImplement_(): 
-        geo1(nullptr), geo2(nullptr), type(-1){}
+    IntersectionResultImplement_(): type(-1){}
     
-    IntersectionResultImplement_(const Geo1& g1, const Geo2& g2, int t): 
-        geo1(&g1), geo2(&g2), type(t){}
+    IntersectionResultImplement_(const Point& p): 
+        type(-1), point(p){}
+    
+    IntersectionResultImplement_(const Geo1& g1, const Geo2& g2, int t):  type(t){
+        list.push_back(&g1);
+        list.push_back(&g2);
+    }
+
+    void geo1(const Geo1& g){
+        auto it = list.begin();
+        (*it) = &g;
+    }
+    void geo2(const Geo1& g){
+        auto it = list.begin();
+        std::advance(it, 1);
+        (*it) = &g;
+    }
+
+    void add(const Geo1& g){
+        list.push_back(&g);
+    }
     
     void show() const{
-        std::cout << "Seg1 : " << *geo1 << std::endl;
-        std::cout << "Seg2 : " << *geo2 << std::endl;
-        auto tss = ToIntersectionTypeSS(type);
-        std::cout << "Type : " << ToString(tss) << std::endl;
+        auto it = list.begin();
+        std::cout << "Seg1 : " << *(*it) << std::endl;
+        it++;
+        std::cout << "Seg2 : " << *(*it) << std::endl;
+        if(list.size() > 2){
+            std::cout << "Multi Segments (" << list.size() <<")Intersect" << std::endl;
+        }else{
+            auto tss = ToIntersectionTypeSS(type);
+            std::cout << "Type : " << ToString(tss) << std::endl;
+        }
         std::cout << "Point: " << point << std::endl;
     }
 };
@@ -288,8 +315,8 @@ public:
         if (_is_box_in_on()) {
             _get_relation();
         }
-        _res.geo1 = &seg1;
-        _res.geo2 = &seg2;
+        _res.geo1(seg1);
+        _res.geo2(seg2);
     }
     IntersectionTypeSS cal_intersection_type(){
         if(_position[1] > -1){

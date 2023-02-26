@@ -226,6 +226,27 @@ public:
             //   and let C(p) denote the subset of segments found that contain p in their interior.
             auto pair_rc = get_sets(p_sweep, status);
 
+            //3. if L(p) and C(p) and R(p) contains more than one segment
+            //   then Report P as an intersection, together with L(p) and C(p) and R(p) 
+            if(l_set.size() + pair_rc.first.size() + pair_rc.second.size() > 1){
+                Result res(point);
+                
+                for(auto s : l_set){
+                    res.add(*s);
+                }
+                for(auto s : pair_rc.first){
+                    res.add(*s);
+                }
+                for(auto s : pair_rc.second){
+                    res.add(*s);
+                }
+                
+                _list_res.emplace_back(res);
+            }
+
+            //4. Delete the segments in R(p) and C(p) from T
+
+
 
 
             i++;
