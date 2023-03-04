@@ -3,13 +3,14 @@
 #include "utility/profile.hpp"
 #include "two_segments.hpp"
 #include "multi_segments.hpp"
+#include "segment_with_name.hpp"
 
 using namespace carpio;
 
 auto GenerateRandomSegments(int num,
                             const double& xmin, const double& xmax,
                             const double& ymin, const double& ymax){
-    typedef std::list<Segment2> ListSegment;
+    typedef std::list<Segment> ListSegment;
     ListSegment lseg;
     // Random::seed(std::time(0));
     for (int i = 0; i< num ; i++){
@@ -17,7 +18,7 @@ auto GenerateRandomSegments(int num,
         double y1 = Random::nextDouble(ymin, ymax);
         double x2 = Random::nextDouble(xmin, xmax);
         double y2 = Random::nextDouble(ymin, ymax);
-        lseg.push_back(Segment2(x1, x2, y1, y2));
+        lseg.push_back(Segment(Point(x1, y1), Point(x2, y2)));
     }
     return lseg;
 }
@@ -76,7 +77,7 @@ void benchmark_test(){
 int main(int argc, char** argv) {
     MakeDir("./fig/");
 
-    // two_segments_test();
+    two_segments_test();
     // MultiSegTestCase1();
     TEST_DS();
 

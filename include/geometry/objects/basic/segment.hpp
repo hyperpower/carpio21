@@ -166,12 +166,12 @@ public:
 		ASSERT(Dim >= 3);
 		return this->pe().z();
 	}
-	ref_Vt psx() {
-		return this->ps().x();
-	}
-	ref_Vt pex() {
-		return this->pe().x();
-	}
+	void   psx(const Vt& v){ (*this)[0][0] = v;}
+	ref_Vt psx()           { return (*this)[0][0]; }
+	
+	void   pex(const Vt& v){ (*this)[1][0] = v;}
+	ref_Vt pex() { return this->pe().x(); }
+	
 	ref_Vt psy() {
 		ASSERT(Dim >= 2);
 		return this->ps().y();
@@ -254,6 +254,37 @@ public:
 			psz() = psz() + dz;
 			pez() = pez() + dz;
 		}
+	}
+
+	void rotate90() {
+		auto dx = this->dx();
+		auto dy = this->dy();
+    	this->pex() -= dy;
+    	this->pey() += dx;
+	}
+
+	Point tangent_vector() const{
+		Point nv;
+		for(int d = 0; d<Dim; d++){
+			nv[d] = (*this)[1][d] - (*this)[0][d];
+		}
+		return nv;
+	}	
+
+	Point normal_unit_vector() const{
+		Point nv;
+		for(int d = 0; d<Dim; d++){
+			nv[d] = (*this)[1][d] - (*this)[0][d];
+		}
+		if constexpr (Dim > 1){
+			auto x = -nv[1];
+			nv[1] = nv[0];
+			nv[0] = x;
+		}else{
+			throw std::logic_error("Dim = 1, no normal unit vector");
+		}
+		Normalize(nv);
+		return nv;
 	}
 
 	/** Set the beginning point */

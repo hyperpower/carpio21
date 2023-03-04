@@ -9,6 +9,7 @@ FILE_ORIGINAL = [
     "main.cpp",
     "two_segments.hpp",
     "multi_segments.hpp",
+    "segment_with_name.hpp",
     "CMakeLists.txt",
     # "plot.py",
     "run.py",

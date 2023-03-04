@@ -385,14 +385,17 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& seg, SegmentTag){
 }
 template<typename ANY>
 void MakeGnuplotActorAsVector(GnuplotActor& actor, const ANY& seg, SegmentTag){
-    actor.command() = "using 1:2 title \"\" ";
+    actor.command("using 1:2:3:4 title \"\" ");
     actor.set_using(ANY::Dim * 2);
-    actor.style()   = "with vectors lc 1"; // default color is 1
+    actor.style("with vectors head filled lc 1"); // default color is 1
     if (seg.empty()) {
         actor.data().push_back("");
         return;
     }
-    actor.data().push_back(ToString(seg[0], " ") + " " + ToString(seg[1], " "));
+    actor.data().push_back(
+        ToString(seg[0], " ") 
+        + " " 
+        + ToString(seg.tangent_vector(), " "));
 
     actor.data().push_back("");
 }
