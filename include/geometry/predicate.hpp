@@ -261,9 +261,12 @@ namespace detail {
     #endif
 
     #ifdef PREDICATES_CXX11_IS_SUPPORTED
-    template <typename T> struct use_fma {static const bool value = (std::is_same<T, float>::value       && fp_fast_fmaf) ||
-                                                                    (std::is_same<T, double>::value      && fp_fast_fma)  ||
-                                                                    (std::is_same<T, long double>::value && fp_fast_fmal);};
+    template <typename T> 
+    struct use_fma {
+        static const bool value = (std::is_same<T, float>::value       && fp_fast_fmaf) ||
+                                  (std::is_same<T, double>::value      && fp_fast_fma)  ||
+                                  (std::is_same<T, long double>::value && fp_fast_fmal);
+    };
     #endif
 
     //@brief  : helper function to sort by absolute value

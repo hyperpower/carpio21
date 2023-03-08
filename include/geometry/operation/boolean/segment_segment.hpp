@@ -68,11 +68,12 @@ inline VEC CalSegmentsIntersection(const VEC& s1s, const VEC& s1e,
         auto y2 = s2s[1];
         auto y3 = s2e[1];
 
-        double denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e-20;
+        typedef typename VEC::value_type Cvt;
+        Cvt denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e20;
 
-        double x = ((x0 * y1 - y0 * x1) * (x2 - x3)
+        Cvt x = ((x0 * y1 - y0 * x1) * (x2 - x3)
                 - (x0 - x1) * (x2 * y3 - y2 * x3)) / denom ;
-        double y = ((x0 * y1 - y0 * x1) * (y2 - y3)
+        Cvt y = ((x0 * y1 - y0 * x1) * (y2 - y3)
                 - (y0 - y1) * (x2 * y3 - y2 * x3)) / denom;
 
         return {{x, y}};
@@ -91,10 +92,11 @@ inline VEC CalSegmentsIntersection(const VEC& s1e,
         auto y2 = s2s[1];
         auto y3 = s2e[1];
 
-        double denom = (-x1) * (y2- y3) - (- y1) * (x2- x3) + 1e-20;
+        typedef typename VEC::value_type Cvt;
+        Cvt denom = (-x1) * (y2- y3) - (- y1) * (x2- x3) + 1e-20;
 
-        double x = (x1 * (x2 * y3 - y2 * x3)) / denom ;
-        double y = (y1 * (x2 * y3 - y2 * x3)) / denom;
+        Cvt x = (x1 * (x2 * y3 - y2 * x3)) / denom ;
+        Cvt y = (y1 * (x2 * y3 - y2 * x3)) / denom;
 
         return {{x, y}};
 }

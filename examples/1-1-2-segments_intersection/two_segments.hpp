@@ -6,6 +6,7 @@
 #include <string>
 #include "geometry/geometry.hpp"
 #include "segment_with_name.hpp"
+#include "utility/rational.hpp"
 
 using namespace carpio;
 
@@ -36,7 +37,6 @@ int plot_a_case(const std::string& case_name,
     a11.title("Segment " + seg1.get_name());
     a11.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
 
-
     auto a2 = ToGnuplotActor(seg2);
     a2.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#F25022\"");
     nv1 = seg2.normal_unit_vector();
@@ -52,8 +52,6 @@ int plot_a_case(const std::string& case_name,
     a3.style("with points pointtype 1 pointsize 3 lw 3 lc black");
     a3.title("Intersection point " + ToString(interp));
 
-
-
     gnu.set_grid();
 
     gnu.add(a1);
@@ -66,7 +64,6 @@ int plot_a_case(const std::string& case_name,
     return 0;
 
 }
-
 
 int a_case(const Point& p1,
            const Point& p2,
@@ -107,6 +104,38 @@ void two_segments_test(){
     // SAME
     a_case(Point( -1, -1), Point( 2,   2),
            Point( -1, -1), Point( 2,   2));
+}
+
+
+void intersection_on_segment(){
+    typedef Rational_<int> Cvt;
+    // typedef float Cvt;
+    typedef Point_<Cvt, 2> Poi;
+    typedef SegmentWithName_<Cvt, 2> Seg;
+    typedef Intersection_<Seg, Seg>  Inter;
+
+    Poi p1(  -30, -30);
+    Poi p2(   30,  30);
+
+    int dx = 1;
+    Poi p3(-25 + dx , -25);
+    Poi p4( 25 - dx,   25);
+    std::cout << p3 << std::endl;
+
+    Seg seg1(p1, p2, "a");
+    Seg seg2(p3, p4, "b");
+
+    // Inter inter(seg1, seg2);
+    // auto strtype = ToString(inter.cal_intersection_type());
+    // std::cout << "Intersection Type : "<< strtype << std::endl;
+    // Poi np = inter.cal_intersection_point();
+    // std::cout << "new point         : "<< np << std::endl;
+
+	// auto res     = OnWhichSide7(p1, p2, np);
+	// auto str_res = ToString(res);
+    // std::cout << "Intersection point position : " << str_res << std::endl;
+
+    // plot_a_case("inter", seg1, seg2, np);
 }
 
 #endif

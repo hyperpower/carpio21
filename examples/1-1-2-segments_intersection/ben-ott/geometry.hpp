@@ -15,8 +15,10 @@ typedef mpq_class rat;
 
 #else 
 
+using namespace carpio;
+
 typedef int I;
-typedef tcb::Rational_<long> rat;
+typedef Rational_<long> rat;
 
 #endif
 namespace ref{
