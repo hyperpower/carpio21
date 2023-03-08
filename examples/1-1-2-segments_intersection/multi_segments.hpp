@@ -15,7 +15,7 @@ int SegmentsPlot(const std::string& fn, const LISTSEG& sl){
 
     auto a1 = ToGnuplotActor(sl);
     // a1.command("using 1:2 title "" ");
-    a1.style("with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
+    a1.style("with linespoints pointtype 7 pointsize 2 lw 2 lc rgb \"#00A4EF\"");
 
     gnu.add(a1);
     gnu.plot();
@@ -26,13 +26,14 @@ auto GenerateSegmentsCase1(){
     typedef SEG_TYPE Seg;
     typedef std::vector<SEG_TYPE> ListSegment;
     ListSegment lseg;
-    //                      x1   x2   y1   y2
-    lseg.push_back(Seg(0, 3, 1, 4));
-    lseg.push_back(Seg(1, 3, 3, 1));
-    lseg.push_back(Seg(2, 5, 2, 3));
-    // lseg.push_back(Seg(2.1, 3.3, 3.5, 2.0));
-    // lseg.push_back(Seg(1.8, 3.3, 2.5, 3.5));
-    // lseg.push_back(Seg(2.8, 3.8, 1.5, 1.8));
+    //                 x1   x2   y1   y2
+    lseg.push_back(Seg(3,  11, 15, 26));
+    lseg.push_back(Seg(0,  30, 10, 40));
+    lseg.push_back(Seg(10, 30, 30, 10));
+    lseg.push_back(Seg(25, 50, 20, 30));
+    lseg.push_back(Seg(21, 33, 35, 20));
+    lseg.push_back(Seg(18, 33, 25, 35));
+    lseg.push_back(Seg(28, 38, 15, 18));
     SegmentsPlot("case1", lseg);
     return lseg;
 }

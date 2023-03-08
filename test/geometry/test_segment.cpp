@@ -276,7 +276,7 @@ TEST(segment, geo_status_b){
 
 
 TEST(segment, rational){
-    using rational = tcb::rational<int>;
+    using rational = Rational_<int>;
 
     constexpr rational r1{};
     static_assert(r1.num() == 0, "");

@@ -156,6 +156,15 @@ public:
         this->_set_cmd(this->_scmd, "lc", " " + ToString(idx) + " ");
         return *this;
     }
+    GnuplotActor& line_color_blue(){
+        this->_set_cmd(this->_scmd, "lc", " rgb \"#00A4EF\"");
+        return *this;
+    }
+    GnuplotActor& line_color_red(){
+        this->_set_cmd(this->_scmd, "lc", " rgb \"#F25022\"");
+        return *this;
+    }
+    
     GnuplotActor& line_width(const int& idx){
         this->_set_cmd(this->_scmd, "lw", " " + ToString(idx) + " ");
         return *this;
@@ -189,8 +198,8 @@ protected:
             ssplit.push_back(key);
             ssplit.push_back(value);
         }else if(op == 1){
-            ssplit.push_back(value);
-            ssplit.push_back(key);
+            ssplit.push_front(value);
+            ssplit.push_front(key);
         }
         cmd = ToString(ssplit, " "); 
     }
@@ -681,15 +690,17 @@ public:
     }
     //------------------------------------------------------------------------------
     //
-    Gnuplot& set_terminal_pdf(const std::string& filename, double x = 400,
-            double y = 300, const std::string& font = "Helvetica",
+    Gnuplot& set_terminal_pdf(const std::string& filename, 
+            double x = 800,
+            double y = 600, 
+            const std::string& font = "Helvetica",
             int fontsize = 12) {
         this->terminal_std = "pdfcairo";
         std::stringstream sst;
         sst << "set terminal " << this->terminal_std << " enhanced font '"
                 << font << "," << fontsize << "'" << "size " << x << ", " << y;
         cmd(sst.str());
-        cmd("set output '" + filename + "'");
+        cmd("set output '" + filename + ".pdf'");
         return *this;
     }
 

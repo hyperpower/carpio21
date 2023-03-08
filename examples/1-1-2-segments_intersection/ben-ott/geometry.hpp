@@ -16,7 +16,7 @@ typedef mpq_class rat;
 #else 
 
 typedef int I;
-typedef tcb::rational<long> rat;
+typedef tcb::Rational_<long> rat;
 
 #endif
 namespace ref{

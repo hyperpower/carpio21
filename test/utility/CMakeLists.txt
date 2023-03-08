@@ -3,8 +3,9 @@ cmake_minimum_required(VERSION 3.0)
 set(This Utility)
 
 set(Sources
-    test_tree.cpp
+    # test_tree.cpp
     # test_any.cpp
+    test_big_int.cpp
 )
 
 add_executable(${This} ${Sources})

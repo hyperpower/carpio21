@@ -24,7 +24,7 @@
 // #define TCB_HAVE_CONCEPTS
 // #endif
 
-namespace tcb {
+namespace carpio {
 
 namespace detail {
 
@@ -69,50 +69,50 @@ constexpr bool is_nonnarrowing_assignable_v = is_nonnarrowing_assignable<T, U>::
 } // end namespace detail
 
 template <typename T>
-class rational {
+class Rational_ {
 public:
     static_assert(std::is_integral<T>::value,
-                  "tcb::rational<T> requires T to be an integral type");
+                  "tcb::Rational_<T> requires T to be an integral type");
 
     using value_type = T;
 
     /* Construction */
 
-    constexpr rational() = default;
+    constexpr Rational_() = default;
 
     template <typename U, typename = std::enable_if_t<std::is_integral<U>::value>>
-    constexpr rational(U num)
+    constexpr Rational_(U num)
         : num_(num)
     {}
 
-    TCB_CONSTEXPR14 rational(value_type num, value_type denom)
+    TCB_CONSTEXPR14 Rational_(value_type num, value_type denom)
         : num_{num}, denom_{denom}
     {
         simplify();
     }
 
-    constexpr rational(const rational&) = default;
+    constexpr Rational_(const Rational_&) = default;
 
     template <typename U,
               typename = std::enable_if_t<detail::is_nonnarrowing_assignable_v<T, U>>>
-    constexpr rational(const rational<U>& other)
+    constexpr Rational_(const Rational_<U>& other)
             : num_(other.num()), denom_(other.denom())
     {}
 
     /* Assignment */
 
-    constexpr rational& operator=(const rational&) = default;
+    constexpr Rational_& operator=(const Rational_&) = default;
 
     template <typename U,
               typename = std::enable_if_t<detail::is_nonnarrowing_assignable_v<T, U>>>
-    TCB_CONSTEXPR14 rational& operator=(const rational<U>& other)
+    TCB_CONSTEXPR14 Rational_& operator=(const Rational_<U>& other)
     {
         num_ = value_type{other.num()};
         denom_ = value_type{other.denom()};
         return *this;
     }
 
-    TCB_CONSTEXPR14 void swap(rational& other)
+    TCB_CONSTEXPR14 void swap(Rational_& other)
     {
         using std::swap;
         swap(num_, other.num_);
@@ -128,7 +128,7 @@ public:
     /* Compound assignment */
 
     template <typename U>
-    TCB_CONSTEXPR14 rational& operator+=(const rational<U>& other)
+    TCB_CONSTEXPR14 Rational_& operator+=(const Rational_<U>& other)
     {
         num_ *= other.denom();
         num_ += denom_ * other.num();
@@ -139,13 +139,13 @@ public:
 
     template <typename U,
               typename = std::enable_if_t<std::is_integral<U>::value>>
-    TCB_CONSTEXPR14 rational& operator+=(U other)
+    TCB_CONSTEXPR14 Rational_& operator+=(U other)
     {
-        return *this += rational<U>{other};
+        return *this += Rational_<U>{other};
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 rational& operator-=(const rational<U>& other)
+    TCB_CONSTEXPR14 Rational_& operator-=(const Rational_<U>& other)
     {
         num_ *= other.denom();
         num_ -= denom_ * other.num();
@@ -155,13 +155,13 @@ public:
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 rational& operator-=(U other)
+    TCB_CONSTEXPR14 Rational_& operator-=(U other)
     {
-        return *this -= rational<U>{other};
+        return *this -= Rational_<U>{other};
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 rational& operator*=(const rational<U>& other)
+    TCB_CONSTEXPR14 Rational_& operator*=(const Rational_<U>& other)
     {
         num_ *= other.num();
         denom_ *= other.denom();
@@ -170,13 +170,13 @@ public:
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 rational& operator*=(U other)
+    TCB_CONSTEXPR14 Rational_& operator*=(U other)
     {
-        return *this *= rational<U>{other};
+        return *this *= Rational_<U>{other};
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 rational& operator/=(const rational<U>& other)
+    TCB_CONSTEXPR14 Rational_& operator/=(const Rational_<U>& other)
     {
         num_ *= other.denom();
         denom_ *= other.num();
@@ -185,17 +185,17 @@ public:
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 rational& operator/=(U other)
+    TCB_CONSTEXPR14 Rational_& operator/=(U other)
     {
-        return *this /= rational<U>{other};
+        return *this /= Rational_<U>{other};
     }
 
     /* Conversion */
 
     template <typename U>
-    constexpr explicit operator rational<U>() const
+    constexpr explicit operator Rational_<U>() const
     {
-        return rational<U>{static_cast<U>(num_), static_cast<U>(denom_)};
+        return Rational_<U>{static_cast<U>(num_), static_cast<U>(denom_)};
     }
 
     constexpr operator long double() const
@@ -222,30 +222,30 @@ private:
  */
 
 template <typename T>
-void swap(rational<T>& r1, rational<T>& r2)
+void swap(Rational_<T>& r1, Rational_<T>& r2)
 {
     r1.swap(r2);
 }
 
 /*
- * Some sized aliases for rational<T>
+ * Some sized aliases for Rational_<T>
  */
 
-using rational8_t = rational<std::int_least8_t>;
-using rational16_t = rational<std::int_least16_t>;
-using rational32_t = rational<std::int_least32_t>;
-using rational64_t = rational<std::int_least64_t>;
-using rational_max_t = rational<std::intmax_t>;
+using rational8_t = Rational_<std::int_least8_t>;
+using rational16_t = Rational_<std::int_least16_t>;
+using rational32_t = Rational_<std::int_least32_t>;
+using rational64_t = Rational_<std::int_least64_t>;
+using rational_max_t = Rational_<std::intmax_t>;
 
 /*
- * SFINAE-able type trait for rational types
+ * SFINAE-able type trait for Rational_ types
  */
 
 template <typename T, typename = void>
 struct is_rational : std::is_integral<T> {};
 
 template <typename T>
-struct is_rational<rational<T>>
+struct is_rational<Rational_<T> >
         : std::conditional_t<std::is_integral<T>::value,
                              std::true_type, std::false_type> {};
 
@@ -266,7 +266,7 @@ struct rational_value_type<T, detail::void_t<std::enable_if_t<std::is_integral<T
 };
 
 template <typename T>
-struct rational_value_type<rational<T>> {
+struct rational_value_type<Rational_<T>> {
     using type = T;
 };
 
@@ -300,7 +300,7 @@ constexpr T numerator(T value)
 }
 
 template <typename T>
-constexpr T numerator(const rational<T>& r)
+constexpr T numerator(const Rational_<T>& r)
 {
     return r.num();
 }
@@ -319,7 +319,7 @@ constexpr T denominator(T)
 }
 
 template <typename T>
-constexpr T denominator(const rational<T>& r)
+constexpr T denominator(const Rational_<T>& r)
 {
     return r.denom();
 }
@@ -389,15 +389,15 @@ constexpr bool operator>=(const T& lhs, const U& rhs)
  */
 
 template <typename T>
-constexpr rational<T> operator+(const rational<T>& r)
+constexpr Rational_<T> operator+(const Rational_<T>& r)
 {
     return r;
 }
 
 template <typename T>
-constexpr rational<T> operator-(const rational<T>& r)
+constexpr Rational_<T> operator-(const Rational_<T>& r)
 {
-    return rational<T>{static_cast<T>(-r.num()), r.denom()};
+    return Rational_<T>{static_cast<T>(-r.num()), r.denom()};
 }
 
 /*
@@ -412,7 +412,7 @@ operator+(const T& lhs, const U& rhs)
 {
     using value_type = decltype(std::declval<rational_value_t<T>>() +
                                 std::declval<rational_value_t<U>>());
-    return rational<value_type>{
+    return Rational_<value_type>{
             denominator(lhs) * numerator(rhs) + denominator(rhs) * numerator(lhs),
             denominator(lhs) * denominator(rhs)};
 }
@@ -425,7 +425,7 @@ operator-(const T& lhs, const U& rhs)
 {
     using value_type = decltype(std::declval<rational_value_t<T>>() -
             std::declval<rational_value_t<U>>());
-    return rational<value_type>{
+    return Rational_<value_type>{
             numerator(lhs) * denominator(rhs) - numerator(rhs) * denominator(lhs),
             denominator(lhs) * denominator(rhs)};
 }
@@ -438,7 +438,7 @@ operator*(const T& lhs, const U& rhs)
 {
     using value_type = decltype(std::declval<rational_value_t<T>>() *
             std::declval<rational_value_t<U>>());
-    return rational<value_type>{
+    return Rational_<value_type>{
             numerator(lhs) * numerator(rhs),
             denominator(lhs) * denominator(rhs)};
 }
@@ -451,7 +451,7 @@ operator/(const T& lhs, const U& rhs)
 {
     using value_type = decltype(std::declval<rational_value_t<T>>() /
             std::declval<rational_value_t<U>>());
-    return rational<value_type>{
+    return Rational_<value_type>{
             numerator(lhs) * denominator(rhs),
             denominator(lhs) * numerator(rhs)};
 }
@@ -471,10 +471,10 @@ operator/(const T& lhs, const U& rhs)
 
 // template <typename T, typename U,
 //           typename = std::enable_if_t<std::is_integral<T>::value>>
-// constexpr rational<U>
+// constexpr Rational_<U>
 // operator/(T t, rational_literal_proxy<U> p)
 // {
-//     return rational<U>(t, p.value);
+//     return Rational_<U>(t, p.value);
 // }
 
 // template <typename T>
@@ -569,7 +569,7 @@ operator/(const T& lhs, const U& rhs)
 // } // end namespace rational_literals
 
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const rational<T>& r)
+std::ostream& operator<<(std::ostream& os, const Rational_<T>& r)
 {
     os << r.num();
     if (r.denom() != 1) {
