@@ -4,18 +4,30 @@
  *  Created on: Jun 15, 2018
  *      Author: zhou
  */
-
+#include <type_traits>
 #include "geometry/geometry.hpp"
+#include "utility/rational.hpp"
 #include "gtest/gtest.h"
 
 using namespace carpio;
 
 const St dim = 3;
 
-typedef Point_<double, dim> Point;
-typedef Point_<double, 3> Point3;
-typedef Point_<double, 2> Point2;
-typedef GGnuplotActor_<double, 2> GA;
+typedef Rational_<int> Rational;
+typedef double NumT;
+
+typedef Point_<NumT, dim> Point;
+typedef Point_<NumT, 3> Point3;
+typedef Point_<NumT, 2> Point2;
+typedef GGnuplotActor_<NumT, 2> GA;
+
+TEST(numtype, int_relation){
+    using value_type = decltype(int() + long());
+    std::cout << std::numeric_limits<int>::max() << std::endl;
+    std::cout << std::numeric_limits<long>::max() << std::endl;
+    std::cout << std::numeric_limits<long long>::max() << std::endl;
+    std::cout << std::numeric_limits<value_type>::max() << std::endl;
+}
 
 
 TEST(point, point_initial){

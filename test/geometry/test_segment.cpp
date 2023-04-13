@@ -14,6 +14,7 @@
 
 using namespace carpio;
 
+
 typedef Point_<double, 3> Point3;
 typedef Point_<double, 2> Point2;
 typedef Segment_<double, 2> Seg2;

@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef TCB_RATIONAL_HPP_INCLUDED
-#define TCB_RATIONAL_HPP_INCLUDED
+#ifndef RATIONAL_HPP_INCLUDED
+#define RATIONAL_HPP_INCLUDED
 
 #include <cstdint>
 #include <ratio>
@@ -14,11 +14,6 @@
 #define TCB_HAVE_CONSTEXPR14
 #endif
 
-#ifdef TCB_HAVE_CONSTEXPR14
-#define TCB_CONSTEXPR14 constexpr
-#else
-#define TCB_CONSTEXPR14
-#endif
 
 // #if __cpp_concepts >= 201500
 // #define TCB_HAVE_CONCEPTS
@@ -29,7 +24,7 @@ namespace carpio {
 namespace detail {
 
 template <typename T>
-TCB_CONSTEXPR14 T gcd(T a, T b)
+constexpr T gcd(T a, T b)
 {
     while (b != 0) {
         T t = b;
@@ -72,7 +67,7 @@ template <typename T>
 class Rational_ {
 public:
     static_assert(std::is_integral<T>::value,
-                  "tcb::Rational_<T> requires T to be an integral type");
+                  "carpio::Rational_<T> requires T to be an integral type");
 
     using value_type = T;
 
@@ -85,7 +80,7 @@ public:
         : num_(num)
     {}
 
-    TCB_CONSTEXPR14 Rational_(value_type num, value_type denom)
+    constexpr Rational_(value_type num, value_type denom)
         : num_{num}, denom_{denom}
     {
         simplify();
@@ -105,14 +100,14 @@ public:
 
     template <typename U,
               typename = std::enable_if_t<detail::is_nonnarrowing_assignable_v<T, U>>>
-    TCB_CONSTEXPR14 Rational_& operator=(const Rational_<U>& other)
+    constexpr Rational_& operator=(const Rational_<U>& other)
     {
         num_ = value_type{other.num()};
         denom_ = value_type{other.denom()};
         return *this;
     }
 
-    TCB_CONSTEXPR14 void swap(Rational_& other)
+    constexpr void swap(Rational_& other)
     {
         using std::swap;
         swap(num_, other.num_);
@@ -128,7 +123,7 @@ public:
     /* Compound assignment */
 
     template <typename U>
-    TCB_CONSTEXPR14 Rational_& operator+=(const Rational_<U>& other)
+    constexpr Rational_& operator+=(const Rational_<U>& other)
     {
         num_ *= other.denom();
         num_ += denom_ * other.num();
@@ -139,13 +134,13 @@ public:
 
     template <typename U,
               typename = std::enable_if_t<std::is_integral<U>::value>>
-    TCB_CONSTEXPR14 Rational_& operator+=(U other)
+    constexpr Rational_& operator+=(U other)
     {
         return *this += Rational_<U>{other};
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 Rational_& operator-=(const Rational_<U>& other)
+    constexpr Rational_& operator-=(const Rational_<U>& other)
     {
         num_ *= other.denom();
         num_ -= denom_ * other.num();
@@ -155,13 +150,13 @@ public:
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 Rational_& operator-=(U other)
+    constexpr Rational_& operator-=(U other)
     {
         return *this -= Rational_<U>{other};
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 Rational_& operator*=(const Rational_<U>& other)
+    constexpr Rational_& operator*=(const Rational_<U>& other)
     {
         num_ *= other.num();
         denom_ *= other.denom();
@@ -170,13 +165,13 @@ public:
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 Rational_& operator*=(U other)
+    constexpr Rational_& operator*=(U other)
     {
         return *this *= Rational_<U>{other};
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 Rational_& operator/=(const Rational_<U>& other)
+    constexpr Rational_& operator/=(const Rational_<U>& other)
     {
         num_ *= other.denom();
         denom_ *= other.num();
@@ -185,7 +180,7 @@ public:
     }
 
     template <typename U>
-    TCB_CONSTEXPR14 Rational_& operator/=(U other)
+    constexpr Rational_& operator/=(U other)
     {
         return *this /= Rational_<U>{other};
     }
@@ -207,7 +202,7 @@ private:
     value_type num_ = 0;
     value_type denom_ = 1;
 
-    TCB_CONSTEXPR14 void simplify()
+    constexpr void simplify()
     {
         using namespace detail;
         auto g = abs(gcd(num_, denom_));
@@ -578,8 +573,6 @@ std::ostream& operator<<(std::ostream& os, const Rational_<T>& r)
     return os;
 }
 
-} // end namespace tcb
-
-#undef TCB_CONSTEXPR14
+} // end namespace carpio 
 
 #endif // TCB_RATIONAL_HPP_INCLUDED

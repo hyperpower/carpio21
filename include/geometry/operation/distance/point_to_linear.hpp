@@ -8,9 +8,9 @@
 namespace carpio {
 // The distance d from a point (x0, y0) to the line ax + by + c = 0
 //
-template <typename NUM>
+template <typename NUM, typename NUM2>
 NUM Distance_PointToLine(const NUM& x0, const NUM& y0,
-		                 const NUM& a,  const NUM& b,  const NUM& c){
+		                 const NUM2& a,  const NUM2& b,  const NUM2& c){
 	double s = a * a + b * b;
 	s = (s==0)?_SMALL_:s;
 	return std::abs(a * x0 + b * y0 + c) / std::sqrt(s);
@@ -59,8 +59,8 @@ NUM Distance2_PointToSegment(const NUM& x0,  const NUM&  y0,
 // --------------------
 // high level function
 // --------------------
-template <typename NUM>
-NUM Distance2(const Point_<NUM, 2>& p, const Line_<NUM>& l){
+template <typename NUM, typename NUM2>
+NUM Distance2(const Point_<NUM, 2>& p, const Line_<NUM2>& l){
 	// Line equation a x + b y = alpha
 	// Line equation change to ax + by - alpha = 0
 	return Distance_PointToLine(p.x(), p.y(), l.a(), l.b(), -(l.alpha()));

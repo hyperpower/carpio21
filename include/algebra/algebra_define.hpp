@@ -106,8 +106,6 @@ inline int CountSignificanceDigit(Float a) {
 }
 
 
-Float volume_of_circular_truncated_cone(Float R, Float r, Float h);
-
 template<class TYPE>
 inline TYPE max(TYPE a, TYPE b, bool (*Comp_ge)(const TYPE&, const TYPE&)) {
 	return Comp_ge(a, b) ? a : b;
