@@ -75,7 +75,9 @@ public:
 
     constexpr Rational_() = default;
 
-    template <typename U, typename = std::enable_if_t<std::is_integral<U>::value>>
+    template <typename U, 
+              typename = std::enable_if_t<std::is_integral<U>::value>
+             >
     constexpr Rational_(U num)
         : num_(num)
     {}
@@ -94,21 +96,30 @@ public:
             : num_(other.num()), denom_(other.denom())
     {}
 
+    template<typename FLOAT,
+            typename = std::enable_if_t<std::is_floating_point<FLOAT>::value> >         
+    constexpr Rational_(const FLOAT& other){
+        from_float(other);
+    }
+
+    template<typename FLOAT,
+            typename = std::enable_if_t<std::is_floating_point<FLOAT>::value> >         
+    constexpr Rational_(const FLOAT& other, const T& precision){
+        from_float(other, precision);
+    }
     /* Assignment */
 
     constexpr Rational_& operator=(const Rational_&) = default;
 
     template <typename U,
               typename = std::enable_if_t<detail::is_nonnarrowing_assignable_v<T, U>>>
-    constexpr Rational_& operator=(const Rational_<U>& other)
-    {
+    constexpr Rational_& operator=(const Rational_<U>& other){
         num_ = value_type{other.num()};
         denom_ = value_type{other.denom()};
         return *this;
     }
 
-    constexpr void swap(Rational_& other)
-    {
+    constexpr void swap(Rational_& other){
         using std::swap;
         swap(num_, other.num_);
         swap(denom_, other.denom_);
@@ -123,8 +134,7 @@ public:
     /* Compound assignment */
 
     template <typename U>
-    constexpr Rational_& operator+=(const Rational_<U>& other)
-    {
+    constexpr Rational_& operator+=(const Rational_<U>& other){
         num_ *= other.denom();
         num_ += denom_ * other.num();
         denom_ *= other.denom();
@@ -134,14 +144,12 @@ public:
 
     template <typename U,
               typename = std::enable_if_t<std::is_integral<U>::value>>
-    constexpr Rational_& operator+=(U other)
-    {
+    constexpr Rational_& operator+=(U other){
         return *this += Rational_<U>{other};
     }
 
     template <typename U>
-    constexpr Rational_& operator-=(const Rational_<U>& other)
-    {
+    constexpr Rational_& operator-=(const Rational_<U>& other){
         num_ *= other.denom();
         num_ -= denom_ * other.num();
         denom_ *= other.denom();
@@ -156,8 +164,7 @@ public:
     }
 
     template <typename U>
-    constexpr Rational_& operator*=(const Rational_<U>& other)
-    {
+    constexpr Rational_& operator*=(const Rational_<U>& other){
         num_ *= other.num();
         denom_ *= other.denom();
         simplify();
@@ -165,14 +172,12 @@ public:
     }
 
     template <typename U>
-    constexpr Rational_& operator*=(U other)
-    {
+    constexpr Rational_& operator*=(U other){
         return *this *= Rational_<U>{other};
     }
 
     template <typename U>
-    constexpr Rational_& operator/=(const Rational_<U>& other)
-    {
+    constexpr Rational_& operator/=(const Rational_<U>& other){
         num_ *= other.denom();
         denom_ *= other.num();
         simplify();
@@ -180,8 +185,7 @@ public:
     }
 
     template <typename U>
-    constexpr Rational_& operator/=(U other)
-    {
+    constexpr Rational_& operator/=(U other){
         return *this /= Rational_<U>{other};
     }
 
@@ -198,6 +202,15 @@ public:
         return num_/static_cast<long double>(denom_);
     }
 
+    /* Transfer */
+    float to_float() const{
+        return float(num_) / float(denom_);
+    }
+
+    double to_double() const{
+        return double(num_) / double(denom_);
+    }
+
 private:
     value_type num_ = 0;
     value_type denom_ = 1;
@@ -208,6 +221,25 @@ private:
         auto g = abs(gcd(num_, denom_));
         num_ = sign(denom_) * num_/g;
         denom_ = abs(denom_)/g;
+    }
+
+    template<class FLOAT,
+            typename = std::enable_if_t<std::is_floating_point<FLOAT>::value> >         
+    void from_float(const FLOAT& x, int precision = 6){
+        auto s   = detail::sign(x);
+        auto d10 = std::numeric_limits<value_type>::digits10;
+        auto pre = std::min(d10, precision);
+        auto absx = std::abs(x);
+        value_type trun   = std::trunc(absx);
+        FLOAT rest = absx - trun;
+        FLOAT p   = std::pow(10, precision);
+        value_type num = std::round(rest * p);
+        value_type den = p;
+        value_type gcd = detail::gcd(num, den);
+        num /= gcd;
+        den /= gcd;
+        num_   = (trun * den + s * num);
+        denom_ = den;
     }
 
 };
