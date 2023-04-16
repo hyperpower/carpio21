@@ -286,12 +286,12 @@ public:
     std::string to_string(const std::string& sep) const {
         std::stringstream sstr;
         sstr.precision(4);
-        sstr << std::scientific << this->at(0);
+        sstr << std::scientific << double(this->at(0));
         if constexpr (Dim >= 2) {
-            sstr << sep << this->at(1);
+            sstr << sep << double(this->at(1));
         }
         if constexpr (Dim == 3) {
-            sstr << sep << this->at(2);
+            sstr << sep << double(this->at(2));
         }
         return sstr.str();
     }

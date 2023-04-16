@@ -34,6 +34,18 @@ std::string ToString(V1 a) {
     sst << a;
     return sst.str();
 }
+
+template<>
+std::string ToString(bool a) {
+    std::ostringstream sst;
+    if (a == true){
+        sst << "True";
+    }else{
+        sst << "False";
+    }
+    return sst.str();
+}
+
 template<class CONTAINER, 
          typename std::enable_if<IsContainer<CONTAINER>::value, bool>::type = true>
 std::string ToString(const CONTAINER& a, const std::string& sep) {

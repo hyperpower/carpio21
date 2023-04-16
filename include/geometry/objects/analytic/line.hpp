@@ -91,6 +91,7 @@ public:
 	typedef TYPE& reference;
 	typedef const TYPE& const_reference;
 	typedef Line_<TYPE> Line;
+	typedef Line_<TYPE> Self;
 	typedef LineTag Tag;
 
 	typedef Point_<Vt, 2> Point;
@@ -251,13 +252,8 @@ public:
 	}
 
 	static std::shared_ptr<Point> Intersect(const Line& l1, const Line& l2){
-		double det = l1.a() * l2.b() - l2.a() * l1.b();
-		if(std::abs(det) < 1e-14){
-			return std::shared_ptr<Point>(nullptr);
-		}
-		double x   = (l2.b() * l1.alpha() - l1.b() * l2.alpha()) / det;
-		double y   = (l1.a() * l2.alpha() - l2.a() * l1.alpha()) / det;
-		return std::make_shared<Point>(Point(x, y));
+		return Self::Intersect(l1.a(), l1.b(), l1.alpha(),
+		                       l2.a(), l2.b(), l2.alpha());
 	}
 };
 
@@ -268,6 +264,13 @@ std::ostream& operator<<(std::ostream& stream, const Line_<TYPE>& line) {
 		   << line.b() << " Y = "
 		   << line.alpha();
 	return stream;
+}
+
+template<class TYPE, class TYPE2>
+auto NormalLinePassPoint(const Line_<TYPE>& line, const Point_<TYPE2, 2>& p){
+	auto a = line.a();
+	auto b = line.b();
+	return Line_<TYPE>(b, -a, b * TYPE(p.x()) -a * TYPE(p.y()));
 }
 
 }

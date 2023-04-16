@@ -32,11 +32,41 @@ TEST(numtype, int_relation){
               << "pow(-2, -3) = " << std::pow(10, -3) << '\n';
 }
 
-typedef Rational_<int> Rational;
+TEST(numtype, overflow){
+    int b = 10000;
+    int a = std::numeric_limits<int>::max() - 10;
+    std::cout << "a + b is overflow = " << ToString(CheckAddOverFlow(a,b)) << std::endl;
+    auto min = std::numeric_limits<int>::min();
+    b = -10;
+    a = std::numeric_limits<int>::min() + 3;
+    ASSERT_TRUE(CheckMultiOverFlow(a, b));
+    a = -10;
+    b = std::numeric_limits<int>::min();
+    ASSERT_TRUE(CheckMultiOverFlow(a, b));
+    a = 10;
+    b = std::numeric_limits<int>::max() - 3;
+    ASSERT_TRUE(CheckMultiOverFlow(a, b));
+    a = -10;
+    b = std::numeric_limits<int>::max() - 3;
+    ASSERT_TRUE(CheckMultiOverFlow(a, b));
+}
+
+typedef Rational_<long> Rational;
 
 TEST(num, count_digits){
-    double x = 3.14159268923;
-    Rational r(x, 8);
+    double x = 3.14156e20;
+    try{
+        Rational r(x, 8);
+        std::cout << r.num() << "/" << r.denom() << std::endl;
+        std::cout << "double = " << std::setprecision(10) << r.to_double() << std::endl;
+    }catch(std::overflow_error e){
+        std::cerr<< e.what()<< std::endl;
+    }
+}
+
+TEST(num, conversion_digits){
+    double x = 3.1415;
+    Rational r(x, 6);
     std::cout << r.num() << "/" << r.denom() << std::endl;
-    std::cout << "double = " << std::setprecision(10) << r.to_double() << std::endl;
+    std::cout << "double = " << std::setprecision(6) << float(r) << std::endl;
 }

@@ -13,7 +13,7 @@ NUM Distance_PointToLine(const NUM& x0, const NUM& y0,
 		                 const NUM2& a,  const NUM2& b,  const NUM2& c){
 	double s = a * a + b * b;
 	s = (s==0)?_SMALL_:s;
-	return std::abs(a * x0 + b * y0 + c) / std::sqrt(s);
+	return NUM(std::abs(double(a) * double(x0) + double(b) * double(y0) + double(c)) / std::sqrt(s));
 }
 template <typename NUM>
 NUM Distance2_PointToRay(const NUM&  x0, const NUM&   y0,
@@ -66,10 +66,9 @@ NUM Distance2(const Point_<NUM, 2>& p, const Line_<NUM2>& l){
 	return Distance_PointToLine(p.x(), p.y(), l.a(), l.b(), -(l.alpha()));
 }
 
-template <typename NUM>
-NUM Distance(const Point_<NUM, 2>& p, const Line_<NUM>& l){
-
-	return std::sqrt(Distance2(p, l));
+template <typename NUM, typename NUM2>
+NUM Distance(const Point_<NUM, 2>& p, const Line_<NUM2>& l){
+	return std::sqrt(double(Distance2<NUM, NUM2>(p, l)));
 }
 
 template <typename NUM>

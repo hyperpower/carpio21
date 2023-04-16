@@ -9,6 +9,11 @@
 #include <ratio>
 #include <type_traits>
 #include <iostream>
+#include <typeinfo>
+
+#include "utility/tinyformat.hpp"
+
+#include "number_define.hpp"
 
 #if __cpp_constexpr >= 201304
 #define TCB_HAVE_CONSTEXPR14
@@ -144,10 +149,17 @@ public:
 
     template <typename U,
               typename = std::enable_if_t<std::is_integral<U>::value>>
-    constexpr Rational_& operator+=(U other){
+    constexpr Rational_& operator+=(const U& other){
         return *this += Rational_<U>{other};
     }
-
+    template <typename U,
+              typename std::enable_if<
+                   std::is_floating_point<U>::value
+              , bool>::type = true >
+    constexpr Rational_& operator+=(const U& other){
+        auto res = U(*this) + other;
+        return *this = Rational_<value_type>{res};
+    }
     template <typename U>
     constexpr Rational_& operator-=(const Rational_<U>& other){
         num_ *= other.denom();
@@ -202,6 +214,13 @@ public:
         return num_/static_cast<long double>(denom_);
     }
 
+    constexpr operator double() const{
+        return num_/static_cast<double>(denom_);
+    }
+    constexpr operator float() const{
+        return num_/static_cast<float>(denom_);
+    }
+
     /* Transfer */
     float to_float() const{
         return float(num_) / float(denom_);
@@ -226,9 +245,18 @@ private:
     template<class FLOAT,
             typename = std::enable_if_t<std::is_floating_point<FLOAT>::value> >         
     void from_float(const FLOAT& x, int precision = 6){
-        auto s   = detail::sign(x);
+        // check x is large than MAX
+        if(x > std::numeric_limits<value_type>::max()){ 
+            std::string err_msg = tfm::format("Function %s converts x = %.5e is large than %s type's maximum %.5e\n",
+                                 "Rational_.from_float(x, precision)", x, 
+                                 GetTypeName<value_type>(),
+                                 std::numeric_limits<value_type>::max());
+            throw std::overflow_error(err_msg);
+        }
+        value_type s   = detail::sign(x);
         auto d10 = std::numeric_limits<value_type>::digits10;
         auto pre = std::min(d10, precision);
+
         auto absx = std::abs(x);
         value_type trun   = std::trunc(absx);
         FLOAT rest = absx - trun;
@@ -238,10 +266,15 @@ private:
         value_type gcd = detail::gcd(num, den);
         num /= gcd;
         den /= gcd;
+        if(CheckMultiOverFlow(trun, den) 
+           || CheckMultiOverFlow(s, num)
+           || CheckAddOverFlow(trun * den, s * num)){
+            std::string err_msg = tfm::format("Can't convert x = %.5e to Rantional, Overflow.",x);
+            throw std::overflow_error("");
+        }
         num_   = (trun * den + s * num);
         denom_ = den;
     }
-
 };
 
 /*

@@ -14,15 +14,13 @@ using namespace carpio;
 const St dim = 3;
 
 typedef Rational_<int> Rational;
-typedef double NumT;
+typedef Rational NumT;
+// typedef double NumT;
 
 typedef Point_<NumT, dim> Point;
 typedef Point_<NumT, 3> Point3;
 typedef Point_<NumT, 2> Point2;
 typedef GGnuplotActor_<NumT, 2> GA;
-
-
-
 
 TEST(point, point_initial){
     Point3 x(1, 0, 0);
@@ -44,7 +42,7 @@ TEST(point, point_initial){
     ASSERT_EQ(x[0], 4);
 
     x = {3, 0, 0};
-    std::list<Vt> arr{1 , 1};
+    std::list<int> arr{1 , 1};
     Translate(x, arr);
     ASSERT_EQ(x[0], 4);
     ASSERT_EQ(x[1], 1);
@@ -83,19 +81,32 @@ TEST(point, max_and_min){
 TEST(point, distance_to_line){
     typedef Line_<Vt> Line;
     Line l(1.0, 1.0, 1.0);
-    Point2 p(0.5, 0.3);
+    Point2 p(0.4, 0.2);
     auto dis = Distance(p, l);
     std::cout<< "Line  : " << l   << std::endl;
     std::cout<< "Point : " << p   << std::endl;
     std::cout<< "Dis   : " << dis << std::endl;
 
+    Line ln = NormalLinePassPoint(l, p);
+    std::cout<< "normal Line  : " << ln   << std::endl;
+    
+    
 
     Gnuplot gnu;
-    auto ap = GA::Points(p, 0);
     gnu.set_terminal_png("./fig/distance_to_line");
-    ap->style() = "with points pointtype 7 pointsize 3 lc variable";
+    auto ap = ToGnuplotActor(p);
+    ap.style("with points pointtype 7 pointsize 3");
     gnu.add(ap);
-    auto al = GA::Lines(l);
+    //intersect
+    auto inp = Line::Intersect(l, ln);
+    auto ainp = ToGnuplotActor(*inp);
+    ainp.style("with points pointtype 7 pointsize 3");
+    gnu.add(ainp);
+    // auto al = GA::Lines(l);
+    auto al = ToGnuplotActor(l, std::vector<double>{-0.0, 1.0});
     gnu.add(al);
+    auto a2 = ToGnuplotActor(ln, std::vector<double>{-0.0, 1.0});
+    gnu.add(a2);
+    gnu.set_equal_aspect_ratio();
     gnu.plot();
 }

@@ -68,8 +68,9 @@ void _Translate( TriSurfaceTag,  GEO& surface, const VEC& arr){
     surface.foreach_vertex(fun);
 }
 // arr has same length as the Dim  
-template<class CONTAINER, class ARR,
-         typename std::enable_if<std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
+// template<class CONTAINER, class ARR,
+        //  typename std::enable_if<std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
+template<class CONTAINER, class ARR>
 void _RegularVectorByDim(const CONTAINER& container, ARR& arr, double default_value = 0){
     // expand container, container support std operation
     // container has equal size of point

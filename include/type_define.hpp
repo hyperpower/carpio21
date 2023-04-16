@@ -225,6 +225,28 @@ struct IsContainer : std::integral_constant<bool,
     HasConstIterator<T>::value && HasBeginEnd<T>::beg_value && HasBeginEnd<T>::end_value> 
 { };
 
+template<typename T>
+inline const char* GetTypeName() {
+  return typeid(T).name();
+}
+
+#define DEFINE_TYPE_NAME(type, type_name)  \
+  template<>                               \
+  inline const char* GetTypeName<type>() { \
+    return type_name;                      \
+  }
+
+DEFINE_TYPE_NAME(int, "int")
+DEFINE_TYPE_NAME(long, "long")
+DEFINE_TYPE_NAME(long long, "long long")
+DEFINE_TYPE_NAME(float, "float")
+DEFINE_TYPE_NAME(double, "double")
+DEFINE_TYPE_NAME(std::string, "string")
+DEFINE_TYPE_NAME(bool, "bool")
+DEFINE_TYPE_NAME(uint32_t, "uint")
+DEFINE_TYPE_NAME(uint64_t, "uint")
+// add your custom types' definitions
+
 // template <typename Callable, typename... Args>
 // decltype(auto) Invoke(Callable &&op, Args &&... args) {
 //   if constexpr (std::is_same<std::invoke_result<Callable, Args...>::type, void>::value) {
