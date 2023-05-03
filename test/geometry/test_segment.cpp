@@ -9,16 +9,18 @@
 #include "geometry/geometry.hpp"
 #include "utility/random.hpp"
 #include "utility/profile.hpp"
-#include "utility/rational.hpp"
 #include "gtest/gtest.h"
+#include "algebra/number/rational.hpp"
 
 using namespace carpio;
 
+typedef double NumType;
+// typedef Rational_<long> NumType;
+typedef Point_<NumType, 3> Point3;
+typedef Point_<NumType, 2> Point2;
+typedef Segment_<NumType, 2> Seg2;
+typedef GGnuplotActor_<NumType, 2> GA;
 
-typedef Point_<double, 3> Point3;
-typedef Point_<double, 2> Point2;
-typedef Segment_<double, 2> Seg2;
-typedef GGnuplotActor_<double, 2> GA;
 
 TEST(segment, mkdir){
     // check current working dir
@@ -31,6 +33,12 @@ TEST(segment, mkdir){
     }
     // Do not disable this test
     MakeDir("./fig/");
+}
+TEST(segment, rational){
+    typedef Rational_<int> Rat;
+    std::cout << "Is Number (int)     = " << IsNumber<int>::value << std::endl;
+    std::cout << "Is Number (Rationl) = " << IsNumber<Rat>::value << std::endl;
+    std::cout << "Is Number (segment) = " << IsNumber<Seg2>::value << std::endl;
 }
 TEST(segment, segment_initial){
     Point2 x(1, 0);
@@ -77,7 +85,6 @@ TEST(segment, segment_point_location){
 }
 
 TEST(segment, intersection){
-    // typedef IntersectionPairSS_<double, 2> Inter;
     Point2 p1(  -1,    0);
     Point2 p2(   3,  0.5);
     Point2 p3( 0.8,  2.0);
@@ -276,22 +283,3 @@ TEST(segment, geo_status_b){
 }
 
 
-TEST(segment, rational){
-    using rational = Rational_<int>;
-
-    constexpr rational r1{};
-    static_assert(r1.num() == 0, "");
-    static_assert(r1.denom() == 1, "");
-    std::cout << r1 << std::endl;
-
-    rational r2;
-    ASSERT_EQ(r2.num(), 0);
-    ASSERT_EQ(r2.denom(), 1);
-
-    rational r3 = 3; 
-    std::cout << r3 << std::endl;
-    r2 = 2;
-    auto r4 = r2/ r3;
-    std::cout << r4 << std::endl;
-
-}

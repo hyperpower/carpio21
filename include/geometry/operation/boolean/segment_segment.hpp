@@ -69,14 +69,19 @@ inline VEC CalSegmentsIntersection(const VEC& s1s, const VEC& s1e,
         auto y3 = s2e[1];
 
         typedef typename VEC::value_type Cvt;
-        Cvt denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e20;
+        Cvt denom;
+        if constexpr (std::is_floating_point<Cvt>::value){  
+            denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e20;
+        }else{
+            denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3);
+        }
 
         Cvt x = ((x0 * y1 - y0 * x1) * (x2 - x3)
                 - (x0 - x1) * (x2 * y3 - y2 * x3)) / denom ;
         Cvt y = ((x0 * y1 - y0 * x1) * (y2 - y3)
                 - (y0 - y1) * (x2 * y3 - y2 * x3)) / denom;
 
-        return {{x, y}};
+        return {x, y};
 }
 template<class VEC> // s1s = {0,0}
 inline VEC CalSegmentsIntersection(const VEC& s1e,
@@ -100,6 +105,7 @@ inline VEC CalSegmentsIntersection(const VEC& s1e,
 
         return {{x, y}};
 }
+// deprecate ===============
 template<typename TYPE, St DIM>
 class IntersectionPairSS_ {
 public:
@@ -268,7 +274,7 @@ public:
         std::cout << "Point: " << point << std::endl;
     }
 };
-
+// deprecate ==================
 
 // Replace  IntersectionPairSS_
 template<class GEO1, class GEO2>
@@ -391,11 +397,6 @@ protected:
     }
 };
 // Replace  IntersectionPairSS_
-
-
-
-
-
 
 
 }

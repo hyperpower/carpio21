@@ -1028,7 +1028,7 @@ protected:
 };
 
 template<typename TYPE>
-class IntersectionSegTri_<TYPE, 3>:public IntersectionBase_<Segment_<TYPE, 3>, Triangle_<TYPE, 2> >{
+class IntersectionSegTri_<TYPE, 3>:public IntersectionBase_<Segment_<TYPE, 3>, Triangle_<TYPE, 3> >{
 public:
     IntersectionSegTri_(){
         std::cout << "Intersection 3" << std::endl;

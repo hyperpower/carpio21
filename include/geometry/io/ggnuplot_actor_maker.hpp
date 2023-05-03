@@ -337,7 +337,7 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& point, PointTag){
 }
 
 template<typename ANY, typename CONTAINER, 
-          typename std::enable_if<std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
+          typename std::enable_if<IsNumber<typename CONTAINER::value_type>::value, bool>::type = true>
 void MakeGnuplotActor(GnuplotActor& actor, const ANY& line, const CONTAINER& con, LineTag){
     assert(con.size() == 2);
     typedef Point_<double, 2> Point;

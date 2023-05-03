@@ -645,7 +645,7 @@ Point_<TYPE, DIM> NewPointFromEnd(
 //              (also called the mixed product, box product)
 //-----------------------------------------------
 template<typename TYPE, St DIM>
-double Orient(
+auto Orient(
         const Point_<TYPE, DIM>&v1,
         const Point_<TYPE, DIM>&v2,
         const Point_<TYPE, DIM>&v3,

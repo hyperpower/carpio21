@@ -18,7 +18,6 @@ auto IntersectN2(const CONTAINER& con, SegmentTag){
     typedef typename CONTAINER::value_type Seg;
     typedef typename Seg::coord_value_type Cvt;
     typedef Intersection_<Seg, Seg> Inter;
-    // typedef IntersectionPairSS_<Cvt, Seg::Dim> Inter;
 
     typedef IntersectionResult_<Seg, Seg> InterRes;
     typedef std::list<InterRes> ListInterRes;
@@ -501,9 +500,9 @@ template<class CONTAINER,
                 && IsGeometry<typename CONTAINER::value_type>::value 
         , bool>::type = true>
 auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
-    typedef typename CONTAINER::value_type Seg;
-    typedef IntersectionReturn_<Seg> InterRet;
-    typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
+    // typedef typename CONTAINER::value_type Seg;
+    // typedef IntersectionReturn_<Seg> InterRet;
+    // typedef std::list<IntersectionReturn_<Seg>> ListInterRet;
     std::string m = ToLowerCase(method);
     if( m == "sweep_line_simple"){
         IntersectionSweepLineSimple_<typename CONTAINER::value_type> inter(con);

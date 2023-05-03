@@ -226,6 +226,12 @@ struct IsContainer : std::integral_constant<bool,
 { };
 
 template<typename T>
+struct IsNumber : std::integral_constant<bool,
+      std::is_arithmetic<T>::value> { 
+};
+
+
+template<typename T>
 inline const char* GetTypeName() {
   return typeid(T).name();
 }

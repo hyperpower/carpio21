@@ -257,10 +257,10 @@ private:
         auto d10 = std::numeric_limits<value_type>::digits10;
         auto pre = std::min(d10, precision);
 
-        auto absx = std::abs(x);
-        value_type trun   = std::trunc(absx);
+        auto absx  = std::abs(x);
+        value_type trun = std::trunc(absx);
         FLOAT rest = absx - trun;
-        FLOAT p   = std::pow(10, precision);
+        FLOAT p    = std::pow(10, precision);
         value_type num = std::round(rest * p);
         value_type den = p;
         value_type gcd = detail::gcd(num, den);
@@ -314,6 +314,11 @@ struct is_rational<std::ratio<Num, Denom>> : std::true_type {};
 
 template <typename T>
 constexpr bool is_rational_v = is_rational<T>::value;
+
+template <typename T>
+struct IsNumber<Rational_<T> > : std::integral_constant<bool,
+      is_rational<T>::value>
+{};
 
 namespace detail {
 

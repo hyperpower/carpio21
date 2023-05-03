@@ -18,7 +18,7 @@ template<class GEO1, class GEO2,
                    IsGeometry<GEO1>::value
                 && IsGeometry<GEO2>::value 
         , bool>::type = true>
-IntersectionReturn_<GEO1, GEO2> Intersect(const GEO1& g1, const GEO2& g2){
+auto Intersect(const GEO1& g1, const GEO2& g2){
     typedef typename GEO1::Tag Tag1;
     typedef typename GEO2::Tag Tag2;
     return Intersect(g1, g2, Tag1(), Tag2());

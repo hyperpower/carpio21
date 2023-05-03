@@ -5,6 +5,25 @@
 
 using namespace carpio;
 
+TEST(num, rational){
+    using rational = Rational_<int>;
+
+    constexpr rational r1{};
+    static_assert(r1.num() == 0, "");
+    static_assert(r1.denom() == 1, "");
+    std::cout << r1 << std::endl;
+
+    rational r2;
+    ASSERT_EQ(r2.num(), 0);
+    ASSERT_EQ(r2.denom(), 1);
+
+    rational r3 = 3; 
+    std::cout << r3 << std::endl;
+    r2 = 2;
+    auto r4 = r2/ r3;
+    std::cout << r4 << std::endl;
+}
+
 
 TEST(numtype, int_relation){
     using value_type = decltype(int() + long());
@@ -54,9 +73,11 @@ TEST(numtype, overflow){
 typedef Rational_<long> Rational;
 
 TEST(num, count_digits){
-    double x = 3.14156e20;
+    double x = 3.16890100101;
     try{
         Rational r(x, 8);
+        auto sd = CountSignificanceDigit(x);
+        std::cout << "Sig Digit = " << sd << std::endl;
         std::cout << r.num() << "/" << r.denom() << std::endl;
         std::cout << "double = " << std::setprecision(10) << r.to_double() << std::endl;
     }catch(std::overflow_error e){
@@ -70,3 +91,5 @@ TEST(num, conversion_digits){
     std::cout << r.num() << "/" << r.denom() << std::endl;
     std::cout << "double = " << std::setprecision(6) << float(r) << std::endl;
 }
+
+

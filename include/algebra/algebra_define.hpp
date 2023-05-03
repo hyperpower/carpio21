@@ -8,11 +8,12 @@
 #ifndef ALGEBRA_DEFINE_HPP_
 #define ALGEBRA_DEFINE_HPP_
 
-#include "type_define.hpp"
 
 #include <math.h>
 #include <iostream>
 #include <cmath>
+
+#include "type_define.hpp"
 
 #undef max
 #undef min
@@ -95,8 +96,8 @@ TYPE SumSquare(const TYPE &a, const TYPE &b) {
 inline long double RoundTo(long double a, int n) {
 	return std::round(a * std::pow(10.0, n)) / std::pow(10.0, n);
 }
-
-inline int CountSignificanceDigit(Float a) {
+template<typename TYPE>
+inline int CountSignificanceDigit(TYPE a) {
 	for (int i = 0; i < 30; i++) {
 		if (RoundTo(a, i) == a) {
 			return i;

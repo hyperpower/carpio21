@@ -8,7 +8,8 @@
 #include <cmath>
 #include <limits>
 
-#include <type_define.hpp>
+#include "type_define.hpp"
+#include "algebra/algebra_define.hpp"
 
 namespace carpio {
 

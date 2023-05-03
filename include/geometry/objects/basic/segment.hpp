@@ -2,6 +2,7 @@
 #define _SEGMENT_HPP_
 
 #include "geometry/geometry_define.hpp"
+#include "algebra/number/number.hpp"
 #include "point.hpp"
 //#include "box.hpp"
 #include <array>
@@ -305,8 +306,8 @@ public:
 	}
 
 	bool empty() const {
-		if (psx() == 0.0 && psy() == 0.0 && pex() == 0.0 && pey() == 0.0
-				&& ((Dim == 3) ? (psz() == 0.0 && pez() == 0.0) : true)) {
+		if (psx() == Zero(psx()) && psy() == Zero(psy()) && pex() == Zero(pex()) && pey() == Zero(pey())
+				&& ((Dim == 3) ? (psz() == Zero(psz()) && pez() == Zero(pez())) : true)) {
 			return true;
 		} else {
 			return false;

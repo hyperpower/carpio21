@@ -28,4 +28,6 @@ double Orient(
     return exact::orient3d(v1.data(), v2.data(), v3.data(), v4.data());
 }
 
+
+}
 #endif
