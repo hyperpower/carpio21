@@ -594,7 +594,7 @@ PointToSegmentPosition OnWhichSide7(
 					return _PS_IN_;
 				} 
 			}else{
-				SHOULD_NOT_REACH;
+				throw std::logic_error("Invalid Location");
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <iostream>
-#include "utility/rational.hpp"
+// #include "algebra/number/rational.hpp"
 #include "geometry/objects/basic/point.hpp"
 #include "geometry/objects/basic/segment.hpp"
 // #include "integer_type.hpp"

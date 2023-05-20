@@ -12,7 +12,13 @@
 #include "big_int.hpp"
 
 namespace carpio {
-
+/**
+ *  Get zero in type T.
+ *
+ *  \param num - a number 
+ *
+ *  \return T - Zero in type T
+ */
 template<class T>
 auto Zero(const T& num){
     return T(0.0);

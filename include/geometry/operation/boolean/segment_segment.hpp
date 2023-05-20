@@ -219,6 +219,9 @@ public:
         return CalSegmentsIntersection((*(_arrp[0])), (*(_arrp[1])), (*(_arrp[2])),(*(_arrp[3])));
     }
 };
+// ^ ^^^ deprecate
+
+
 template<class GEO1, class GEO2>
 class IntersectionResultImplement_<GEO1, GEO2, SegmentTag, SegmentTag>{
 public:
@@ -314,7 +317,7 @@ public:
     IntersectionImplement_(
             const GEO1& seg1,
             const GEO2& seg2
-            ){
+            ):_res(seg1, seg2, -1){
         _arrp[0] = &(seg1.ps());
         _arrp[1] = &(seg1.pe());
         _arrp[2] = &(seg2.ps());
@@ -323,8 +326,6 @@ public:
         if (_is_box_in_on()) {
             _get_relation();
         }
-        _res.geo1(seg1);
-        _res.geo2(seg2);
     }
     IntersectionTypeSS cal_intersection_type(){
         if(_position[1] > -1){

@@ -93,10 +93,11 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
       vector_seg v(l_set.size() + ir_set.first.size());
       set_union(l_set.begin(), l_set.end(),
                 ir_set.first.begin(), ir_set.first.end(), v.begin());
-      Segment* sl = find_leftmost(v, point), * sr = find_rightmost(v, point);
+      Segment* sl  = find_leftmost(v, point), * sr = find_rightmost(v, point);
       Segment* s_b = find_left_neighboor(sl, btree), * s_a = find_right_neighboor(sr, btree);
       
-      compute_new_events(sl, s_b, p, queue); compute_new_events(sr, s_a, p, queue);
+      compute_new_events(sl, s_b, p, queue); 
+      compute_new_events(sr, s_a, p, queue);
     }
     std::cout << "tree size  = " << btree.size() << std::endl;
   }

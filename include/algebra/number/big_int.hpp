@@ -21,127 +21,121 @@
 #define BIG_INT_HPP
 
 #include <iostream>
+#include <tuple>
 
 class BigInt {
+protected:
     std::string value;
     char sign;
 
-    public:
-        // Constructors:
-        BigInt();
-        BigInt(const BigInt&);
-        BigInt(const long long&);
-        BigInt(const std::string&);
+public:
+    // Constructors:
+    BigInt();
+    BigInt(const BigInt&);
+    BigInt(const long long&);
+    BigInt(const std::string&);
 
-        // Assignment operators:
-        BigInt& operator=(const BigInt&);
-        BigInt& operator=(const long long&);
-        BigInt& operator=(const std::string&);
+    // Assignment operators:
+    BigInt& operator=(const BigInt&);
+    BigInt& operator=(const long long&);
+    BigInt& operator=(const std::string&);
 
-        // Unary arithmetic operators:
-        BigInt operator+() const;   // unary +
-        BigInt operator-() const;   // unary -
+    // Unary arithmetic operators:
+    BigInt operator+() const;   // unary +
+    BigInt operator-() const;   // unary -
 
-        // Binary arithmetic operators:
-        BigInt operator+(const BigInt&) const;
-        BigInt operator-(const BigInt&) const;
-        BigInt operator*(const BigInt&) const;
-        BigInt operator/(const BigInt&) const;
-        BigInt operator%(const BigInt&) const;
-        BigInt operator+(const long long&) const;
-        BigInt operator-(const long long&) const;
-        BigInt operator*(const long long&) const;
-        BigInt operator/(const long long&) const;
-        BigInt operator%(const long long&) const;
-        BigInt operator+(const std::string&) const;
-        BigInt operator-(const std::string&) const;
-        BigInt operator*(const std::string&) const;
-        BigInt operator/(const std::string&) const;
-        BigInt operator%(const std::string&) const;
+    // Binary arithmetic operators:
+    BigInt operator+(const BigInt&) const;
+    BigInt operator-(const BigInt&) const;
+    BigInt operator*(const BigInt&) const;
+    BigInt operator/(const BigInt&) const;
+    BigInt operator%(const BigInt&) const;
+    BigInt operator+(const long long&) const;
+    BigInt operator-(const long long&) const;
+    BigInt operator*(const long long&) const;
+    BigInt operator/(const long long&) const;
+    BigInt operator%(const long long&) const;
+    BigInt operator+(const std::string&) const;
+    BigInt operator-(const std::string&) const;
+    BigInt operator*(const std::string&) const;
+    BigInt operator/(const std::string&) const;
+    BigInt operator%(const std::string&) const;
 
-        // Arithmetic-assignment operators:
-        BigInt& operator+=(const BigInt&);
-        BigInt& operator-=(const BigInt&);
-        BigInt& operator*=(const BigInt&);
-        BigInt& operator/=(const BigInt&);
-        BigInt& operator%=(const BigInt&);
-        BigInt& operator+=(const long long&);
-        BigInt& operator-=(const long long&);
-        BigInt& operator*=(const long long&);
-        BigInt& operator/=(const long long&);
-        BigInt& operator%=(const long long&);
-        BigInt& operator+=(const std::string&);
-        BigInt& operator-=(const std::string&);
-        BigInt& operator*=(const std::string&);
-        BigInt& operator/=(const std::string&);
-        BigInt& operator%=(const std::string&);
+    // Arithmetic-assignment operators:
+    BigInt& operator+=(const BigInt&);
+    BigInt& operator-=(const BigInt&);
+    BigInt& operator*=(const BigInt&);
+    BigInt& operator/=(const BigInt&);
+    BigInt& operator%=(const BigInt&);
+    BigInt& operator+=(const long long&);
+    BigInt& operator-=(const long long&);
+    BigInt& operator*=(const long long&);
+    BigInt& operator/=(const long long&);
+    BigInt& operator%=(const long long&);
+    BigInt& operator+=(const std::string&);
+    BigInt& operator-=(const std::string&);
+    BigInt& operator*=(const std::string&);
+    BigInt& operator/=(const std::string&);
+    BigInt& operator%=(const std::string&);
 
-        // Increment and decrement operators:
-        BigInt& operator++();       // pre-increment
-        BigInt& operator--();       // pre-decrement
-        BigInt operator++(int);     // post-increment
-        BigInt operator--(int);     // post-decrement
+    // Increment and decrement operators:
+    BigInt& operator++();       // pre-increment
+    BigInt& operator--();       // pre-decrement
+    BigInt operator++(int);     // post-increment
+    BigInt operator--(int);     // post-decrement
 
-        // Relational operators:
-        bool operator<(const BigInt&) const;
-        bool operator>(const BigInt&) const;
-        bool operator<=(const BigInt&) const;
-        bool operator>=(const BigInt&) const;
-        bool operator==(const BigInt&) const;
-        bool operator!=(const BigInt&) const;
-        bool operator<(const long long&) const;
-        bool operator>(const long long&) const;
-        bool operator<=(const long long&) const;
-        bool operator>=(const long long&) const;
-        bool operator==(const long long&) const;
-        bool operator!=(const long long&) const;
-        bool operator<(const std::string&) const;
-        bool operator>(const std::string&) const;
-        bool operator<=(const std::string&) const;
-        bool operator>=(const std::string&) const;
-        bool operator==(const std::string&) const;
-        bool operator!=(const std::string&) const;
+    // Relational operators:
+    bool operator<(const BigInt&) const;
+    bool operator>(const BigInt&) const;
+    bool operator<=(const BigInt&) const;
+    bool operator>=(const BigInt&) const;
+    bool operator==(const BigInt&) const;
+    bool operator!=(const BigInt&) const;
+    bool operator<(const long long&) const;
+    bool operator>(const long long&) const;
+    bool operator<=(const long long&) const;
+    bool operator>=(const long long&) const;
+    bool operator==(const long long&) const;
+    bool operator!=(const long long&) const;
+    bool operator<(const std::string&) const;
+    bool operator>(const std::string&) const;
+    bool operator<=(const std::string&) const;
+    bool operator>=(const std::string&) const;
+    bool operator==(const std::string&) const;
+    bool operator!=(const std::string&) const;
 
-        // I/O stream operators:
-        friend std::istream& operator>>(std::istream&, BigInt&);
-        friend std::ostream& operator<<(std::ostream&, const BigInt&);
+    // I/O stream operators:
+    friend std::istream& operator>>(std::istream&, BigInt&);
+    friend std::ostream& operator<<(std::ostream&, const BigInt&);
 
-        // Conversion functions:
-        std::string to_string() const;
-        int to_int() const;
-        long to_long() const;
-        long long to_long_long() const;
+    // Conversion functions:
+    std::string to_string() const;
+    int to_int() const;
+    long to_long() const;
+    long long to_long_long() const;
 
-        // Random number generating functions:
-        friend BigInt big_random(size_t);
+    // Random number generating functions:
+    friend BigInt big_random(size_t);
 };
 
 #endif  // BIG_INT_HPP
-
 
 /*
     ===========================================================================
     Utility functions
     ===========================================================================
 */
-
-#ifndef BIG_INT_UTILITY_FUNCTIONS_HPP
-#define BIG_INT_UTILITY_FUNCTIONS_HPP
-
-#include <tuple>
-
-
-/*
-    is_valid_number
-    ---------------
-    Checks whether the given string is a valid integer.
-*/
-
+/**
+ *  Checks whether the given string is a valid integer.
+ *
+ *  \param num - a number in format of string
+ *
+ *  \return bool - whether given string is a valid integer
+ */
 bool is_valid_number(const std::string& num) {
     for (char digit : num)
         if (digit < '0' or digit > '9')
             return false;
-
     return true;
 }
 
@@ -230,8 +224,6 @@ bool is_power_of_10(const std::string& num){
 
     return true;    // first digit is 1 and the following digits are all 0
 }
-
-#endif  // BIG_INT_UTILITY_FUNCTIONS_HPP
 
 
 /*
@@ -1908,10 +1900,6 @@ BigInt BigInt::operator--(int) {
     ===========================================================================
 */
 
-#ifndef BIG_INT_IO_STREAM_OPERATORS_HPP
-#define BIG_INT_IO_STREAM_OPERATORS_HPP
-
-
 
 /*
     BigInt from input stream
@@ -1940,6 +1928,5 @@ std::ostream& operator<<(std::ostream& out, const BigInt& num) {
     return out;
 }
 
-#endif  // BIG_INT_IO_STREAM_OPERATORS_HPP
 
 

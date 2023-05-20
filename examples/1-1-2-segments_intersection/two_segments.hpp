@@ -6,7 +6,7 @@
 #include <string>
 #include "geometry/geometry.hpp"
 #include "segment_with_name.hpp"
-#include "utility/rational.hpp"
+// #include "algebra/number/rational.hpp"
 
 using namespace carpio;
 
