@@ -39,6 +39,10 @@ public:
     
 	SegmentWithName_(const Point& s, const Point& e) :Base(s,e){
 	}
+	SegmentWithName_(const Vt& ax, const Vt& bx, //
+			         const Vt& ay, const Vt& by, //
+			         const Vt& az = 0, const Vt& bz = 0) :Base(ax, bx, ay, by, az, bz){
+	}
     SegmentWithName_(const Point& s, const Point& e, const std::string& n):
         Base(s,e), name(n){
     }

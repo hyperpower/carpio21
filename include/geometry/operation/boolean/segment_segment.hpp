@@ -71,7 +71,7 @@ inline VEC CalSegmentsIntersection(const VEC& s1s, const VEC& s1e,
         typedef typename VEC::value_type Cvt;
         Cvt denom;
         if constexpr (std::is_floating_point<Cvt>::value){  
-            denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e20;
+            denom = (x0 - x1) * (y2- y3) - (y0 - y1) * (x2- x3) + 1e-20;
         }else{
             denom = (x0-x1) * (y2- y3) - (y0 - y1) * (x2- x3);
         }
@@ -81,11 +81,12 @@ inline VEC CalSegmentsIntersection(const VEC& s1s, const VEC& s1e,
         Cvt y = ((x0 * y1 - y0 * x1) * (y2 - y3)
                 - (y0 - y1) * (x2 * y3 - y2 * x3)) / denom;
 
-        return {x, y};
+        return VEC{x, y};
 }
 template<class VEC> // s1s = {0,0}
 inline VEC CalSegmentsIntersection(const VEC& s1e,
-                                   const VEC& s2s, const VEC& s2e){
+                                   const VEC& s2s, 
+                                   const VEC& s2e){
         ASSERT(VEC::Dim == 2);
         // double x0 = 0.0;
         auto x1 = s1e[0];
@@ -277,7 +278,6 @@ public:
         std::cout << "Point: " << point << std::endl;
     }
 };
-// deprecate ==================
 
 // Replace  IntersectionPairSS_
 template<class GEO1, class GEO2>
@@ -352,13 +352,28 @@ public:
     }
 
     Result execute(){
-        auto t = this->cal_intersection_type();
-        this->res.type = t;
-        if(t == _SS_INTERSECT_){
-            this->res.p = cal_intersection_point();
+        this->_res.type = this->cal_intersection_type();
+        if(this->_res.type == _SS_INTERSECT_){
+            this->_res.point = cal_intersection_point();
         }
+        return this->_res;
     }
 
+    PointToSegmentPosition point_position(St idx){
+        ASSERT(idx >= 0 && idx < 4);
+        // 0 start of seg1
+        // 1 end   of seg1
+        // 2 start of seg2
+        // 3 end   of seg2
+        if((idx == 0 || idx == 1) && (_position[idx] == -1)){
+            _get_relation();
+        }
+        if((idx == 2 || idx == 3) && (_position[idx] == -1)){
+            _position[2] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[2]));
+            _position[3] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[3]));
+        }
+        return ToPointToSegmentPosition(_position[idx]);
+    }
 protected:
     short _get_ss_type1(){ // seg1 to seg2
         short t = _SSTYPE[_position[0]][_position[1]];
@@ -384,18 +399,7 @@ protected:
             _position[3] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[3]));
         }
     }
-    int point_position(St idx){
-        ASSERT(idx >= 0 && idx < 4);
-        // 0 start of seg1
-        // 1 start of seg1
-        // 2 start of seg2
-        // 3 start of seg2
-        if(idx == 2 || idx == 3){
-            _position[2] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[2]));
-            _position[3] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[3]));
-        }
-        return _position[idx];
-    }
+    
 };
 // Replace  IntersectionPairSS_
 

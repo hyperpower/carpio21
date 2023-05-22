@@ -37,7 +37,8 @@ public:
   }
 
   void push(const T& value, const A& assoc) {
-    std::vector<A> v; v.push_back(assoc);
+    std::vector<A> v; 
+    v.push_back(assoc);
     std::pair<typename PriorityQueue_t<T,A>::Type::iterator, bool> ret =
       this->insert(std::pair<T, std::vector<A> > (value, v));
     if(false == ret.second)

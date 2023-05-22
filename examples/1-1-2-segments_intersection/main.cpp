@@ -42,7 +42,7 @@ void benchmark_test(){
         m1_time.push_back(dt/1000);
     	std::cout << "M1 Time  = " << dt << "ms" << std::endl;
     	// std::cout << "Res size = " << res.size() << std::endl;
-        // Method1 ==========================================
+        // Method2 ==========================================
         start = Clock::Tick();
         ProfileStart("Method_SweepLine");
         res = Intersect(lseg, "sweep_line_simple");
@@ -78,8 +78,9 @@ int main(int argc, char** argv) {
     MakeDir("./fig/");
 
     two_segments_test();
-    intersection_on_segment();
+    // intersection_on_segment();
     // MultiSegTestCase1();
+    MultiSegTestCase1N2();
     // TEST_DS();
 
     // benchmark_test();

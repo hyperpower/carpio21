@@ -28,7 +28,9 @@ Results
 
 Location 0 NO
 ^^^^^^^^^^^^^^
-Two segments are seperated. There are no intersection between the two segments. But function of finding the intersection point is still working. The intersection point is on neither of the segments.
+Two segments are seperated. There are no intersection between the two segments. 
+But function of finding the intersection point is still working.
+The intersection point is on neither of the segments.
 
 .. figure:: fig/NO.png
    :alt: Figure intersection NO
@@ -116,6 +118,27 @@ Method 2 Sweep Line -- Simple
 Generally speaking sweepline means that you are processing the data in some order (e.g. left to
 right order). A data structure is maintained that keeps the information orgnised from the part of
 the data currently to the left of the sweepline.
+
+Method 3 Sweep Line -- Bentley-Ottmann
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Example
+-------------------------------
+
+.. list-table:: Segment Define
+   :widths: 25 25 25
+   :header-rows: 1
+
+   * - Segment Names
+     - Start Point
+     - End Point
+   * - a
+     - (0, 0)
+     - (1, 1)
+   * - b
+     - (0.5, 0.5)
+     - (0.8, 0.7)
+
 
 Benchmark
 -------------------------------

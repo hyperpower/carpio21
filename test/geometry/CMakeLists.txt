@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.4)
 
 set(This Geometry)
+set(Bezier Bezier)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 set(Sources
-    # test_bezier.cpp
     # test_box.cpp
     # test_box3.cpp
     # test_point.cpp
@@ -18,6 +18,8 @@ set(Sources
     # test_polygon_partition.cpp
     test_segment.cpp
 )
+set(Sources_Bezier test_bezier.cpp)
+
 find_package(Python COMPONENTS Interpreter Development)
 
 IF(Python_FOUND)
@@ -27,13 +29,18 @@ ELSE()
 ENDIF()
 
 add_executable(${This} ${Sources})
+add_executable(${Bezier} ${Sources_Bezier})
 
 target_link_libraries(${This} PUBLIC
+    gtest_main
+)
+target_link_libraries(${Bezier} PUBLIC
     gtest_main
 )
 
 if(Python_FOUND)
   target_link_libraries(${This} PUBLIC ${Python_LIBRARIES})
+  target_link_libraries(${Bezier} PUBLIC ${Python_LIBRARIES})
 ELSE()
   MESSAGE(FATAL_ERROR "Unable to link python libraries")
 ENDIF()
@@ -41,5 +48,10 @@ ENDIF()
 add_test(
     NAME ${This}
     COMMAND ${This}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+)
+add_test(
+    NAME ${Bezier}
+    COMMAND ${Bezier}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )

@@ -98,11 +98,12 @@ public:
     const std::string& command() const {
         return _pcmd;
     }
-    // deprecate---
+    // deprecate-->
     std::string& style() {
         return _scmd;
     }
-    // deprecate---
+    // <-- deprecate
+    
     const std::string& style() const {
         return _scmd;
     }
@@ -149,6 +150,11 @@ public:
 
     GnuplotActor& point_size(const int& size){
         this->_set_cmd(this->_scmd, "pointsize", ToString(size));
+        return *this;
+    }
+
+    GnuplotActor& point_type(const int& size){
+        this->_set_cmd(this->_scmd, "pointtype", ToString(size));
         return *this;
     }
 

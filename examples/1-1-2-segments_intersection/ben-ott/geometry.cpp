@@ -61,14 +61,17 @@ bool Segment::intersect(const Segment& seg, Point& inter) const {
     return false;
 
   // computing r,s : Cramer's solutions
-  rat r = (xc - xa)*(yc - yd) - (yc - ya)*(xc - xd); r /= delta;
-  rat s = (yc - ya)*(xb - xa) - (xc - xa)*(yb - ya); s /= delta;
+  rat r = (xc - xa)*(yc - yd) - (yc - ya)*(xc - xd); 
+  r /= delta;
+  rat s = (yc - ya)*(xb - xa) - (xc - xa)*(yb - ya); 
+  s /= delta;
   
   // r, s in [0,1] else no intersection
   if(r<zero || r>one || s<zero || s>one)
     return false;
 
-  rat xi = xa + r*(xb - xa), yi = ya + r*(yb - ya);
+  rat xi = xa + r*(xb - xa);
+  rat yi = ya + r*(yb - ya);
   inter.assign(xi, yi);
   
   return true;

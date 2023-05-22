@@ -195,12 +195,10 @@ public:
     auto execute(){
         ListResult _list_res;
         
-        
         Point p_sweep(0,0);
         CompareSeg comp(&p_sweep);
         StatusTree status(comp);
 
-        
         int i = 0;
         while (!queue.empty()){
         // for(int i = 0; i < 5; i++){

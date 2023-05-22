@@ -9,7 +9,7 @@
 
 #include "number_define.hpp"
 #include "rational.hpp"
-#include "big_int.hpp"
+// #include "big_int.hpp"
 
 namespace carpio {
 /**
