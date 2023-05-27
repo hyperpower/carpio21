@@ -16,7 +16,8 @@ set(Sources
     # test_seg_tri.cpp
     # test_predicate.cpp
     # test_polygon_partition.cpp
-    test_segment.cpp
+    # test_segment.cpp
+    test_ben_ott.cpp
 )
 set(Sources_Bezier test_bezier.cpp)
 

@@ -16,7 +16,7 @@
 #include <cmath>
 
 namespace carpio {
-
+// deprcate
 template<typename TYPE, St DIM>
 class GGnuplotActor_ {
 public:

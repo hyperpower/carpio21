@@ -82,7 +82,7 @@ rat Segment::high(const Point& p_sweep) const {
   if(slope.type == infty) { // find max y if vertical
     py = p_sweep.get_ordinate();
     ly = left.get_ordinate();
-    ry = right.get_ordinate();
+    ry = right.get_ordinate(); // zhou: assume ly < ry
     if(py < ly)
       return ly;
     else if(py > ry)

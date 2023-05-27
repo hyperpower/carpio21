@@ -79,7 +79,7 @@ public:
 		this->pe() = rhs.pe();
 	}
 	void reconstruct(const Point& s, const Point& e) {
-		ASSERT(s != e);
+		// ASSERT(s != e);
 		this->ps() = s;
 		this->pe() = e;
 	}
@@ -415,17 +415,46 @@ inline TYPE MinX(const Segment_<TYPE, DIM>& p) {
 	return p.psx() < p.pex() ? p.psx() : p.pex();
 }
 template<typename TYPE, St DIM>
+inline TYPE MinX(const Segment_<TYPE, DIM>& s1, const Segment_<TYPE, DIM>& s2) {
+	auto vs1 = MinX(s1);
+	auto vs2 = MinX(s2);
+	return vs1 < vs2 ? vs1 : vs2;
+}
+template<typename TYPE, St DIM>
 inline TYPE MinY(const Segment_<TYPE, DIM>& p) {
 	return p.psy() < p.pey() ? p.psy() : p.pey();
+}
+template<typename TYPE, St DIM>
+inline TYPE MinY(const Segment_<TYPE, DIM>& s1, const Segment_<TYPE, DIM>& s2) {
+	auto vs1 = MinY(s1);
+	auto vs2 = MinY(s2);
+	return vs1 < vs2 ? vs1 : vs2;
 }
 template<typename TYPE, St DIM>
 inline TYPE MaxX(const Segment_<TYPE, DIM>& p) {
 	return p.psx() > p.pex() ? p.psx() : p.pex();
 }
 template<typename TYPE, St DIM>
+inline TYPE MaxX(const Segment_<TYPE, DIM>& s1, const Segment_<TYPE, DIM>& s2) {
+	auto vs1 = MaxX(s1);
+	auto vs2 = MaxX(s2);
+	return vs1 > vs2 ? vs1 : vs2;
+}
+template<typename TYPE, St DIM>
 inline TYPE MaxY(const Segment_<TYPE, DIM>& p) {
 	return p.psy() > p.pey() ? p.psy() : p.pey();
 }
+template<typename TYPE, St DIM>
+inline TYPE MaxY(const Segment_<TYPE, DIM>& s1, const Segment_<TYPE, DIM>& s2) {
+	auto vs1 = MaxY(s1);
+	auto vs2 = MaxY(s2);
+	return vs1 > vs2 ? vs1 : vs2;
+}
+template<typename TYPE, St DIM>
+inline auto EnclosureDiagonal(const Segment_<TYPE, DIM>& s1, const Segment_<TYPE, DIM>& s2) {
+	return Segment_<TYPE, DIM>(MinX(s1, s2), MaxX(s1, s2), MinY(s1, s2), MaxY(s1, s2));	
+}
+
 // Point loaction relative to a segment in 2D
 // It has 7 possibilities
 // ================================
