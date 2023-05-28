@@ -104,7 +104,8 @@ map_event bentley_ottmann(std::vector<Segment>& set) {
   return inter;
 }
 
-void find_neighboors(const Point& p, BST<Segment,Point>::Type& btree,
+void find_neighboors(const Point& p, 
+                     BST<Segment,Point>::Type& btree,
                      Segment*& above, Segment*& below) {
   //create a segment of length 0 representing p :
   rat x = p.get_abscissa(), y = p.get_ordinate();

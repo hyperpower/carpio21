@@ -85,18 +85,18 @@ class SweepEventQueue_ : public std::map<EVENT, std::list<const VALUE*> > {
 public:
     typedef const VALUE* constp_Value;
     typedef std::map<EVENT, std::list<constp_Value> > Base;
-    typedef std::list<constp_Value> List;
+    typedef std::list<constp_Value> Listcp;
 
     void push(const EVENT& event) {
-        List list; //empty vector
-        this->insert(std::pair<EVENT, List> (event, list));
+        Listcp list; //empty vector
+        this->insert(std::pair<EVENT, Listcp> (event, list));
     }
 
-    void push(const EVENT& event, typename List::value_type assoc) {
-        List v; 
+    void push(const EVENT& event, typename Listcp::value_type assoc) {
+        Listcp v; 
         v.push_back(assoc);
         std::pair<typename Base::iterator, bool> ret =
-            this->insert(std::pair<EVENT, List > (event, v));
+            this->insert(std::pair<EVENT, Listcp > (event, v));
         if(false == ret.second){
             ret.first->second.push_back(assoc);
         }
@@ -125,24 +125,27 @@ struct CompareSeg_ {
 
     Point* _ppoint;
 
+    CompareSeg_(): _ppoint(nullptr) {};
+
     CompareSeg_(Point* c) : _ppoint(c) { }; 
 
     bool operator() (const Segment* a, const Segment* b) const{
         return this->operator()((*a), (*b));
     }
     bool operator() (const Segment& a, const Segment& b) const{
-        // return a->less(*b,*_ppoint); 
-        auto ay = y_at_sweep_point(a);
-        auto by = y_at_sweep_point(b);
-        auto sa = Slope(a);
-        auto sb = Slope(b);
-
-        return (ay < by || (ay == by && (sa < sb)));
+        // std::cout << "compare a =   "<< a << std::endl;
+        // std::cout << "compare b =   "<< b << std::endl;
+        bool res =  this->less(a, b, *(this->_ppoint)); 
+        // std::cout << "compare res = "<< res << std::endl;
+        return res;
     }
 
     auto y_at_sweep_point(const Segment& seg) const{
+        return this->y_at_sweep_point(seg, *(this->_ppoint)); 
+    }
+    auto y_at_sweep_point(const Segment& seg, const Point& p) const{
         if(seg.is_vertical()) { // find max y if vertical
-            auto py = _ppoint->y();
+            auto py = p.y();
             auto ly = seg.p_less_x().y();
             auto ry = seg.p_greater_x().y();
             if(py < ly) // ?
@@ -159,7 +162,18 @@ struct CompareSeg_ {
             auto xb = right.x();
             auto yb = right.y();
             
-            return (yb - ya)/(xb - xa)*(_ppoint->x() - xa) + ya;
+            return (yb - ya)/(xb - xa)*(p.x() - xa) + ya;
+        }
+    }
+    bool less(const Segment& a, const Segment& b, const Point& p_sweep) const{
+        auto ay = y_at_sweep_point(a, p_sweep);
+        // std::cout << "ay = " << ay << std::endl;
+        auto by = y_at_sweep_point(b, p_sweep);
+        // std::cout << "by = " << by << std::endl;
+        if(ay < by){
+            return true;
+        }else{
+            return (ay == by && (Slope(a) < Slope(b)));
         }
     }
 };
