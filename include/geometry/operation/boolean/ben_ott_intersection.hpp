@@ -76,6 +76,8 @@ public:
     typedef Intersection_<Segment, Segment> InterTwo;
     typedef IntersectionResult_<Segment, Segment> Result;
     typedef std::list<Result> ListResult;
+
+    typedef SegSlope_<TYPE> Slope;
 protected:
     EventQueue queue;
     #ifdef _DEBUG_MODE_
@@ -131,7 +133,9 @@ public:
             // HANDLE EVENT POINT(point)
             // 1. Let L(p) be the set of segments whose Left endpoint is p;
             //    these segments are stored with the event point p.
-            auto l_set = queue.begin()->second;
+            auto l_set = queue.begin()->second[0];
+            auto c_set = queue.begin()->second[1];
+            auto r_set = queue.begin()->second[2];
 
             #ifdef _DEBUG_MODE_
             PlotListpSegment(gnu, l_set, "#FBBC04" );
@@ -143,83 +147,58 @@ public:
             //   they are adjacent in T. 
             //   Let R(p) denote the subset of segments found whose right endpoint is p, 
             //   and let C(p) denote the subset of segments found that contain p in their interior.
-            auto pair_rc = get_sets(point, status);
+            // auto pair_rc = get_sets(point, status);
 
             //3. if L(p) and C(p) and R(p) contains more than one segment
             //   then Report P as an intersection, together with L(p) and C(p) and R(p) 
             #ifdef _DEBUG_MODE_
-            // std::cout << "tree  size = " << status.size() << std::endl;
-            std::cout << "l_sel size = " << l_set.size() << std::endl;
-            std::cout << "r_set size = " << pair_rc.first.size() << std::endl;
-            std::cout << "c_set size = " << pair_rc.second.size() << std::endl;
             // PlotListpSegment(gnu, pair_rc.first, "#34A853");
             #endif
-            if(l_set.size() + pair_rc.first.size() + pair_rc.second.size() > 1){
+            if(l_set.size() + c_set.size() + r_set.size() > 1){
                 Result res(point);
                 
                 for(auto s : l_set){
                     res.add(*s);
                 }
-                for(auto s : pair_rc.first){
+                for(auto s : c_set){
                     res.add(*s);
                 }
-                for(auto s : pair_rc.second){
+                for(auto s : r_set){
                     res.add(*s);
                 }
                 
                 _list_res.emplace_back(res);
             }
             //4. Delete the segments in R(p) and C(p) from T
-            for(auto s : status){
-                std::cout << "find s = " << *s << " >>> "; 
-                if (auto search = status.find(s); search != status.end())
-                    std::cout << "Found " << '\n';
-                else
-                    std::cout << "Not found\n";
-            }
-            for(auto s : pair_rc.first){
-                std::cout << "delete r    " << *s << std::endl;
-                std::cout << "status size " << status.size() << std::endl;
-                // auto comp = status.key_comp();
-                // std::cout << "sweep p     " << *(comp._ppoint) << std::endl;
-                // std::cout << "comp        " << comp(s, s) << std::endl;
-                if (auto search = status.find(s); search != status.end())
-                    std::cout << "Found " << **search << '\n';
-                else
-                    std::cout << "Not found\n";
+            for(auto s : r_set){
                 status.erase(s);
-                std::cout << "status size " << status.size() << std::endl;
             }
-            for(auto s : pair_rc.second){
-                std::cout << "delete c    " << *s << std::endl;
-                std::cout << "status size " << status.size() << std::endl;
+            for(auto s : c_set){
                 status.erase(s);
-                std::cout << "status size " << status.size() << std::endl;
             }
             p_sweep.x(point.x());
             p_sweep.y(point.y());
             //5. insert l_set and c_set in status tree
-            std::cout << "l_set size = " << l_set.size() << std::endl;
             for(auto s : l_set){
                 status.insert(s);
             }
-            for(auto s : pair_rc.second){
+            for(auto s : c_set){
                 status.insert(s);
             }
-            if(l_set.size() + pair_rc.second.size() == 0){
+            if(l_set.size() + c_set.size() == 0){
                 cpSegment s_a, s_b;
                 _find_neighboors(p_sweep, status, s_a, s_b); 
                 _compute_new_events(s_a, s_b, event);
             } else {
                 ListcpSeg lunion;
-                std::set_union(l_set.begin(),          l_set.end(),
-                               pair_rc.second.begin(), pair_rc.second.end(),
-                               lunion.begin());
-                cpSegment sl  = _find_lower_most(lunion, point);
-                cpSegment sr  = _find_upper_most(lunion, point);
+                std::set_union(l_set.begin(), l_set.end(),
+                               c_set.begin(), c_set.end(),
+                               std::inserter(lunion, lunion.begin()));
+                cpSegment sl  = _find_min_slope(lunion);
+                cpSegment sr  = _find_max_slope(lunion);
                 cpSegment s_b = _find_lower_neighboor(sl, status);
                 cpSegment s_a = _find_upper_neighboor(sr, status);
-      
+                
                 _compute_new_events(sl, s_b, event); 
                 _compute_new_events(sr, s_a, event);
             }
@@ -236,30 +215,44 @@ public:
         return _list_res;
     }
 
+    // std::pair<ListcpSeg, ListcpSeg> get_sets(const Point& p, StatusTree& tree){
+    //     ListcpSeg r, c;
+    //     if(tree.empty()){
+    //         return std::pair<ListcpSeg, ListcpSeg> (r, c);
+    //     }
+    //     auto x = p.x();
+    //     auto y = p.y();
+    //     Segment s(x, x, y, y);
+    //     std::cout << "get sets s = " << s <<std::endl; 
+
+    //     auto it  = tree.upper_bound(&s);
+    //     std::cout << "get sets upper b = " << **it <<std::endl; 
+    //     if(it != tree.end()){
+    //         ++it;
+    //     }
+    //     auto rit = std::reverse_iterator(it);
+
+    //     while(rit != tree.rend()) { // p is on segment
+    //         std::cout << "rit " << **rit << std::endl;
+    //         auto ps = (*rit)->p_less_x();
+    //         auto pe = (*rit)->p_greater_x();
+    //         auto flag = OnWhichSide7(ps, pe, p);
+    //         if(flag == _PS_ON_END_){
+    //             r.push_back(*rit);
+    //         }else if(flag == _PS_IN_){
+    //             c.push_back(*rit);
+    //         }
+    //         rit++;
+    //     }
+
+    //     return std::pair<ListcpSeg, ListcpSeg>(r, c);
+    // }
     std::pair<ListcpSeg, ListcpSeg> get_sets(const Point& p, StatusTree& tree){
         ListcpSeg r, c;
         if(tree.empty()){
             return std::pair<ListcpSeg, ListcpSeg> (r, c);
         }
-        auto x = p.x();
-        auto y = p.y();
-        Segment s(x, x, y, y);
-
-        auto it  = tree.upper_bound(&s);
-        auto rit = std::reverse_iterator(it);
-
-        while(rit != tree.rend()) { // p is on segment
-            auto ps = (*rit)->p_less_x();
-            auto pe = (*rit)->p_greater_x();
-            auto flag = OnWhichSide7(ps, pe, p);
-            if(flag == _PS_ON_END_){
-                std::cout << "on end =" << **rit << std::endl;
-                r.push_back(*rit);
-            }else if(flag == _PS_IN_){
-                c.push_back(*rit);
-            }
-            rit++;
-        }
+        
 
         return std::pair<ListcpSeg, ListcpSeg>(r, c);
     }
@@ -271,8 +264,8 @@ protected:
         for(auto& seg : con){
             Event e_left(seg.p_less_x());
             Event e_right(seg.p_greater_x());
-            queue.push(e_left, &(seg));
-            queue.push(e_right);  
+            queue.push_left(e_left, &(seg));
+            queue.push_right(e_right, &(seg));  
         }
     }
     void _find_neighboors(const Point& p, 
@@ -323,6 +316,26 @@ protected:
         }
         return min;
     }
+    cpSegment _find_min_slope(const ListcpSeg& v) const{
+        auto it = v.begin();
+        auto min = *(v.begin());
+
+        while(++it != v.end()) {
+            if(Slope(*(*it)) < Slope(*min))
+                min = *it;
+        }
+        return min;
+    }
+    cpSegment _find_max_slope(const ListcpSeg& v) const{
+        auto it = v.begin();
+        auto max = *(v.begin());
+
+        while(++it != v.end()) {
+            if(Slope(*max) < Slope(**it))
+                max = *it;
+        }
+        return max;
+    }
     cpSegment _find_upper_most(const ListcpSeg& v, const Point& p) const{
         //asuming v isn't empty
         CompareSeg comp;        
@@ -335,14 +348,17 @@ protected:
         }
         return max;
     }
+    
     void _compute_new_events(cpSegment s0, cpSegment s1, const Event &current){
         if (s0 && s1){
             InterTwo inter(*s0, *s1);
             auto res = inter.execute();
             if(res.type == _SS_INTERSECT_){
                 Event ev_i(res.point);
-                if (current < ev_i && !queue.mem(ev_i))
-                    queue.push(ev_i);
+                if (current < ev_i && !queue.mem(ev_i)){
+                    queue.push_intersect(ev_i, s0);
+                    queue.push_intersect(ev_i, s1);
+                }
             }
         }
     }

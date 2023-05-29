@@ -81,28 +81,53 @@ public:
 
 
 template <class EVENT, class VALUE> 
-class SweepEventQueue_ : public std::map<EVENT, std::list<const VALUE*> > {
+class SweepEventQueue_ : public std::map<EVENT, 
+            std::array<std::list<const VALUE*>, 3> > {
 public:
     typedef const VALUE* constp_Value;
     typedef std::map<EVENT, std::list<constp_Value> > Base;
     typedef std::list<constp_Value> Listcp;
+    typedef std::array<Listcp, 3>   ArrListcp;
 
     void push(const EVENT& event) {
         Listcp list; //empty vector
-        this->insert(std::pair<EVENT, Listcp> (event, list));
+        this->insert(std::pair<EVENT, ArrListcp> (event, {list, list, list}));
     }
 
-    void push(const EVENT& event, typename Listcp::value_type assoc) {
-        Listcp v; 
-        v.push_back(assoc);
-        std::pair<typename Base::iterator, bool> ret =
-            this->insert(std::pair<EVENT, Listcp > (event, v));
-        if(false == ret.second){
-            ret.first->second.push_back(assoc);
+    void push_left(const EVENT& event, typename Listcp::value_type assoc) {
+        auto iter = this->find(event);
+        if(iter != this->end()){
+            iter->second[0].push_back(assoc);
+        }else{
+            Listcp v; 
+            v.push_back(assoc);
+            Listcp emptylist;
+            this->insert(std::pair<EVENT, ArrListcp> (event, {v, emptylist, emptylist}));
         }
-        return;
     }
-
+    void push_right(const EVENT& event, typename Listcp::value_type assoc) {
+        auto iter = this->find(event);
+        if(iter != this->end()){
+            iter->second[2].push_back(assoc);
+        }else{
+            Listcp v; 
+            v.push_back(assoc);
+            Listcp emptylist;
+            this->insert(std::pair<EVENT, ArrListcp> (event, {emptylist, emptylist, v}));
+        }
+    }
+    void push_intersect(const EVENT& event, 
+                        typename Listcp::value_type assoc) {
+        auto iter = this->find(event);
+        if(iter != this->end()){
+            iter->second[1].push_back(assoc);
+        }else{
+            Listcp v; 
+            v.push_back(assoc);
+            Listcp emptylist;
+            this->insert(std::pair<EVENT, ArrListcp> (event, {emptylist, v, emptylist}));
+        }
+    }
     EVENT top() {
         return this->begin()->first;
     }
@@ -133,10 +158,7 @@ struct CompareSeg_ {
         return this->operator()((*a), (*b));
     }
     bool operator() (const Segment& a, const Segment& b) const{
-        // std::cout << "compare a =   "<< a << std::endl;
-        // std::cout << "compare b =   "<< b << std::endl;
         bool res =  this->less(a, b, *(this->_ppoint)); 
-        // std::cout << "compare res = "<< res << std::endl;
         return res;
     }
 
