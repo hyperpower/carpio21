@@ -162,6 +162,10 @@ public:
         this->_set_cmd(this->_scmd, "lc", " " + ToString(idx) + " ");
         return *this;
     }
+    GnuplotActor& line_color(const std::string& color_code){
+        this->_set_cmd(this->_scmd, "lc", " \"" + color_code + "\" ");
+        return *this;
+    }
     GnuplotActor& line_color_blue(){
         this->_set_cmd(this->_scmd, "lc", " rgb \"#00A4EF\"");
         return *this;
@@ -641,7 +645,7 @@ public:
     //     return *this;
     // }
 
-    Gnuplot& set_label(
+    inline Gnuplot& set_label(
             int tag,
             const std::string & label,
             const double& x, const double& y,
@@ -651,6 +655,10 @@ public:
         cmdstr << "set label " << tag << " \"" << label << "\" at first " << x
                 << ", " << y << " " << append;
         cmd(cmdstr.str());
+        return *this;
+    }
+    inline Gnuplot& unset_label() {
+        cmd("unset label");
         return *this;
     }
     template<class POINTS>

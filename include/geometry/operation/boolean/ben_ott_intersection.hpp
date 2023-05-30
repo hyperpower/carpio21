@@ -79,12 +79,12 @@ public:
 
     typedef SegSlope_<TYPE> Slope;
 protected:
-    EventQueue queue;
-    #ifdef _DEBUG_MODE_
+#ifdef _DEBUG_MODE_
     typedef std::list<Segment> ListSegment;
     ListSegment listseg;
     Segment diagonal;
-    #endif
+#endif
+    EventQueue queue;
 public:
     template<class CONTAINER, 
             typename std::enable_if<
@@ -185,6 +185,8 @@ public:
             for(auto s : c_set){
                 status.insert(s);
             }
+            // p_sweep.x(point.x());
+            // p_sweep.y(point.y());
             if(l_set.size() + c_set.size() == 0){
                 cpSegment s_a, s_b;
                 _find_neighboors(p_sweep, status, s_a, s_b); 
@@ -194,17 +196,31 @@ public:
                 std::set_union(l_set.begin(), l_set.end(),
                                c_set.begin(), c_set.end(),
                                std::inserter(lunion, lunion.begin()));
-                cpSegment sl  = _find_min_slope(lunion);
-                cpSegment sr  = _find_max_slope(lunion);
-                cpSegment s_b = _find_lower_neighboor(sl, status);
-                cpSegment s_a = _find_upper_neighboor(sr, status);
+                std::cout << "union size = " << lunion.size() << std::endl;
+                cpSegment s_min  = _find_min_slope(lunion);
+                if(s_min){
+                    std::cout << "s_min   = " << *s_min << std::endl;
+                }
+                cpSegment s_max  = _find_max_slope(lunion);
+                if(s_max){
+                    std::cout << "s_max   = " << *s_max << std::endl;
+                }
+                cpSegment s_lower = _find_lower_neighboor(s_min, status);
+                if(s_lower){
+                    std::cout << "s_lower = " << *s_lower << std::endl;
+                }
+                cpSegment s_upper = _find_upper_neighboor(s_max, status);
+                if(s_upper){
+                    std::cout << "s_upper = " << *s_upper << std::endl;
+                }
                 
-                _compute_new_events(sl, s_b, event); 
-                _compute_new_events(sr, s_a, event);
+                _compute_new_events(s_min, s_lower, event); 
+                _compute_new_events(s_max, s_upper, event);
             }
 
             #ifdef _DEBUG_MODE_
-            this->_plot_status_tree(gnu, status);
+            this->_plot_status_tree(gnu, status, p_sweep);
+            this->_plot_res_points(gnu, _list_res);
             gnu.plot();
             gnu.clear();
             std::cout << " end loop ========== " << std::endl;
@@ -259,6 +275,9 @@ public:
 #ifndef _DEBUG_MODE_
 protected:
 #endif
+    IntersectionBenOtt_(){}
+
+
     template<class CONTAINER>
     void _build_priority_queue(const CONTAINER& con){
         for(auto& seg : con){
@@ -292,6 +311,9 @@ protected:
 
     cpSegment _find_lower_neighboor(cpSegment s, const StatusTree& tree) const{
         auto iter = tree.find(s);
+        if(iter == tree.end()){
+            throw std::invalid_argument(ToString(*s) + " should in tree!");
+        }
         if(iter == tree.begin())
             return nullptr;
         else
@@ -299,23 +321,15 @@ protected:
     }
     cpSegment _find_upper_neighboor(cpSegment s, const StatusTree& tree) const{
         auto iter = tree.find(s);
-        if(++iter == tree.begin())
+        if(iter == tree.end()){
+            throw std::invalid_argument(ToString(*s) + " should in tree!");
+        }
+        if(++iter == tree.end())
             return nullptr;
         else
             return *iter;
     }
-    cpSegment _find_lower_most(const ListcpSeg& v, const Point& p) const{
-        //asuming v isn't empty
-        CompareSeg comp;        
-        auto it = v.begin();
-        auto min = *(v.begin());
 
-        while(++it != v.end()) {
-            if(comp.less(*(*it), *min, p))
-                min = *it;
-        }
-        return min;
-    }
     cpSegment _find_min_slope(const ListcpSeg& v) const{
         auto it = v.begin();
         auto min = *(v.begin());
@@ -332,18 +346,6 @@ protected:
 
         while(++it != v.end()) {
             if(Slope(*max) < Slope(**it))
-                max = *it;
-        }
-        return max;
-    }
-    cpSegment _find_upper_most(const ListcpSeg& v, const Point& p) const{
-        //asuming v isn't empty
-        CompareSeg comp;        
-        auto it = v.begin();
-        auto max = *(v.begin());
-
-        while(++it != v.end()) {
-            if(! comp.less(*(*it), *max, p))
                 max = *it;
         }
         return max;
@@ -373,12 +375,38 @@ protected:
             listseg.push_back(seg);
         }
     }
-    void _plot_status_tree(Gnuplot& gnu, const StatusTree& tree){
+    void _plot_status_tree(Gnuplot& gnu, const StatusTree& tree, const Point& sweep){
+        gnu.unset_label();
+        int index = 1;
         for(auto seg : tree){
             auto a1 = ToGnuplotActorAsVector(*seg);
             std::string color_code = "#EA8982" ;
             a1.style("with vector head filled size screen 0.03,5,80 lw 2 lc rgb \"" + color_code +"\"");
             gnu.add(a1);
+            auto nv = seg->normal_unit_vector();
+            double ratio = 0.5;
+            std::ostringstream sst;
+            sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
+                << nv.x() * ratio << ", " << nv.y() * ratio; 
+            gnu.set_label(index, ToString(index), seg->pc().x(), seg->pc().y(), sst.str());
+            index++;
+        }
+    }
+    void _plot_res_points(Gnuplot& gnu, const ListResult& list){
+        gnu.unset_label();
+        int index = 1;
+        for(auto res : list){
+            auto p = res.point;
+            auto a1 = ToGnuplotActor(p);
+            a1.line_color("#202125");
+            a1.point_type(4);
+            a1.point_size(2);
+            // a1.style("with vector head filled size screen 0.03,5,80 lw 2 lc rgb \"" + color_code +"\"");
+            gnu.add(a1);
+            std::ostringstream sst;
+            sst << "right front font \", 18\" textcolor rgb \"#202125\""; 
+            gnu.set_label(index, ToString(index), p.x(), p.y(), sst.str());
+            index++;
         }
     }
     #endif

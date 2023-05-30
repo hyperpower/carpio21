@@ -150,9 +150,11 @@ struct CompareSeg_ {
 
     Point* _ppoint;
 
-    CompareSeg_(): _ppoint(nullptr) {};
+    double _e;
 
-    CompareSeg_(Point* c) : _ppoint(c) { }; 
+    CompareSeg_(): _ppoint(nullptr), _e(1e-14) {};
+
+    CompareSeg_(Point* c) : _ppoint(c), _e(1e-14){ }; 
 
     bool operator() (const Segment* a, const Segment* b) const{
         return this->operator()((*a), (*b));
@@ -189,13 +191,11 @@ struct CompareSeg_ {
     }
     bool less(const Segment& a, const Segment& b, const Point& p_sweep) const{
         auto ay = y_at_sweep_point(a, p_sweep);
-        // std::cout << "ay = " << ay << std::endl;
         auto by = y_at_sweep_point(b, p_sweep);
-        // std::cout << "by = " << by << std::endl;
-        if(ay < by){
+        if(by - ay > _e){
             return true;
         }else{
-            return (ay == by && (Slope(a) < Slope(b)));
+            return ( std::abs(ay - by) < _e && (Slope(a) < Slope(b)));
         }
     }
 };

@@ -409,6 +409,12 @@ template<typename TYPE, St DIM>
 inline std::ostream& operator<<(std::ostream& o, const Segment_<TYPE, DIM>& p) {
 	return o << p.ps() << "-->" << p.pe();
 }
+template<typename TYPE, St DIM>
+inline std::string ToString(const Segment_<TYPE, DIM>& p){
+    std::ostringstream sst;
+    sst << p;
+	return sst.str(); 
+}
 
 template<typename TYPE, St DIM>
 inline TYPE MinX(const Segment_<TYPE, DIM>& p) {
