@@ -125,12 +125,10 @@ TEST(ben_ott, two_seg_order){
         std::cout << ToString(index) << "  " << *ps << std::endl;
         index++;
     }
-    
-
 }
 
 TEST(ben_ott, case1){
-    auto sl = GenerateSegmentsCase3<Segment>();
+    auto sl = GenerateSegmentsCase2<Segment>();
 
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/case1");

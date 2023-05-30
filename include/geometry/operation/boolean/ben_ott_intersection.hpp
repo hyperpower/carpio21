@@ -123,8 +123,6 @@ public:
 
             Event event = queue.top();
             auto& point = event.get_point();
-            // p_sweep.x(point.x());
-            // p_sweep.y(point.y());
             
             #ifdef _DEBUG_MODE_
             PlotSweepLine(gnu, point);
@@ -133,15 +131,14 @@ public:
             // HANDLE EVENT POINT(point)
             // 1. Let L(p) be the set of segments whose Left endpoint is p;
             //    these segments are stored with the event point p.
-            auto l_set = queue.begin()->second[0];
-            auto c_set = queue.begin()->second[1];
-            auto r_set = queue.begin()->second[2];
+            auto& l_set = queue.begin()->second[0];
+            auto& c_set = queue.begin()->second[1];
+            auto& r_set = queue.begin()->second[2];
 
             #ifdef _DEBUG_MODE_
             PlotListpSegment(gnu, l_set, "#FBBC04" );
             #endif
 
-            queue.pop();
 
             //2. Find all segments stored in T that contain p; 
             //   they are adjacent in T. 
@@ -185,8 +182,7 @@ public:
             for(auto s : c_set){
                 status.insert(s);
             }
-            // p_sweep.x(point.x());
-            // p_sweep.y(point.y());
+
             if(l_set.size() + c_set.size() == 0){
                 cpSegment s_a, s_b;
                 _find_neighboors(p_sweep, status, s_a, s_b); 
@@ -218,6 +214,7 @@ public:
                 _compute_new_events(s_max, s_upper, event);
             }
 
+            queue.pop();
             #ifdef _DEBUG_MODE_
             this->_plot_status_tree(gnu, status, p_sweep);
             this->_plot_res_points(gnu, _list_res);
@@ -230,39 +227,7 @@ public:
         }
         return _list_res;
     }
-
-    // std::pair<ListcpSeg, ListcpSeg> get_sets(const Point& p, StatusTree& tree){
-    //     ListcpSeg r, c;
-    //     if(tree.empty()){
-    //         return std::pair<ListcpSeg, ListcpSeg> (r, c);
-    //     }
-    //     auto x = p.x();
-    //     auto y = p.y();
-    //     Segment s(x, x, y, y);
-    //     std::cout << "get sets s = " << s <<std::endl; 
-
-    //     auto it  = tree.upper_bound(&s);
-    //     std::cout << "get sets upper b = " << **it <<std::endl; 
-    //     if(it != tree.end()){
-    //         ++it;
-    //     }
-    //     auto rit = std::reverse_iterator(it);
-
-    //     while(rit != tree.rend()) { // p is on segment
-    //         std::cout << "rit " << **rit << std::endl;
-    //         auto ps = (*rit)->p_less_x();
-    //         auto pe = (*rit)->p_greater_x();
-    //         auto flag = OnWhichSide7(ps, pe, p);
-    //         if(flag == _PS_ON_END_){
-    //             r.push_back(*rit);
-    //         }else if(flag == _PS_IN_){
-    //             c.push_back(*rit);
-    //         }
-    //         rit++;
-    //     }
-
-    //     return std::pair<ListcpSeg, ListcpSeg>(r, c);
-    // }
+    
     std::pair<ListcpSeg, ListcpSeg> get_sets(const Point& p, StatusTree& tree){
         ListcpSeg r, c;
         if(tree.empty()){
