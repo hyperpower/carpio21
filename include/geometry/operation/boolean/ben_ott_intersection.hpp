@@ -114,6 +114,7 @@ public:
             std::cout << "loop index = " << i << std::endl;
 
             gnu.set_terminal_png("./fig/" + ToString(i));
+            gnu.set_equal_ratio();
             auto dx = MaxX(diagonal) - MinX(diagonal);
             auto dy = MaxY(diagonal) - MinY(diagonal);
             gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
@@ -325,6 +326,26 @@ protected:
                 if (current < ev_i && !queue.mem(ev_i)){
                     queue.push_intersect(ev_i, s0);
                     queue.push_intersect(ev_i, s1);
+                }
+            }
+            if(res.type == _SS_TOUCH_){
+                std::cout << "TOUCH" << std::endl;
+                for(short i = 0 ; i < 2; i++){
+                    auto pos = inter.point_position(i);
+                    if(pos == _PS_IN_){
+                        queue.push_intersect(Event(s0->p(i)), s1);
+                        std::cout<<"push i " << s0->p(i) <<" " << *s1 << std::endl;
+                        break;
+                    }
+                }
+                for(short i = 2; i < 4; i++){
+                    auto pos = inter.point_position(i);
+                    std::cout << ToString(pos) << std::endl;
+                    if(pos == _PS_IN_){
+                        queue.push_intersect(Event(s1->p(i-2)), s0);
+                        std::cout<<"push i " << s1->p(i-2) <<" " << *s0 << std::endl;
+                        break;
+                    }
                 }
             }
         }

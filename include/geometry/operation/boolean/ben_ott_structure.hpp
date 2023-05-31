@@ -97,7 +97,10 @@ public:
     void push_left(const EVENT& event, typename Listcp::value_type assoc) {
         auto iter = this->find(event);
         if(iter != this->end()){
-            iter->second[0].push_back(assoc);
+            auto liter = std::find (iter->second[0].begin(), iter->second[0].end(), assoc);
+            if(liter == iter->second[0].end()){
+                iter->second[0].push_back(assoc);
+            }
         }else{
             Listcp v; 
             v.push_back(assoc);
@@ -108,7 +111,10 @@ public:
     void push_right(const EVENT& event, typename Listcp::value_type assoc) {
         auto iter = this->find(event);
         if(iter != this->end()){
-            iter->second[2].push_back(assoc);
+            auto liter = std::find (iter->second[2].begin(), iter->second[2].end(), assoc);
+            if(liter == iter->second[2].end()){
+                iter->second[2].push_back(assoc);
+            }
         }else{
             Listcp v; 
             v.push_back(assoc);
@@ -120,7 +126,10 @@ public:
                         typename Listcp::value_type assoc) {
         auto iter = this->find(event);
         if(iter != this->end()){
-            iter->second[1].push_back(assoc);
+            auto liter = std::find (iter->second[1].begin(), iter->second[1].end(), assoc);
+            if(liter == iter->second[1].end()){
+                iter->second[1].push_back(assoc);
+            }
         }else{
             Listcp v; 
             v.push_back(assoc);

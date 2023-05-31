@@ -94,6 +94,19 @@ auto GenerateSegmentsCase2(){ //normal
     lseg.push_back(Seg(28, 38, 15, 18));
     return lseg;
 }
+template<class SEG_TYPE>
+auto GenerateSegmentsCase4(){ // intersect in mid
+    typedef SEG_TYPE Seg;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    lseg.push_back(Seg(Point(0, 10), Point(15, 26)));
+    lseg.push_back(Seg(Point(15, 30), Point(10, 40)));
+    lseg.push_back(Seg(Point(10, 10),  Point(20,  20))); //
+    lseg.push_back(Seg(Point(14, 14),  Point(10,  30)));
+    lseg.push_back(Seg(Point(10, 25),  Point(20,  35))); //
+    
+    return lseg;
+}
 TEST(ben_ott, two_seg_order){
     Segment s1(Point(15, 26), Point(2,  20));  // left big  
     Segment s2(Point(6, 18),  Point(20,  35)); // left small
@@ -128,7 +141,7 @@ TEST(ben_ott, two_seg_order){
 }
 
 TEST(ben_ott, case1){
-    auto sl = GenerateSegmentsCase2<Segment>();
+    auto sl = GenerateSegmentsCase4<Segment>();
 
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/case1");

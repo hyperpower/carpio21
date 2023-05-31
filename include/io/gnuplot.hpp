@@ -637,13 +637,13 @@ public:
         return *this;
     }
 
-    // Gnuplot& set_equal_ratio() {
-    //     std::ostringstream cmdstr;
-    //     cmdstr << "set size ratio -1";
-    //     cmd(cmdstr.str());
+    Gnuplot& set_equal_ratio() {
+        std::ostringstream cmdstr;
+        cmdstr << "set size ratio -1";
+        cmd(cmdstr.str());
 
-    //     return *this;
-    // }
+        return *this;
+    }
 
     inline Gnuplot& set_label(
             int tag,
