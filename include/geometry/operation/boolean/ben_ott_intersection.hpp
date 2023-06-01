@@ -152,27 +152,21 @@ public:
             #ifdef _DEBUG_MODE_
             // PlotListpSegment(gnu, pair_rc.first, "#34A853");
             #endif
+            std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
             if(l_set.size() + c_set.size() + r_set.size() > 1){
-                Result res(point);
-                
-                for(auto s : l_set){
-                    res.add(*s);
-                }
-                for(auto s : c_set){
-                    res.add(*s);
-                }
-                for(auto s : r_set){
-                    res.add(*s);
-                }
-                
-                _list_res.emplace_back(res);
+                _new_result(event, _list_res);
             }
-            //4. Delete the segments in R(p) and C(p) from T
+            //4. Delete the segents in R(p) and C(p) from T
             for(auto s : r_set){
-                status.erase(s);
+                auto r = _erase_seg_in_status(status, s);
+                if(r == 0)
+                    throw std::invalid_argument(ToString(*s) + " should in status tree!");
             }
             for(auto s : c_set){
-                status.erase(s);
+                auto r = _erase_seg_in_status(status, s);
+                if(r == 0)
+                    throw std::invalid_argument(ToString(*s) + " should in status tree!");
+                // status.erase(s);
             }
             p_sweep.x(point.x());
             p_sweep.y(point.y());
@@ -183,6 +177,7 @@ public:
             for(auto s : c_set){
                 status.insert(s);
             }
+
 
             if(l_set.size() + c_set.size() == 0){
                 cpSegment s_a, s_b;
@@ -215,6 +210,9 @@ public:
                 _compute_new_events(s_max, s_upper, event);
             }
 
+            std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
+            // update res
+            
             queue.pop();
             #ifdef _DEBUG_MODE_
             this->_plot_status_tree(gnu, status, p_sweep);
@@ -242,6 +240,26 @@ public:
 protected:
 #endif
     IntersectionBenOtt_(){}
+
+    void _new_result(const Event& current, ListResult& list){
+        Result res(current.get_point());
+
+        auto& l_set = queue.begin()->second[0];
+        auto& c_set = queue.begin()->second[1];
+        auto& r_set = queue.begin()->second[2];
+
+        for(auto s : l_set){
+            res.add(*s);
+        }
+        for(auto s : c_set){
+            res.add(*s);
+        }
+        for(auto s : r_set){
+            res.add(*s);
+        }
+                
+        list.emplace_back(res);
+    }
 
 
     template<class CONTAINER>
@@ -273,6 +291,20 @@ protected:
         }else{ 
             below = *--iter;
         }
+    }
+
+    bool _erase_seg_in_status(StatusTree& tree, const cpSegment& s) const{
+        auto removed = tree.erase(s);
+        if (removed == 0){
+            for(auto iter = tree.begin(); iter!= tree.end(); iter++){
+                if(*iter == s){
+                    tree.erase(iter);
+                    removed = 1;
+                    break;
+                }
+            }
+        }
+        return removed;
     }
 
     cpSegment _find_lower_neighboor(cpSegment s, const StatusTree& tree) const{
@@ -329,12 +361,11 @@ protected:
                 }
             }
             if(res.type == _SS_TOUCH_){
-                std::cout << "TOUCH" << std::endl;
                 for(short i = 0 ; i < 2; i++){
                     auto pos = inter.point_position(i);
+                    std::cout << ToString(pos) << std::endl;
                     if(pos == _PS_IN_){
                         queue.push_intersect(Event(s0->p(i)), s1);
-                        std::cout<<"push i " << s0->p(i) <<" " << *s1 << std::endl;
                         break;
                     }
                 }
@@ -343,7 +374,6 @@ protected:
                     std::cout << ToString(pos) << std::endl;
                     if(pos == _PS_IN_){
                         queue.push_intersect(Event(s1->p(i-2)), s0);
-                        std::cout<<"push i " << s1->p(i-2) <<" " << *s0 << std::endl;
                         break;
                     }
                 }

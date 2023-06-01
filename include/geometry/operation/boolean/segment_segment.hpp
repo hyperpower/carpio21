@@ -263,6 +263,24 @@ public:
     void add(const Geo1& g){
         list.push_back(&g);
     }
+    template<class CONTAINER, 
+            typename std::enable_if<
+                IsContainer<CONTAINER>::value
+            &&  std::is_same<typename CONTAINER::value_type, cpGeo>::value 
+        , bool>::type = true>
+    void add(const CONTAINER& con){
+        list.insert(list.end(), con.begin(), con.end());
+    }
+
+
+    template<class CONTAINER, 
+            typename std::enable_if<
+                IsContainer<CONTAINER>::value
+            &&  std::is_same<typename CONTAINER::value_type, cpGeo>::value 
+        , bool>::type = true>
+    void merge(const CONTAINER& con){ // same element will be droped 
+        
+    }
     
     void show() const{
         auto it = list.begin();

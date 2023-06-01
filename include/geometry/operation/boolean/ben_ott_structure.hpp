@@ -71,9 +71,11 @@ public:
         return *_sppoint;
     }
     bool operator<(const SweepEvent_& e) const{
+        auto x  = _sppoint->x();
+        auto xo = e._sppoint->x();
         return (
-            (_sppoint->x() < e._sppoint->x())
-            || (   (_sppoint->x() == e._sppoint->x())
+            (xo - x) > 1e-14
+            || (   std::abs( xo - x) < 1e-14
                 && (_sppoint->y()  < e._sppoint->y()))
             );
     }

@@ -99,10 +99,24 @@ auto GenerateSegmentsCase4(){ // intersect in mid
     typedef SEG_TYPE Seg;
     typedef std::vector<SEG_TYPE> ListSegment;
     ListSegment lseg;
-    lseg.push_back(Seg(Point(0, 10), Point(15, 26)));
-    lseg.push_back(Seg(Point(15, 30), Point(10, 40)));
+    lseg.push_back(Seg(Point(0, 10),   Point(15,  26)));
+    lseg.push_back(Seg(Point(15, 30),  Point(10,  40)));
     lseg.push_back(Seg(Point(10, 10),  Point(20,  20))); //
-    lseg.push_back(Seg(Point(14, 14),  Point(10,  30)));
+    lseg.push_back(Seg(Point(15, 15),  Point(10,  30)));
+    lseg.push_back(Seg(Point(10, 25),  Point(20,  35))); //
+    
+    return lseg;
+}
+template<class SEG_TYPE>
+auto GenerateSegmentsCase5(){ // intersect in mid
+    typedef SEG_TYPE Seg;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    lseg.push_back(Seg(Point(4, 10),   Point(6,  30)));
+    lseg.push_back(Seg(Point(10, 15),  Point(10,  40)));
+    lseg.push_back(Seg(Point(5,  20),  Point(20,  20)));
+    lseg.push_back(Seg(Point(10, 10),  Point(20,  20))); //
+    lseg.push_back(Seg(Point(15, 15),  Point(10,  30)));
     lseg.push_back(Seg(Point(10, 25),  Point(20,  35))); //
     
     return lseg;
@@ -141,7 +155,7 @@ TEST(ben_ott, two_seg_order){
 }
 
 TEST(ben_ott, case1){
-    auto sl = GenerateSegmentsCase4<Segment>();
+    auto sl = GenerateSegmentsCase5<Segment>();
 
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/case1");
