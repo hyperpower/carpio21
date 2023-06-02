@@ -51,6 +51,13 @@ struct SegSlope_ {
         else
             return (s.type == _INFINITY_ || value < s.value);
     }
+    bool operator==(const SegSlope_<TYPE> &rhs) const{
+        if(!(this->operator<(rhs)) && !rhs.operator<(*this)){
+            return true;
+        }else{
+            return false;
+        }
+    }
 };
 
 
@@ -84,59 +91,36 @@ public:
 
 template <class EVENT, class VALUE> 
 class SweepEventQueue_ : public std::map<EVENT, 
-            std::array<std::list<const VALUE*>, 3> > {
+            std::array<std::set<const VALUE*>, 3> > {
 public:
     typedef const VALUE* constp_Value;
     typedef std::map<EVENT, std::list<constp_Value> > Base;
-    typedef std::list<constp_Value> Listcp;
-    typedef std::array<Listcp, 3>   ArrListcp;
+    typedef std::set<constp_Value> Setcp;
+    typedef std::array<Setcp, 3>   ArrSetcp;
 
-    void push(const EVENT& event) {
-        Listcp list; //empty vector
-        this->insert(std::pair<EVENT, ArrListcp> (event, {list, list, list}));
-    }
 
-    void push_left(const EVENT& event, typename Listcp::value_type assoc) {
-        auto iter = this->find(event);
-        if(iter != this->end()){
-            auto liter = std::find (iter->second[0].begin(), iter->second[0].end(), assoc);
-            if(liter == iter->second[0].end()){
-                iter->second[0].push_back(assoc);
-            }
-        }else{
-            Listcp v; 
-            v.push_back(assoc);
-            Listcp emptylist;
-            this->insert(std::pair<EVENT, ArrListcp> (event, {v, emptylist, emptylist}));
-        }
+    void add(const EVENT& event) {
+        Setcp set_empty; //empty vector
+        this->insert(std::pair<EVENT, ArrSetcp> (event, {set_empty, set_empty, set_empty}));
     }
-    void push_right(const EVENT& event, typename Listcp::value_type assoc) {
+    void add_event(const EVENT& event, const int& idx, typename Setcp::value_type assoc) {
         auto iter = this->find(event);
         if(iter != this->end()){
-            auto liter = std::find (iter->second[2].begin(), iter->second[2].end(), assoc);
-            if(liter == iter->second[2].end()){
-                iter->second[2].push_back(assoc);
-            }
+            auto res = iter->second[idx].insert(assoc);
         }else{
-            Listcp v; 
-            v.push_back(assoc);
-            Listcp emptylist;
-            this->insert(std::pair<EVENT, ArrListcp> (event, {emptylist, emptylist, v}));
-        }
-    }
-    void push_intersect(const EVENT& event, 
-                        typename Listcp::value_type assoc) {
-        auto iter = this->find(event);
-        if(iter != this->end()){
-            auto liter = std::find (iter->second[1].begin(), iter->second[1].end(), assoc);
-            if(liter == iter->second[1].end()){
-                iter->second[1].push_back(assoc);
+            Setcp v, set_empty; 
+            v.insert(assoc);
+            switch (idx){
+            case 0:
+                this->insert(std::pair<EVENT, ArrSetcp> (event, {v, set_empty, set_empty}));
+                break;
+            case 1:
+                this->insert(std::pair<EVENT, ArrSetcp> (event, {set_empty, v, set_empty}));
+                break;
+            case 2:
+                this->insert(std::pair<EVENT, ArrSetcp> (event, {set_empty, set_empty, v}));
+                break;
             }
-        }else{
-            Listcp v; 
-            v.push_back(assoc);
-            Listcp emptylist;
-            this->insert(std::pair<EVENT, ArrListcp> (event, {emptylist, v, emptylist}));
         }
     }
     EVENT top() {
@@ -205,8 +189,12 @@ struct CompareSeg_ {
         auto by = y_at_sweep_point(b, p_sweep);
         if(by - ay > _e){
             return true;
+        }else if(std::abs(ay - by) < _e && (Slope(a) < Slope(b))){
+            return true;
+        }else if(std::abs(ay - by) < _e && (Slope(a) == Slope(b))){
+            return &a < &b;
         }else{
-            return ( std::abs(ay - by) < _e && (Slope(a) < Slope(b)));
+            return false;
         }
     }
 };

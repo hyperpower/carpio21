@@ -121,6 +121,38 @@ auto GenerateSegmentsCase5(){ // intersect in mid
     
     return lseg;
 }
+template<class SEG_TYPE>
+auto GenerateSegmentsCase6(){ // intersect in mid
+    typedef SEG_TYPE Seg;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    lseg.push_back(Seg(Point(0, 0),  Point(10, 10)));
+    lseg.push_back(Seg(Point(0, 5),  Point(10, 5)));
+    lseg.push_back(Seg(Point(5, 0),  Point(5,  10)));
+    lseg.push_back(Seg(Point(0, 10), Point(10, 0)));
+    lseg.push_back(Seg(Point(2, 3),  Point(5, 5)));
+    lseg.push_back(Seg(Point(5, 5),  Point(7, 8)));
+    
+    return lseg;
+}
+template<class SEG_TYPE>
+auto GenerateSegmentsCase7(){ // overlap
+    typedef SEG_TYPE Seg;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    lseg.push_back(Seg(Point(0, 0),  Point(10, 10)));
+    lseg.push_back(Seg(Point(3, 3),  Point(5, 5)));
+    lseg.push_back(Seg(Point(8, 8),  Point(12, 12)));
+
+    lseg.push_back(Seg(Point(0, 1),  Point(0, 10)));
+    lseg.push_back(Seg(Point(0, 3),  Point(0, 5)));
+
+    lseg.push_back(Seg(Point(1, 0),  Point(10, 0)));
+    lseg.push_back(Seg(Point(3, 0),  Point(5,  0)));
+    lseg.push_back(Seg(Point(12, 0),  Point(8, 0)));
+    
+    return lseg;
+}
 TEST(ben_ott, two_seg_order){
     Segment s1(Point(15, 26), Point(2,  20));  // left big  
     Segment s2(Point(6, 18),  Point(20,  35)); // left small
@@ -155,7 +187,7 @@ TEST(ben_ott, two_seg_order){
 }
 
 TEST(ben_ott, case1){
-    auto sl = GenerateSegmentsCase5<Segment>();
+    auto sl = GenerateSegmentsCase7<Segment>();
 
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/case1");
@@ -173,5 +205,5 @@ TEST(ben_ott, case1){
     }
     // PlotListIntersectionResult(gnu, res);
 
-    gnu.plot();
+    // gnu.plot();
 }

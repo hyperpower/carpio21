@@ -68,7 +68,7 @@ public:
     
     typedef SweepEvent_<TYPE> Event;
     typedef SweepEventQueue_<Event, Segment> EventQueue;
-    typedef typename EventQueue::Listcp ListcpSeg;
+    typedef typename EventQueue::Setcp SetcpSeg;
 
     // typedef std::set<const Geo*> GeoSet;
     typedef CompareSeg_<TYPE> CompareSeg;
@@ -152,8 +152,9 @@ public:
             #ifdef _DEBUG_MODE_
             // PlotListpSegment(gnu, pair_rc.first, "#34A853");
             #endif
-            std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
-            if(l_set.size() + c_set.size() + r_set.size() > 1){
+            auto set_size = l_set.size() + c_set.size() + r_set.size();
+            std::cout << "three set size = " << set_size << std::endl;
+            if(set_size > 1){
                 _new_result(event, _list_res);
             }
             //4. Delete the segents in R(p) and C(p) from T
@@ -178,13 +179,13 @@ public:
                 status.insert(s);
             }
 
-
+            std::cout << "status size = "<< status.size() << std::endl;
             if(l_set.size() + c_set.size() == 0){
                 cpSegment s_a, s_b;
                 _find_neighboors(p_sweep, status, s_a, s_b); 
                 _compute_new_events(s_a, s_b, event);
             } else {
-                ListcpSeg lunion;
+                SetcpSeg lunion;
                 std::set_union(l_set.begin(), l_set.end(),
                                c_set.begin(), c_set.end(),
                                std::inserter(lunion, lunion.begin()));
@@ -212,6 +213,13 @@ public:
 
             std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
             // update res
+            auto n_set_size = l_set.size() + c_set.size() + r_set.size();
+            if(n_set_size > 1 && n_set_size > set_size ){
+                if(set_size > 1){
+                    _list_res.pop_back();
+                }
+                _new_result(event, _list_res);
+            }
             
             queue.pop();
             #ifdef _DEBUG_MODE_
@@ -227,14 +235,14 @@ public:
         return _list_res;
     }
     
-    std::pair<ListcpSeg, ListcpSeg> get_sets(const Point& p, StatusTree& tree){
-        ListcpSeg r, c;
+    std::pair<SetcpSeg, SetcpSeg> get_sets(const Point& p, StatusTree& tree){
+        SetcpSeg r, c;
         if(tree.empty()){
-            return std::pair<ListcpSeg, ListcpSeg> (r, c);
+            return std::pair<SetcpSeg, SetcpSeg> (r, c);
         }
         
 
-        return std::pair<ListcpSeg, ListcpSeg>(r, c);
+        return std::pair<SetcpSeg, SetcpSeg>(r, c);
     }
 #ifndef _DEBUG_MODE_
 protected:
@@ -249,26 +257,25 @@ protected:
         auto& r_set = queue.begin()->second[2];
 
         for(auto s : l_set){
-            res.add(*s);
+            res.add(s);
         }
         for(auto s : c_set){
-            res.add(*s);
+            res.add(s);
         }
         for(auto s : r_set){
-            res.add(*s);
+            res.add(s);
         }
                 
         list.emplace_back(res);
     }
-
 
     template<class CONTAINER>
     void _build_priority_queue(const CONTAINER& con){
         for(auto& seg : con){
             Event e_left(seg.p_less_x());
             Event e_right(seg.p_greater_x());
-            queue.push_left(e_left, &(seg));
-            queue.push_right(e_right, &(seg));  
+            queue.add_event(e_left,  0, &(seg));
+            queue.add_event(e_right, 2, &(seg));  
         }
     }
     void _find_neighboors(const Point& p, 
@@ -328,7 +335,7 @@ protected:
             return *iter;
     }
 
-    cpSegment _find_min_slope(const ListcpSeg& v) const{
+    cpSegment _find_min_slope(const SetcpSeg& v) const{
         auto it = v.begin();
         auto min = *(v.begin());
 
@@ -338,7 +345,7 @@ protected:
         }
         return min;
     }
-    cpSegment _find_max_slope(const ListcpSeg& v) const{
+    cpSegment _find_max_slope(const SetcpSeg& v) const{
         auto it = v.begin();
         auto max = *(v.begin());
 
@@ -356,25 +363,25 @@ protected:
             if(res.type == _SS_INTERSECT_){
                 Event ev_i(res.point);
                 if (current < ev_i && !queue.mem(ev_i)){
-                    queue.push_intersect(ev_i, s0);
-                    queue.push_intersect(ev_i, s1);
+                    queue.add_event(ev_i, 1, s0);
+                    queue.add_event(ev_i, 1, s1);
                 }
             }
-            if(res.type == _SS_TOUCH_){
+            if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
                 for(short i = 0 ; i < 2; i++){
                     auto pos = inter.point_position(i);
                     std::cout << ToString(pos) << std::endl;
                     if(pos == _PS_IN_){
-                        queue.push_intersect(Event(s0->p(i)), s1);
-                        break;
+                        queue.add_event(Event(s0->p(i)), 1, s1);
+                        // break;
                     }
                 }
                 for(short i = 2; i < 4; i++){
                     auto pos = inter.point_position(i);
                     std::cout << ToString(pos) << std::endl;
                     if(pos == _PS_IN_){
-                        queue.push_intersect(Event(s1->p(i-2)), s0);
-                        break;
+                        queue.add_event(Event(s1->p(i-2)), 1, s0);
+                        // break;
                     }
                 }
             }
