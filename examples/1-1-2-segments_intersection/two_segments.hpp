@@ -13,6 +13,7 @@ using namespace carpio;
 typedef Point_<double, 2>   Point;
 typedef SegmentWithName_<double, 2> Segment;
 typedef Intersection_<Segment, Segment>  Inter;
+typedef typename Inter::Result Result;
 // typedef GGnuplotActor_<double, 2>      GA;
 
 int plot_a_case(const std::string& case_name,
@@ -73,12 +74,11 @@ int a_case(const Point& p1,
     Segment seg2(p3, p4, "b");
 
     Inter inter(seg1, seg2);
-    auto strtype = ToString(inter.cal_intersection_type());
-    std::cout << "Intersection Type : "<< strtype << std::endl;
-    Point np = inter.cal_intersection_point();
-    std::cout << "new point         : "<< np << std::endl;
+    auto res = inter.execute();
+    std::cout << "Intersection Type : "<< res.type  << std::endl;
+    std::cout << "new point         : "<< res.point << std::endl;
 
-    plot_a_case(strtype, seg1, seg2, np);
+    plot_a_case(ToString(res.type), seg1, seg2, res.point);
     return 0;
 }
 
@@ -97,7 +97,7 @@ void two_segments_test(){
            Point( -1,   0), Point(-0.3, 1.0));
     // TOUCH
     a_case(Point( -1,   0), Point(3,    0.0),
-           Point(  0,   0), Point(-0.5, 1.0));
+           Point(  2,   0), Point(-0.5, 1.0));
     // OVERLAP
     a_case(Point(  0, -1), Point( 4,   3),
            Point( -1, -2), Point( 2,   1));

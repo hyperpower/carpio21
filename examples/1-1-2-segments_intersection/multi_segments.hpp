@@ -2,8 +2,6 @@
 #define _MULTI_SEGMENTS_HPP_
 
 #include "two_segments.hpp" 
-#include "ben-ott/bentley_ottmann.hpp"
-#include "ben-ott/ben_ott_structures.hpp"
 
 template<class LISTSEG>
 void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){

@@ -22,7 +22,8 @@ enum IntersectionTypeSS {
 	_SS_TOUCH_    = 2,  //
 	_SS_OVERLAP_  = 3,  //
 	_SS_SAME_     = 4,  //
-	_SS_INTERSECT_= 5
+	_SS_INTERSECT_= 5,
+	_SS_INVALID_  = -1,
 };
 
 }

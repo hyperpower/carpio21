@@ -20,6 +20,7 @@ inline std::string ToString(IntersectionTypeSS ss){
         case _SS_OVERLAP_  :  return "OVERLAP";  break;
         case _SS_SAME_     :  return "SAME";     break;
         case _SS_INTERSECT_:  return "INTERSECT";break;
+        case _SS_INVALID_  :  return "INVALID";break;
     }
     return "ERROR IntersectionType";
 }
@@ -236,16 +237,16 @@ public:
     // const Geo1* geo1;
     // const Geo2* geo2;
 
-    int type;
+    IntersectionTypeSS type;
     Point point;
     ListcpGeo list;
 
-    IntersectionResultImplement_(): type(-1){}
+    IntersectionResultImplement_(): type(_SS_INVALID_){}
     
     IntersectionResultImplement_(const Point& p): 
-        type(-1), point(p){}
+        type(_SS_INVALID_), point(p){}
     
-    IntersectionResultImplement_(const Geo1& g1, const Geo2& g2, int t):  type(t){
+    IntersectionResultImplement_(const Geo1& g1, const Geo2& g2, IntersectionTypeSS t):  type(t){
         list.push_back(&g1);
         list.push_back(&g2);
     }
@@ -329,7 +330,7 @@ public:
     IntersectionImplement_(
             const GEO1& seg1,
             const GEO2& seg2
-            ):_res(seg1, seg2, -1){
+            ):_res(seg1, seg2, _SS_INVALID_){
         _arrp[0] = &(seg1.ps());
         _arrp[1] = &(seg1.pe());
         _arrp[2] = &(seg2.ps());
@@ -368,8 +369,30 @@ public:
         if(this->_res.type == _SS_INTERSECT_){
             this->_res.point = cal_intersection_point();
         }
+        if(this->_res.type == _SS_TOUCH_ || this->_res.type ==_SS_OVERLAP_) {
+            for(St i = 0; i<4; i++){
+                if(this->point_position(i) == _PS_IN_){
+                    this->_res.point = *(this->_arrp[i]);
+                    break;
+                }
+            }
+        }
+        if(this->_res.type == _SS_CONNECT_){
+            for(St i = 0; i<4; i++){
+                auto pos = this->point_position(i);
+                if(pos == _PS_ON_START_ || pos == _PS_ON_END_){
+                    this->_res.point = *(this->_arrp[i]);
+                    break;
+                }
+            }
+        }
+        if(this->_res.type == _SS_SAME_){
+            this->_res.point = *(this->_arrp[0]);
+        }
+
         return this->_res;
     }
+
 
     PointToSegmentPosition point_position(St idx){
         ASSERT(idx >= 0 && idx < 4);
@@ -411,7 +434,7 @@ protected:
             _position[3] = OnWhichSide7(*(_arrp[0]), *(_arrp[1]), *(_arrp[3]));
         }
     }
-    
+
 };
 // Replace  IntersectionPairSS_
 
