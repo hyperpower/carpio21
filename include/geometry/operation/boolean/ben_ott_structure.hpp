@@ -1,6 +1,6 @@
 #ifndef _BEN_OTT_STRUCTURE_HPP_
 #define _BEN_OTT_STRUCTURE_HPP_
-
+// bentley ottmann 
 #include <memory>
 #include <queue>
 #include <iostream>
@@ -10,23 +10,25 @@
 
 namespace carpio{
 
-template<class TYPE>
+template<class SEG>
 struct SegSlope_ {
-    typedef Point_<TYPE, 2> Point;
-    typedef Segment_<TYPE, 2> Segment;
+    typedef SegSlope_<SEG> Self;
+    typedef typename SEG::Point Point;
+    typedef SEG Segment;
+    typedef typename SEG::coord_value_type Vt;
 
     static const int _RATIONAL_ = 1;
     static const int _INFINITY_ = 0;
 
     int  type; 
-    TYPE value; 
+    Vt   value; 
 
     SegSlope_(const Segment& seg){
         make(seg);
     }
 
-    void make(const TYPE& x0,const TYPE& y0,
-              const TYPE& x1,const TYPE& y1){
+    void make(const Vt& x0,const Vt& y0,
+              const Vt& x1,const Vt& y1){
         if(x0 == x1)
             type = _INFINITY_;
         else {
@@ -45,13 +47,13 @@ struct SegSlope_ {
         make(xa, ya, xb, yb);
     }
 
-    bool operator<(const SegSlope_<TYPE>& s) const{
+    bool operator<(const Self& s) const{
         if (type == _INFINITY_)
             return false;
         else
             return (s.type == _INFINITY_ || value < s.value);
     }
-    bool operator==(const SegSlope_<TYPE> &rhs) const{
+    bool operator==(const Self &rhs) const{
         if(!(this->operator<(rhs)) && !rhs.operator<(*this)){
             return true;
         }else{
@@ -61,10 +63,10 @@ struct SegSlope_ {
 };
 
 
-template<class TYPE>
+template<class SEG>
 class SweepEvent_ {
 private:
-    typedef Point_<TYPE, 2> Point;
+    typedef typename SEG::Point Point;
     typedef std::shared_ptr<Point> spObj;
     spObj _sppoint; 
 public:
@@ -137,26 +139,38 @@ public:
 };
 
 // StatusTree
-template<class TYPE>
+template<class SEG>
 struct CompareSeg_ {
-    typedef Point_<TYPE, 2> Point;
-    typedef Segment_<TYPE, 2> Segment;
-    typedef SegSlope_<TYPE>   Slope;
+    typedef typename SEG::Point Point;
+    typedef SEG Segment;
+    typedef const Segment* cpSegment;
+    typedef std::set<cpSegment> Setcp;
+    typedef typename SEG::coord_value_type Vt;
+    typedef SegSlope_<SEG>   Slope;
 
     Point* _ppoint;
+    Setcp* _pset;
 
     double _e;
 
-    CompareSeg_(): _ppoint(nullptr), _e(1e-14) {};
+    CompareSeg_(): _ppoint(nullptr), _pset(nullptr), _e(1e-14) {};
 
-    CompareSeg_(Point* c) : _ppoint(c), _e(1e-14){ }; 
+    CompareSeg_(Point* c) : _ppoint(c), _pset(nullptr), _e(1e-14){ }; 
+
+    CompareSeg_(Point* c, Setcp* s) : _ppoint(c), _pset(s), _e(1e-14){ }; 
 
     bool operator() (const Segment* a, const Segment* b) const{
-        return this->operator()((*a), (*b));
-    }
-    bool operator() (const Segment& a, const Segment& b) const{
-        bool res =  this->less(a, b, *(this->_ppoint)); 
-        return res;
+        if(_pset != nullptr && !(_pset->empty())){
+            auto itera = _pset->find(a);
+            if(itera != _pset->end()){
+                auto iterb = _pset->find(b);
+                if(iterb != _pset->end()){
+                    return this->less_slope(a, b);
+                }
+            }
+        }
+        return this->less(*a, *b, *(this->_ppoint)); 
+        
     }
 
     auto y_at_sweep_point(const Segment& seg) const{
@@ -195,6 +209,16 @@ struct CompareSeg_ {
             return &a < &b;
         }else{
             return false;
+        }
+    }
+
+    bool less_slope(cpSegment a, cpSegment b) const{
+        Slope sa(*a);
+        Slope sb(*b);
+        if(sa < sb){
+            return true;
+        }else if(sa == sb){
+            return &a < &b;
         }
     }
 };

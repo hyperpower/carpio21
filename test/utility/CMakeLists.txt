@@ -4,8 +4,9 @@ set(This Utility)
 
 set(Sources
     # test_tree.cpp
+    test_clock.cpp
     # test_any.cpp
-    test_big_int.cpp
+    # test_big_int.cpp
 )
 
 add_executable(${This} ${Sources})

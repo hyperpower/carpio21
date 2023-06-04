@@ -146,7 +146,7 @@ class Runer:
                   f" -G \"Unix Makefiles\""
         else:
             cmd = f"cmake -S \"{self._path.this}\"" \
-              f" -B \"{path_build}\""
+                  f" -B \"{path_build}\"" 
         print(cmd)
         # os.system(cmd)
         result = os.popen(cmd)

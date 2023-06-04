@@ -33,7 +33,7 @@ void PlotListIntersectionResult(Gnuplot& gnu, const LISTSEGRES& l){
         a.point_type(7);
         a.point_size(2);
         a.line_color_red();
-        std::cout << a.style() << std::endl;
+        // std::cout << a.style() << std::endl;
         gnu.add(a);
     }
 }
@@ -59,24 +59,35 @@ auto GenerateSegmentsCase1(){
     return lseg;
 }
 
-// void MultiSegTestCase1(){
-//     auto sl = GenerateSegmentsCase1<ref::Segment>();
-//     SegmentsPlot("case1", sl);
-//     auto res = ref::bentley_ottmann(sl);
-//     std::cout << "Size Res" << res.size() << std::endl;
-//     for (auto m : res){
-//         auto& e = m.first;
-//         auto& vs = m.second;
-//         std::cout << "x ="<<e.get_point().get_abscissa() << " y = " << e.get_point().get_ordinate() << std::endl;
-//     }
-// }
-void MultiSegTestCase1N2(){
-    auto sl = GenerateSegmentsCase1<Segment>();
-    auto res = Intersect(sl, "N2");
-    std::cout << "Len Res = " << res.size() << std::endl;
-    for(auto& r : res){
-        r.show();
+auto GenerateRandomSegments(int num,
+                            const double& xmin, const double& xmax,
+                            const double& ymin, const double& ymax){
+    typedef std::list<Segment> ListSegment;
+    ListSegment lseg;
+    // Random::seed(std::time(0));
+    for (int i = 0; i< num ; i++){
+        double x1 = Random::nextDouble(xmin, xmax);
+        double y1 = Random::nextDouble(ymin, ymax);
+        double x2 = Random::nextDouble(xmin, xmax);
+        double y2 = Random::nextDouble(ymin, ymax);
+        lseg.push_back(Segment(Point(x1, y1), Point(x2, y2)));
     }
+    return lseg;
+}
+
+void MultiSegTestCase1N2(const std::list<Segment>& sl){
+    // auto sl = GenerateSegmentsCase1<Segment>();
+    // auto sl = GenerateRandomSegments(50, 0, 100, 0, 100);
+    std::cout << "Segments n = " << sl.size() << std::endl;
+    ProfileStart("Intersect N2");
+    auto res = Intersect(sl, "N2");
+    std::cout << "Intersection Points : " << res.size() << std::endl;
+    ProfileEnd();
+    // std::cout << "Len Res = " << res.size() << std::endl;
+    // for(auto& r : res){
+        // r.show();
+    // }
+    ProfileListShow();
     
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/case1_N2");
@@ -88,16 +99,103 @@ void MultiSegTestCase1N2(){
 
     gnu.plot();
 }
-// int TEST_DS(){
-//     typedef IntersectionBenOtt_<double> Inter;
-//     auto sl = GenerateSegmentsCase1<Segment_<double, 2> >();
+void MultiSegTestCase1BenOtt(const std::list<Segment>& sl){
+    // auto sl = GenerateSegmentsCase1<Segment>();
+    // auto sl = GenerateRandomSegments(50, 0, 100, 0, 100);
+    std::cout << "Segments n = " << sl.size() << std::endl;
+    ProfileStart("Intersect Ben");
+    auto res = Intersect(sl, "bentley_ottmann");
+    std::cout << "Intersection Points : " << res.size() << std::endl;
+    ProfileEnd();
+    // std::cout << "Len Res = " << res.size() << std::endl;
+    // for(auto& r : res){
+        // r.show();
+    // }
+    ProfileListShow();
+    
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/case1_ben_ott");
+    gnu.set_xlabel("x");
+    gnu.set_ylabel("y");
 
-//     Inter inter(sl);
+    PlotListSegment(gnu, sl);
+    PlotListIntersectionResult(gnu, res);
 
-//     inter.execute();
+    gnu.plot();
+}
 
-//     return 1;
-// }
+
+
+void benchmark_test(){
+    ProfileClean();
+    std::vector<int> arr_num     = {100, 500, 1000, 2000};
+    std::list<double> m1_time;
+    std::list<double> m2_time;
+    std::list<double> m3_time;
+
+    for(auto& num : arr_num){
+        ProfileStart("GenerateSegments_" + ToString(num));
+        auto lseg = GenerateRandomSegments(num, 0, 100, 0, 100);
+        ProfileEnd();
+        // Method1 ==========================================
+        auto start = std::chrono::system_clock::now();
+        ProfileStart("Method_N2_" + ToString(num));
+        tfm::format(std::cout, "Method_N2_%d  ", num); 
+        auto res = Intersect(lseg);
+        tfm::format(std::cout, " find %10d\n", res.size()); 
+        ProfileEnd();
+	    auto end = std::chrono::system_clock::now();
+    	double dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        m1_time.push_back(dt);
+        std::string out = tfm::format("%25s :  %15.5f %3s\n",
+                                 "Method N2", dt, "s");
+    	std::cout << out;
+        // Method2 ==========================================
+        start = std::chrono::system_clock::now();
+        ProfileStart("Method_SweepLine_" + ToString(num));
+        tfm::format(std::cout, "Method_SweepLine_%d  ", num); 
+        res = Intersect(lseg, "sweep_line_simple");
+        tfm::format(std::cout, " find %10d\n", res.size()); 
+        ProfileEnd();
+	    end = std::chrono::system_clock::now();
+    	dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        m2_time.push_back(dt);
+        out = tfm::format("%25s :  %15.5f %3s\n",
+                                 "Simple Sweep", dt, "s");
+    	std::cout << out;
+        // Method2 ==========================================
+        start = std::chrono::system_clock::now();
+        ProfileStart("Method_Ben_" + ToString(num));
+        tfm::format(std::cout, "Method_Ben_%d  ", num); 
+        res = Intersect(lseg, "bentley_ottmann");
+        tfm::format(std::cout, " find %10d\n", res.size()); 
+        ProfileEnd();
+	    end = std::chrono::system_clock::now();
+    	dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        m3_time.push_back(dt);
+        out = tfm::format("%25s :  %15.5f %3s\n",
+                                 "bentley ottmann", dt, "s");
+    	std::cout << out;
+    }
+    ProfileListShow();
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/benchmark");
+    gnu.set_xlabel("number of segments");
+    gnu.set_ylabel("time (s)");
+    // gnu.set_label(1, strtype, -4.5, 4);
+
+    auto a1 = ToGnuplotActor(arr_num, m1_time);
+    a1.command("using 1:2 title \"Method n2\" ");
+    a1.style("with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
+
+    auto a2 = ToGnuplotActor(arr_num, m2_time);
+    a2.command("using 1:2 title \"Method Sweep Line Simple\" ");
+    a2.style("with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#F25022\"");
+
+    gnu.add(a1);
+    gnu.add(a2);
+    gnu.plot();
+}
 
 
 #endif

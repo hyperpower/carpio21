@@ -157,7 +157,7 @@ TEST(ben_ott, two_seg_order){
     Segment s1(Point(15, 26), Point(2,  20));  // left big  
     Segment s2(Point(6, 18),  Point(20,  35)); // left small
 
-    typedef IntersectionBenOtt_<NumType> Inter;
+    typedef IntersectionBenOtt_<Segment> Inter;
     typedef Intersection_<Segment, Segment> InterTwo;
     InterTwo i(s1, s2);
     auto res = i.execute();
@@ -186,23 +186,46 @@ TEST(ben_ott, two_seg_order){
     }
 }
 
+template<class SEG_TYPE>
+auto GenerateRandomSegments(int num,
+                            const double& xmin, const double& xmax,
+                            const double& ymin, const double& ymax){
+    typedef SEG_TYPE Seg;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    // Random::seed(std::time(0));
+    for (int i = 0; i< num ; i++){
+        double x1 = Random::nextDouble(xmin, xmax);
+        double y1 = Random::nextDouble(ymin, ymax);
+        double x2 = Random::nextDouble(xmin, xmax);
+        double y2 = Random::nextDouble(ymin, ymax);
+        lseg.push_back(Segment(Point(x1, y1), Point(x2, y2)));
+    }
+    return lseg;
+}
+
 TEST(ben_ott, case1){
-    auto sl = GenerateSegmentsCase7<Segment>();
+    // auto sl = GenerateSegmentsCase7<Segment>();
+    auto sl = GenerateRandomSegments<Segment>(6, 0, 500, 0, 100);
+    auto resn2 = Intersect(sl, "N2");
+    
 
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/case1");
     gnu.set_xlabel("x");
     gnu.set_ylabel("y");
 
-    typedef IntersectionBenOtt_<NumType> Inter;
+    typedef IntersectionBenOtt_<Segment> Inter;
     Inter inter(sl);
     auto lres = inter.execute();
-    std::cout << "Result size = " << lres.size() << std::endl;
+    std::cout << "Result size    = " << lres.size() << std::endl;
+    std::cout << "Result size n2 = " << resn2.size() << std::endl;
     int count = 0;
     for(auto& res : lres){
         std::cout << count << " : "<< res.point << std::endl;
         count++;
     }
+    
     // PlotListIntersectionResult(gnu, res);
 
     // gnu.plot();

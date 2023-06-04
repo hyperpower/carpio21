@@ -39,6 +39,16 @@
 #include <mach/mach_time.h>
 #endif
 
+#ifdef _WIN32
+#  include <Windows.h>
+#  define sleep_function_name           Sleep
+#  define sleep_time_multiplier_for_ms      1
+#else
+#  include <unistd.h>
+#  define sleep_function_name           usleep
+#  define sleep_time_multiplier_for_ms      1000
+#endif
+
 #ifndef MARK_UNUSED
 /// If a variable is labelled with this directive, the compiler should not emit a warning even if it is unused in the code.
 #define MARK_UNUSED(x) ((void)x)
@@ -46,6 +56,12 @@
 
 namespace carpio {
 
+
+/* Cross platform millisecond sleep */
+void sleep_ms(unsigned long int time_to_sleep_in_ms)
+{
+   sleep_function_name ( sleep_time_multiplier_for_ms * time_to_sleep_in_ms );
+}
 /// A tick is the basic unit of the high-resolution timer. If MATH_TICK_IS_FLOAT is defined,
 /// then tick_t is a floating-point type. Otherwise a 64-bit unsigned integer is used instead.
 #ifdef _TICK_IS_FLOAT

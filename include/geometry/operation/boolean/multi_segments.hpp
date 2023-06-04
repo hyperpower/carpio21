@@ -9,6 +9,7 @@
 #include "segment_segment.hpp"
 #include "utility/profile.hpp"
 #include "utility/avl_tree.hpp"
+#include "ben_ott_intersection.hpp"
 
 
 namespace carpio{
@@ -21,25 +22,21 @@ auto IntersectN2(const CONTAINER& con, SegmentTag){
 
     typedef IntersectionResult_<Seg, Seg> InterRes;
     typedef std::list<InterRes> ListInterRes;
-    ListInterRes res;
+    ListInterRes lres;
     for(auto iter = con.begin(); iter != con.end(); ++iter){
         auto& seg1 = *iter;
         for(auto iterin = std::next(iter); iterin != con.end(); ++iterin){
-            ProfileStart("IntersectCall");
+            // ProfileStart("IntersectCall");
             auto& seg2 = *iterin;
             Inter inter(seg1, seg2);
-            auto t = inter.cal_intersection_type();
-            if(t != _SS_NO_){
-                InterRes ret(seg1, seg2, t);
-                if(t == _SS_INTERSECT_){
-                    ret.point = inter.cal_intersection_point();
-                }
-                res.push_back(ret);
+            auto res = inter.execute();
+            if(res.type != _SS_NO_ && res.type != _SS_INVALID_){
+                lres.push_back(res);
             }
-            ProfileEnd();
+            // ProfileEnd();
         }
     }
-    return res;
+    return lres;
 }
 
 
@@ -158,24 +155,18 @@ protected:
         for(auto iter = s.begin(); iter != s.end(); ++iter){
             if(iter != cur_iter){
                 auto res = check_intersect(*(*(iter)), *(*(cur_iter)), GTag());
-                if(res.type != _SS_NO_){
+                if(res.type != _SS_NO_ && res.type != _SS_INVALID_){
                     _list_res.push_back(res);
                 }
             }
         }
     }
     auto check_intersect(const Geo& g1, const Geo& g2, SegmentTag){
-        ProfileStart("SIntersectCall");
+        // ProfileStart("SIntersectCall");
         typedef Intersection_<Geo, Geo> Inter;
         Inter inter(g1, g2);
-        auto t = inter.cal_intersection_type();
-        Result ret(g1, g2, t);
-        if(t == _SS_INTERSECT_){
-            auto p = inter.cal_intersection_point();
-            ret.point = p;
-        }
-        ProfileEnd();
-        return ret;
+        return inter.execute();
+        // ProfileEnd();
     }
 };
 
@@ -507,7 +498,11 @@ auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
     if( m == "sweep_line_simple"){
         IntersectionSweepLineSimple_<typename CONTAINER::value_type> inter(con);
         return inter.execute();
-    }else{
+    }else if (m == "bentley_ottmann"){
+        IntersectionBenOtt_<typename CONTAINER::value_type> inter(con);
+        return inter.execute();
+    }
+    else{
         return IntersectN2(con, SegmentTag());
     }
 }

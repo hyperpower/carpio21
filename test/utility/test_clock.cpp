@@ -3,18 +3,51 @@
 
 #include "gtest/gtest.h"
 #include "utility/clock.hpp"
+#include "utility/profile.hpp"
 
 #include <math.h>
 #include <string>
 #include <memory>
+#include <chrono>
+#include <ctime>
+#include <iostream>
+#include <thread>
 // #include "mpi.h"
 
 namespace carpio {
 
-TEST(Clock, mpi){
-
+void a_function(){
+     sleep_ms(10);
 }
 
+TEST(profile, clock){
+    ProfileStart("main");
+    for (int i = 0 ; i< 10 ;i++){
+        ProfileStart("inner_fun");
+        a_function();
+        ProfileEnd();
+    }
+    ProfileEnd();
+
+    ProfileListShow();
+}
+TEST(profile, clock2){
+    ProfileClean();
+    ProfileStart("main");
+    for (int i = 0 ; i< 10 ;i++){
+        ProfileStart("inner_fun");
+        a_function();
+        ProfileEnd();
+    }
+    for (int i = 0 ; i< 10 ;i++){
+        ProfileStart("inner_fun2");
+        a_function();
+        ProfileEnd();
+    }
+    ProfileEnd();
+
+    ProfileListShow();
+}
 }
 
 #endif

@@ -15,8 +15,6 @@ set(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
 set(SOURCE
    ${SOURCE}
-   ${CMAKE_CURRENT_SOURCE_DIR}/ben-ott/bentley_ottmann.cpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/ben-ott/geometry.cpp
 )
 
 # python =======
@@ -37,9 +35,7 @@ ENDIF()
 # location of header files
 INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/../../include
-    ${PROJECT_SOURCE_DIR}/ben-ott
 )
-# link_directories(${PROJECT_SOURCE_DIR}/ben-ott)
 
 add_executable(main ${SOURCE})
 

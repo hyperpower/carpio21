@@ -1,6 +1,6 @@
 #ifndef _BEN_OTT_INTERSECTION_HPP_
 #define _BEN_OTT_INTERSECTION_HPP_
-
+// bentley ottmann 
 #include "geometry/operation/boolean/ben_ott_structure.hpp"
 #include "geometry/operation/boolean/segment_segment.hpp"
 
@@ -11,13 +11,16 @@
 namespace carpio {
 #ifdef _DEBUG_MODE_
     template<class TYPE>
-    void PlotSweepLine(Gnuplot& gnu, const Point_<TYPE, 2>& p){
+    void PlotSweepLine(Gnuplot& gnu, const Point_<TYPE, 2>& p,
+                                     const Segment_<TYPE, 2>& dia){
         typedef Point_<TYPE, 2>   Point;
         typedef Segment_<TYPE, 2> Segment;
         auto a = ToGnuplotActor(p);
-        a.point_size(2);
-        Point pup(p[0], p[1] + 10);
-        Point plow(p[0], p[1] - 10);
+        a.point_size(1);
+        a.point_type(5);
+        auto dy = MaxY(dia) - MinY(dia);
+        Point pup(p[0],  MaxY(dia) + dy * 0.1);
+        Point plow(p[0], MinY(dia) - dy * 0.1);
         Segment seg(plow, pup);
         auto aseg = ToGnuplotActor(seg);
 
@@ -55,29 +58,37 @@ namespace carpio {
         gnu.add(a1);
         }
     }
-
+    template<class SEG>
+    void PlotpSegment(Gnuplot& gnu, 
+                     const SEG* seg, 
+                          const std::string& color_code = "#00A4EF"){
+        auto a1 = ToGnuplotActorAsVector(*seg);
+        a1.style("with vector head filled size screen 0.03,15,145 lw 3 lc rgb \"" + color_code +"\"");
+        gnu.add(a1);
+    }
 #endif
-template<class TYPE>
+template<class SEG>
 class IntersectionBenOtt_{
 public:
-    typedef IntersectionBenOtt_<TYPE> Self;
+    typedef IntersectionBenOtt_<SEG> Self;
 
-    typedef Point_<TYPE, 2>   Point;
-    typedef Segment_<TYPE, 2> Segment;
+    typedef typename SEG::Point Point;
+    typedef SEG Segment;
+    typedef typename SEG::coord_value_type Vt;
     typedef const Segment* cpSegment;
     
-    typedef SweepEvent_<TYPE> Event;
+    typedef SweepEvent_<Segment> Event;
     typedef SweepEventQueue_<Event, Segment> EventQueue;
     typedef typename EventQueue::Setcp SetcpSeg;
 
     // typedef std::set<const Geo*> GeoSet;
-    typedef CompareSeg_<TYPE> CompareSeg;
+    typedef CompareSeg_<Segment> CompareSeg;
     typedef std::set<const Segment*, CompareSeg > StatusTree;
     typedef Intersection_<Segment, Segment> InterTwo;
     typedef IntersectionResult_<Segment, Segment> Result;
     typedef std::list<Result> ListResult;
 
-    typedef SegSlope_<TYPE> Slope;
+    typedef SegSlope_<Segment> Slope;
 protected:
 #ifdef _DEBUG_MODE_
     typedef std::list<Segment> ListSegment;
@@ -105,14 +116,14 @@ public:
         ListResult _list_res;
         
         Point p_sweep(0,0);
-        CompareSeg comp(&p_sweep);
+        SetcpSeg ulc;
+        CompareSeg comp(&p_sweep, &ulc);
         StatusTree status(comp);
 
         int i = 0;
         while (!queue.empty()){
             #ifdef _DEBUG_MODE_
             std::cout << "loop index = " << i << std::endl;
-
             gnu.set_terminal_png("./fig/" + ToString(i));
             gnu.set_equal_ratio();
             auto dx = MaxX(diagonal) - MinX(diagonal);
@@ -126,7 +137,7 @@ public:
             auto& point = event.get_point();
             
             #ifdef _DEBUG_MODE_
-            PlotSweepLine(gnu, point);
+            PlotSweepLine(gnu, point, diagonal);
             #endif
 
             // HANDLE EVENT POINT(point)
@@ -137,7 +148,7 @@ public:
             auto& r_set = queue.begin()->second[2];
 
             #ifdef _DEBUG_MODE_
-            PlotListpSegment(gnu, l_set, "#FBBC04" );
+            PlotListpSegment(gnu, c_set, "#FBBC04" );
             #endif
 
 
@@ -153,7 +164,7 @@ public:
             // PlotListpSegment(gnu, pair_rc.first, "#34A853");
             #endif
             auto set_size = l_set.size() + c_set.size() + r_set.size();
-            std::cout << "three set size = " << set_size << std::endl;
+            // std::cout << "three set size = " << set_size << std::endl;
             if(set_size > 1){
                 _new_result(event, _list_res);
             }
@@ -172,46 +183,55 @@ public:
             p_sweep.x(point.x());
             p_sweep.y(point.y());
             //5. insert l_set and c_set in status tree
-            for(auto s : l_set){
+            ulc.clear();
+            std::set_union(l_set.begin(), l_set.end(),
+                            c_set.begin(), c_set.end(),
+                            std::inserter(ulc, ulc.begin()));
+            for(auto s : ulc){
                 status.insert(s);
             }
-            for(auto s : c_set){
-                status.insert(s);
-            }
+            // for(auto s : c_set){
+            //     status.insert(s);
+            // }
 
-            std::cout << "status size = "<< status.size() << std::endl;
-            if(l_set.size() + c_set.size() == 0){
+            // std::cout << "status size = "<< status.size() << std::endl;
+            if(ulc.size() == 0){
                 cpSegment s_a, s_b;
                 _find_neighboors(p_sweep, status, s_a, s_b); 
                 _compute_new_events(s_a, s_b, event);
             } else {
-                SetcpSeg lunion;
-                std::set_union(l_set.begin(), l_set.end(),
-                               c_set.begin(), c_set.end(),
-                               std::inserter(lunion, lunion.begin()));
-                std::cout << "union size = " << lunion.size() << std::endl;
-                cpSegment s_min  = _find_min_slope(lunion);
-                if(s_min){
-                    std::cout << "s_min   = " << *s_min << std::endl;
-                }
-                cpSegment s_max  = _find_max_slope(lunion);
+                // std::cout << "union size = " << ulc.size() << std::endl;
+                cpSegment s_min  = _find_min_slope(ulc);
+                // if(s_min){
+                    // std::cout << "s_min   = " << *s_min << std::endl;
+                // }
+                cpSegment s_max  = _find_max_slope(ulc);
+                #ifdef _DEBUG_MODE_
                 if(s_max){
-                    std::cout << "s_max   = " << *s_max << std::endl;
+                    std::cout << "s_lower = " << *s_max << std::endl;
+                    PlotpSegment(gnu, s_max, "#A0C347" );
                 }
+                #endif
                 cpSegment s_lower = _find_lower_neighboor(s_min, status);
+                #ifdef _DEBUG_MODE_
                 if(s_lower){
                     std::cout << "s_lower = " << *s_lower << std::endl;
                 }
+                #endif
                 cpSegment s_upper = _find_upper_neighboor(s_max, status);
+
+                #ifdef _DEBUG_MODE_
                 if(s_upper){
                     std::cout << "s_upper = " << *s_upper << std::endl;
+                    PlotpSegment(gnu, s_upper, "#F04137" );
                 }
+                #endif
                 
                 _compute_new_events(s_min, s_lower, event); 
                 _compute_new_events(s_max, s_upper, event);
             }
 
-            std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
+            // std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
             // update res
             auto n_set_size = l_set.size() + c_set.size() + r_set.size();
             if(n_set_size > 1 && n_set_size > set_size ){
@@ -319,10 +339,12 @@ protected:
         if(iter == tree.end()){
             throw std::invalid_argument(ToString(*s) + " should in tree!");
         }
-        if(iter == tree.begin())
+        if(iter == tree.begin()){
             return nullptr;
-        else
-            return *--iter;
+        }else{
+            std::advance(iter, -1); 
+            return *iter;
+        }
     }
     cpSegment _find_upper_neighboor(cpSegment s, const StatusTree& tree) const{
         auto iter = tree.find(s);

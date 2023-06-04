@@ -45,7 +45,7 @@ TEST(box, points){
 
     plotly.add(ap);
 
-    // plotly.write("./fig/out", "html");
+    plotly.write("./fig/out", "html");
 }
 
 
