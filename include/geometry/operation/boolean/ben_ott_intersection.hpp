@@ -163,12 +163,17 @@ public:
             #ifdef _DEBUG_MODE_
             // PlotListpSegment(gnu, pair_rc.first, "#34A853");
             #endif
+            ProfileStart("BO_SetSize");
             auto set_size = l_set.size() + c_set.size() + r_set.size();
             // std::cout << "three set size = " << set_size << std::endl;
+            ProfileEnd();
             if(set_size > 1){
+                ProfileStart("BO_ReportRes");
                 _new_result(event, _list_res);
+                ProfileEnd();
             }
             //4. Delete the segents in R(p) and C(p) from T
+            ProfileStart("BO_DeleteRC");
             for(auto s : r_set){
                 auto r = _erase_seg_in_status(status, s);
                 if(r == 0)
@@ -180,6 +185,7 @@ public:
                     throw std::invalid_argument(ToString(*s) + " should in status tree!");
                 // status.erase(s);
             }
+            ProfileEnd();
             p_sweep.x(point.x());
             p_sweep.y(point.y());
             //5. insert l_set and c_set in status tree
@@ -187,19 +193,25 @@ public:
             std::set_union(l_set.begin(), l_set.end(),
                             c_set.begin(), c_set.end(),
                             std::inserter(ulc, ulc.begin()));
+            ProfileStart("BO_InsertCL");
             for(auto s : ulc){
                 status.insert(s);
             }
+            ProfileEnd();
             // for(auto s : c_set){
             //     status.insert(s);
             // }
 
             // std::cout << "status size = "<< status.size() << std::endl;
+            ProfileStart("BO_FindNew");
             if(ulc.size() == 0){
                 cpSegment s_a, s_b;
+                ProfileStart("BO_findn");
                 _find_neighboors(p_sweep, status, s_a, s_b); 
+                ProfileEnd();
                 _compute_new_events(s_a, s_b, event);
             } else {
+                ProfileStart("BO_findb");
                 // std::cout << "union size = " << ulc.size() << std::endl;
                 cpSegment s_min  = _find_min_slope(ulc);
                 // if(s_min){
@@ -226,11 +238,11 @@ public:
                     PlotpSegment(gnu, s_upper, "#F04137" );
                 }
                 #endif
-                
+                ProfileEnd();
                 _compute_new_events(s_min, s_lower, event); 
                 _compute_new_events(s_max, s_upper, event);
             }
-
+            ProfileEnd();
             // std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
             // update res
             auto n_set_size = l_set.size() + c_set.size() + r_set.size();
@@ -380,8 +392,10 @@ protected:
     
     void _compute_new_events(cpSegment s0, cpSegment s1, const Event &current){
         if (s0 && s1){
+            ProfileStart("Inter2Seg_BO");
             InterTwo inter(*s0, *s1);
             auto res = inter.execute();
+            ProfileEnd();
             if(res.type == _SS_INTERSECT_){
                 Event ev_i(res.point);
                 if (current < ev_i && !queue.mem(ev_i)){

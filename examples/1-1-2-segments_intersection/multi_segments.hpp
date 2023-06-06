@@ -79,7 +79,7 @@ void MultiSegTestCase1N2(const std::list<Segment>& sl){
     // auto sl = GenerateSegmentsCase1<Segment>();
     // auto sl = GenerateRandomSegments(50, 0, 100, 0, 100);
     std::cout << "Segments n = " << sl.size() << std::endl;
-    ProfileStart("Intersect N2");
+    ProfileStart("Inter N2");
     auto res = Intersect(sl, "N2");
     std::cout << "Intersection Points : " << res.size() << std::endl;
     ProfileEnd();
@@ -128,13 +128,13 @@ void MultiSegTestCase1BenOtt(const std::list<Segment>& sl){
 
 void benchmark_test(){
     ProfileClean();
-    std::vector<int> arr_num     = {100, 500, 1000, 2000};
+    std::vector<int> arr_num     = {3000};
     std::list<double> m1_time;
     std::list<double> m2_time;
     std::list<double> m3_time;
 
     for(auto& num : arr_num){
-        ProfileStart("GenerateSegments_" + ToString(num));
+        ProfileStart("GenSeg_" + ToString(num));
         auto lseg = GenerateRandomSegments(num, 0, 100, 0, 100);
         ProfileEnd();
         // Method1 ==========================================
@@ -152,7 +152,7 @@ void benchmark_test(){
     	std::cout << out;
         // Method2 ==========================================
         start = std::chrono::system_clock::now();
-        ProfileStart("Method_SweepLine_" + ToString(num));
+        ProfileStart("Method_sl_" + ToString(num));
         tfm::format(std::cout, "Method_SweepLine_%d  ", num); 
         res = Intersect(lseg, "sweep_line_simple");
         tfm::format(std::cout, " find %10d\n", res.size()); 

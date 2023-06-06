@@ -17,7 +17,9 @@
 namespace carpio {
 
 void a_function(){
+     ProfileStart("a fun");
      sleep_ms(10);
+     ProfileEnd();
 }
 
 TEST(profile, clock){

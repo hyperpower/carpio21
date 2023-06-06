@@ -262,10 +262,10 @@ public:
     }
 
     void add(const Geo1& g){
-        list.push_back(&g);
+        list.emplace_back(&g);
     }
     void add(cpGeo& pg){
-        list.push_back(pg);
+        list.emplace_back(pg);
     }
     template<class CONTAINER, 
             typename std::enable_if<

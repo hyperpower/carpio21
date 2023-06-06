@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 #include <chrono>
+#include <tuple>
 
 #include "type_define.hpp"
 #include "tinyformat.hpp"
@@ -41,25 +42,20 @@ struct FunctionInfo{
         std::cout << date;
     }
 };
+
+
 class ProbeInfo{
 public:
     typedef std::chrono::time_point<std::chrono::system_clock> TimePoint;
     std::list<TimePoint> lstart;
     std::list<TimePoint> lend;
-
-    ProbeInfo(){
+protected:
+    double _t_dt; // total time
+public:
+    ProbeInfo(): _t_dt(0){
     }
 
-    auto size(){
-        if(lstart.size() == lend.size()){
-            return lstart.size();
-        }else{
-            // warning
-            return lstart.size();
-        }
-    }
-
-    double sum() const{
+    double sum_total_time() const{
         auto istart = lstart.begin();
         auto iend   = lend.begin();
         double dt = 0;
@@ -70,9 +66,19 @@ public:
         }
         return dt;
     }
-    void show_sum() const{
-        
+
+    double total_time(){
+       return sum_total_time();
     }
+
+    double total_call() const{
+        return lstart.size();
+    }
+
+    double avg_time(){
+        return total_time() / total_call();
+    }
+
 };
 
 class ProbeName : public std::list<std::string>{
@@ -107,53 +113,86 @@ public:
         }
         return res;
     }
+    std::string to_string_indent(const std::string& sep = " ") const{
+        std::string res;
+        auto iter = this->begin();
+        auto n    = std::next(iter);
+        for(;iter!= this->end(); iter++, n++){
+            if(n != this->end()){
+                res += sep;
+            }else{
+                res += *iter;
+            }
+        }
+        return res;
+    }
 };
-class ProfileTable{
+class ProfileTable: public std::list<std::tuple<ProbeName, long long, double> >{
 public:
-    std::list<ProbeName> lname;
-    std::list<ProbeInfo> linfo;
+    typedef std::tuple<ProbeName, long long, double> Row;
+
+    ProfileTable(){};
 
     auto find(const ProbeName& name){
-        auto itern = lname.begin();
-        auto iteri = linfo.begin();
+        auto it = this->begin();
         
-        for(; itern!= lname.end() && iteri != linfo.end();){
-            if(*itern == name){
-                return std::pair<std::list<ProbeName>::iterator,
-                                 std::list<ProbeInfo>::iterator>(itern, iteri);
+        for(; it!= this->end();it++){
+            if(std::get<0>(*it) == name){
+                return it;
             }
-            itern++;
-            iteri++;
         }
-        return std::pair<std::list<ProbeName>::iterator,
-                         std::list<ProbeInfo>::iterator>(lname.end(), linfo.end());
+        return this->end();
     }
 
-    void push(const ProbeName& pn, const typename ProbeInfo::TimePoint& t){
-        lname.push_back(pn);
-        linfo.emplace_back(ProbeInfo());
-        linfo.back().lstart.push_back(t);
-
+    void push(const ProbeName& pn, double dt){
+        auto it = this->find(pn);
+        if(it != this->end()){
+            Row& r = (*it);
+            auto& c = std::get<1>(r);
+            c+=1;
+            auto& tt = std::get<2>(r);
+            tt+=dt;
+        }else{
+            this->emplace_back(Row(pn, 1, dt));
+        }
     }
 
-    void clear(){
-        lname.clear();
-        linfo.clear();
+    void add_dt(const ProbeName& pn, double dt){
+        auto it = this->find(pn);
+        if(it != this->end()){
+            Row& r = (*it);
+            auto& tt = std::get<2>(r);
+            tt+=dt;
+        }else{
+            throw std::invalid_argument("Not find :" + pn.to_string());
+        }
     }
 
-
+    void show(){
+        tfm::format(std::cout, "%-20s |%11s |%11s |%11s\n", 
+                    "name", "total num", "total time", "avg time");
+        for(auto& row : *this){
+            tfm::format(std::cout, "%-20s %12d %12.2f %12.4f\n", 
+                         std::get<0>(row).to_string_indent(), 
+                         std::get<1>(row),
+                         std::get<2>(row) / 1000.0,
+                         std::get<2>(row) / std::get<1>(row) / 1000.0);
+        }
+    }
 
 };
+
+
 class Profile{
 private:
     static Profile * pinstance_;
     static std::mutex mutex_;
 
     // int level;
-    ProbeName _cur_name;
     typedef std::chrono::time_point<std::chrono::system_clock> TimePoint;
 
-    // std::list<TimePoint> _cur_tick;
+    std::list<TimePoint> _cur_tick;
+    ProbeName _cur_name;
 
     ProfileTable _table;
 protected:
@@ -162,15 +201,6 @@ protected:
     }
     ~Profile() {
     }
-
-    // auto _find(const std::string& name){
-    //     for(auto iter = _list.begin(); iter!= _list.end(); ++iter){
-    //         if(iter->name == name){
-    //             return iter;
-    //         }
-    //     }
-    //     return _list.end();
-    // }
     
 public:
     Profile(Profile &other) = delete;
@@ -178,33 +208,21 @@ public:
 
     void probe_start(const std::string& name){
         // level++;
-        auto tn = std::chrono::system_clock::now();
-        std::string nn = name;
-        _cur_name.push_back(nn);
-        auto p = _table.find(_cur_name);
-        if (p.first == _table.lname.end()){
-            _table.push(_cur_name, tn);
-        }else{
-            p.second->lstart.push_back(tn);
-        }
-        
+        _cur_name.push_back(name);
+        _cur_tick.push_back(std::chrono::system_clock::now());
+        _table.push(_cur_name, 0);
     }
 
     void probe_end(){
         auto tn = std::chrono::system_clock::now();
-        auto p = _table.find(_cur_name);
-        if (p.first != _table.lname.end()){
-            p.second->lend.push_back(tn);
-        }else{
-            throw std::logic_error("no probe start");
-        }
+        double dt = std::chrono::duration_cast<std::chrono::microseconds>(tn - _cur_tick.back()).count();
+        _table.add_dt(_cur_name, dt);
         _cur_name.pop_back();
+        _cur_tick.pop_back();
     }
 
-    void show_list() const{
-        for(auto& name: _table.lname){
-            std::cout << name.to_string() << std::endl;
-        }
+    void show_list() {
+        _table.show();
     }
 
     void clean(){

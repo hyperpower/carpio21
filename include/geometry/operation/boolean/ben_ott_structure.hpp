@@ -24,7 +24,9 @@ struct SegSlope_ {
     Vt   value; 
 
     SegSlope_(const Segment& seg){
+        ProfileStart("slope");
         make(seg);
+        ProfileEnd();
     }
 
     void make(const Vt& x0,const Vt& y0,
@@ -219,6 +221,8 @@ struct CompareSeg_ {
             return true;
         }else if(sa == sb){
             return &a < &b;
+        }else{
+            return false;
         }
     }
 };

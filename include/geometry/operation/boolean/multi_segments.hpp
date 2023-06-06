@@ -26,14 +26,14 @@ auto IntersectN2(const CONTAINER& con, SegmentTag){
     for(auto iter = con.begin(); iter != con.end(); ++iter){
         auto& seg1 = *iter;
         for(auto iterin = std::next(iter); iterin != con.end(); ++iterin){
-            // ProfileStart("IntersectCall");
             auto& seg2 = *iterin;
+            ProfileStart("Inter2Seg");
             Inter inter(seg1, seg2);
             auto res = inter.execute();
+            ProfileEnd();
             if(res.type != _SS_NO_ && res.type != _SS_INVALID_){
                 lres.push_back(res);
             }
-            // ProfileEnd();
         }
     }
     return lres;
@@ -162,11 +162,12 @@ protected:
         }
     }
     auto check_intersect(const Geo& g1, const Geo& g2, SegmentTag){
-        // ProfileStart("SIntersectCall");
+        ProfileStart("Inter2Seg_SL");
         typedef Intersection_<Geo, Geo> Inter;
         Inter inter(g1, g2);
-        return inter.execute();
-        // ProfileEnd();
+        auto res = inter.execute();
+        ProfileEnd();
+        return res;
     }
 };
 
