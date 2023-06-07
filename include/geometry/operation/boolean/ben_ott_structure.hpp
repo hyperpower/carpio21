@@ -24,9 +24,9 @@ struct SegSlope_ {
     Vt   value; 
 
     SegSlope_(const Segment& seg){
-        ProfileStart("slope");
+        // ProfileStart("slope");
         make(seg);
-        ProfileEnd();
+        // ProfileEnd();
     }
 
     void make(const Vt& x0,const Vt& y0,

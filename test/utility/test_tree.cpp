@@ -386,6 +386,51 @@ TEST(avl_tree, random){
     // AddNodeEmphi(100, gnu, pf->value.x, pf->value.y, "aa"); 
     gnu.plot();
 }
+auto GenerateRandomNumber(int num){
+    std::vector<double> vec;
+    double vmin = -100;
+    double vmax = 100;
+    for (int i = 0; i< num ; i++){
+        double v = Random::nextDouble(vmin, vmax);
+        vec.push_back(v);
+    }
+    return vec;
+}
+
+auto BuildSet(const std::vector<double>& vec){
+    std::set<double> s;
+    ProfileStart("BuildSet");
+    for(auto& v : vec){
+        s.insert(v);
+    }
+    ProfileEnd();
+    return s;
+}
+typedef TreeNode_<double, 2> NumNode;
+typedef AvlTree_<NumNode> Avl;
+auto BuildAvl(const std::vector<double>& vec){
+    Avl s;
+    ProfileStart("BuildAvl");
+    for(auto& v : vec){
+        s.insert(v);
+    }
+    ProfileEnd();
+    return s;
+}
+
+TEST(avl_tree, speed){
+    typedef std::set<double> Set;
+    ProfileStart("GenNum");
+    auto vec = GenerateRandomNumber(10000);
+    ProfileEnd();
+
+    auto s = BuildSet(vec); 
+    auto a = BuildAvl(vec); 
+
+    ProfileListShow();
+
+
+}
 
 }
 
