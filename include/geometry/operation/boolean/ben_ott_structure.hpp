@@ -19,9 +19,12 @@ struct SegSlope_ {
 
     static const int _RATIONAL_ = 1;
     static const int _INFINITY_ = 0;
+    static const int _INVALID_  = -1;
 
     int  type; 
-    Vt   value; 
+    Vt   value;
+
+    SegSlope_():type(_INVALID_){} 
 
     SegSlope_(const Segment& seg){
         // ProfileStart("slope");
@@ -62,6 +65,30 @@ struct SegSlope_ {
             return false;
         }
     }
+};
+
+// template<class T ...>
+// class SegProxy;
+
+template<class SEG>
+class SegProxy_{
+public:
+    typedef SegProxy_<SEG> Self;
+    typedef typename SEG::Point Point;
+    typedef SEG Segment;
+    typedef const Segment* cpSegment;
+    typedef typename SEG::coord_value_type Vt;
+
+protected:
+    cpSegment _cpseg;
+    bool _reversed;
+    SegSlope_<SEG> _slope;
+
+public:
+    SegProxy_(): _cpseg(nullptr), _reversed(false){}
+
+    
+
 };
 
 

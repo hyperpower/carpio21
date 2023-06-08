@@ -386,19 +386,33 @@ TEST(avl_tree, random){
     // AddNodeEmphi(100, gnu, pf->value.x, pf->value.y, "aa"); 
     gnu.plot();
 }
+struct SlowComp{
+    double _num;
+
+    SlowComp():_num(0){};
+
+    SlowComp(const double& num):_num(num){
+    }
+
+    bool operator<(const SlowComp& rhs) const{
+        // sleep_ms(1);
+        return this->_num < rhs._num;
+    }
+};
 auto GenerateRandomNumber(int num){
-    std::vector<double> vec;
+    std::vector<SlowComp> vec;
     double vmin = -100;
     double vmax = 100;
     for (int i = 0; i< num ; i++){
         double v = Random::nextDouble(vmin, vmax);
-        vec.push_back(v);
+        vec.push_back(SlowComp(v));
     }
     return vec;
 }
 
-auto BuildSet(const std::vector<double>& vec){
-    std::set<double> s;
+
+auto BuildSet(const std::vector<SlowComp>& vec){
+    std::set<SlowComp> s;
     ProfileStart("BuildSet");
     for(auto& v : vec){
         s.insert(v);
@@ -406,9 +420,9 @@ auto BuildSet(const std::vector<double>& vec){
     ProfileEnd();
     return s;
 }
-typedef TreeNode_<double, 2> NumNode;
+typedef TreeNode_<SlowComp, 2> NumNode;
 typedef AvlTree_<NumNode> Avl;
-auto BuildAvl(const std::vector<double>& vec){
+auto BuildAvl(const std::vector<SlowComp>& vec){
     Avl s;
     ProfileStart("BuildAvl");
     for(auto& v : vec){
@@ -421,11 +435,24 @@ auto BuildAvl(const std::vector<double>& vec){
 TEST(avl_tree, speed){
     typedef std::set<double> Set;
     ProfileStart("GenNum");
-    auto vec = GenerateRandomNumber(10000);
+    auto vec = GenerateRandomNumber(200);
     ProfileEnd();
 
     auto s = BuildSet(vec); 
     auto a = BuildAvl(vec); 
+
+    auto vecin = GenerateRandomNumber(10);
+    ProfileStart("InsertSet");
+    for(auto& v : vecin){
+        s.insert(v);
+    }
+    ProfileEnd();
+
+    ProfileStart("InsertAvl");
+    for(auto& v : vecin){
+        a.insert(v);
+    }
+    ProfileEnd();
 
     ProfileListShow();
 
