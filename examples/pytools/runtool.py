@@ -161,7 +161,9 @@ class Runer:
         elif platform.system() == "Darwin":
             cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
         print(cmd)
-        os.system(cmd)
+        # os.system(cmd)
+        result = os.popen(cmd)
+        print(result.read())
 
 
     def execute(self):

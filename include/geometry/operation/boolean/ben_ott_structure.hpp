@@ -89,6 +89,8 @@ public:
 
     
 
+    
+
 };
 
 
@@ -224,7 +226,7 @@ struct CompareSeg_ {
             auto xb = right.x();
             auto yb = right.y();
             
-            return (yb - ya)/(xb - xa)*(p.x() - xa) + ya;
+            return (yb - ya)/(xb - xa) * (p.x() - xa) + ya;
         }
     }
     bool less(const Segment& a, const Segment& b, const Point& p_sweep) const{

@@ -189,15 +189,15 @@ public:
             p_sweep.x(point.x());
             p_sweep.y(point.y());
             //5. insert l_set and c_set in status tree
+            ProfileStart("BO_InsertCL");
             ulc.clear();
             std::set_union(l_set.begin(), l_set.end(),
                             c_set.begin(), c_set.end(),
                             std::inserter(ulc, ulc.begin()));
-            // ProfileStart("BO_InsertCL");
             for(auto s : ulc){
                 status.insert(s);
             }
-            // ProfileEnd();
+            ProfileEnd();
             // for(auto s : c_set){
             //     status.insert(s);
             // }
@@ -206,17 +206,12 @@ public:
             // ProfileStart("BO_FindNew");
             if(ulc.size() == 0){
                 cpSegment s_a, s_b;
-                // ProfileStart("BO_findn");
                 _find_neighboors(p_sweep, status, s_a, s_b); 
-                // ProfileEnd();
+                ProfileStart("FindN_0");
                 _compute_new_events(s_a, s_b, event);
+                ProfileEnd();
             } else {
-                // ProfileStart("BO_findb");
-                // std::cout << "union size = " << ulc.size() << std::endl;
                 cpSegment s_min  = _find_min_slope(ulc);
-                // if(s_min){
-                    // std::cout << "s_min   = " << *s_min << std::endl;
-                // }
                 cpSegment s_max  = _find_max_slope(ulc);
                 #ifdef _DEBUG_MODE_
                 if(s_max){
@@ -239,8 +234,12 @@ public:
                 }
                 #endif
                 // ProfileEnd();
+                ProfileStart("FindN_1");
                 _compute_new_events(s_min, s_lower, event); 
+                ProfileEnd();
+                ProfileStart("FindN_2");
                 _compute_new_events(s_max, s_upper, event);
+                ProfileEnd();
             }
             // ProfileEnd();
             // std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
@@ -332,11 +331,11 @@ protected:
         }
     }
 
-    bool _erase_seg_in_status(StatusTree& tree, const cpSegment& s) const{
-        auto removed = tree.erase(s);
+    bool _erase_seg_in_status(StatusTree& tree, const cpSegment& cps) const{
+        auto removed = tree.erase(cps);
         if (removed == 0){
             for(auto iter = tree.begin(); iter!= tree.end(); iter++){
-                if(*iter == s){
+                if(*iter == cps){
                     tree.erase(iter);
                     removed = 1;
                     break;
@@ -346,10 +345,10 @@ protected:
         return removed;
     }
 
-    cpSegment _find_lower_neighboor(cpSegment s, const StatusTree& tree) const{
-        auto iter = tree.find(s);
+    cpSegment _find_lower_neighboor(cpSegment cps, const StatusTree& tree) const{
+        auto iter = tree.find(cps);
         if(iter == tree.end()){
-            throw std::invalid_argument(ToString(*s) + " should in tree!");
+            throw std::invalid_argument(ToString(*cps) + " should in tree!");
         }
         if(iter == tree.begin()){
             return nullptr;
@@ -391,19 +390,22 @@ protected:
     }
     
     void _compute_new_events(cpSegment s0, cpSegment s1, const Event &current){
-        if (s0 && s1){
-            // ProfileStart("Inter2Seg_BO");
+        if (s0 != nullptr && s1 != nullptr){
+            ProfileStart("Inter2Seg_BO");
             InterTwo inter(*s0, *s1);
             auto res = inter.execute();
-            // ProfileEnd();
+            ProfileEnd();
             if(res.type == _SS_INTERSECT_){
+                // ProfileStart("NewEvent");
                 Event ev_i(res.point);
+                // ProfileEnd();
                 if (current < ev_i && !queue.mem(ev_i)){
+                    // ProfileStart("AddEvent");
                     queue.add_event(ev_i, 1, s0);
                     queue.add_event(ev_i, 1, s1);
+                    // ProfileEnd();
                 }
-            }
-            if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
+            }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
                 for(short i = 0 ; i < 2; i++){
                     auto pos = inter.point_position(i);
                     std::cout << ToString(pos) << std::endl;
