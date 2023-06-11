@@ -2,6 +2,7 @@
 #define GEOMETRY_DEFINE_HPP_
 
 #include "type_define.hpp"
+#include "utility/profile.hpp"
 
 #include <math.h>
 

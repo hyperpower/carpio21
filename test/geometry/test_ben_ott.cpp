@@ -2,9 +2,9 @@
 
 #define _DEBUG_MODE_
 
-#include "geometry/geometry.hpp"
 #include "utility/random.hpp"
 #include "utility/profile.hpp"
+#include "geometry/geometry.hpp"
 #include "gtest/gtest.h"
 
 

@@ -78,18 +78,39 @@ public:
     typedef SEG Segment;
     typedef const Segment* cpSegment;
     typedef typename SEG::coord_value_type Vt;
+    typedef SegSlope_<SEG> Slope;
 
 protected:
     cpSegment _cpseg;
-    bool _reversed;
     SegSlope_<SEG> _slope;
 
 public:
-    SegProxy_(): _cpseg(nullptr), _reversed(false){}
+    SegProxy_(): _cpseg(nullptr){}
 
-    
+    SegProxy_(const Segment& seg):_cpseg(&seg),_slope(seg){
+    }
 
-    
+    auto p_less_x() const{
+		return _cpseg->p_less_x();
+	}
+	auto p_less_y() const{
+		return _cpseg->p_less_y();
+	}
+	auto p_greater_x() const{
+		return _cpseg->p_greater_x();
+	}
+	auto p_greater_y() const{
+		return _cpseg->p_greater_y();
+	}
+    auto x() const {
+        return _cpseg->x();
+    }
+    auto y() const {
+        return _cpseg->y();
+    }
+    const Slope& slope() const {
+        return this->_slope;
+    }    
 
 };
 
