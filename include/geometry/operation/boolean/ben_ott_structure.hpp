@@ -257,26 +257,26 @@ struct CompareSeg_ {
     bool less(const Segment& a, const Segment& b, const Point& p_sweep) const{
         auto ay = y_at_sweep_point(a, p_sweep);
         auto by = y_at_sweep_point(b, p_sweep);
-        if(by - ay > _e){
-            return true;
-        }else if(std::abs(ay - by) < _e && (Slope(a) < Slope(b))){
-            return true;
-        }else if(std::abs(ay - by) < _e && (Slope(a) == Slope(b))){
-            return &a < &b;
+        if(std::abs(ay - by) > _e){
+            return ay < by;
         }else{
-            return false;
+            auto sa = Slope(a);
+            auto sb = Slope(b);
+            if(sa == sb){
+                return &a < &b;
+            }else{
+                return sa < sb;
+            }
         }
     }
 
     bool less_slope(cpSegment a, cpSegment b) const{
         Slope sa(*a);
         Slope sb(*b);
-        if(sa < sb){
-            return true;
-        }else if(sa == sb){
-            return &a < &b;
+        if(sa == sb){
+            return a < b;
         }else{
-            return false;
+            return sa < sb;
         }
     }
 };
