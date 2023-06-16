@@ -70,6 +70,8 @@ struct SegSlope_ {
 // template<class T ...>
 // class SegProxy;
 
+struct SegmentProxyTag: public SegmentTag {};
+
 template<class SEG>
 class SegProxy_{
 public:
@@ -77,8 +79,10 @@ public:
     typedef typename SEG::Point Point;
     typedef SEG Segment;
     typedef const Segment* cpSegment;
-    typedef typename SEG::coord_value_type Vt;
+    typedef typename SEG::coord_value_type coord_value_type;
     typedef SegSlope_<SEG> Slope;
+
+    typedef SegmentProxyTag Tag;
 
 protected:
     cpSegment _cpseg;

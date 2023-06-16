@@ -1,6 +1,6 @@
 #include <functional>
 
-#define _DEBUG_MODE_
+// #define _DEBUG_MODE_
 
 #include "utility/random.hpp"
 #include "utility/profile.hpp"
@@ -229,4 +229,19 @@ TEST(ben_ott, case1){
     // PlotListIntersectionResult(gnu, res);
 
     // gnu.plot();
+}
+
+
+TEST(ben_ott, update){
+    auto sl = GenerateSegmentsCase1<Segment>();
+    typedef std::list<SegProxy_<Segment> > ListSegProxy;
+    ListSegProxy listseg;
+    for(auto& seg : sl){
+        listseg.emplace_back(seg);
+    }
+
+    typedef IntersectionBenOtt_<SegProxy_<Segment> > Inter;
+    Inter inter(listseg);
+    // inter.execute();
+
 }
