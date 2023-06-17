@@ -21,7 +21,11 @@ set(Sources
 )
 set(Sources_Bezier test_bezier.cpp)
 
+
+
 find_package(Python COMPONENTS Interpreter Development)
+
+find_package(CGAL)
 
 file(WRITE "./out.txt" CMake_Version : ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}\n)
 file(APPEND "./out.txt" System_Name : ${CMAKE_SYSTEM_NAME}\n)
@@ -49,6 +53,7 @@ add_executable(${Bezier} ${Sources_Bezier})
 
 target_link_libraries(${This} PUBLIC
     gtest_main
+    CGAL::CGAL
 )
 target_link_libraries(${Bezier} PUBLIC
     gtest_main

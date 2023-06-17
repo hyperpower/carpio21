@@ -1,5 +1,5 @@
-#ifndef _BEN_OTT_INTERSECTION_HPP_
-#define _BEN_OTT_INTERSECTION_HPP_
+#ifndef _BEN_OTT_INTERSECTION2_HPP_
+#define _BEN_OTT_INTERSECTION2_HPP_
 // bentley ottmann 
 #include "geometry/operation/boolean/ben_ott_structure.hpp"
 #include "geometry/operation/boolean/segment_segment.hpp"
@@ -68,22 +68,27 @@ namespace carpio {
     }
 #endif
 template<class SEG>
-class IntersectionBenOtt_{
+class IntersectionBenOtt2_{
 public:
-    typedef IntersectionBenOtt_<SEG> Self;
+    typedef IntersectionBenOtt2_<SEG> Self;
 
     typedef typename SEG::Point Point;
     typedef SEG Segment;
     typedef typename SEG::coord_value_type Vt;
     typedef const Segment* cpSegment;
+
+    typedef SegProxy_<SEG> SegProxy;
+    typedef const SegProxy* cpSegProxy;
+
+    typedef std::list<SegProxy> ListSegProxy;
     
-    typedef SweepEvent_<Segment> Event;
-    typedef SweepEventQueue_<Event, Segment> EventQueue;
+    typedef SweepEvent_<SegProxy> Event;
+    typedef SweepEventQueue_<Event, SegProxy> EventQueue;
     typedef typename EventQueue::Setcp SetcpSeg;
 
     // typedef std::set<const Geo*> GeoSet;
-    typedef CompareSeg_<Segment> CompareSeg;
-    typedef std::set<const Segment*, CompareSeg > StatusTree;
+    typedef CompareSeg_<SegProxy> CompareSeg;
+    typedef std::set<cpSegProxy, CompareSeg > StatusTree;
     typedef Intersection_<Segment, Segment> InterTwo;
     typedef IntersectionResult_<Segment, Segment> Result;
     typedef std::list<Result> ListResult;
@@ -96,14 +101,16 @@ protected:
     Segment diagonal;
 #endif
     EventQueue queue;
+    ListSegProxy listsegproxy;    
 public:
     template<class CONTAINER, 
             typename std::enable_if<
                 IsContainer<CONTAINER>::value
             &&  IsSegment<typename CONTAINER::value_type>::value 
         , bool>::type = true>
-    IntersectionBenOtt_(const CONTAINER& con){
-        _build_priority_queue(con);
+    IntersectionBenOtt2_(const CONTAINER& con){
+        _build_list_segproxy(con);
+        _build_priority_queue(this->listsegproxy);
     #ifdef _DEBUG_MODE_
         _build_list_segment(con);
     #endif
@@ -177,12 +184,12 @@ public:
             for(auto s : r_set){
                 auto r = _erase_seg_in_status(status, s);
                 if(r == 0)
-                    throw std::invalid_argument(ToString(*s) + " should in status tree!");
+                    throw std::invalid_argument(ToString(s->seg()) + " should in status tree!");
             }
             for(auto s : c_set){
                 auto r = _erase_seg_in_status(status, s);
                 if(r == 0)
-                    throw std::invalid_argument(ToString(*s) + " should in status tree!");
+                    throw std::invalid_argument(ToString(s->seg()) + " should in status tree!");
                 // status.erase(s);
             }
             // ProfileEnd();
@@ -193,37 +200,38 @@ public:
             std::set_union(l_set.begin(), l_set.end(),
                             c_set.begin(), c_set.end(),
                             std::inserter(ulc, ulc.begin()));
+            auto it_hint = status.begin();
             for(auto s : ulc){
-                status.insert(s);
+                it_hint = status.insert(it_hint, s);
             }
-            // for(auto s : c_set){
-            //     status.insert(s);
+            // for(auto s : ulc){
+                // status.insert(s);
             // }
 
             // std::cout << "status size = "<< status.size() << std::endl;
             // ProfileStart("BO_FindNew");
             if(ulc.size() == 0){
-                cpSegment s_a, s_b;
+                cpSegProxy s_a, s_b;
                 _find_neighboors(p_sweep, status, s_a, s_b); 
                 // ProfileStart("FindN_0");
                 _compute_new_events(s_a, s_b, event);
                 // ProfileEnd();
             } else {
-                cpSegment s_min  = _find_min_slope(ulc);
-                cpSegment s_max  = _find_max_slope(ulc);
+                auto s_min  = _find_min_slope(ulc);
+                auto s_max  = _find_max_slope(ulc);
                 #ifdef _DEBUG_MODE_
                 if(s_max){
                     std::cout << "s_lower = " << *s_max << std::endl;
                     PlotpSegment(gnu, s_max, "#A0C347" );
                 }
                 #endif
-                cpSegment s_lower = _find_lower_neighboor(s_min, status);
+                auto s_lower = _find_lower_neighboor(s_min, status);
                 #ifdef _DEBUG_MODE_
                 if(s_lower){
                     std::cout << "s_lower = " << *s_lower << std::endl;
                 }
                 #endif
-                cpSegment s_upper = _find_upper_neighboor(s_max, status);
+                auto s_upper = _find_upper_neighboor(s_max, status);
 
                 #ifdef _DEBUG_MODE_
                 if(s_upper){
@@ -276,7 +284,7 @@ public:
 #ifndef _DEBUG_MODE_
 protected:
 #endif
-    IntersectionBenOtt_(){}
+    IntersectionBenOtt2_(){}
 
     void _new_result(const Event& current, ListResult& list){
         Result res(current.get_point());
@@ -286,13 +294,13 @@ protected:
         auto& r_set = queue.begin()->second[2];
 
         for(auto s : l_set){
-            res.add(s);
+            res.add(s->seg());
         }
         for(auto s : c_set){
-            res.add(s);
+            res.add(s->seg());
         }
         for(auto s : r_set){
-            res.add(s);
+            res.add(s->seg());
         }
                 
         list.emplace_back(res);
@@ -307,14 +315,22 @@ protected:
             queue.add_event(e_right, 2, &(seg));  
         }
     }
+
+    template<class CONTAINER>
+    void _build_list_segproxy(const CONTAINER& con){
+        for(auto& seg : con){
+            this->listsegproxy.emplace_back(SegProxy(seg));
+        }
+    }
     void _find_neighboors(const Point& p, 
                           const StatusTree& tree,
-                          cpSegment& above, cpSegment& below) {
+                          cpSegProxy& above, cpSegProxy& below) {
         //create a segment of length 0 representing p :
         Segment s(p.x(), p.x(), p.y(), p.y());
+        SegProxy sp(s);
         
         //search for upper neighboor
-        auto iter = tree.upper_bound(&s);
+        auto iter = tree.upper_bound(&sp);
         
         if(iter == tree.end()){
             above = nullptr;
@@ -329,7 +345,7 @@ protected:
         }
     }
 
-    bool _erase_seg_in_status(StatusTree& tree, const cpSegment& cps) const{
+    bool _erase_seg_in_status(StatusTree& tree, const cpSegProxy& cps) const{
         auto removed = tree.erase(cps);
         if (removed == 0){
             for(auto iter = tree.begin(); iter!= tree.end(); iter++){
@@ -343,10 +359,10 @@ protected:
         return removed;
     }
 
-    cpSegment _find_lower_neighboor(cpSegment cps, const StatusTree& tree) const{
+    cpSegProxy _find_lower_neighboor(cpSegProxy cps, const StatusTree& tree) const{
         auto iter = tree.find(cps);
         if(iter == tree.end()){
-            throw std::invalid_argument(ToString(*cps) + " should in tree!");
+            throw std::invalid_argument(ToString(cps->seg()) + " should in tree!");
         }
         if(iter == tree.begin()){
             return nullptr;
@@ -355,10 +371,10 @@ protected:
             return *iter;
         }
     }
-    cpSegment _find_upper_neighboor(cpSegment s, const StatusTree& tree) const{
+    cpSegProxy _find_upper_neighboor(cpSegProxy s, const StatusTree& tree) const{
         auto iter = tree.find(s);
         if(iter == tree.end()){
-            throw std::invalid_argument(ToString(*s) + " should in tree!");
+            throw std::invalid_argument(ToString(s->seg()) + " should in tree!");
         }
         if(++iter == tree.end())
             return nullptr;
@@ -366,31 +382,31 @@ protected:
             return *iter;
     }
 
-    cpSegment _find_min_slope(const SetcpSeg& v) const{
+    cpSegProxy _find_min_slope(const SetcpSeg& v) const{
         auto it = v.begin();
         auto min = *(v.begin());
 
         while(++it != v.end()) {
-            if(Slope(*(*it)) < Slope(*min))
+            if((*it)->slope() < min->slope())
                 min = *it;
         }
         return min;
     }
-    cpSegment _find_max_slope(const SetcpSeg& v) const{
+    cpSegProxy _find_max_slope(const SetcpSeg& v) const{
         auto it = v.begin();
         auto max = *(v.begin());
 
         while(++it != v.end()) {
-            if(Slope(*max) < Slope(**it))
+            if(max->slope() < (*it)->slope())
                 max = *it;
         }
         return max;
     }
     
-    void _compute_new_events(cpSegment s0, cpSegment s1, const Event &current){
+    void _compute_new_events(cpSegProxy s0, cpSegProxy s1, const Event &current){
         if (s0 != nullptr && s1 != nullptr){
             // ProfileStart("Inter2Seg_BO");
-            InterTwo inter(*s0, *s1);
+            InterTwo inter(s0->seg(), s1->seg());
             auto res = inter.execute();
             // ProfileEnd();
             if(res.type == _SS_INTERSECT_){
@@ -406,7 +422,6 @@ protected:
             }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
                 for(short i = 0 ; i < 2; i++){
                     auto pos = inter.point_position(i);
-                    std::cout << ToString(pos) << std::endl;
                     if(pos == _PS_IN_){
                         queue.add_event(Event(s0->p(i)), 1, s1);
                         // break;
@@ -414,7 +429,6 @@ protected:
                 }
                 for(short i = 2; i < 4; i++){
                     auto pos = inter.point_position(i);
-                    std::cout << ToString(pos) << std::endl;
                     if(pos == _PS_IN_){
                         queue.add_event(Event(s1->p(i-2)), 1, s0);
                         // break;

@@ -3,6 +3,11 @@
 
 #include "two_segments.hpp" 
 
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/Arr_segment_traits_2.h>
+#include <CGAL/Surface_sweep_2_algorithms.h>
+
+
 template<class LISTSEG>
 void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
     // gnu.set_label(1, strtype, -4.5, 4);
@@ -125,7 +130,19 @@ void MultiSegTestCase1BenOtt(const std::list<Segment>& sl){
 }
 
 
+typedef CGAL::Exact_predicates_exact_constructions_kernel       Kernel;
+typedef Kernel::Point_2                                         Point_2;
+typedef CGAL::Arr_segment_traits_2<Kernel>                      Traits_2;
+typedef Traits_2::Curve_2                                       Segment_2;
 
+template<class LISTSEG>
+auto ToCGAL(const LISTSEG& lseg){
+    std::vector<Segment_2> nl;
+    for(auto& s : lseg){
+        nl.emplace_back(Segment_2(Point_2(s.psx(), s.psy()), Point_2(s.pex(), s.pey())));
+    }
+    return nl;
+}
 
 void benchmark_test(){
     ProfileClean();
@@ -137,6 +154,7 @@ void benchmark_test(){
     for(auto& num : arr_num){
         ProfileStart("GenSeg_" + ToString(num));
         auto lseg = GenerateRandomSegments(num, 0, 100, 0, 100);
+        auto nlseg = ToCGAL(lseg);
         ProfileEnd();
         // Method1 ==========================================
         auto start = std::chrono::system_clock::now();
@@ -151,7 +169,7 @@ void benchmark_test(){
         std::string out = tfm::format("%25s :  %15.5f %3s\n",
                                  "Method N2", dt, "s");
     	std::cout << out;
-        // Method2 ==========================================
+        // Method2 Simple sweeep line =============================
         start = std::chrono::system_clock::now();
         ProfileStart("Method_sl_" + ToString(num));
         tfm::format(std::cout, "Method_SweepLine_%d  ", num); 
@@ -164,7 +182,7 @@ void benchmark_test(){
         out = tfm::format("%25s :  %15.5f %3s\n",
                                  "Simple Sweep", dt, "s");
     	std::cout << out;
-        // Method2 ==========================================
+        // Method Ben Ott ==========================================
         start = std::chrono::system_clock::now();
         ProfileStart("Method_Ben_" + ToString(num));
         tfm::format(std::cout, "Method_Ben_%d  ", num); 
@@ -176,6 +194,36 @@ void benchmark_test(){
         m3_time.push_back(dt);
         out = tfm::format("%25s :  %15.5f %3s\n",
                                  "bentley ottmann", dt, "s");
+    	std::cout << out;
+        // Method Ben Ott2 ==========================================
+        start = std::chrono::system_clock::now();
+        ProfileStart("Method_Ben2_" + ToString(num));
+        tfm::format(std::cout, "Method_Ben_%d  ", num); 
+        res = Intersect(lseg, "bentley_ottmann2");
+        tfm::format(std::cout, " find %10d\n", res.size()); 
+        ProfileEnd();
+	    end = std::chrono::system_clock::now();
+    	dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        m3_time.push_back(dt);
+        out = tfm::format("%25s :  %15.5f %3s\n",
+                                 "bentley ottmann2", dt, "s");
+    	std::cout << out;
+        // Method CGAL ==========================================
+        start = std::chrono::system_clock::now();
+        ProfileStart("Method_CGAL_" + ToString(num));
+        tfm::format(std::cout, "Method_CGAL_%d  ", num); 
+        
+        std::list<Point_2> pts;
+        CGAL::compute_intersection_points(nlseg.begin(), nlseg.end(),
+                                     std::back_inserter(pts)); 
+        
+        tfm::format(std::cout, " find %10d\n", res.size()); 
+        ProfileEnd();
+	    end = std::chrono::system_clock::now();
+    	dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        m3_time.push_back(dt);
+        out = tfm::format("%25s :  %15.5f %3s\n",
+                                 "CGAL", dt, "s");
     	std::cout << out;
     }
     ProfileListShow();

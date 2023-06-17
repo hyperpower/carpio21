@@ -8,6 +8,8 @@
 #include <typeinfo>
 #include "math.h"
 
+
+
 using namespace carpio;
 
 template<typename TYPE, St DIM>
