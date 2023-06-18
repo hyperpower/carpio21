@@ -405,19 +405,18 @@ protected:
     
     void _compute_new_events(cpSegProxy s0, cpSegProxy s1, const Event &current){
         if (s0 != nullptr && s1 != nullptr){
-            // ProfileStart("Inter2Seg_BO");
             InterTwo inter(s0->seg(), s1->seg());
             auto res = inter.execute();
-            // ProfileEnd();
             if(res.type == _SS_INTERSECT_){
-                // ProfileStart("NewEvent");
-                Event ev_i(res.point);
-                // ProfileEnd();
-                if (current < ev_i && !queue.mem(ev_i)){
-                    // ProfileStart("AddEvent");
-                    queue.add_event(ev_i, 1, s0);
-                    queue.add_event(ev_i, 1, s1);
-                    // ProfileEnd();
+                if (Event::CompareLess(current.get_point(), res.point) ){
+                    Event ev_i(res.point);
+                    auto iter = queue.find(ev_i);
+                    if(iter == queue.end()){
+                        typename EventQueue::Setcp v, set_empty; 
+                        v.insert(s0);
+                        v.insert(s1);
+                        queue.insert(std::pair<Event, typename EventQueue::ArrSetcp> (ev_i, {set_empty, v, set_empty}));
+                    }
                 }
             }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
                 for(short i = 0 ; i < 2; i++){

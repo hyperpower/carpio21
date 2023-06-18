@@ -406,7 +406,6 @@ protected:
             }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
                 for(short i = 0 ; i < 2; i++){
                     auto pos = inter.point_position(i);
-                    std::cout << ToString(pos) << std::endl;
                     if(pos == _PS_IN_){
                         queue.add_event(Event(s0->p(i)), 1, s1);
                         // break;
@@ -414,7 +413,6 @@ protected:
                 }
                 for(short i = 2; i < 4; i++){
                     auto pos = inter.point_position(i);
-                    std::cout << ToString(pos) << std::endl;
                     if(pos == _PS_IN_){
                         queue.add_event(Event(s1->p(i-2)), 1, s0);
                         // break;

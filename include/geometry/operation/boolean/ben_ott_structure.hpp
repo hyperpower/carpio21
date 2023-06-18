@@ -6,6 +6,7 @@
 #include <iostream>
 #include <set>
 
+#include "algebra/number/number_define.hpp"
 #include "geometry/objects/objects.hpp"
 
 namespace carpio{
@@ -147,13 +148,13 @@ public:
         return *_sppoint;
     }
     bool operator<(const SweepEvent_& e) const{
-        auto x  = _sppoint->x();
-        auto xo = e._sppoint->x();
-        return (
-            (xo - x) > 1e-14
-            || (   std::abs( xo - x) < 1e-14
-                && (_sppoint->y()  < e._sppoint->y()))
-            );
+        return CompareLess(*_sppoint, *e._sppoint);
+    }
+
+    static inline bool CompareLess(const Point& p1, const Point& p2){
+        auto dx = p2[0] - p1[0];
+        return (dx > 1e-14)
+            || ( std::abs(dx) < 1e-14 && p1[1] < p2[1]); 
     }
 };
 
@@ -236,8 +237,10 @@ struct CompareSeg_ {
                 }
             }
         }
-        return this->less(*a, *b, *(this->_ppoint)); 
-        
+        // ProfileStart("Less");
+        bool res =  this->less(*a, *b, *(this->_ppoint)); 
+        // ProfileEnd();
+        return res;
     }
 
     auto y_at_sweep_point(const Segment& seg) const{
@@ -266,8 +269,10 @@ struct CompareSeg_ {
         }
     }
     bool less(const Segment& a, const Segment& b, const Point& p_sweep) const{
+        // ProfileStart("Y_at_sweep");
         auto ay = y_at_sweep_point(a, p_sweep);
         auto by = y_at_sweep_point(b, p_sweep);
+        // ProfileEnd();
         if(std::abs(ay - by) > _e){
             return ay < by;
         }else{

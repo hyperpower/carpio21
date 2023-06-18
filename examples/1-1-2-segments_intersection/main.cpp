@@ -13,9 +13,10 @@ int main(int argc, char** argv) {
     two_segments_test();
     // intersection_on_segment();
     // MultiSegTestCase1();
-    auto l = GenerateRandomSegments(20, 0, 100, 0, 100);
+    auto l = GenerateGrid(20);
+    // auto l = GenerateParallelSlanted(20);
     MultiSegTestCase1N2(l);
     MultiSegTestCase1BenOtt(l);
 
     benchmark_test();
-}
+} 

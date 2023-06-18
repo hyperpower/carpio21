@@ -80,6 +80,45 @@ auto GenerateRandomSegments(int num,
     return lseg;
 }
 
+auto GenerateParallelSlanted(int num){
+    typedef std::list<Segment> ListSegment;
+    ListSegment lseg;
+    for (int i = 1; i< num + 1 ; i++){
+        lseg.push_back(Segment(Point(-i, i), Point(i, i+i)));
+    }
+    return lseg; 
+}
+
+auto GenerateSparse(int size){
+    typedef std::list<Segment> ListSegment;
+    ListSegment lseg;
+    int num = std::floor(std::sqrt(double(size)));
+    for (int i = 1; i< num + 1 ; i++){
+        for (int j = 1; j< num + 1; j++){
+            double x = i * 10; 
+            double y = j * 10;
+            double r = Random::nextDouble();
+            lseg.emplace_back(Segment(Point(x, y), Point(x + 10 * std::cos(r), y + 10 * std::sin(r)) ) );
+        }
+    }
+    return lseg;
+}
+
+auto GenerateGrid(int size){
+    typedef std::list<Segment> ListSegment;
+    ListSegment lseg;
+    int num = std::floor(size / 2.0);
+    double dy =-0.3;
+    double dx = 0.1;
+    for (int i = 1; i< num + 1 ; i++){
+        lseg.emplace_back(Segment(Point(dx, i + dy), Point(dx + num - 1, i + dy )));
+    }
+    for (int i = 1; i< num + 1 ; i++){
+        lseg.emplace_back(Segment(Point(dx + i, dy), Point(dx + i, num - 1 + dy )));
+    }
+    return lseg;
+}
+
 void MultiSegTestCase1N2(const std::list<Segment>& sl){
     // auto sl = GenerateSegmentsCase1<Segment>();
     // auto sl = GenerateRandomSegments(50, 0, 100, 0, 100);
@@ -154,7 +193,11 @@ void benchmark_test(){
     for(auto& num : arr_num){
         ProfileStart("GenSeg_" + ToString(num));
         auto lseg = GenerateRandomSegments(num, 0, 100, 0, 100);
+        // auto lseg = GenerateParallelSlanted(num);
+        // auto lseg = GenerateSparse(num);
+        // auto lseg = GenerateGrid(num);
         auto nlseg = ToCGAL(lseg);
+        std::cout << "Segment size = " << lseg.size() << std::endl;
         ProfileEnd();
         // Method1 ==========================================
         auto start = std::chrono::system_clock::now();
