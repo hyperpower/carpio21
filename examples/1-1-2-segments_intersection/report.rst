@@ -125,19 +125,18 @@ Method 3 Sweep Line -- Bentley-Ottmann
 Example
 -------------------------------
 
-.. list-table:: Segment Define
-   :widths: 25 25 25
-   :header-rows: 1
+Case1 - Normal Intersection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   * - Segment Names
-     - Start Point
-     - End Point
-   * - a
-     - (0, 0)
-     - (1, 1)
-   * - b
-     - (0.5, 0.5)
-     - (0.8, 0.7)
+Segemnts are in trivial case. None of them are vertial nor horizontal. Intersections are expected on segement, not 
+on segment ends. Input data are shown in :ref:`table-case1`.
+
+
+.. _table-case1:
+.. csv-table:: Input Segments for case1
+   :file: fig/bo_case1.txt
+   :widths: 30, 30, 30, 30
+   :header-rows: 1
 
 
 Benchmark
