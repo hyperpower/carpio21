@@ -83,10 +83,10 @@ int a_case(const Point& p1,
 }
 
 void two_segments_test(){
-    Point p1(  -1,    0);
+    Point p1(  -3,  0.2);
     Point p2(   3,  0.5);
-    Point p3( 0.8,  2.0);
-    Point p4(-0.3, -1.0);
+    Point p3( 2.1,  3.0);
+    Point p4(-0.8, -1.5);
     // intersect
     a_case(p1, p2, p3, p4);
     // NO

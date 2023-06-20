@@ -10,18 +10,20 @@ void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
     // gnu.set_label(1, strtype, -4.5, 4);
     int index = 1;
     for(auto seg : sl){
-        auto a = ToGnuplotActor(seg);
-        a.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
+        // auto a = ToGnuplotActor(seg);
+        // a.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
         auto nv = seg.normal_unit_vector();
         double ratio = 0.5;
         std::ostringstream sst;
-        sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
+        sst << "front font \", 18\" textcolor rgb \"#3A4044\" offset first " 
             << nv.x() * ratio << ", " << nv.y() * ratio; 
         gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
         auto a1 = ToGnuplotActorAsVector(seg);
-        // a1.title("Segment " + seg.get_name());
+        if(index == 1){
+            a1.title("Segment");
+        }
         a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
-        gnu.add(a);
+        // gnu.add(a);
         gnu.add(a1);
         index++;
     }
@@ -30,13 +32,18 @@ void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
 
 template<class LISTSEGRES>
 void PlotListIntersectionResult(Gnuplot& gnu, const LISTSEGRES& l){
+    int index = 1;
     for(auto& res : l){
         auto a = ToGnuplotActor(res.point);
         a.point_type(7);
         a.point_size(2);
         a.line_color_red();
+        if(index == l.size()){
+            a.title("Intersect Point");
+        }
         // std::cout << a.style() << std::endl;
         gnu.add(a);
+        index++;
     }
 }
 
@@ -71,7 +78,33 @@ auto GenerateSegmentsCase1(){
     // SegmentsPlot("case1", lseg);
     return lseg;
 }
-
+template<class SEG_TYPE>
+auto GenerateSegmentsCase2(){ // insersection on one point
+    typedef SEG_TYPE Seg;
+    typedef typename SEG_TYPE::Point Poi;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    //                 x1   x2   y1   y2
+    lseg.push_back(Seg(Poi(-10,  10), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(-20, 5.0), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(-30,-5.0), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(0.0, 0.0), Poi(-15, -10)));
+    lseg.push_back(Seg(Poi(-15, -15), Poi(15, 15)));
+    lseg.push_back(Seg(Poi(-5, 15), Poi(5, -15)));
+    lseg.push_back(Seg(Poi(10, 2),  Poi(20, 10)));
+    lseg.push_back(Seg(Poi(10, 2),  Poi(15, 8)));
+    lseg.push_back(Seg(Poi(10, 2),  Poi(13, -8)));
+    lseg.push_back(Seg(Poi(10, 2),  Poi(20, -5)));
+    lseg.push_back(Seg(Poi(8,  5),  Poi(12, -1)));
+    // lseg.push_back(Seg(Poi(6, -1),  Poi(14.5, 5)));
+    int count = 1;
+    for(auto& seg : lseg){
+        seg.set_name(ToString(count));
+        count++;
+    }
+    // SegmentsPlot("case1", lseg);
+    return lseg;
+}
 
 void MultiSegTestCase1N2(const std::string& filename, const std::list<Segment>& sl){
     // auto sl = GenerateSegmentsCase1<Segment>();
@@ -130,6 +163,9 @@ int main_simple(){
     auto ls = GenerateSegmentsCase1<Segment>();
     OutputCSV("bo_case1.txt", ls);
     MultiSegTest_BenOtt("bo_case1", ls);
+    ls = GenerateSegmentsCase2<Segment>();
+    MultiSegTest_BenOtt("bo_case2", ls);
+    return 1;
 }
 
 
