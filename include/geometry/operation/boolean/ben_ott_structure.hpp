@@ -74,6 +74,7 @@ struct SegmentProxyTag: public SegmentTag {};
 template<class SEG>
 class SegProxy_{
 public:
+	static const St Dim = SEG::Dim;
     typedef SegProxy_<SEG> Self;
     typedef typename SEG::Point Point;
     typedef SEG Segment;
@@ -127,6 +128,58 @@ public:
         return _slope.type == Slope::_INFINITY_;
     }
 
+    inline auto tangent_vector() const{
+        return _cpseg->tangent_vector();
+    }
+
+    inline bool empty() const{
+        return _cpseg->empty();
+    }
+
+};
+
+struct SegmentWithSlopeTag: public SegmentTag {};
+
+template<class SEG>
+class SegWithSlope_:public SEG{
+public:
+	static const St Dim = SEG::Dim;
+    typedef SEG Base;
+    typedef SegWithSlope_<SEG> Self;
+    typedef typename SEG::Point Point;
+    typedef SEG Segment;
+    typedef const Segment* cpSegment;
+    typedef typename SEG::coord_value_type coord_value_type;
+    typedef SegSlope_<SEG> Slope;
+
+    typedef SegmentProxyTag Tag;
+
+protected:
+    cpSegment _cpseg;
+    SegSlope_<Segment> _slope;
+
+public:
+    SegWithSlope_(): _cpseg(nullptr){}
+
+    SegWithSlope_(const Segment& seg):
+        Base(seg), _cpseg(&seg), _slope(seg){
+    }
+    
+    inline auto cpseg() const{
+        return _cpseg;
+    }
+
+    inline auto seg() const{
+        return *_cpseg;
+    }
+    
+    inline const Slope& slope() const {
+        return this->_slope;
+    }    
+
+    inline bool is_vertical() const{
+        return _slope.type == Slope::_INFINITY_;
+    }
 };
 
 

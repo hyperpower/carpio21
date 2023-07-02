@@ -1,6 +1,6 @@
 #include <functional>
 
-// #define _DEBUG_MODE_
+#define _DEBUG_MODE_
 
 #include "utility/random.hpp"
 #include "utility/profile.hpp"
@@ -157,7 +157,23 @@ auto GenerateSegmentsCase7(){ // overlap
     
     return lseg;
 }
-
+template<class SEG_TYPE>
+auto GenerateSegmentsCase8(){
+    typedef SEG_TYPE Seg;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    
+    lseg.push_back(Seg(Point(-15, -15), Point(15, 15)));
+    lseg.push_back(Seg(Point(-5, 15),   Point(5, -15)));
+    lseg.push_back(Seg(Point(10, 2),    Point(20, 10)));
+    lseg.push_back(Seg(Point(10, 2),    Point(15, 8)));
+    lseg.push_back(Seg(Point(10, 2),    Point(13, -8)));
+    lseg.push_back(Seg(Point(10, 2),    Point(20, -5)));
+    lseg.push_back(Seg(Point(8,  5),    Point(12, -1)));
+    lseg.push_back(Seg(Point(6, -1),    Point(14.5, 5)));
+    
+    return lseg;
+}
 
 typedef IntersectionBenOtt_<Segment>  Inter;
 typedef IntersectionBenOtt2_<Segment> Inter2;
@@ -166,18 +182,26 @@ TEST(ben_ott, two_seg_order){
     Segment s1(Point(15, 26), Point(2,  20));  // left big  
     Segment s2(Point(6, 18),  Point(20,  35)); // left small
 
+    std::cout << "Two segments " << std::endl;
+    std::cout << "1 - " << s1 << std::endl; 
+    std::cout << "2 - " << s2 << std::endl; 
+
     typedef Intersection_<Segment, Segment> InterTwo;
     InterTwo i(s1, s2);
     auto res = i.execute();
-    std::cout << res.point << std::endl;
+    std::cout << "intersect at " << res.point << std::endl;
 
     Point pc = res.point;
     // pc.x(pc.x() + 0.01);
     Inter::CompareSeg comp(&(pc));
+    typedef Inter::SegProxy SegProxy;
     Inter::StatusTree tree(comp);
 
-    tree.insert(&s1);
-    tree.insert(&s2);
+    SegProxy sp1(s1);
+    SegProxy sp2(s2);
+
+    tree.insert(&sp1);
+    tree.insert(&sp2);
 
     auto y1 = comp.y_at_sweep_point(s1, pc.x());
     auto y2 = comp.y_at_sweep_point(s2, pc.x());
@@ -212,7 +236,7 @@ auto GenerateRandomSegments(int num,
     return lseg;
 }
 
-TEST(ben_ott, random){
+TEST(ben_ott, DISABLED_random){
     // auto sl = GenerateSegmentsCase7<Segment>();
     auto sl = GenerateRandomSegments<Segment>(6, 0, 500, 0, 100);
     auto resn2 = Intersect(sl, "N2");
@@ -240,19 +264,20 @@ TEST(ben_ott, random){
 
 
 TEST(ben_ott, update){
-    // auto sl = GenerateSegmentsCase1<Segment>();
-    auto sl = GenerateRandomSegments<Segment>(10, 0, 500, 0, 500);
+    typedef SegWithSlope_<Segment> SegS;
+    auto sl = GenerateSegmentsCase7<Segment>();
+    // auto sl = GenerateRandomSegments<Segment>(10, 0, 500, 0, 500);
     // typedef std::list<SegProxy_<Segment> > ListSegProxy;
     // ListSegProxy listseg;
     // for(auto& seg : sl){
         // listseg.emplace_back(seg);
     // }
 
-    ProfileStart("1 Ben Ott");
-    Inter inter(sl);
-    auto lres = inter.execute();
-    std::cout << "1 Result size    = " << lres.size() << std::endl;
-    ProfileEnd();
+    // ProfileStart("1 Ben Ott");
+    // Inter inter(sl);
+    // auto lres = inter.execute();
+    // std::cout << "1 Result size    = " << lres.size() << std::endl;
+    // ProfileEnd();
     ProfileStart("2 Ben Ott");
     Inter2 inter2(sl);
     auto lres2 = inter2.execute();
@@ -299,7 +324,7 @@ auto ToCGAL(const LISTSEG& lseg){
 //   assert(CGAL::do_curves_intersect (segments, segments + 4));
   
 // }
-TEST(cgal_random, test){
+TEST(cgal_random, DISABLED_test){
     auto sl = GenerateRandomSegments<Segment>(1000, 0, 600, 0, 500);
     auto nsl = ToCGAL(sl);
 

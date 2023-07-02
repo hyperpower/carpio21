@@ -221,21 +221,21 @@ public:
                 auto s_max  = _find_max_slope(ulc);
                 #ifdef _DEBUG_MODE_
                 if(s_max){
-                    std::cout << "s_lower = " << *s_max << std::endl;
+                    std::cout << "s_lower = " << s_max->seg() << std::endl;
                     PlotpSegment(gnu, s_max, "#A0C347" );
                 }
                 #endif
                 auto s_lower = _find_lower_neighboor(s_min, status);
                 #ifdef _DEBUG_MODE_
                 if(s_lower){
-                    std::cout << "s_lower = " << *s_lower << std::endl;
+                    std::cout << "s_lower = " << s_lower->seg() << std::endl;
                 }
                 #endif
                 auto s_upper = _find_upper_neighboor(s_max, status);
 
                 #ifdef _DEBUG_MODE_
                 if(s_upper){
-                    std::cout << "s_upper = " << *s_upper << std::endl;
+                    std::cout << "s_upper = " << s_upper->seg() << std::endl;
                     PlotpSegment(gnu, s_upper, "#F04137" );
                 }
                 #endif
