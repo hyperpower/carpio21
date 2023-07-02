@@ -1,6 +1,6 @@
 #include <functional>
 
-#define _DEBUG_MODE_
+// #define _DEBUG_MODE_
 
 #include "utility/random.hpp"
 #include "utility/profile.hpp"
@@ -170,13 +170,13 @@ auto GenerateSegmentsCase8(){
     lseg.push_back(Seg(Point(10, 2),    Point(13, -8)));
     lseg.push_back(Seg(Point(10, 2),    Point(20, -5)));
     lseg.push_back(Seg(Point(8,  5),    Point(12, -1)));
-    lseg.push_back(Seg(Point(6, -1),    Point(14.5, 5)));
+    lseg.push_back(Seg(Point(6, -1),    Point(14, 5)));
     
     return lseg;
 }
 
 typedef IntersectionBenOtt_<Segment>  Inter;
-typedef IntersectionBenOtt2_<Segment> Inter2;
+// typedef IntersectionBenOtt2_<Segment> Inter2;
 
 TEST(ben_ott, two_seg_order){
     Segment s1(Point(15, 26), Point(2,  20));  // left big  
@@ -265,7 +265,7 @@ TEST(ben_ott, DISABLED_random){
 
 TEST(ben_ott, update){
     typedef SegWithSlope_<Segment> SegS;
-    auto sl = GenerateSegmentsCase7<Segment>();
+    auto sl = GenerateSegmentsCase8<Segment>();
     // auto sl = GenerateRandomSegments<Segment>(10, 0, 500, 0, 500);
     // typedef std::list<SegProxy_<Segment> > ListSegProxy;
     // ListSegProxy listseg;
@@ -278,10 +278,10 @@ TEST(ben_ott, update){
     // auto lres = inter.execute();
     // std::cout << "1 Result size    = " << lres.size() << std::endl;
     // ProfileEnd();
-    ProfileStart("2 Ben Ott");
-    Inter2 inter2(sl);
-    auto lres2 = inter2.execute();
-    std::cout << "2 Result size    = " << lres2.size() << std::endl;
+    ProfileStart("1 Ben Ott");
+    Inter inter(sl);
+    auto lres = inter.execute();
+    std::cout << "1 Result size    = " << lres.size() << std::endl;
     ProfileEnd();
 
     ProfileListShow();
@@ -324,7 +324,7 @@ auto ToCGAL(const LISTSEG& lseg){
 //   assert(CGAL::do_curves_intersect (segments, segments + 4));
   
 // }
-TEST(cgal_random, DISABLED_test){
+TEST(cgal_random, test){
     auto sl = GenerateRandomSegments<Segment>(1000, 0, 600, 0, 500);
     auto nsl = ToCGAL(sl);
 
@@ -342,12 +342,6 @@ TEST(cgal_random, DISABLED_test){
     Inter inter(sl);
     auto lres = inter.execute();
     std::cout << "Ben-Ott size   = " << lres.size() << std::endl;
-    ProfileEnd();
-
-    ProfileStart("BenOtt2");
-    Inter2 inter2(sl);
-    auto lres2 = inter2.execute();
-    std::cout << "Ben-Ott2 size  = " << lres2.size() << std::endl;
     ProfileEnd();
 
     ProfileStart("N2");    

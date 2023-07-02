@@ -129,21 +129,21 @@ public:
         int i = 0;
         while (!queue.empty()){
             #ifdef _DEBUG_MODE_
-            std::cout << "loop index = " << i << std::endl;
-            gnu.set_terminal_png("./fig/" + ToString(i));
-            gnu.set_equal_ratio();
-            auto dx = MaxX(diagonal) - MinX(diagonal);
-            auto dy = MaxY(diagonal) - MinY(diagonal);
-            gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
-            gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
-            PlotListSegment(gnu, this->listseg);
+                std::cout << "loop index = " << i << std::endl;
+                gnu.set_terminal_png("./fig/" + ToString(i));
+                gnu.set_equal_ratio();
+                auto dx = MaxX(diagonal) - MinX(diagonal);
+                auto dy = MaxY(diagonal) - MinY(diagonal);
+                gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
+                gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
+                PlotListSegment(gnu, this->listseg);
             #endif
 
             Event event = queue.top();
             auto& point = event.get_point();
             
             #ifdef _DEBUG_MODE_
-            PlotSweepLine(gnu, point, diagonal);
+                PlotSweepLine(gnu, point, diagonal);
             #endif
 
             // HANDLE EVENT POINT(point)
@@ -154,7 +154,7 @@ public:
             auto& r_set = queue.begin()->second[2];
 
             #ifdef _DEBUG_MODE_
-            PlotListpSegment(gnu, c_set, "#FBBC04" );
+                PlotListpSegment(gnu, c_set, "#FBBC04" );
             #endif
 
 
@@ -220,9 +220,14 @@ public:
                 auto s_max  = _find_max_slope(ulc);
                 #ifdef _DEBUG_MODE_
                 if(s_max){
-                    std::cout << "s_lower = " << s_max->seg() << std::endl;
+                    std::cout << "s_max = " << s_max->seg() << std::endl;
                     PlotpSegment(gnu, s_max, "#A0C347" );
                 }
+                if(s_min){
+                    std::cout << "s_min = " << s_min->seg() << std::endl;
+                    // PlotpSegment(gnu, s_min, "#A0C347" );
+                }
+
                 #endif
                 auto s_lower = _find_lower_neighboor(s_min, status);
                 #ifdef _DEBUG_MODE_
@@ -238,16 +243,10 @@ public:
                     PlotpSegment(gnu, s_upper, "#F04137" );
                 }
                 #endif
-                // ProfileEnd();
-                // ProfileStart("FindN_1");
                 _compute_new_events(s_min, s_lower, event); 
-                // ProfileEnd();
-                // ProfileStart("FindN_2");
                 _compute_new_events(s_max, s_upper, event);
-                // ProfileEnd();
             }
             // ProfileEnd();
-            // std::cout << "three set size = " << l_set.size() + c_set.size() + r_set.size() << std::endl;
             // update res
             auto n_set_size = l_set.size() + c_set.size() + r_set.size();
             if(n_set_size > 1 && n_set_size > set_size ){
@@ -293,13 +292,13 @@ protected:
         auto& r_set = queue.begin()->second[2];
 
         for(auto s : l_set){
-            res.add(s->seg());
+            res.add(s->cpseg());
         }
         for(auto s : c_set){
-            res.add(s->seg());
+            res.add(s->cpseg());
         }
         for(auto s : r_set){
-            res.add(s->seg());
+            res.add(s->cpseg());
         }
                 
         list.emplace_back(res);
@@ -308,8 +307,8 @@ protected:
     template<class CONTAINER>
     void _build_priority_queue(const CONTAINER& con){
         for(auto& seg : con){
-            Event e_left(seg.p_less_x());
-            Event e_right(seg.p_greater_x());
+            Event e_left(seg.ps());
+            Event e_right(seg.pe());
             queue.add_event(e_left,  0, &(seg));
             queue.add_event(e_right, 2, &(seg));  
         }
@@ -406,8 +405,8 @@ protected:
         if (s0 != nullptr && s1 != nullptr){
             InterTwo inter(s0->seg(), s1->seg());
             auto res = inter.execute();
-            if(res.type == _SS_INTERSECT_){
-                if (Event::CompareLess(current.get_point(), res.point) ){
+            if (CompareLess(current.get_point(), res.point) ){
+                if(res.type == _SS_INTERSECT_){
                     Event ev_i(res.point);
                     auto iter = queue.find(ev_i);
                     if(iter == queue.end()){
@@ -416,20 +415,20 @@ protected:
                         v.insert(s1);
                         queue.insert(std::pair<Event, typename EventQueue::ArrSetcp> (ev_i, {set_empty, v, set_empty}));
                     }
-                }
-            }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
-                for(short i = 0 ; i < 2; i++){
-                    auto pos = inter.point_position(i);
-                    if(pos == _PS_IN_){
-                        queue.add_event(Event(s0->p(i)), 1, s1);
-                        // break;
+                }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
+                    for(short i = 0 ; i < 2; i++){
+                        auto pos = inter.point_position(i);
+                        if(pos == _PS_IN_){
+                            queue.add_event(Event(s0->p(i)), 1, s1);
+                            // break;
+                        }
                     }
-                }
-                for(short i = 2; i < 4; i++){
-                    auto pos = inter.point_position(i);
-                    if(pos == _PS_IN_){
-                        queue.add_event(Event(s1->p(i-2)), 1, s0);
-                        // break;
+                    for(short i = 2; i < 4; i++){
+                        auto pos = inter.point_position(i);
+                        if(pos == _PS_IN_){
+                            queue.add_event(Event(s1->p(i-2)), 1, s0);
+                            // break;
+                        }
                     }
                 }
             }

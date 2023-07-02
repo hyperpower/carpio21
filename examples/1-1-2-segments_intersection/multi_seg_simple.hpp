@@ -85,10 +85,10 @@ auto GenerateSegmentsCase2(){ // insersection on one point
     typedef std::vector<SEG_TYPE> ListSegment;
     ListSegment lseg;
     //                 x1   x2   y1   y2
-    // lseg.push_back(Seg(Poi(-10,  10), Poi(0, 0)));
-    // lseg.push_back(Seg(Poi(-20, 5.0), Poi(0, 0)));
-    // lseg.push_back(Seg(Poi(-30,-5.0), Poi(0, 0)));
-    // lseg.push_back(Seg(Poi(0.0, 0.0), Poi(-15, -10)));
+    lseg.push_back(Seg(Poi(-10,  10), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(-20, 5.0), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(-30,-5.0), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(0.0, 0.0), Poi(-15, -10)));
     lseg.push_back(Seg(Poi(-15, -15), Poi(15, 15)));
     lseg.push_back(Seg(Poi(-5, 15), Poi(5, -15)));
     lseg.push_back(Seg(Poi(10, 2),  Poi(20, 10)));
@@ -96,7 +96,7 @@ auto GenerateSegmentsCase2(){ // insersection on one point
     lseg.push_back(Seg(Poi(10, 2),  Poi(13, -8)));
     lseg.push_back(Seg(Poi(10, 2),  Poi(20, -5)));
     lseg.push_back(Seg(Poi(8,  5),  Poi(12, -1)));
-    // lseg.push_back(Seg(Poi(6, -1),  Poi(16, 5)));
+    lseg.push_back(Seg(Poi(6, -1),  Poi(16, 5)));
     int count = 1;
     for(auto& seg : lseg){
         seg.set_name(ToString(count));
@@ -137,7 +137,7 @@ void MultiSegTest_BenOtt(const std::string& filename, const LISTSEG& sl){
     // auto sl = GenerateRandomSegments(50, 0, 100, 0, 100);
     std::cout << "Segments n = " << sl.size() << std::endl;
     ProfileStart("Intersect Ben");
-    auto res = Intersect(sl, "bentley_ottmann2");
+    auto res = Intersect(sl, "bentley_ottmann");
     std::cout << "Intersection Points : " << res.size() << std::endl;
     ProfileEnd();
     // std::cout << "Len Res = " << res.size() << std::endl;

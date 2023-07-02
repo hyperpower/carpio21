@@ -264,7 +264,7 @@ public:
     void add(const Geo1& g){
         list.emplace_back(&g);
     }
-    void add(cpGeo& pg){
+    void add(cpGeo pg){
         list.emplace_back(pg);
     }
     template<class CONTAINER, 

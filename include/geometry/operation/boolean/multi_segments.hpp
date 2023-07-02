@@ -10,7 +10,7 @@
 #include "utility/profile.hpp"
 #include "utility/avl_tree.hpp"
 #include "ben_ott_intersection.hpp"
-#include "ben_ott_intersection_2.hpp"
+// #include "ben_ott_intersection_2.hpp"
 
 
 namespace carpio{
@@ -502,9 +502,6 @@ auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
         return inter.execute();
     }else if (m == "bentley_ottmann"){
         IntersectionBenOtt_<typename CONTAINER::value_type> inter(con);
-        return inter.execute();
-    }else if (m == "bentley_ottmann2"){
-        IntersectionBenOtt2_<typename CONTAINER::value_type> inter(con);
         return inter.execute();
     }
     else{

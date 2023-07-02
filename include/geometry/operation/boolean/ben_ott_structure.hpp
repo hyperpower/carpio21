@@ -11,6 +11,14 @@
 
 namespace carpio{
 
+
+template<class P>
+inline bool CompareLess(const P& p1, const P& p2, double tol = 1e-14){
+        auto dx = p2[0] - p1[0];
+        return (dx > tol)
+            || ( std::abs(dx) < tol && p1[1] < p2[1]); 
+}
+
 template<class SEG>
 struct SegSlope_ {
     typedef SegSlope_<SEG> Self;
@@ -27,8 +35,11 @@ struct SegSlope_ {
 
     SegSlope_():type(_INVALID_){} 
 
-    SegSlope_(const Segment& seg){
-        make(seg);
+    // SegSlope_(const Segment& seg){
+    //     make(seg);
+    // }
+    SegSlope_(const Point& ps, const Point& pe){
+        make(ps[0], ps[1], pe[0], pe[1]);
     }
 
     void make(const Vt& x0,const Vt& y0,
@@ -41,15 +52,15 @@ struct SegSlope_ {
         }
     }
 
-    void make(const Segment& seg){
-        auto& left  = seg.p_less_x();
-        auto& right = seg.p_greater_x();
-        auto xa = left.x();
-        auto ya = left.y();
-        auto xb = right.x();
-        auto yb = right.y();
-        make(xa, ya, xb, yb);
-    }
+    // void make(const Segment& seg){
+    //     auto& left  = seg.p_less_x();
+    //     auto& right = seg.p_greater_x();
+    //     auto xa = left.x();
+    //     auto ya = left.y();
+    //     auto xb = right.x();
+    //     auto yb = right.y();
+    //     make(xa, ya, xb, yb);
+    // }
 
     bool operator<(const Self& s) const{
         if (type == _INFINITY_)
@@ -66,77 +77,6 @@ struct SegSlope_ {
     }
 };
 
-// template<class T ...>
-// class SegProxy;
-
-struct SegmentProxyTag: public SegmentTag {};
-
-template<class SEG>
-class SegProxy_{
-public:
-	static const St Dim = SEG::Dim;
-    typedef SegProxy_<SEG> Self;
-    typedef typename SEG::Point Point;
-    typedef SEG Segment;
-    typedef const Segment* cpSegment;
-    typedef typename SEG::coord_value_type coord_value_type;
-    typedef SegSlope_<SEG> Slope;
-
-    typedef SegmentProxyTag Tag;
-
-protected:
-    cpSegment _cpseg;
-    SegSlope_<Segment> _slope;
-
-public:
-    SegProxy_(): _cpseg(nullptr){}
-
-    SegProxy_(const Segment& seg):_cpseg(&seg),_slope(seg){
-    }
-    
-    inline auto seg() const{
-        return *_cpseg;
-    }
-
-    inline auto p(int idx) const{
-        return _cpseg->p(idx);
-    }
-
-    inline auto& p_less_x() const{
-		return _cpseg->p_less_x();
-	}
-	inline auto& p_less_y() const{
-		return _cpseg->p_less_y();
-	}
-	inline auto& p_greater_x() const{
-		return _cpseg->p_greater_x();
-	}
-	inline auto& p_greater_y() const{
-		return _cpseg->p_greater_y();
-	}
-    inline auto x() const {
-        return _cpseg->x();
-    }
-    inline auto y() const {
-        return _cpseg->y();
-    }
-    inline const Slope& slope() const {
-        return this->_slope;
-    }    
-
-    inline bool is_vertical() const{
-        return _slope.type == Slope::_INFINITY_;
-    }
-
-    inline auto tangent_vector() const{
-        return _cpseg->tangent_vector();
-    }
-
-    inline bool empty() const{
-        return _cpseg->empty();
-    }
-
-};
 
 struct SegmentWithSlopeTag: public SegmentTag {};
 
@@ -152,17 +92,21 @@ public:
     typedef typename SEG::coord_value_type coord_value_type;
     typedef SegSlope_<SEG> Slope;
 
-    typedef SegmentProxyTag Tag;
+    typedef SegmentWithSlopeTag Tag;
 
 protected:
     cpSegment _cpseg;
-    SegSlope_<Segment> _slope;
+    Slope     _slope;
 
 public:
     SegWithSlope_(): _cpseg(nullptr){}
 
     SegWithSlope_(const Segment& seg):
-        Base(seg), _cpseg(&seg), _slope(seg){
+        Base(seg), _cpseg(&seg){
+        if(CompareLess(Base::pe(), Base::ps())){
+            this->change_orientation();
+        }
+        _slope = Slope(this->ps(), this->pe());
     }
     
     inline auto cpseg() const{
@@ -203,12 +147,7 @@ public:
     bool operator<(const SweepEvent_& e) const{
         return CompareLess(*_sppoint, *e._sppoint);
     }
-
-    static inline bool CompareLess(const Point& p1, const Point& p2){
-        auto dx = p2[0] - p1[0];
-        return (dx > 1e-14)
-            || ( std::abs(dx) < 1e-14 && p1[1] < p2[1]); 
-    }
+    
 };
 
 
@@ -246,6 +185,7 @@ public:
             }
         }
     }
+
     EVENT top() {
         return this->begin()->first;
     }
@@ -302,8 +242,8 @@ struct CompareSeg_ {
     auto y_at_sweep_point(const Segment& seg, const Point& p) const{
         if(seg.is_vertical()) { // find max y if vertical
             auto py = p.y();
-            auto ly = seg.p_less_x().y();
-            auto ry = seg.p_greater_x().y();
+            auto ly = seg.psy();
+            auto ry = seg.pey();
             if(py < ly) // ?
                 return ly;
             else if(py > ry)
@@ -311,8 +251,8 @@ struct CompareSeg_ {
             else
                 return py;
         }else {
-            auto& left  = seg.p_less_x();
-            auto& right = seg.p_greater_x();
+            auto& left  = seg.ps();
+            auto& right = seg.pe();
             auto xa = left.x();
             auto ya = left.y();
             auto xb = right.x();
@@ -329,8 +269,8 @@ struct CompareSeg_ {
         if(std::abs(ay - by) > _e){
             return ay < by;
         }else{
-            auto sa = _get_slope(a, typename Segment::Tag());
-            auto sb = _get_slope(b, typename Segment::Tag());
+            auto sa = a.slope();
+            auto sb = b.slope();
             if(sa == sb){
                 return &a < &b;
             }else{
@@ -340,8 +280,8 @@ struct CompareSeg_ {
     }
 
     bool less_slope(const Segment& a, const Segment& b) const{
-        auto sa = _get_slope(a, typename Segment::Tag());
-        auto sb = _get_slope(b, typename Segment::Tag());
+        auto sa = a.slope();
+        auto sb = b.slope();
         if(sa == sb){
             return &a < &b;
         }else{
@@ -349,13 +289,7 @@ struct CompareSeg_ {
         }
     }
 
-    inline auto _get_slope(const Segment& a, SegmentProxyTag) const{
-        return a.slope();
-    }
-
-    inline auto _get_slope(const Segment& a, SegmentTag) const{
-        return Slope(a);
-    }
+   
 };
 
 

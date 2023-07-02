@@ -164,7 +164,7 @@ auto ToCGAL(const LISTSEG& lseg){
 
 void benchmark_test(){
     ProfileClean();
-    std::vector<int> arr_num     = {3000};
+    std::vector<int> arr_num     = {30};
     std::list<double> m1_time;
     std::list<double> m2_time;
     std::list<double> m3_time;
@@ -216,19 +216,6 @@ void benchmark_test(){
         m3_time.push_back(dt);
         out = tfm::format("%25s :  %15.5f %3s\n",
                                  "bentley ottmann", dt, "s");
-    	std::cout << out;
-        // Method Ben Ott2 ==========================================
-        start = std::chrono::system_clock::now();
-        ProfileStart("Method_Ben2_" + ToString(num));
-        tfm::format(std::cout, "Method_Ben_%d  ", num); 
-        res = Intersect(lseg, "bentley_ottmann2");
-        tfm::format(std::cout, " find %10d\n", res.size()); 
-        ProfileEnd();
-	    end = std::chrono::system_clock::now();
-    	dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        m3_time.push_back(dt);
-        out = tfm::format("%25s :  %15.5f %3s\n",
-                                 "bentley ottmann2", dt, "s");
     	std::cout << out;
         // Method CGAL ==========================================
         start = std::chrono::system_clock::now();

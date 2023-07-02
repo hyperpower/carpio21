@@ -21,5 +21,5 @@ int main(int argc, char** argv) {
     main_simple();
     
 
-    // benchmark_test();
+    benchmark_test();
 } 
