@@ -214,14 +214,14 @@ public:
                 cpSegment s_min  = _find_min_slope(ulc);
                 cpSegment s_max  = _find_max_slope(ulc);
                 #ifdef _DEBUG_MODE_
-                if(s_max){
-                    std::cout << "s_lower = " << *s_max << std::endl;
+                if(s_max != nullptr){
+                    std::cout << "s_max   = " << *s_max << std::endl;
                     PlotpSegment(gnu, s_max, "#A0C347" );
                 }
                 #endif
                 cpSegment s_lower = _find_lower_neighboor(s_min, status);
                 #ifdef _DEBUG_MODE_
-                if(s_lower){
+                if(s_lower != nullptr){
                     std::cout << "s_lower = " << *s_lower << std::endl;
                 }
                 #endif

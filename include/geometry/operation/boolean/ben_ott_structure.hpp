@@ -212,15 +212,19 @@ struct CompareSeg_ {
     CompareSeg_(Point* c, Setcp* s) : _ppoint(c), _pset(s), _e(1e-14){ }; 
 
     bool operator() (const Segment* a, const Segment* b) const{
+        std::cout << "here\n";
         if(_pset != nullptr && !(_pset->empty())){
+            std::cout << "here in\n";
             auto itera = _pset->find(a);
             if(itera != _pset->end()){
                 auto iterb = _pset->find(b);
                 if(iterb != _pset->end()){
+                    std::cout << "less_slope\n";
                     return this->less_slope(a, b);
                 }
             }
         }
+        std::cout << "else \n";
         return this->less(*a, *b, *(this->_ppoint)); 
         
     }
@@ -267,6 +271,7 @@ struct CompareSeg_ {
     bool less_slope(cpSegment a, cpSegment b) const{
         Slope sa(*a);
         Slope sb(*b);
+        std::cout << "slope a b \n";
         if(sa < sb){
             return true;
         }else if(sa == sb){

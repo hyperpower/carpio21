@@ -205,8 +205,8 @@ auto GenerateRandomSegments(int num,
 }
 
 TEST(ben_ott, case1){
-    // auto sl = GenerateSegmentsCase7<Segment>();
-    auto sl = GenerateRandomSegments<Segment>(6, 0, 500, 0, 100);
+    auto sl = GenerateSegmentsCase1<Segment>();
+    // auto sl = GenerateRandomSegments<Segment>(6, 0, 500, 0, 100);
     auto resn2 = Intersect(sl, "N2");
     
 
