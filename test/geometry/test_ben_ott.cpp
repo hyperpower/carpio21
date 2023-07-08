@@ -1,11 +1,15 @@
 #include <functional>
 
-#define _DEBUG_MODE_
+// #define _DEBUG_MODE_
 
 #include "utility/random.hpp"
 #include "utility/profile.hpp"
 #include "geometry/geometry.hpp"
 #include "gtest/gtest.h"
+
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/Arr_segment_traits_2.h>
+#include <CGAL/Surface_sweep_2_algorithms.h>
 
 
 using namespace carpio;
@@ -153,23 +157,51 @@ auto GenerateSegmentsCase7(){ // overlap
     
     return lseg;
 }
+template<class SEG_TYPE>
+auto GenerateSegmentsCase8(){
+    typedef SEG_TYPE Seg;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    
+    lseg.push_back(Seg(Point(-15, -15), Point(15, 15)));
+    lseg.push_back(Seg(Point(-5, 15),   Point(5, -15)));
+    lseg.push_back(Seg(Point(10, 2),    Point(20, 10)));
+    lseg.push_back(Seg(Point(10, 2),    Point(15, 8)));
+    lseg.push_back(Seg(Point(10, 2),    Point(13, -8)));
+    lseg.push_back(Seg(Point(10, 2),    Point(20, -5)));
+    lseg.push_back(Seg(Point(8,  5),    Point(12, -1)));
+    lseg.push_back(Seg(Point(6, -1),    Point(14, 5)));
+    
+    return lseg;
+}
+
+typedef IntersectionBenOtt_<Segment>  Inter;
+// typedef IntersectionBenOtt2_<Segment> Inter2;
+
 TEST(ben_ott, two_seg_order){
     Segment s1(Point(15, 26), Point(2,  20));  // left big  
     Segment s2(Point(6, 18),  Point(20,  35)); // left small
 
-    typedef IntersectionBenOtt_<Segment> Inter;
+    std::cout << "Two segments " << std::endl;
+    std::cout << "1 - " << s1 << std::endl; 
+    std::cout << "2 - " << s2 << std::endl; 
+
     typedef Intersection_<Segment, Segment> InterTwo;
     InterTwo i(s1, s2);
     auto res = i.execute();
-    std::cout << res.point << std::endl;
+    std::cout << "intersect at " << res.point << std::endl;
 
     Point pc = res.point;
     // pc.x(pc.x() + 0.01);
     Inter::CompareSeg comp(&(pc));
+    typedef Inter::SegProxy SegProxy;
     Inter::StatusTree tree(comp);
 
-    tree.insert(&s1);
-    tree.insert(&s2);
+    SegProxy sp1(s1);
+    SegProxy sp2(s2);
+
+    tree.insert(&sp1);
+    tree.insert(&sp2);
 
     auto y1 = comp.y_at_sweep_point(s1, pc.x());
     auto y2 = comp.y_at_sweep_point(s2, pc.x());
@@ -204,9 +236,9 @@ auto GenerateRandomSegments(int num,
     return lseg;
 }
 
-TEST(ben_ott, case1){
-    auto sl = GenerateSegmentsCase1<Segment>();
-    // auto sl = GenerateRandomSegments<Segment>(6, 0, 500, 0, 100);
+TEST(ben_ott, DISABLED_random){
+    // auto sl = GenerateSegmentsCase7<Segment>();
+    auto sl = GenerateRandomSegments<Segment>(6, 0, 500, 0, 100);
     auto resn2 = Intersect(sl, "N2");
     
 
@@ -215,7 +247,6 @@ TEST(ben_ott, case1){
     gnu.set_xlabel("x");
     gnu.set_ylabel("y");
 
-    typedef IntersectionBenOtt_<Segment> Inter;
     Inter inter(sl);
     auto lres = inter.execute();
     std::cout << "Result size    = " << lres.size() << std::endl;
@@ -229,4 +260,94 @@ TEST(ben_ott, case1){
     // PlotListIntersectionResult(gnu, res);
 
     // gnu.plot();
+}
+
+
+TEST(ben_ott, update){
+    typedef SegWithSlope_<Segment> SegS;
+    auto sl = GenerateSegmentsCase6<Segment>();
+    // auto sl = GenerateRandomSegments<Segment>(10, 0, 500, 0, 500);
+    // typedef std::list<SegProxy_<Segment> > ListSegProxy;
+    // ListSegProxy listseg;
+    // for(auto& seg : sl){
+        // listseg.emplace_back(seg);
+    // }
+
+    // ProfileStart("1 Ben Ott");
+    // Inter inter(sl);
+    // auto lres = inter.execute();
+    // std::cout << "1 Result size    = " << lres.size() << std::endl;
+    // ProfileEnd();
+    ProfileStart("1 Ben Ott");
+    Inter inter(sl);
+    auto lres = inter.execute();
+    std::cout << "1 Result size    = " << lres.size() << std::endl;
+    ProfileEnd();
+
+    ProfileListShow();
+    ProfileClean();
+}
+
+typedef CGAL::Exact_predicates_exact_constructions_kernel       Kernel;
+typedef Kernel::Point_2                                         Point_2;
+typedef CGAL::Arr_segment_traits_2<Kernel>                      Traits_2;
+typedef Traits_2::Curve_2                                       Segment_2;
+
+template<class LISTSEG>
+auto ToCGAL(const LISTSEG& lseg){
+    std::vector<Segment_2> nl;
+    for(auto& s : lseg){
+        nl.emplace_back(Segment_2(Point_2(s.psx(), s.psy()), Point_2(s.pex(), s.pey())));
+    }
+    return nl;
+}
+
+// TEST(cgal_example, test){
+//   // Construct the input segments.
+//   Segment_2 segments[] = {Segment_2 (Point_2 (1, 5), Point_2 (8, 5)),
+//                           Segment_2 (Point_2 (1, 1), Point_2 (8, 8)),
+//                           Segment_2 (Point_2 (3, 1), Point_2 (3, 8)),
+//                           Segment_2 (Point_2 (8, 5), Point_2 (8, 8))};
+//   // Compute all intersection points.
+//   std::list<Point_2> pts;
+//   CGAL::compute_intersection_points(segments, segments + 4,
+//                                     std::back_inserter(pts));
+//   // Print the result.
+//   std::cout << "Found " << pts.size() << " intersection points: " << std::endl;
+//   std::copy(pts.begin(), pts.end(),
+//             std::ostream_iterator<Point_2>(std::cout, "\n"));
+//   // Compute the non-intersecting sub-segments induced by the input segments.
+//   std::list<Segment_2> sub_segs;
+//   CGAL::compute_subcurves(segments, segments + 4, std::back_inserter(sub_segs));
+//   std::cout << "Found " << sub_segs.size()
+//             << " interior-disjoint sub-segments." << std::endl;
+//   assert(CGAL::do_curves_intersect (segments, segments + 4));
+  
+// }
+TEST(cgal_random, DISABLED_test){
+    auto sl = GenerateRandomSegments<Segment>(1000, 0, 600, 0, 500);
+    auto nsl = ToCGAL(sl);
+
+    std::cout << "Input size     = " << nsl.size() << std::endl;
+    ProfileStart("CGAL");
+    std::list<Point_2> pts;
+    CGAL::compute_intersection_points(nsl.begin(), nsl.end(),
+                                     std::back_inserter(pts));
+    std::cout << "CGAL   size    = " << pts.size() << std::endl;
+    // std::copy(pts.begin(), pts.end(),
+            // std::ostream_iterator<Point_2>(std::cout, "\n"));
+    ProfileEnd();
+
+    ProfileStart("BenOtt");
+    Inter inter(sl);
+    auto lres = inter.execute();
+    std::cout << "Ben-Ott size   = " << lres.size() << std::endl;
+    ProfileEnd();
+
+    ProfileStart("N2");    
+    auto resn2 = Intersect(sl, "N2");
+    std::cout << "Ben-Ott size   = " << resn2.size() << std::endl;
+    ProfileEnd();
+
+    ProfileListShow();
 }

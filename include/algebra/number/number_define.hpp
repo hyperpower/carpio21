@@ -14,6 +14,36 @@
 namespace carpio {
 
 
+/**
+ *  Get zero in type T.
+ *
+ *  \param num - a number 
+ *
+ *  \return T - Zero in type T
+ */
+template<class T>
+auto Zero(const T& num){
+    return T(0.0);
+}
+//compare float number
+template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
+bool IsEqual(const T& x, const T& y){
+    auto maxXYOne = std::max( { 1.0, std::fabs(x) , std::fabs(y) } ) ;
+    return std::fabs(x - y) <= std::numeric_limits<T>::epsilon()*maxXYOne ;
+}
+
+template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
+bool IsLess(const T& x, const T& y){  // x < y
+    auto maxXYOne = std::max( { 1.0, std::fabs(x) , std::fabs(y) } ) ;
+    return std::fabs(y - x) > std::numeric_limits<T>::epsilon()*maxXYOne ;
+}
+
+template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
+bool IsGreater(const T& x, const T& y){  // x > y
+    auto maxXYOne = std::max( { 1.0, std::fabs(x) , std::fabs(y) } ) ;
+    return std::fabs(x- y) > std::numeric_limits<T>::epsilon()*maxXYOne ;
+}
+
 
 // true = overflow
 // false = not overflow

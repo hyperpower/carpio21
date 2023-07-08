@@ -2,6 +2,7 @@ import os
 from jinja2 import Environment, Template 
 import datetime
 import runtool as RT
+import platform
 
 def generate_0_svg(p):
     fn = "0.svg"
@@ -53,7 +54,8 @@ def revise_report_rst(dir_in, info, dir_out):
     # order is important !!!
     fstr = add_hidden_toc(info, fstr)
     fstr = add_title(info, fstr)
-    
+
+    fstr = append_sys_info(fstr)
     fstr = append_wall_time_table(info, fstr)
 
     outname = os.path.join(dir_out, "report.rst")
@@ -90,8 +92,8 @@ def add_hidden_toc(info, fstr):
 def append_wall_time_table(info, fstr):
     text = """
 
-Run time infomation
-=====================
+Run time information
+--------------------
 
 .. table:: Summary of Running Time.
     :widths: auto
@@ -126,8 +128,48 @@ Run time infomation
 
     return fstr + text
 
+def get_sys_info():
+    d = {}
+    d["Platform"] = platform.platform()
+    d["processor"] = platform.processor()
+    d["Python Version"] = platform.python_version()
+    result = os.popen("cmake --version")
+    d["Cmake Version"] = result.read().split("\n")[0]
+    result = os.popen("gcc --version")
+    d["C++ Version"] = result.read().split("\n")[0]
+    result = os.popen("gnuplot --version")
+    d["Gnuplot Version"] = result.read().split("\n")[0]
+    return d
+
+def append_sys_info(fstr):
+    info = get_sys_info()
+    text = """
+
+Platform Info
+==============
+
+Syetem Enviroment Information
+--------------------------------
+
+.. csv-table:: System Infomation
+   :header: "Item", "Info"
+   :widths: 15, 30
+
+"""
+
+    for k, v in info.items():
+        row = "   %s, %s\n" % (k, v)
+        text +=row
+    
+    text +="\n\n"
+    
+    return fstr + text; 
+
 
 if __name__ == '__main__':
-    print(float_sec_to_str(2))
+
+    print("="*40, "System Information", "="*40)
+    print(append_sys_info(""))
+   
 
 

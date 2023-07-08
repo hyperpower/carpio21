@@ -3,6 +3,8 @@
 #include "utility/clock.hpp"
 #include <valarray>
 
+// #include <omp.h>
+
 using namespace carpio;
 
 TEST(array, add){
@@ -49,7 +51,7 @@ TEST(array, openmp){
 	// a.show();
 	// b.show();
 	tick_t start = Clock::Tick();
-//	omp_set_num_threads(1);
+	// omp_set_num_threads(1);
 //#pragma omp parallel
 	b = a + b - a * b + 5.0 * a;
 //  b.show();

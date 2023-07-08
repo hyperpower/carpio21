@@ -141,7 +141,7 @@ double ArrayOp(int nt, double na){
     auto end  = std::chrono::system_clock::now();
     std::cout << "Num of threads = " << nt;
     std::cout << " Num of Array = "  << na;
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start) / 1000.0;
     std::cout << " Time = " << elapsed.count() << "ms" << std::endl;
     return elapsed.count();
 }
@@ -154,8 +154,8 @@ void ArrayOpPlot(){
     // gnu.set_yrange(80, 300.0);
     gnu.set_xlabel("Number of threads (-)");
     gnu.set_ylabel("Wall Time (ms)");
-    gnu.set_ylogscale();
-    ArrayListV_<double> vna = {1e4, 1e6, 5e6};
+    // gnu.set_ylogscale();
+    ArrayListV_<double> vna = {1e4, 1e6, 5e6, 1e7};
     ArrayListV_<double> vnt = {1, 2, 4, 6, 8, 10, 12, 14, 15, 16};
     for(auto& na: vna){
         std::cout << "Array Size = " << na << std::endl;

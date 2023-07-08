@@ -79,7 +79,7 @@ Location 4 SAME
 Two segments are the same. 
 
 .. warning::
-    The intersection point can't be found. The point is (0,0)
+    The intersection point can't be found. The point is the start point of the first segment 
 
 .. figure:: fig/SAME.png
    :alt: Figure intersection SAME
@@ -125,20 +125,30 @@ Method 3 Sweep Line -- Bentley-Ottmann
 Example
 -------------------------------
 
-.. list-table:: Segment Define
-   :widths: 25 25 25
+Case1 - Normal Intersection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Segemnts are in trivial case. None of them are vertial nor horizontal. Intersections are expected on segement, not 
+on segment ends. Input data are shown in :numref:`table-case1`.
+
+
+.. _table-case1:
+.. csv-table:: Input Segments for case1
+   :file: fig/bo_case1.txt
+   :widths: 25, 25, 25, 25
    :header-rows: 1
 
-   * - Segment Names
-     - Start Point
-     - End Point
-   * - a
-     - (0, 0)
-     - (1, 1)
-   * - b
-     - (0.5, 0.5)
-     - (0.8, 0.7)
 
+Intersection results are shown in :numref:`fig-bo_case1`.
+
+
+.. _fig-bo_case1:
+.. figure:: fig/bo_case1.png
+   :alt: Figure intersection case1
+   :align: center 
+
+   Normal intersections
+   
 
 Benchmark
 -------------------------------

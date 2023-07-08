@@ -393,7 +393,7 @@ void MakeGnuplotActorAsVector(GnuplotActor& actor, const ANY& seg, SegmentTag){
         return;
     }
     actor.data().push_back(
-        ToString(seg[0], " ") 
+        ToString(seg.p(0), " ") 
         + " " 
         + ToString(seg.tangent_vector(), " "));
 

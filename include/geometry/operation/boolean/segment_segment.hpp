@@ -264,7 +264,7 @@ public:
     void add(const Geo1& g){
         list.emplace_back(&g);
     }
-    void add(cpGeo& pg){
+    void add(cpGeo pg){
         list.emplace_back(pg);
     }
     template<class CONTAINER, 
@@ -367,9 +367,7 @@ public:
     Result execute(){
         this->_res.type = this->cal_intersection_type();
         if(this->_res.type == _SS_INTERSECT_){
-            ProfileStart("RealInter");
             this->_res.point = cal_intersection_point();
-            ProfileEnd();
         }
         if(this->_res.type == _SS_TOUCH_ || this->_res.type ==_SS_OVERLAP_) {
             for(St i = 0; i<4; i++){

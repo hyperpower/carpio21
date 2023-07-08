@@ -7,6 +7,7 @@ import errno
 import argparse
 import time
 from path import *
+import pathlib
 # sphinx should be installed
 from sphinx.cmd.build import main as sphinx_main
 
@@ -48,6 +49,18 @@ def is_sub_path(subpath, paths):
             return True
     return False
 
+
+# code files in path
+def is_code_file_in(path, fn):
+    pdir = pathlib.Path(fn).resolve().parent
+    code_ext = [".cpp", ".hpp", ".py", "rst"]
+    file_name, file_extension = os.path.splitext(fn)
+    if file_extension in code_ext and pdir == path:
+        return True
+    else:
+        return False
+
+
 def clean(path, original_files):
     print("clean ====== ")
     ori_ff = []
@@ -62,7 +75,7 @@ def clean(path, original_files):
     for (dirpath, dirnames, filenames) in os.walk(path, topdown=False):
         for name in filenames:
             ff = os.path.join(dirpath, name)
-            if ff not in ori_ff and not is_sub_path(os.path.dirname(ff), ori_fd):
+            if ff not in ori_ff and not is_sub_path(os.path.dirname(ff), ori_fd) and not is_code_file_in(path, ff):
                 os.remove(ff)
     
     for (dirpath, dirnames, filenames) in os.walk(path, topdown=False):
@@ -211,6 +224,11 @@ class Runer:
         os.chdir(current)
         pass
 
+    def clean_doc(self):
+        doc_dir = os.path.abspath(os.path.join(self._path.this, "doc"))
+        if os.path.isdir(doc_dir):
+            shutil.rmtree(doc_dir)
+
     def build_doc(self):
         # 
         doc_dir        = os.path.abspath(os.path.join(self._path.this, "doc"))
@@ -316,6 +334,7 @@ class Runer:
             print(" build document ===== ")
             t  = time.perf_counter()
             record["document"] = True
+            self.clean_doc()
             self.build_doc()
             self._info["document_wall_time"] = time.perf_counter() - t
 
