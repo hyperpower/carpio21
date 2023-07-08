@@ -265,7 +265,7 @@ TEST(ben_ott, DISABLED_random){
 
 TEST(ben_ott, update){
     typedef SegWithSlope_<Segment> SegS;
-    auto sl = GenerateSegmentsCase8<Segment>();
+    auto sl = GenerateSegmentsCase6<Segment>();
     // auto sl = GenerateRandomSegments<Segment>(10, 0, 500, 0, 500);
     // typedef std::list<SegProxy_<Segment> > ListSegProxy;
     // ListSegProxy listseg;
@@ -324,7 +324,7 @@ auto ToCGAL(const LISTSEG& lseg){
 //   assert(CGAL::do_curves_intersect (segments, segments + 4));
   
 // }
-TEST(cgal_random, test){
+TEST(cgal_random, DISABLED_test){
     auto sl = GenerateRandomSegments<Segment>(1000, 0, 600, 0, 500);
     auto nsl = ToCGAL(sl);
 

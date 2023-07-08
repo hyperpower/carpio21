@@ -2,7 +2,7 @@
 Problem Description
 ===================
 
-This test case just illustrates how to use OpenMP. The prefromence test has been carried out for comparsion. Note that the perfromence may highly depend on hardware platform. This test program could get different results on an other computer. 
+This test case just illustrates how to use MPI. The prefromence test has been carried out for comparsion. Note that the perfromence may highly depend on hardware platform. This test program could get different results on an other computer. 
 
 Time Test
 ===================

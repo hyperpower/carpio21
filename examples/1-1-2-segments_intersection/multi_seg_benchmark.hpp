@@ -90,10 +90,10 @@ auto GenerateGrid(int size){
     double dy =-0.3;
     double dx = 0.1;
     for (int i = 1; i< num + 1 ; i++){
-        lseg.emplace_back(Segment(Point(dx, i + dy), Point(dx + num - 1, i + dy )));
+        lseg.emplace_back(Segment(Point(dx, i + dy), Point(dx + num, dy + i )));
     }
     for (int i = 1; i< num + 1 ; i++){
-        lseg.emplace_back(Segment(Point(dx + i, dy), Point(dx + i, num - 1 + dy )));
+        lseg.emplace_back(Segment(Point(dx + i, dy), Point(dx + i, dy + num )));
     }
     return lseg;
 }
