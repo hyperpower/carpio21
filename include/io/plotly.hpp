@@ -862,6 +862,8 @@ public:
 protected:
 
     void _init() {    
+        // std::cout << Py_GetVersion() << std::endl;
+
         this->_plotly    = _py->import("plotly");
         this->_plotly_go = _py->import("plotly.graph_objects");
 

@@ -95,23 +95,17 @@ def append_wall_time_table(info, fstr):
 Run time information
 --------------------
 
-.. table:: Summary of Running Time.
-    :widths: auto
-    :align: center 
+.. csv-table:: Summary of Running Time.
+    :header: "Step", "Wall Time"
+    :widths: 20, 40
 
-    ============= =====================
-     Steps         Wall Time (s)            
-    ============= ====================="""
+"""
 
     keys = [
         ["make_wall_time",    "make"],
         ["build_wall_time",   "build"],
         ["execute_wall_time", "execute"],
-    ]
-
-    textrow ="""
-    %14s %s
-""" 
+    ] 
 
     for row in keys:
         k = row[0] # key
@@ -119,12 +113,11 @@ Run time information
         tstr = float_sec_to_str(info[k])
         row.append(tstr)
         
-        textrow ="""
-    %-14s %s""" % (n, tstr)
+        textrow ="    %s,%s\n" % (n, tstr)
         text += textrow
 
-    text +="""
-    ============= ====================="""
+    text +="\n\n"
+
 
     return fstr + text
 
@@ -153,7 +146,7 @@ Syetem Enviroment Information
 
 .. csv-table:: System Infomation
    :header: "Item", "Info"
-   :widths: 15, 30
+   :widths: 20, 40
 
 """
 
