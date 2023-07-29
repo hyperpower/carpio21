@@ -3,6 +3,7 @@ from jinja2 import Environment, Template
 import datetime
 import runtool as RT
 import platform
+import cpuinfo
 
 def generate_0_svg(p):
     fn = "0.svg"
@@ -121,15 +122,19 @@ Run time information
 
     return fstr + text
 
+
+def comma_to_space(input):
+    return input.replace(",", " ")
+
 def get_sys_info():
     d = {}
-    d["Platform"] = platform.platform()
-    d["processor"] = platform.processor()
+    cpu = cpuinfo.get_cpu_info()
+    d["Operating System"]  = platform.platform()
+    d["CPU"] = cpu["brand_raw"]
+    d["CPU Architecture"] = cpu["arch"]
     d["Python Version"] = platform.python_version()
     result = os.popen("cmake --version")
     d["Cmake Version"] = result.read().split("\n")[0]
-    result = os.popen("gcc --version")
-    d["C++ Version"] = result.read().split("\n")[0]
     result = os.popen("gnuplot --version")
     d["Gnuplot Version"] = result.read().split("\n")[0]
     return d
@@ -151,7 +156,7 @@ Syetem Enviroment Information
 """
 
     for k, v in info.items():
-        row = "   %s, %s\n" % (k, v)
+        row = "   %s, %s\n" % (k, comma_to_space(v))
         text +=row
     
     text +="\n\n"
@@ -160,6 +165,10 @@ Syetem Enviroment Information
 
 
 if __name__ == '__main__':
+
+
+    for key, value in cpuinfo.get_cpu_info().items():
+        print("{0}: {1}\n".format(key, value))
 
     print("="*40, "System Information", "="*40)
     print(append_sys_info(""))

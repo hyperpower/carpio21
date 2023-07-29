@@ -7,6 +7,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/)
 
 set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
+include(info.cmake)
 # Check the architecture and set CMAKE_LIBRARY_ARCHITECTURE accordingly
 #if(UNIX)
 #  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -45,3 +46,5 @@ if(PYTHON_LIBRARIES)
 ELSE()
   MESSAGE(FATAL_ERROR "Unable to link python libraries")
 ENDIF()
+
+foo()

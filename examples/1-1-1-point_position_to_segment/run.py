@@ -10,7 +10,8 @@ FILE_ORIGINAL = [
     "CMakeLists.txt",
     # "plot.py",
     "run.py",
-    "report.rst"
+    "report.rst",
+    "info.cmake"
 ]
 
 if __name__ == '__main__':

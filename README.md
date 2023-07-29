@@ -4,6 +4,14 @@ A new carpio in 2021
 - reconstruct Structure Grid
 
 
+## Required Pakages
+
+This project require following packages:
+
+ - [py-cpuinfo](https://pypi.org/project/py-cpuinfo/)
+ - [jinja2](https://docs.jinkan.org/docs/jinja2/)
+ - [sphinx](https://www.sphinx-doc.org/)
+ - [plotly](https://plotly.com/python/)
 
 ## Reference Code
 

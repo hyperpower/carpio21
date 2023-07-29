@@ -140,7 +140,6 @@ double ArrayOp(int nt, double na){
     b = a + b - a * b + 5.0 * a;
     auto end  = std::chrono::system_clock::now();
     std::cout << "Num of threads = " << nt;
-    std::cout << " Num of Array = "  << na;
     auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start) / 1000.0;
     std::cout << " Time = " << elapsed.count() << "ms" << std::endl;
     return elapsed.count();
