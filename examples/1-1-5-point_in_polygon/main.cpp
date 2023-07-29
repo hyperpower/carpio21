@@ -8,7 +8,6 @@ using namespace carpio;
 
 typedef Point_<double, 2>         Point;
 typedef PointChain_<double, 2>    PC;
-typedef GGnuplotActor_<double, 2> GA;
 
 
 int case_random() {
