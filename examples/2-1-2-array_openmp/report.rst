@@ -6,9 +6,15 @@ This test case just illustrates how to use OpenMP. The prefromence test has been
 
 Time Test
 ===================
-OpenMP takes some time to allocate the threads and manage them. This procedure will spend some time. Compare to the time for runing simple task, the time used for managing threads can't not be ignored. Here, we want to find out what kind of task is suitalbe for paralleling in terms of excution time. A simple sleep funtion is used as single task function. Multiple threads, say n threads, will execut the function n times. If they are runing in prefect parallel, the execution time time will be as same as the single thread running the funtion for just one time. 
+OpenMP takes some time to allocate the threads and manage them. This procedure will spend some time. Compare to the time for runing simple task, the time used for managing threads can't not be ignored. Here, we want to find out what kind of task is suitable for paralleling in terms of execution time. A simple sleep funtion is used as single task function. Multiple threads, say n threads, will execut the function n times. If they are runing in prefect parallel, the execution time time will be as same as the single thread running the funtion for just one time. 
 
-We set the number of threads, n = 2, 4, 8, 16. The result is shown in following Figure.   
+We set the number of threads, n = 2, 4, 8. The ratio of acceleration defined as follows:
+
+.. math::
+   r = \frac{\Delta t_s}{\Delta t_p n_t}
+
+where, :math:`r` is ratio, :math:`\Delta t_s` is serial execution time, :math:`\Delta t_p` is parallel execution time, :math:`n_t` is number of threads.
+The results shown in following Figure.   
 
 .. figure:: fig/timetest.png
    :alt: Time test for OpenMP
@@ -19,11 +25,11 @@ We set the number of threads, n = 2, 4, 8, 16. The result is shown in following 
 Two obvious conclusions can be reached:
 
 - More threads will take more time to manage.
-- Execution time of single function is better be more than 10 millisecond.
+- The longer execution time of the single function, the better parallel execution time will be obtained.
 
 Array Operation Test
 ======================
-A simple array operation(+,-,*) execute in parallel. Following figure shows the result. The operation is acted on arrays with different length. The longer array takes more time to operate. The execution time should be longer than 10 ms. The parallel execution could save time. 
+A simple array operation(+,-,*) execute in parallel. Following figure shows the result. The operation is acted on arrays with different length. The longer array takes more time to operate.
 
 .. figure:: fig/arrayop.png
    :alt: arrar test for OpenMP

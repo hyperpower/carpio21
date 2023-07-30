@@ -69,12 +69,13 @@ double TimeTest(double single_dt, int n_threads, int n_loop){
 #else defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
         usleep(St(single_dt * 1000));
 #endif
+    
     }
 // #endif
     auto end = std::chrono::system_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
     
-    return elapsed.count();
+    return elapsed.count() / 1000.0;
 }
 
 auto TimeTestRun(double single_dt){
@@ -94,6 +95,30 @@ auto TimeTestRun(double single_dt){
     return ToGnuplotActor(nts, rts);
 }
 
+auto TimeTestNumThread(const std::vector<double>& t_times, int n_thread){
+    // std::vector<double> t_times = {1, 2, 4, 8, 16};
+    int n_loop = 1000;
+    std::vector<double> rts; //ratio = vt / wt * 100%
+    std::vector<double> stt;
+    tfm::format(std::cout, "%10s %10s %10s %10s %10s\n","Single", "n Thread", "n Loop", "Wall time", "Ratio");
+
+    for(auto tt : t_times){
+        double st = TimeTest(tt, 1, n_loop);
+        tfm::format(std::cout, "%10d %10d %10d %10d %10d\n", tt, 1, n_loop, st, 1.0);
+        stt.push_back(st);
+        // rts.push_back(1);
+        if(n_thread > 1){
+            double wt = TimeTest(tt, n_thread, n_loop);
+            double rt = st / wt / n_thread;
+            tfm::format(std::cout, "%10d %10d %10d %10d %10d\n", tt, n_thread, n_loop, wt, rt);
+            rts.push_back(rt);
+        }
+    }
+
+    return ToGnuplotActor(stt, rts);
+
+}
+
 auto TheoryRatio(int max_threads){
     std::list<double> nts;
     std::list<double> rts;
@@ -110,23 +135,24 @@ void TimeTestPlot(){
     gnu.set_terminal_png("./fig/timetest");
     gnu.set_grid();
     // gnu.set_xlogscale();
-    gnu.set("key right top");
-    // gnu.set_yrange(80, 300.0);
-    gnu.set_xlabel("Number of Threads");
-    gnu.set_ylabel("Time ratio (Parallel Wall Time / Single Thread Theory Time)");
-    std::vector<int> vnt = {1, 2, 4, 8, 16};
-    std::vector<double> sts = {1,2,3,4,5};
-    for(auto& sdt: sts){
-        std::cout << "Single Task Time = " << sdt << "ms" << std::endl;
-        auto a = TimeTestRun(sdt);
-        a.command("using 1:2 title \"Num of Threads = " + ToString(sdt) + "\" ");
-        a.style("with points pt 2");
+    gnu.set("key right bottom");
+    gnu.set_yrange(0.0, 1.2);
+    gnu.set_xlabel("Single Thread Wall Time (ms)");
+    gnu.set_xlogscale();
+    gnu.set_ylabel("Ratio");
+    std::vector<int> vnt = {2, 4, 6, 8};
+    std::vector<double> sts = {0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5};
+    for(auto& nt: vnt){
+        // std::cout << "Single Task Time = " << sdt << "ms" << std::endl;
+        auto a = TimeTestNumThread(sts, nt);
+        a.command("using 1:2 title \"Num of Threads = " + ToString(nt) + "\" ");
+        a.style("with linespoints pt 2 lw 2");
         gnu.add(a);
     }
-    auto at = TheoryRatio(16);
-    at.command("using 1:2 title \"Theory Time Ratio\" ");
-    at.style("with lines lw 2");
-    gnu.add(at);
+    // auto at = TheoryRatio(16);
+    // at.command("using 1:2 title \"Theory Time Ratio\" ");
+    // at.style("with lines lw 2");
+    // gnu.add(at);
     
     gnu.plot();
 }
@@ -140,8 +166,9 @@ double ArrayOp(int nt, double na){
     b = a + b - a * b + 5.0 * a;
     auto end  = std::chrono::system_clock::now();
     std::cout << "Num of threads = " << nt;
-    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start) / 1000.0;
-    std::cout << " Time = " << elapsed.count() << "ms" << std::endl;
+    std::cout << " Size = " << na;
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << " Time = " << elapsed.count() / 1000.0 << "ms" << std::endl;
     return elapsed.count();
 }
 
@@ -149,30 +176,38 @@ void ArrayOpPlot(){
     Gnuplot gnu;
     gnu.set_terminal_png("./fig/arrayop");
     gnu.set_grid();
-    gnu.set("key right top");
-    // gnu.set_yrange(80, 300.0);
-    gnu.set_xlabel("Number of threads (-)");
-    gnu.set_ylabel("Wall Time (ms)");
+    gnu.set("key left top");
+    gnu.set_yrange(0.0, 1.0);
+    gnu.set_xlabel("Single Thread Wall Time (ms)");
+    gnu.set_ylabel("Ratio");
+    gnu.set_xlogscale();
     // gnu.set_ylogscale();
-    ArrayListV_<double> vna = {1e4, 1e6, 5e6, 1e7};
-    ArrayListV_<double> vnt = {1, 2, 4, 6, 8, 10, 12, 14, 15, 16};
-    for(auto& na: vna){
-        std::cout << "Array Size = " << na << std::endl;
+    ArrayListV_<double> vna = {1e4, 1e5, 1e6, 5e6, 1e7, 5e7, 1e8, 5e8};
+    ArrayListV_<double> vnt = {2, 4, 6, 8}; // n > 2
+    ArrayListV_<double> vst(vna.size());
+    for(int i = 0; i< vna.size(); i++){
+        vst[i] = ArrayOp(1, vna[i]);
+    }
+    for(auto& nt: vnt){
+        ArrayListV_<double> vr;
         ArrayListV_<double> vdt;
-        for(auto& nt: vnt){
-            auto dt = ArrayOp(nt, na);
-            vdt.push_back(dt);
+        for(int i = 0; i< vna.size(); i++){
+            auto st = vst[i];
+            auto dt = ArrayOp(nt, vna[i]);
+            double r = st / dt / nt;
+            vr.push_back(r);
+            vdt.push_back(st);
         }
-        auto a = ToGnuplotActor(vnt, vdt);
-        a.command() = "using 1:2 title \"Array Size = " + ToString(na) + "\" ";
-        a.style()   = "with lines lw 2";
+        auto a = ToGnuplotActor(vdt, vr);
+        a.command() = "using 1:2 title \"Num of Thread = " + ToString(nt) + "\" ";
+        a.style()   = "with linespoints ps 2 lw 2";
         gnu.add(a);
     }
     gnu.plot();
 }
 
 int main(int argc, char** argv) {
-    ThreadPrint(3);
+    // ThreadPrint(3);
     TimeTestPlot();
     ArrayOpPlot();
 }
