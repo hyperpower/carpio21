@@ -23,19 +23,7 @@
 #error unsupported or unknown operating system
 #endif
 
-
 using namespace carpio;
-
-struct ThreadInfo{
-    int t_num;
-    tick_t t_start;
-    tick_t t_end;
-
-    void show() const{
-        std::cout << "Thread Num      = " << t_num << std::endl;
-        std::cout << "Wall Time dt    = " << Clock::TimespanToMillisecondsD(t_start, t_end) << " mm"<< std::endl;
-    }
-};
 
 
 int ThreadPrint(int nt){
@@ -66,10 +54,9 @@ double TimeTest(double single_dt, int n_threads, int n_loop){
         // std::cout << "thread" << omp_get_thread_num() << std::endl;
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__)
         Sleep(single_dt);
-#else defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
+#elif defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
         usleep(St(single_dt * 1000));
 #endif
-    
     }
 // #endif
     auto end = std::chrono::system_clock::now();
@@ -119,16 +106,6 @@ auto TimeTestNumThread(const std::vector<double>& t_times, int n_thread){
 
 }
 
-auto TheoryRatio(int max_threads){
-    std::list<double> nts;
-    std::list<double> rts;
-    for (int i = 1 ; i <= max_threads; i++){
-        nts.push_back(i);
-        rts.push_back(1.0/double(i)); 
-    }
-
-    return ToGnuplotActor(nts, rts);
-}
 
 void TimeTestPlot(){
     Gnuplot gnu;
@@ -149,10 +126,6 @@ void TimeTestPlot(){
         a.style("with linespoints pt 2 lw 2");
         gnu.add(a);
     }
-    // auto at = TheoryRatio(16);
-    // at.command("using 1:2 title \"Theory Time Ratio\" ");
-    // at.style("with lines lw 2");
-    // gnu.add(at);
     
     gnu.plot();
 }
@@ -207,7 +180,7 @@ void ArrayOpPlot(){
 }
 
 int main(int argc, char** argv) {
-    // ThreadPrint(3);
+    ThreadPrint(3);
     TimeTestPlot();
     ArrayOpPlot();
 }

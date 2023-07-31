@@ -222,7 +222,6 @@ struct CompareSeg_ {
 
     bool operator() (cpSegment a, cpSegment b) const{
         if(_pset != nullptr && !(_pset->empty())){
-            std::cout << "here in\n";
             auto itera = _pset->find(a);
             if(itera != _pset->end()){
                 auto iterb = _pset->find(b);

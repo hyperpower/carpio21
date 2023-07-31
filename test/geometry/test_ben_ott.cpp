@@ -19,7 +19,7 @@ typedef double NumType;
 // typedef Rational_<long> NumType;
 typedef Point_<NumType, 2> Point;
 typedef Segment_<NumType, 2> Segment;
-
+typedef IntersectionBenOtt_<Segment>  Inter;
 
 TEST(ben_ott, mkdir){
     // check current working dir
@@ -56,6 +56,15 @@ void AddListSegment(Gnuplot& gnu, const LISTSEG& sl){
     }
 }
 
+template<class RES>
+void AddIntersectionPoints(Gnuplot& gnu, const RES& r){
+    for(auto a : r ){
+        auto actor = ToGnuplotActor(a.point);
+        actor.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#E01C76\"");
+        gnu.add(actor);
+    }
+}
+
 template<class SEG_TYPE>
 auto GenerateSegmentsCase1(){ // mulit right
     typedef SEG_TYPE Seg;
@@ -69,8 +78,30 @@ auto GenerateSegmentsCase1(){ // mulit right
     
     return lseg;
 }
+
+TEST(ben_ott, case1){
+    auto sl = GenerateSegmentsCase1<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl);
+    auto lres = inter.execute();
+    std::cout << "Find  inter    = " << lres.size() << std::endl;
+
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/case1");
+    gnu.set_xlabel("x");
+    gnu.set_ylabel("y");
+    AddListSegment(gnu, sl);
+    AddIntersectionPoints(gnu, lres);
+    gnu.plot();
+    auto lresn2 = Intersect(sl,"n2");
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    EXPECT_EQ(lres.size(),   4);
+    EXPECT_EQ(lresn2.size(), 9);
+}
+
 template<class SEG_TYPE>
-auto GenerateSegmentsCase3(){ // mulit left
+auto GenerateSegmentsCase2(){ // mulit left
     typedef SEG_TYPE Seg;
     typedef std::vector<SEG_TYPE> ListSegment;
     ListSegment lseg;
@@ -82,8 +113,29 @@ auto GenerateSegmentsCase3(){ // mulit left
     
     return lseg;
 }
+TEST(ben_ott, case2){
+    auto sl = GenerateSegmentsCase2<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl);
+    auto lres = inter.execute();
+    std::cout << "Find  inter    = " << lres.size() << std::endl;
+
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/case2");
+    gnu.set_xlabel("x");
+    gnu.set_ylabel("y");
+    AddListSegment(gnu, sl);
+    AddIntersectionPoints(gnu, lres);
+    gnu.plot();
+    
+    auto lresn2 = Intersect(sl,"n2");
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    EXPECT_EQ(lres.size(),   4);
+    EXPECT_EQ(lresn2.size(), 4);
+}
 template<class SEG_TYPE>
-auto GenerateSegmentsCase2(){ //normal
+auto GenerateSegmentsCase3(){ //normal
     typedef SEG_TYPE Seg;
     typedef std::vector<SEG_TYPE> ListSegment;
     ListSegment lseg;
@@ -175,7 +227,6 @@ auto GenerateSegmentsCase8(){
     return lseg;
 }
 
-typedef IntersectionBenOtt_<Segment>  Inter;
 // typedef IntersectionBenOtt2_<Segment> Inter2;
 
 TEST(ben_ott, two_seg_order){
