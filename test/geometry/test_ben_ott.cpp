@@ -1,6 +1,6 @@
 #include <functional>
 
-// #define _DEBUG_MODE_
+#define _DEBUG_MODE_
 
 #include "utility/random.hpp"
 #include "utility/profile.hpp"
@@ -64,6 +64,18 @@ void AddIntersectionPoints(Gnuplot& gnu, const RES& r){
         gnu.add(actor);
     }
 }
+template<class INPUT, class RES>
+void PlotIntersection(const std::string& fn, const INPUT& list, const RES& res){
+    Gnuplot gnu;
+    gnu.set_terminal_png("./fig/" + fn);
+    gnu.set_xlabel("x");
+    gnu.set_ylabel("y");
+    AddListSegment(gnu, list);
+    if(fn != "case4"){
+        AddIntersectionPoints(gnu, res);
+    }
+    gnu.plot();
+}
 
 template<class SEG_TYPE>
 auto GenerateSegmentsCase1(){ // mulit right
@@ -86,13 +98,7 @@ TEST(ben_ott, case1){
     auto lres = inter.execute();
     std::cout << "Find  inter    = " << lres.size() << std::endl;
 
-    Gnuplot gnu;
-    gnu.set_terminal_png("./fig/case1");
-    gnu.set_xlabel("x");
-    gnu.set_ylabel("y");
-    AddListSegment(gnu, sl);
-    AddIntersectionPoints(gnu, lres);
-    gnu.plot();
+    PlotIntersection("case1", sl, lres);
     auto lresn2 = Intersect(sl,"n2");
     std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
     
@@ -119,14 +125,8 @@ TEST(ben_ott, case2){
     Inter inter(sl);
     auto lres = inter.execute();
     std::cout << "Find  inter    = " << lres.size() << std::endl;
-
-    Gnuplot gnu;
-    gnu.set_terminal_png("./fig/case2");
-    gnu.set_xlabel("x");
-    gnu.set_ylabel("y");
-    AddListSegment(gnu, sl);
-    AddIntersectionPoints(gnu, lres);
-    gnu.plot();
+    
+    PlotIntersection("case2", sl, lres);
     
     auto lresn2 = Intersect(sl,"n2");
     std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
@@ -150,6 +150,21 @@ auto GenerateSegmentsCase3(){ //normal
     lseg.push_back(Seg(28, 38, 15, 18));
     return lseg;
 }
+TEST(ben_ott, case3){
+    auto sl = GenerateSegmentsCase3<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl);
+    auto lres = inter.execute();
+    std::cout << "Find  inter    = " << lres.size() << std::endl;
+    
+    PlotIntersection("case3", sl, lres);
+    
+    auto lresn2 = Intersect(sl,"n2");
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    EXPECT_EQ(lres.size(),   4);
+    EXPECT_EQ(lresn2.size(), 4);
+}
 template<class SEG_TYPE>
 auto GenerateSegmentsCase4(){ // intersect in mid
     typedef SEG_TYPE Seg;
@@ -162,6 +177,21 @@ auto GenerateSegmentsCase4(){ // intersect in mid
     lseg.push_back(Seg(Point(10, 25),  Point(20,  35))); //
     
     return lseg;
+}
+TEST(ben_ott, case4){
+    auto sl = GenerateSegmentsCase4<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl, "case4");
+    auto lres = inter.execute();
+    // std::cout << "Find  inter    = " << lres.size() << std::endl;
+    
+    
+    auto lresn2 = Intersect(sl,"n2");
+    PlotIntersection("case4", sl, lresn2);
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    // EXPECT_EQ(lres.size(),   4);
+    EXPECT_EQ(lresn2.size(), 4);
 }
 template<class SEG_TYPE>
 auto GenerateSegmentsCase5(){ // intersect in mid

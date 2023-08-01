@@ -60,8 +60,8 @@ namespace carpio {
     }
     template<class SEG>
     void PlotpSegment(Gnuplot& gnu, 
-                     const SEG* seg, 
-                          const std::string& color_code = "#00A4EF"){
+                      const SEG* seg, 
+                      const std::string& color_code = "#00A4EF"){
         auto a1 = ToGnuplotActorAsVector(*seg);
         a1.style("with vector head filled size screen 0.03,15,145 lw 3 lc rgb \"" + color_code +"\"");
         gnu.add(a1);
@@ -98,6 +98,9 @@ protected:
     typedef std::list<Segment> ListSegment;
     ListSegment listseg;
     Segment diagonal;
+    std::string _case_name;
+    std::string _debug_case_name;
+    int _loop_i;
 #endif
     EventQueue queue;
     ListSegProxy listsegproxy;    
@@ -107,17 +110,22 @@ public:
                 IsContainer<CONTAINER>::value
             &&  IsSegment<typename CONTAINER::value_type>::value 
         , bool>::type = true>
-    IntersectionBenOtt_(const CONTAINER& con){
+    IntersectionBenOtt_(const CONTAINER& con,
+        const std::string& case_name = ""){
         _build_list_segproxy(con);
         _build_priority_queue(this->listsegproxy);
     #ifdef _DEBUG_MODE_
         _build_list_segment(con);
+        _case_name = case_name;
+        _debug_case_name = "case4";
+        _loop_i = 0;
     #endif
     }
 
     auto execute(){
         #ifdef _DEBUG_MODE_
         Gnuplot gnu;
+        _loop_i = 0;
         #endif
         ListResult _list_res;
         
@@ -126,24 +134,31 @@ public:
         CompareSeg comp(&p_sweep, &ulc);
         StatusTree status(comp);
 
-        int i = 0;
-        while (!queue.empty()){
+        while (!queue.empty() 
             #ifdef _DEBUG_MODE_
-                std::cout << "loop index = " << i << std::endl;
-                gnu.set_terminal_png("./fig/" + ToString(i));
+                && _loop_i< 6
+            #endif
+            ){
+            #ifdef _DEBUG_MODE_
+            if(_case_name == _debug_case_name){
+                std::cout << "loop index = " << _loop_i << std::endl;
+                gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i));
                 gnu.set_equal_ratio();
                 auto dx = MaxX(diagonal) - MinX(diagonal);
                 auto dy = MaxY(diagonal) - MinY(diagonal);
                 gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
                 gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
                 PlotListSegment(gnu, this->listseg);
+            }
             #endif
 
             Event event = queue.top();
             auto& point = event.get_point();
             
             #ifdef _DEBUG_MODE_
+            if(_case_name == _debug_case_name){
                 PlotSweepLine(gnu, point, diagonal);
+            }
             #endif
 
             // HANDLE EVENT POINT(point)
@@ -154,7 +169,9 @@ public:
             auto& r_set = queue.begin()->second[2];
 
             #ifdef _DEBUG_MODE_
+            if(_case_name == _debug_case_name){
                 PlotListpSegment(gnu, c_set, "#FBBC04" );
+            }
             #endif
 
 
@@ -219,31 +236,48 @@ public:
                 auto s_min  = _find_min_slope(ulc);
                 auto s_max  = _find_max_slope(ulc);
                 #ifdef _DEBUG_MODE_
+                if(_debug_condition()){
                 if(s_max){
                     std::cout << "s_max = " << s_max->seg() << std::endl;
-                    PlotpSegment(gnu, s_max, "#A0C347" );
+                    PlotpSegment(gnu, s_max->cpseg(), "#A0C347" );
                 }
                 if(s_min){
                     std::cout << "s_min = " << s_min->seg() << std::endl;
                     // PlotpSegment(gnu, s_min, "#A0C347" );
                 }
-
+                }
                 #endif
                 auto s_lower = _find_lower_neighboor(s_min, status);
                 #ifdef _DEBUG_MODE_
+                if(_debug_condition()){
                 if(s_lower){
                     std::cout << "s_lower = " << s_lower->seg() << std::endl;
+                }
                 }
                 #endif
                 auto s_upper = _find_upper_neighboor(s_max, status);
 
                 #ifdef _DEBUG_MODE_
+                if(_debug_condition()){
                 if(s_upper){
                     std::cout << "s_upper = " << s_upper->seg() << std::endl;
                     PlotpSegment(gnu, s_upper, "#F04137" );
                 }
+                }
+                #endif
+
+
+                #ifdef _DEBUG_MODE_
+                if(_debug_condition()){
+                    std::cout << "call min vs lower -> ";
+                }
                 #endif
                 _compute_new_events(s_min, s_lower, event); 
+                #ifdef _DEBUG_MODE_
+                if(_debug_condition()){
+                    std::cout << "call max vs upper -> ";
+                }
+                #endif
                 _compute_new_events(s_max, s_upper, event);
             }
             // ProfileEnd();
@@ -258,13 +292,15 @@ public:
             
             queue.pop();
             #ifdef _DEBUG_MODE_
+            if(_case_name == _debug_case_name){
             this->_plot_status_tree(gnu, status, p_sweep);
             this->_plot_res_points(gnu, _list_res);
             gnu.plot();
             gnu.clear();
             std::cout << " end loop ========== " << std::endl;
+            }
+            _loop_i++;
             #endif
-            i++;
             // std::cout << "Geo Set size = " << _set.size() << std::endl;
         }
         return _list_res;
@@ -407,6 +443,11 @@ protected:
             auto res = inter.execute();
             if (CompareLess(current.get_point(), res.point) ){
                 if(res.type == _SS_INTERSECT_){
+                #ifdef _DEBUG_MODE_
+                if(_debug_condition()){
+                    std::cout << " intersect" << std::endl;
+                }
+                #endif
                     Event ev_i(res.point);
                     auto iter = queue.find(ev_i);
                     if(iter == queue.end()){
@@ -416,6 +457,11 @@ protected:
                         queue.insert(std::pair<Event, typename EventQueue::ArrSetcp> (ev_i, {set_empty, v, set_empty}));
                     }
                 }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
+                    #ifdef _DEBUG_MODE_
+                    if(_debug_condition()){
+                        std::cout << " touch or overlap" << std::endl;
+                    }
+                    #endif
                     for(short i = 0 ; i < 2; i++){
                         auto pos = inter.point_position(i);
                         if(pos == _PS_IN_){
@@ -433,6 +479,11 @@ protected:
                 }
             }
         }
+        #ifdef _DEBUG_MODE_
+        else if(_debug_condition()){
+            std::cout << " xx " << std::endl;
+        }
+        #endif
     }
 #ifdef _DEBUG_MODE_
     template<class CONTAINER>
@@ -478,6 +529,13 @@ protected:
             gnu.set_label(index, ToString(index), p.x(), p.y(), sst.str());
             index++;
         }
+    }
+
+    inline int _loop_index_any(int index){
+        return index;
+    }
+    bool _debug_condition(){
+        return _case_name == _debug_case_name && _loop_i == 5;
     }
     #endif
 
