@@ -526,7 +526,6 @@ template<typename ANY,
             IsGeometry<ANY>::value,
         bool>::type = true>
 auto ToGnuplotActor(const ANY& geo){
-    typedef std::shared_ptr<GnuplotActor> spActor;
     GnuplotActor actor;
     MakeGnuplotActor(actor, geo, typename ANY::Tag());    
     return actor;
@@ -537,7 +536,6 @@ template<typename ANY, typename CONTAINER,
          && IsContainer<CONTAINER>::value, 
         bool>::type = true>
 auto ToGnuplotActor(const ANY& geo, const CONTAINER& con){
-    typedef std::shared_ptr<GnuplotActor> spActor;
     GnuplotActor actor;
     MakeGnuplotActor(actor, geo, con, typename ANY::Tag());    
     return actor;
@@ -547,7 +545,6 @@ template<typename ANY,
             IsGeometry<ANY>::value,
         bool>::type = true>
 auto ToGnuplotActorAsVector(const ANY& geo){
-    typedef std::shared_ptr<GnuplotActor> spActor;
     GnuplotActor actor;
     MakeGnuplotActorAsVector(actor, geo, typename ANY::Tag());    
     return actor;

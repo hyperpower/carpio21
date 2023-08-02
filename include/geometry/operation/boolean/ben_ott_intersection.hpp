@@ -33,7 +33,7 @@ namespace carpio {
         int index = 1;
         for(auto seg : sl){
             auto a = ToGnuplotActor(seg);
-            a.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
+            a.style("with points pointtype 7 pointsize 1 lw 3 lc rgb \"#B5B5B5\"");
             auto nv = seg.normal_unit_vector();
             double ratio = 0.5;
             // std::ostringstream sst;
@@ -42,7 +42,7 @@ namespace carpio {
             // gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
             auto a1 = ToGnuplotActorAsVector(seg);
             // a1.title("Segment " + seg.get_name());
-            a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
+            a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#B5B5B5\"");
             gnu.add(a);
             gnu.add(a1);
             index++;
@@ -51,11 +51,24 @@ namespace carpio {
     template<class LISTSEG>
     void PlotListpSegment(Gnuplot& gnu, 
                           const LISTSEG& sl, 
+                          const std::string& t = "",
                           const std::string& color_code = "#00A4EF"){
-    for(auto seg : sl){
-        auto a1 = ToGnuplotActorAsVector(*seg);
-        a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"" + color_code +"\"");
-        gnu.add(a1);
+    int i = 0;
+    if(sl.size() == 0 ){
+        auto a = ToGnuplotActorAsVector(Segment_<double, 2>(0,0,1,1));
+        a.title(t + " n=" + ToString(sl.size()));
+        a.style("with vector head filled size screen 0.03,10,155 lw 2 lc rgb \"" + color_code +"\"");
+        gnu.add(a);
+    }else{
+        for(auto seg : sl){
+            auto a1 = ToGnuplotActorAsVector(*seg);
+            if(i == 0){
+                a1.title(t + " n=" + ToString(sl.size()));
+            }
+            a1.style("with vector head filled size screen 0.03,10,155 lw 2 lc rgb \"" + color_code +"\"");
+            gnu.add(a1);
+            i++;
+            }
         }
     }
     template<class SEG>
@@ -65,6 +78,13 @@ namespace carpio {
         auto a1 = ToGnuplotActorAsVector(*seg);
         a1.style("with vector head filled size screen 0.03,15,145 lw 3 lc rgb \"" + color_code +"\"");
         gnu.add(a1);
+    }
+    template<class POINT>
+    void PlotNewPoint(Gnuplot& gnu,
+                      const POINT& p){
+        auto a = ToGnuplotActor(p);
+        a.style("with points pointtype 12 pointsize 3 lw 2 lc rgb \"#151516\"");
+        gnu.add(a);
     }
 #endif
 template<class SEG>
@@ -101,6 +121,7 @@ protected:
     std::string _case_name;
     std::string _debug_case_name;
     int _loop_i;
+    Gnuplot gnu;
 #endif
     EventQueue queue;
     ListSegProxy listsegproxy;    
@@ -117,14 +138,13 @@ public:
     #ifdef _DEBUG_MODE_
         _build_list_segment(con);
         _case_name = case_name;
-        _debug_case_name = "case4";
+        _debug_case_name = "case5";
         _loop_i = 0;
     #endif
     }
 
     auto execute(){
         #ifdef _DEBUG_MODE_
-        Gnuplot gnu;
         _loop_i = 0;
         #endif
         ListResult _list_res;
@@ -136,19 +156,25 @@ public:
 
         while (!queue.empty() 
             #ifdef _DEBUG_MODE_
-                && _loop_i< 6
+                // && _loop_i< 6
             #endif
             ){
             #ifdef _DEBUG_MODE_
-            if(_case_name == _debug_case_name){
-                std::cout << "loop index = " << _loop_i << std::endl;
+            gnu.clear();
+            std::cout << "loop index = " << _loop_i << std::endl;
+            if(_debug_condition()){
                 gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i));
                 gnu.set_equal_ratio();
                 auto dx = MaxX(diagonal) - MinX(diagonal);
                 auto dy = MaxY(diagonal) - MinY(diagonal);
-                gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
-                gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
+                gnu.set_xrange(MinX(diagonal) - dx * 0.2, MaxX(diagonal) + dx * 0.2);
+                gnu.set_yrange(MinY(diagonal) - dy * 0.2, MaxY(diagonal) + dy * 0.2);
+                gnu.set_xlabel("x " + _case_name + " i = " + ToString(_loop_i));
+                // gnu.set_key("left top");
+                gnu.set_key("right top");
+                gnu.set_key("outside");
                 PlotListSegment(gnu, this->listseg);
+
             }
             #endif
 
@@ -170,7 +196,9 @@ public:
 
             #ifdef _DEBUG_MODE_
             if(_case_name == _debug_case_name){
-                PlotListpSegment(gnu, c_set, "#FBBC04" );
+                PlotListpSegment(gnu, l_set, "l set", "#FBBC04" );
+                PlotListpSegment(gnu, c_set, "c set", "#F35426" );
+                PlotListpSegment(gnu, r_set, "r set", "#81BC06" );
             }
             #endif
 
@@ -183,9 +211,7 @@ public:
 
             //3. if L(p) and C(p) and R(p) contains more than one segment
             //   then Report P as an intersection, together with L(p) and C(p) and R(p) 
-            #ifdef _DEBUG_MODE_
-            // PlotListpSegment(gnu, pair_rc.first, "#34A853");
-            #endif
+
             // ProfileStart("BO_SetSize");
             auto set_size = l_set.size() + c_set.size() + r_set.size();
             // std::cout << "three set size = " << set_size << std::endl;
@@ -243,7 +269,7 @@ public:
                 }
                 if(s_min){
                     std::cout << "s_min = " << s_min->seg() << std::endl;
-                    // PlotpSegment(gnu, s_min, "#A0C347" );
+                    PlotpSegment(gnu, s_min->cpseg(), "#A0C347" );
                 }
                 }
                 #endif
@@ -261,7 +287,7 @@ public:
                 if(_debug_condition()){
                 if(s_upper){
                     std::cout << "s_upper = " << s_upper->seg() << std::endl;
-                    PlotpSegment(gnu, s_upper, "#F04137" );
+                    PlotpSegment(gnu, s_upper->cpseg(), "#F04137" );
                 }
                 }
                 #endif
@@ -292,13 +318,13 @@ public:
             
             queue.pop();
             #ifdef _DEBUG_MODE_
-            if(_case_name == _debug_case_name){
+            if(_debug_condition()){
             this->_plot_status_tree(gnu, status, p_sweep);
             this->_plot_res_points(gnu, _list_res);
             gnu.plot();
             gnu.clear();
-            std::cout << " end loop ========== " << std::endl;
             }
+            std::cout << " end loop ========== " << std::endl;
             _loop_i++;
             #endif
             // std::cout << "Geo Set size = " << _set.size() << std::endl;
@@ -441,13 +467,14 @@ protected:
         if (s0 != nullptr && s1 != nullptr){
             InterTwo inter(s0->seg(), s1->seg());
             auto res = inter.execute();
+            #ifdef _DEBUG_MODE_
+                if(_debug_condition()){
+                    std::cout << ToString(res.type) << std::endl;
+                }
+            #endif
             if (CompareLess(current.get_point(), res.point) ){
                 if(res.type == _SS_INTERSECT_){
-                #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
-                    std::cout << " intersect" << std::endl;
-                }
-                #endif
+                
                     Event ev_i(res.point);
                     auto iter = queue.find(ev_i);
                     if(iter == queue.end()){
@@ -456,6 +483,11 @@ protected:
                         v.insert(s1);
                         queue.insert(std::pair<Event, typename EventQueue::ArrSetcp> (ev_i, {set_empty, v, set_empty}));
                     }
+                #ifdef _DEBUG_MODE_
+                if(_debug_condition()){
+                    PlotNewPoint(gnu, res.point);
+                }
+                #endif
                 }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
                     #ifdef _DEBUG_MODE_
                     if(_debug_condition()){
@@ -465,19 +497,34 @@ protected:
                     for(short i = 0 ; i < 2; i++){
                         auto pos = inter.point_position(i);
                         if(pos == _PS_IN_){
-                            queue.add_event(Event(s0->p(i)), 1, s1);
-                            // break;
+                            queue.add_event(Event(s0->cpseg()->p(i)), 1, s1);
+                            #ifdef _DEBUG_MODE_
+                            if(_debug_condition()){
+                                PlotNewPoint(gnu, s0->cpseg()->p(i));
+                            }
+                            #endif
                         }
                     }
                     for(short i = 2; i < 4; i++){
                         auto pos = inter.point_position(i);
                         if(pos == _PS_IN_){
-                            queue.add_event(Event(s1->p(i-2)), 1, s0);
+                            queue.add_event(Event(s1->cpseg()->p(i-2)), 1, s0);
                             // break;
+                            #ifdef _DEBUG_MODE_
+                            if(_debug_condition()){
+                                std::cout << s1->p(i-2) << std::endl;
+                                PlotNewPoint(gnu, s1->cpseg()->p(i-2));
+                            }
+                            #endif
                         }
                     }
                 }
             }
+            #ifdef _DEBUG_MODE_
+            else if(_debug_condition()){
+                std::cout << " oo " << std::endl;
+            }
+            #endif
         }
         #ifdef _DEBUG_MODE_
         else if(_debug_condition()){
@@ -535,7 +582,8 @@ protected:
         return index;
     }
     bool _debug_condition(){
-        return _case_name == _debug_case_name && _loop_i == 5;
+        // return _case_name == _debug_case_name && _loop_i == 5;
+        return _case_name == _debug_case_name && _loop_i == _loop_index_any(_loop_i);
     }
     #endif
 

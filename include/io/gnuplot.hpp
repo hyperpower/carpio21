@@ -1179,6 +1179,10 @@ public:
         return *this;
     }
 
+    Gnuplot& reset(){
+        this->cmd("reset");
+    }
+
     Gnuplot& splot(){
         this->splot(this->_actors);
         this->clear();

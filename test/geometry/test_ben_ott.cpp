@@ -190,7 +190,7 @@ TEST(ben_ott, case4){
     PlotIntersection("case4", sl, lresn2);
     std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
     
-    // EXPECT_EQ(lres.size(),   4);
+    EXPECT_EQ(lres.size(),   4);
     EXPECT_EQ(lresn2.size(), 4);
 }
 template<class SEG_TYPE>
@@ -207,6 +207,22 @@ auto GenerateSegmentsCase5(){ // intersect in mid
     
     return lseg;
 }
+
+TEST(ben_ott, case5){
+    auto sl = GenerateSegmentsCase5<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl, "case5");
+    auto lres = inter.execute();
+    // std::cout << "Find  inter    = " << lres.size() << std::endl;
+    
+    auto lresn2 = Intersect(sl,"n2");
+    PlotIntersection("case5", sl, lresn2);
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    EXPECT_EQ(lres.size(),   5);
+    EXPECT_EQ(lresn2.size(), 8);
+}
+
 template<class SEG_TYPE>
 auto GenerateSegmentsCase6(){ // intersect in mid
     typedef SEG_TYPE Seg;
