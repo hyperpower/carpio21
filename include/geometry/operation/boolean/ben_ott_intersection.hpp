@@ -138,7 +138,7 @@ public:
     #ifdef _DEBUG_MODE_
         _build_list_segment(con);
         _case_name = case_name;
-        _debug_case_name = "case5";
+        _debug_case_name = "case9";
         _loop_i = 0;
     #endif
     }
@@ -472,9 +472,8 @@ protected:
                     std::cout << ToString(res.type) << std::endl;
                 }
             #endif
-            if (CompareLess(current.get_point(), res.point) ){
+            if (CompareLessEqual(current.get_point(), res.point) ){
                 if(res.type == _SS_INTERSECT_){
-                
                     Event ev_i(res.point);
                     auto iter = queue.find(ev_i);
                     if(iter == queue.end()){

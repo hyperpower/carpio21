@@ -70,10 +70,9 @@ void PlotIntersection(const std::string& fn, const INPUT& list, const RES& res){
     gnu.set_terminal_png("./fig/" + fn);
     gnu.set_xlabel("x");
     gnu.set_ylabel("y");
+    gnu.set_equal_aspect_ratio();
     AddListSegment(gnu, list);
-    if(fn != "case4"){
-        AddIntersectionPoints(gnu, res);
-    }
+    AddIntersectionPoints(gnu, res);
     gnu.plot();
 }
 
@@ -185,9 +184,9 @@ TEST(ben_ott, case4){
     auto lres = inter.execute();
     // std::cout << "Find  inter    = " << lres.size() << std::endl;
     
+    PlotIntersection("case4", sl, lres);
     
     auto lresn2 = Intersect(sl,"n2");
-    PlotIntersection("case4", sl, lresn2);
     std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
     
     EXPECT_EQ(lres.size(),   4);
@@ -213,13 +212,12 @@ TEST(ben_ott, case5){
     std::cout << "Input segmnets = " << sl.size() << std::endl;
     Inter inter(sl, "case5");
     auto lres = inter.execute();
-    // std::cout << "Find  inter    = " << lres.size() << std::endl;
-    
+    PlotIntersection("case5", sl, lres);
+
     auto lresn2 = Intersect(sl,"n2");
-    PlotIntersection("case5", sl, lresn2);
     std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
     
-    EXPECT_EQ(lres.size(),   5);
+    EXPECT_EQ(lres.size(),   8);
     EXPECT_EQ(lresn2.size(), 8);
 }
 
@@ -237,6 +235,21 @@ auto GenerateSegmentsCase6(){ // intersect in mid
     
     return lseg;
 }
+
+TEST(ben_ott, case6){
+    auto sl = GenerateSegmentsCase6<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl, "case6");
+    auto lres = inter.execute();
+    PlotIntersection("case6", sl, lres);
+    
+    auto lresn2 = Intersect(sl,"n2");
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    EXPECT_EQ(lres.size(),   1);
+    EXPECT_EQ(lresn2.size(), 15);
+}
+
 template<class SEG_TYPE>
 auto GenerateSegmentsCase7(){ // overlap
     typedef SEG_TYPE Seg;
@@ -255,6 +268,19 @@ auto GenerateSegmentsCase7(){ // overlap
     
     return lseg;
 }
+TEST(ben_ott, case7){
+    auto sl = GenerateSegmentsCase7<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl, "case7");
+    auto lres = inter.execute();
+    PlotIntersection("case7", sl, lres);
+
+    auto lresn2 = Intersect(sl,"n2");
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    EXPECT_EQ(lres.size(),   10);
+    EXPECT_EQ(lresn2.size(), 5);
+}
 template<class SEG_TYPE>
 auto GenerateSegmentsCase8(){
     typedef SEG_TYPE Seg;
@@ -262,18 +288,71 @@ auto GenerateSegmentsCase8(){
     ListSegment lseg;
     
     lseg.push_back(Seg(Point(-15, -15), Point(15, 15)));
-    lseg.push_back(Seg(Point(-5, 15),   Point(5, -15)));
+    lseg.push_back(Seg(Point(-10, -10), Point(10, 10)));
+    lseg.push_back(Seg(Point(-6, 16),   Point(6, -16)));
+    lseg.push_back(Seg(Point(-3, 8),    Point(3, -8 )));
     lseg.push_back(Seg(Point(10, 2),    Point(20, 10)));
     lseg.push_back(Seg(Point(10, 2),    Point(15, 8)));
     lseg.push_back(Seg(Point(10, 2),    Point(13, -8)));
     lseg.push_back(Seg(Point(10, 2),    Point(20, -5)));
     lseg.push_back(Seg(Point(8,  5),    Point(12, -1)));
-    lseg.push_back(Seg(Point(6, -1),    Point(14, 5)));
+    lseg.push_back(Seg(Point(6, 1),     Point(14, 3)));
     
     return lseg;
 }
 
+TEST(ben_ott, case8){
+    auto sl = GenerateSegmentsCase8<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl, "case8");
+    auto lres = inter.execute();
+    PlotIntersection("case8", sl, lres);
+
+    auto lresn2 = Intersect(sl,"n2");
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    EXPECT_EQ(lres.size(),   6);
+    EXPECT_EQ(lresn2.size(), 21);
+}
 // typedef IntersectionBenOtt2_<Segment> Inter2;
+
+template<class SEG_TYPE>
+auto GenerateSegmentsCase9(){
+    typedef SEG_TYPE Seg;
+    typedef typename SEG_TYPE::Point Poi;
+    typedef std::vector<SEG_TYPE> ListSegment;
+    ListSegment lseg;
+    //                 x1   x2   y1   y2
+    lseg.push_back(Seg(Poi(-10,  10), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(-20, 5.0), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(-30,-5.0), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(0.0, 0.0), Poi(-15, -10)));
+    lseg.push_back(Seg(Poi(-15, -15), Poi(15, 15)));
+    lseg.push_back(Seg(Poi(-5, 15), Poi(5, -15)));
+    lseg.push_back(Seg(Poi(10, 2),  Poi(20, 10)));
+    lseg.push_back(Seg(Poi(10, 2),  Poi(15, 8)));
+    lseg.push_back(Seg(Poi(10, 2),  Poi(13, -8)));
+    lseg.push_back(Seg(Poi(10, 2),  Poi(20, -5)));
+    lseg.push_back(Seg(Poi(8,  5),  Poi(12, -1)));
+    lseg.push_back(Seg(Poi(6, -1),  Poi(16, 5)));
+    
+    // SegmentsPlot("case1", lseg);
+    return lseg;
+}
+
+TEST(ben_ott, case9){
+    auto sl = GenerateSegmentsCase9<Segment>();
+    std::cout << "Input segmnets = " << sl.size() << std::endl;
+    Inter inter(sl, "case9");
+    auto lres = inter.execute();
+    PlotIntersection("case9", sl, lres);
+
+    auto lresn2 = Intersect(sl,"n2");
+    std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
+    
+    EXPECT_EQ(lres.size(),   5);
+    EXPECT_EQ(lresn2.size(), 28);
+}
 
 TEST(ben_ott, two_seg_order){
     Segment s1(Point(15, 26), Point(2,  20));  // left big  

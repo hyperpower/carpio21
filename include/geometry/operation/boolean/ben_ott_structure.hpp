@@ -16,9 +16,14 @@ template<class P>
 inline bool CompareLess(const P& p1, const P& p2, double tol = 1e-14){
         auto dx = p2[0] - p1[0];
         return (dx > tol)
-            || ( std::abs(dx) < tol && p1[1] < p2[1]); 
+            || ( std::abs(dx) <= tol && p1[1] < p2[1]); 
 }
-
+template<class P>
+inline bool CompareLessEqual(const P& p1, const P& p2, double tol = 1e-14){
+        auto dx = p2[0] - p1[0];
+        return (dx > tol)
+            || ( std::abs(dx) <= tol && p1[1] <= p2[1]); 
+}
 template<class SEG>
 struct SegSlope_ {
     typedef SegSlope_<SEG> Self;
