@@ -86,8 +86,8 @@ auto GenerateSegmentsCase2(){ // insersection on one point
     ListSegment lseg;
     //                 x1   x2   y1   y2
     lseg.push_back(Seg(Poi(-10,  10), Poi(0, 0)));
-    lseg.push_back(Seg(Poi(-20, 5.0), Poi(0, 0)));
-    lseg.push_back(Seg(Poi(-30,-5.0), Poi(0, 0)));
+    lseg.push_back(Seg(Poi(0.0, 0.0), Poi(-20, 5.0)));
+    lseg.push_back(Seg(Poi(-20,-5.0), Poi(0, 0)));
     lseg.push_back(Seg(Poi(0.0, 0.0), Poi(-15, -10)));
     lseg.push_back(Seg(Poi(-15, -15), Poi(15, 15)));
     lseg.push_back(Seg(Poi(-5, 15), Poi(5, -15)));
@@ -151,6 +151,7 @@ void MultiSegTest_BenOtt(const std::string& filename, const LISTSEG& sl){
     gnu.set_xlabel("x");
     gnu.set_ylabel("y");
     gnu.set_grid();
+    gnu.set_equal_aspect_ratio();
 
     PlotListSegment(gnu, sl);
     PlotListIntersectionResult(gnu, res);

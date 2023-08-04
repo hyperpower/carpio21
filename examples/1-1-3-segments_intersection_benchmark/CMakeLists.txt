@@ -38,9 +38,7 @@ INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/../../include
 )
 
-add_definitions(-D_DEBUG_MODE_)
 add_executable(main ${SOURCE})
-
 
 if(PYTHON_LIBRARIES)
   TARGET_LINK_LIBRARIES(main ${PYTHON_LIBRARIES})

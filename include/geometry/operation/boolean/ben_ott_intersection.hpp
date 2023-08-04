@@ -11,7 +11,7 @@
 namespace carpio {
 #ifdef _DEBUG_MODE_
     template<class TYPE>
-    void PlotSweepLine(Gnuplot& gnu, const Point_<TYPE, 2>& p,
+    void _PlotSweepLine(Gnuplot& gnu, const Point_<TYPE, 2>& p,
                                      const Segment_<TYPE, 2>& dia){
         typedef Point_<TYPE, 2>   Point;
         typedef Segment_<TYPE, 2> Segment;
@@ -28,7 +28,7 @@ namespace carpio {
         gnu.add(aseg);
     }
     template<class LISTSEG>
-    void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
+    void _PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
         // gnu.set_label(1, strtype, -4.5, 4);
         int index = 1;
         for(auto seg : sl){
@@ -49,7 +49,7 @@ namespace carpio {
         }
     }
     template<class LISTSEG>
-    void PlotListpSegment(Gnuplot& gnu, 
+    void _PlotListpSegment(Gnuplot& gnu, 
                           const LISTSEG& sl, 
                           const std::string& t = "",
                           const std::string& color_code = "#00A4EF"){
@@ -173,7 +173,7 @@ public:
                 // gnu.set_key("left top");
                 gnu.set_key("right top");
                 gnu.set_key("outside");
-                PlotListSegment(gnu, this->listseg);
+                _PlotListSegment(gnu, this->listseg);
 
             }
             #endif
@@ -183,7 +183,7 @@ public:
             
             #ifdef _DEBUG_MODE_
             if(_case_name == _debug_case_name){
-                PlotSweepLine(gnu, point, diagonal);
+                _PlotSweepLine(gnu, point, diagonal);
             }
             #endif
 
@@ -196,9 +196,9 @@ public:
 
             #ifdef _DEBUG_MODE_
             if(_case_name == _debug_case_name){
-                PlotListpSegment(gnu, l_set, "l set", "#FBBC04" );
-                PlotListpSegment(gnu, c_set, "c set", "#F35426" );
-                PlotListpSegment(gnu, r_set, "r set", "#81BC06" );
+                _PlotListpSegment(gnu, l_set, "l set", "#FBBC04" );
+                _PlotListpSegment(gnu, c_set, "c set", "#F35426" );
+                _PlotListpSegment(gnu, r_set, "r set", "#81BC06" );
             }
             #endif
 
@@ -535,10 +535,10 @@ protected:
     template<class CONTAINER>
     void _build_list_segment(const CONTAINER& con){
         if(! con.empty()){
-           diagonal = *(con.begin()); 
+            diagonal = *(con.begin()); 
         }
         for(auto& seg : con){
-            diagonal = EnclosureDiagonal(diagonal, seg);
+            diagonal = EnclosureDiagonal(seg, diagonal);
             listseg.push_back(seg);
         }
     }

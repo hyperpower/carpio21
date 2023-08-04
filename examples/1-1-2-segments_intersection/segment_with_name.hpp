@@ -38,6 +38,8 @@ protected:
 public:
 	SegmentWithName_() :
 			Base() {};
+	
+	SegmentWithName_(const Base& b): Base(b){};
     
 	SegmentWithName_(const Point& s, const Point& e) :Base(s,e){
 	}
