@@ -1,47 +1,46 @@
 #ifndef _MULTI_SEGMENTS_HPP_
 #define _MULTI_SEGMENTS_HPP_
 
-#include "two_segments.hpp" 
 
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Arr_segment_traits_2.h>
 #include <CGAL/Surface_sweep_2_algorithms.h>
 
 
-// template<class LISTSEG>
-// void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
-//     // gnu.set_label(1, strtype, -4.5, 4);
-//     int index = 1;
-//     for(auto seg : sl){
-//         auto a = ToGnuplotActor(seg);
-//         a.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
-//         auto nv = seg.normal_unit_vector();
-//         double ratio = 0.5;
-//         std::ostringstream sst;
-//         sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
-//             << nv.x() * ratio << ", " << nv.y() * ratio; 
-//         gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
-//         auto a1 = ToGnuplotActorAsVector(seg);
-//         a1.title("Segment " + seg.get_name());
-//         a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
-//         gnu.add(a);
-//         gnu.add(a1);
-//         index++;
-//     }
+template<class LISTSEG>
+void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
+    // gnu.set_label(1, strtype, -4.5, 4);
+    int index = 1;
+    for(auto seg : sl){
+        auto a = ToGnuplotActor(seg);
+        a.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
+        auto nv = seg.normal_unit_vector();
+        double ratio = 0.5;
+        std::ostringstream sst;
+        sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
+            << nv.x() * ratio << ", " << nv.y() * ratio; 
+        gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
+        auto a1 = ToGnuplotActorAsVector(seg);
+        a1.title("Segment " + seg.get_name());
+        a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
+        gnu.add(a);
+        gnu.add(a1);
+        index++;
+    }
 
-// }
+}
 
-// template<class LISTSEGRES>
-// void PlotListIntersectionResult(Gnuplot& gnu, const LISTSEGRES& l){
-//     for(auto& res : l){
-//         auto a = ToGnuplotActor(res.point);
-//         a.point_type(7);
-//         a.point_size(2);
-//         a.line_color_red();
-//         // std::cout << a.style() << std::endl;
-//         gnu.add(a);
-//     }
-// }
+template<class LISTSEGRES>
+void PlotListIntersectionResult(Gnuplot& gnu, const LISTSEGRES& l){
+    for(auto& res : l){
+        auto a = ToGnuplotActor(res.point);
+        a.point_type(7);
+        a.point_size(2);
+        a.line_color_red();
+        // std::cout << a.style() << std::endl;
+        gnu.add(a);
+    }
+}
 
 auto GenerateRandomSegments(int num,
                             const double& xmin, const double& xmax,

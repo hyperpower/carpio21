@@ -137,7 +137,13 @@ void MultiSegTest_BenOtt(const std::string& filename, const LISTSEG& sl){
     // auto sl = GenerateRandomSegments(50, 0, 100, 0, 100);
     std::cout << "Segments n = " << sl.size() << std::endl;
     ProfileStart("Intersect Ben");
-    auto res = Intersect(sl, "bentley_ottmann");
+    
+
+    typedef IntersectionBenOtt_<Segment> Inter;
+    Inter inter(sl, filename);
+    inter._set_debug_case_name(filename);
+    auto res = inter.execute();
+
     std::cout << "Intersection Points : " << res.size() << std::endl;
     ProfileEnd();
     // std::cout << "Len Res = " << res.size() << std::endl;

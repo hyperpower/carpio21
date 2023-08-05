@@ -10,23 +10,7 @@
 
 namespace carpio {
 #ifdef _DEBUG_MODE_
-    template<class TYPE>
-    void _PlotSweepLine(Gnuplot& gnu, const Point_<TYPE, 2>& p,
-                                     const Segment_<TYPE, 2>& dia){
-        typedef Point_<TYPE, 2>   Point;
-        typedef Segment_<TYPE, 2> Segment;
-        auto a = ToGnuplotActor(p);
-        a.point_size(1);
-        a.point_type(5);
-        auto dy = MaxY(dia) - MinY(dia);
-        Point pup(p[0],  MaxY(dia) + dy * 0.1);
-        Point plow(p[0], MinY(dia) - dy * 0.1);
-        Segment seg(plow, pup);
-        auto aseg = ToGnuplotActor(seg);
-
-        gnu.add(a);
-        gnu.add(aseg);
-    }
+    
     template<class LISTSEG>
     void _PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
         // gnu.set_label(1, strtype, -4.5, 4);
@@ -165,6 +149,7 @@ public:
             if(_debug_condition()){
                 gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i));
                 gnu.set_equal_ratio();
+                gnu.set_grid();
                 auto dx = MaxX(diagonal) - MinX(diagonal);
                 auto dy = MaxY(diagonal) - MinY(diagonal);
                 gnu.set_xrange(MinX(diagonal) - dx * 0.2, MaxX(diagonal) + dx * 0.2);
@@ -183,7 +168,7 @@ public:
             
             #ifdef _DEBUG_MODE_
             if(_case_name == _debug_case_name){
-                _PlotSweepLine(gnu, point, diagonal);
+                _plot_sweep_line(gnu, point, diagonal);
             }
             #endif
 
@@ -542,6 +527,21 @@ protected:
             listseg.push_back(seg);
         }
     }
+    void _plot_sweep_line(Gnuplot& gnu, const Point& p,
+                                      const Segment& dia){
+        auto a = ToGnuplotActor(p);
+        a.point_size(1);
+        a.point_type(5);
+        auto dy = MaxY(dia) - MinY(dia);
+        Point pup(p[0],  MaxY(dia) + dy * 0.2);
+        Point plow(p[0], MinY(dia) - dy * 0.2);
+        Segment seg(plow, pup);
+        auto aseg = ToGnuplotActor(seg);
+
+        gnu.add(a);
+        gnu.add(aseg);
+    }
+
     void _plot_status_tree(Gnuplot& gnu, const StatusTree& tree, const Point& sweep){
         gnu.unset_label();
         int index = 1;
@@ -575,6 +575,10 @@ protected:
             gnu.set_label(index, ToString(index), p.x(), p.y(), sst.str());
             index++;
         }
+    }
+
+    void _set_debug_case_name(const std::string& name){
+        this->_debug_case_name = name;
     }
 
     inline int _loop_index_any(int index){

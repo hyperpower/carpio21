@@ -15,9 +15,6 @@ set(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
 SET(CMAKE_BUILD_TYPE "Release")
 
-# GGAL =========
-find_package(CGAL)
-
 # python =======
 set(REQUIRED_PYTHON_VERSION 3.4)
 # message(STATUS "======== LOOKING FOR PYTHON ${REQUIRED_PYTHON_VERSION} ========================")
@@ -48,10 +45,6 @@ ELSE()
   MESSAGE(FATAL_ERROR "Unable to link python libraries")
 ENDIF()
 
-If(CGAL_FOUND)
-  TARGET_LINK_LIBRARIES(main CGAL::CGAL)
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to link CGAL libraries")
-ENDIF()
+
 
   
