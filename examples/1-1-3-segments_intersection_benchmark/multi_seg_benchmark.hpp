@@ -1,11 +1,33 @@
 #ifndef _MULTI_SEGMENTS_HPP_
 #define _MULTI_SEGMENTS_HPP_
 
+#include <functional>
+#include <map>
+
+#include "utility/random.hpp"
+#include "utility/clock.hpp"
+#include "utility/profile.hpp"
+#include "utility/any.hpp"
+#include "geometry/geometry.hpp"
+#include "io/text_file.hpp"
+#include "utility/tinyformat.hpp"
 
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Arr_segment_traits_2.h>
 #include <CGAL/Surface_sweep_2_algorithms.h>
 
+
+using namespace carpio;
+
+typedef Point_<double, 2>   Point;
+typedef Segment_<double, 2> Segment;
+typedef std::list<Segment> ListSegment;
+typedef Intersection_<Segment, Segment>  Inter;
+typedef typename Inter::Result Result;
+
+typedef std::map<std::string, Any> MapAny;
+typedef std::function<ListSegment(int)> FunGenerator; 
+typedef std::function<MapAny(const ListSegment&)> FunCal;
 
 template<class LISTSEG>
 void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
@@ -19,12 +41,12 @@ void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
         std::ostringstream sst;
         sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
             << nv.x() * ratio << ", " << nv.y() * ratio; 
-        gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
-        auto a1 = ToGnuplotActorAsVector(seg);
-        a1.title("Segment " + seg.get_name());
-        a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
+        // gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
+        // auto a1 = ToGnuplotActorAsVector(seg);
+        // a1.title("Segment " + seg.get_name());
+        // a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
         gnu.add(a);
-        gnu.add(a1);
+        // gnu.add(a1);
         index++;
     }
 
@@ -42,9 +64,10 @@ void PlotListIntersectionResult(Gnuplot& gnu, const LISTSEGRES& l){
     }
 }
 
+
 auto GenerateRandomSegments(int num,
-                            const double& xmin, const double& xmax,
-                            const double& ymin, const double& ymax){
+                            const double& xmin = 0, const double& xmax = 50,
+                            const double& ymin = 0, const double& ymax = 50){
     typedef std::list<Segment> ListSegment;
     ListSegment lseg;
     // Random::seed(std::time(0));
@@ -96,6 +119,55 @@ auto GenerateGrid(int size){
     }
     return lseg;
 }
+
+auto GeneratorList(){
+    std::map<std::string, FunGenerator> res;
+    res["grid"] = &GenerateGrid;
+    res["parallel_slant"] = &GenerateParallelSlanted;
+    return res;
+}
+
+auto CalN2(const ListSegment& segs){
+    MapAny res;
+    res["input_num_segs"] = segs.size();
+    res["name_method"] = "n2";
+    auto start = std::chrono::system_clock::now();
+    auto ires = Intersect(segs);
+	auto end = std::chrono::system_clock::now();
+  	double dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    res["dt"] = dt;
+    res["num_intersects"] = ires.size();
+    res["result"] = ires;
+    return res;
+}
+auto CalSweepLineSimple(const ListSegment& segs){
+    MapAny res;
+    res["input_num_segs"] = segs.size();
+    res["name_method"] = "sweep_line_simple";
+    auto start = std::chrono::system_clock::now();
+    auto ires = Intersect(segs, "sweep_line_simple");
+	auto end = std::chrono::system_clock::now();
+  	double dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    res["dt"] = dt;
+    res["num_intersects"] = ires.size();
+    res["result"] = ires;
+    return res;
+}
+auto CalSweepLineBenOtt(const ListSegment& segs){
+    MapAny res;
+    res["input_num_segs"] = segs.size();
+    res["name_method"] = "bentley_ottmann";
+    auto start = std::chrono::system_clock::now();
+    auto ires = Intersect(segs, "bentley_ottmann");
+	auto end = std::chrono::system_clock::now();
+  	double dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    res["dt"] = dt;
+    res["num_intersects"] = ires.size();
+    res["result"] = ires;
+    return res;
+}
+
+
 
 void MultiSegTestCase1N2(const std::list<Segment>& sl){
     // auto sl = GenerateSegmentsCase1<Segment>();
@@ -161,98 +233,33 @@ auto ToCGAL(const LISTSEG& lseg){
     return nl;
 }
 
-void benchmark_test(){
-    ProfileClean();
-    std::vector<int> arr_num     = {30};
-    std::list<double> m1_time;
-    std::list<double> m2_time;
-    std::list<double> m3_time;
-
-    for(auto& num : arr_num){
-        ProfileStart("GenSeg_" + ToString(num));
-        auto lseg = GenerateRandomSegments(num, 0, 100, 0, 100);
-        // auto lseg = GenerateParallelSlanted(num);
-        // auto lseg = GenerateSparse(num);
-        // auto lseg = GenerateGrid(num);
-        auto nlseg = ToCGAL(lseg);
-        std::cout << "Segment size = " << lseg.size() << std::endl;
-        ProfileEnd();
-        // Method1 ==========================================
-        auto start = std::chrono::system_clock::now();
-        ProfileStart("Method_N2_" + ToString(num));
-        tfm::format(std::cout, "Method_N2_%d  ", num); 
-        auto res = Intersect(lseg);
-        tfm::format(std::cout, " find %10d\n", res.size()); 
-        ProfileEnd();
-	    auto end = std::chrono::system_clock::now();
-    	double dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        m1_time.push_back(dt);
-        std::string out = tfm::format("%25s :  %15.5f %3s\n",
-                                 "Method N2", dt, "s");
-    	std::cout << out;
-        // Method2 Simple sweeep line =============================
-        start = std::chrono::system_clock::now();
-        ProfileStart("Method_sl_" + ToString(num));
-        tfm::format(std::cout, "Method_SweepLine_%d  ", num); 
-        res = Intersect(lseg, "sweep_line_simple");
-        tfm::format(std::cout, " find %10d\n", res.size()); 
-        ProfileEnd();
-	    end = std::chrono::system_clock::now();
-    	dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        m2_time.push_back(dt);
-        out = tfm::format("%25s :  %15.5f %3s\n",
-                                 "Simple Sweep", dt, "s");
-    	std::cout << out;
-        // Method Ben Ott ==========================================
-        start = std::chrono::system_clock::now();
-        ProfileStart("Method_Ben_" + ToString(num));
-        tfm::format(std::cout, "Method_Ben_%d  ", num); 
-        res = Intersect(lseg, "bentley_ottmann");
-        tfm::format(std::cout, " find %10d\n", res.size()); 
-        ProfileEnd();
-	    end = std::chrono::system_clock::now();
-    	dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        m3_time.push_back(dt);
-        out = tfm::format("%25s :  %15.5f %3s\n",
-                                 "bentley ottmann", dt, "s");
-    	std::cout << out;
-        // Method CGAL ==========================================
-        start = std::chrono::system_clock::now();
-        ProfileStart("Method_CGAL_" + ToString(num));
-        tfm::format(std::cout, "Method_CGAL_%d  ", num); 
-        
-        std::list<Point_2> pts;
-        CGAL::compute_intersection_points(nlseg.begin(), nlseg.end(),
+auto CalSweepLineCGAL(const ListSegment& segs){
+    std::map<std::string, Any> res;
+    auto nlseg = ToCGAL(segs);
+    res["input_num_segs"] = segs.size();
+    res["name_method"] = "bentley_ottmann";
+    auto start = std::chrono::system_clock::now();
+    std::list<Point_2> pts;
+    CGAL::compute_intersection_points(nlseg.begin(), nlseg.end(),
                                      std::back_inserter(pts)); 
         
-        tfm::format(std::cout, " find %10d\n", res.size()); 
-        ProfileEnd();
-	    end = std::chrono::system_clock::now();
-    	dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        m3_time.push_back(dt);
-        out = tfm::format("%25s :  %15.5f %3s\n",
-                                 "CGAL", dt, "s");
-    	std::cout << out;
-    }
-    ProfileListShow();
-    Gnuplot gnu;
-    gnu.set_terminal_png("./fig/benchmark");
-    gnu.set_xlabel("number of segments");
-    gnu.set_ylabel("time (s)");
-    // gnu.set_label(1, strtype, -4.5, 4);
-
-    auto a1 = ToGnuplotActor(arr_num, m1_time);
-    a1.command("using 1:2 title \"Method n2\" ");
-    a1.style("with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
-
-    auto a2 = ToGnuplotActor(arr_num, m2_time);
-    a2.command("using 1:2 title \"Method Sweep Line Simple\" ");
-    a2.style("with linespoints pointtype 7 pointsize 3 lw 3 lc rgb \"#F25022\"");
-
-    gnu.add(a1);
-    gnu.add(a2);
-    gnu.plot();
+	auto end = std::chrono::system_clock::now();
+  	double dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    res["dt"] = dt;
+    res["num_intersects"] = pts.size();
+    res["result"] = pts;
+    return res;
 }
+
+auto CalList(){
+    std::map<std::string, FunCal> res;
+    res["n2"] = &CalN2; 
+    res["sweep_line_simple"] = &CalSweepLineSimple; 
+    res["sweep_line_benott"] = &CalSweepLineBenOtt; 
+    res["sweep_line_CGAL"] = &CalSweepLineBenOtt;
+    return res; 
+}
+
 
 
 #endif

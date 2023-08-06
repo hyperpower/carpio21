@@ -1181,6 +1181,7 @@ public:
 
     Gnuplot& reset(){
         this->cmd("reset");
+        return *this;
     }
 
     Gnuplot& splot(){
