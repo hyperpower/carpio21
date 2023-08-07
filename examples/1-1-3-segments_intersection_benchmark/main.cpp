@@ -11,7 +11,7 @@ void benchmark_test(){
 
     for(auto& num : arr_num){
         ProfileStart("GenSeg_" + ToString(num));
-        auto lseg = GenerateRandomSegments(num, 0, 100, 0, 100);
+        auto lseg = GenerateRandomSegments(num);
         // auto lseg = GenerateParallelSlanted(num);
         // auto lseg = GenerateSparse(num);
         // auto lseg = GenerateGrid(num);
@@ -100,5 +100,6 @@ void benchmark_test(){
 int main(int argc, char** argv) {
     MakeDir("./fig/");
 
-    benchmark_test();
+    // benchmark_test();
+    Benchmark();
 } 
