@@ -3,7 +3,7 @@
 #include "utility/clock.hpp"
 #include <valarray>
 
-// #include <omp.h>
+#include <omp.h>
 
 using namespace carpio;
 
@@ -41,7 +41,6 @@ TEST(multiarray, multiarray){
 	std::cout << "ma(0,0) = " << ma(0,0) << std::endl;
 	std::cout << "mb(0,0) = " << mb(0,0) << std::endl;
 	std::cout << "a(0,0)  = " << a(0,0) << std::endl;
-
 }
 
 TEST(array, openmp){

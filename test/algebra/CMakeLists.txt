@@ -4,9 +4,9 @@ set(This Algebra)
 
 set(Sources
     # test_solver_jacobi.cpp
-    test_multi_array.cpp
     # test_linear_polynomial.cpp
-    # test_matrix_sparse.cpp
+    test_multi_array.cpp
+    test_matrix_sparse.cpp
     # test_rational.cpp
 )
 
@@ -14,6 +14,7 @@ add_executable(${This} ${Sources})
 
 target_link_libraries(${This} PUBLIC
     gtest_main
+    OpenMP::OpenMP_CXX
 )
 
 add_test(
