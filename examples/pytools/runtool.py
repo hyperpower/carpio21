@@ -122,10 +122,12 @@ def parse_args():
 _RUNTOOL_DIR_   = os.path.abspath(os.path.join(__file__, "../"))
 
 class Runer:
-    def __init__(self, run_file, original_files):
+    def __init__(self, run_file, original_files, n_mp = 1, n_mpi = 1):
         self._orifiles = original_files
         self._path     = Path(run_file)
         self._info     = case_info(self._path.this, original_files)
+        self._num_openmp =n_mp
+        self._num_mpi    =n_mpi
 
         self._init_time_record()
 
@@ -190,26 +192,38 @@ class Runer:
         else:
             print("! executable file not found !")
             os.chdir(current)
-            return
+            return False
 
-        os.system(cmd)
+        exit_code = os.system(cmd)
         os.chdir(current)
+        if exit_code == 0:
+            return True
+        else:
+            print("! cmd         : %s", cmd)
+            print("! return code :", exit_code)
+            return False
 
     def execute_mpi(self):
         current = os.getcwd()
         os.chdir(self._path.this)
         exe = self._path.this + "/build/Release/main.exe"
         if os.path.exists(exe):
-            cmd = "mpiexec -n 4 \"" + exe +"\""
+            cmd = "mpiexec -n %d \"" % (self._num_mpi) + exe +"\""
         elif os.path.exists(self._path.this + "/build/main"):
-            cmd = "mpiexec -n 4 " + self._path.this + "/build/main"
+            cmd = "mpiexec -n %d " % (self._num_mpi) + self._path.this + "/build/main"
         else:
             print("! executable file not found !")
             os.chdir(current)
-            return
+            return False
 
-        os.system(cmd)
+        exit_code = os.system(cmd)
         os.chdir(current)
+        if exit_code == 0:
+            return True
+        else:
+            print("! cmd         : %s", cmd)
+            print("! return code :", exit_code)
+            return False
         
 
     def plot(self):
@@ -269,6 +283,7 @@ class Runer:
             self._info[n] = 0.0
 
     def _run_all(self):
+        run_flag = True
         self.clean()
         print("make ===== ")
         t  = time.perf_counter()
@@ -283,14 +298,21 @@ class Runer:
         self._info["build_wall_time"] = time.perf_counter() - t
         print("execute ====== ")
         t  = time.perf_counter()
-        self.execute()
+        if(self._num_mpi > 1):
+            run_flag = self.execute_mpi()
+        else:
+            run_flag = self.execute()
         self._info["execute_wall_time"] = time.perf_counter() - t
+        if run_flag is not True:
+            return run_flag
         print("plot ====== ")
         t  = time.perf_counter()
         self.plot()
         self._info["plot_wall_time"] = time.perf_counter() - t
         print("build doc ====")
         self.build_doc()
+        print("Info  ========")
+        self.show_info()
 
 
     def run(self, args):

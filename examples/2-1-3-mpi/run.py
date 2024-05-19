@@ -20,5 +20,5 @@ import runtool as RT
 
 if __name__ == '__main__':
     args = RT.parse_args()
-    runer = RT.Runer(__file__, FILE_ORIGINAL)
+    runer = RT.Runer(__file__, FILE_ORIGINAL, 1, 4)
     runer.run(args)
