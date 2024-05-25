@@ -412,7 +412,7 @@ auto GenerateRandomSegments(int num,
     return lseg;
 }
 
-TEST(ben_ott, DISABLED_random){
+TEST(ben_ott,random){
     // auto sl = GenerateSegmentsCase7<Segment>();
     auto sl = GenerateRandomSegments<Segment>(6, 0, 500, 0, 100);
     auto resn2 = Intersect(sl, "N2");
@@ -501,7 +501,7 @@ auto ToCGAL(const LISTSEG& lseg){
   
 // }
 TEST(cgal_random, DISABLED_test){
-    auto sl = GenerateRandomSegments<Segment>(1000, 0, 600, 0, 500);
+    auto sl = GenerateRandomSegments<Segment>(100, 0, 600, 0, 500);
     auto nsl = ToCGAL(sl);
 
     std::cout << "Input size     = " << nsl.size() << std::endl;

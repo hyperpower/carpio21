@@ -45,7 +45,7 @@ target_link_libraries(${Bezier} PUBLIC
 )
 
 if(Python_FOUND)
-  file(APPEND "./out.txt" Python_Lib : ${Python_LIBRARIES}\n)
+  # file(APPEND "./out.txt" Python_Lib : ${Python_LIBRARIES}\n)
   target_link_libraries(${This} PUBLIC ${Python_LIBRARIES})
   target_link_libraries(${Bezier} PUBLIC ${Python_LIBRARIES})
 ELSE()

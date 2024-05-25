@@ -356,8 +356,8 @@ protected:
         for(auto& seg : con){
             Event e_left(seg.ps());
             Event e_right(seg.pe());
-            queue.add_event(e_left,  0, &(seg));
-            queue.add_event(e_right, 2, &(seg));  
+            queue.add_event(e_left,  0, &(seg)); //idx = 0 point start (left)
+            queue.add_event(e_right, 2, &(seg)); //idx = 2 point end (right)
         }
     }
 

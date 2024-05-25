@@ -5,6 +5,7 @@ import platform
 import sys
 import errno
 import argparse
+import subprocess
 import time
 from path import *
 import pathlib
@@ -170,14 +171,15 @@ class Runer:
     def build(self):
         project_name = self._info["name"]
         if platform.system() == "Windows":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10 --clean-first")
         elif platform.system() == "Linux":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10 --clean-first")
         elif platform.system() == "Darwin":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10")
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10 --clean-first")
         print(cmd)
-        # os.system(cmd)
         result = os.popen(cmd)
+        # result = subprocess.Popen(cmd)
+        # print(result.stdout)
         print(result.read())
 
 
@@ -236,7 +238,6 @@ class Runer:
             elif platform.system() == "Darwin":
                 os.system("python3 ./plot.py")
         os.chdir(current)
-        pass
 
     def clean_doc(self):
         doc_dir = os.path.abspath(os.path.join(self._path.this, "doc"))
