@@ -722,11 +722,12 @@ public:
             const std::string& filename,
             double  x  = 800,  double  y  = 600,
             const std::string& font       = "Fira Code",
-                          int  fontsize   = 12) {
+                          int  fontsize   = 12,
+            const std::string& str_add        = "") {
         this->terminal_std = "pngcairo";
         std::stringstream sst;
         sst << "set terminal " << this->terminal_std << " dashed enhanced font '"
-                << font << "," << fontsize << "'" << " size " << x << ", " << y;
+                << font << "," << fontsize << "'" << " size " << x << ", " << y << " " << str_add;
         cmd(sst.str());
         cmd("set output '" + filename + ".png'");
         return *this;
@@ -951,7 +952,7 @@ public:
             const std::string &str = "") {  //
         if (x.size() != y.size()) {
             std::cerr << " >Warning! The containers' size are not equal. \n";
-            std::cerr << " >Warning! x =" << x.size() << " y =" << y.size
+            std::cerr << " >Warning! x =" << x.size() << " y =" << y.size()
                     << " \n";
         }
         // inline data
@@ -965,7 +966,7 @@ public:
         if (x.size() >= y.size()) {
             for (; itery != y.end();) {
                 sst << (*iterx) << " " << (*itery);
-                sst << "\n";
+                // sst << "\n";
                 cmd(sst.str());
                 sst.str("");
                 iterx++;
@@ -974,7 +975,7 @@ public:
         } else {
             for (; iterx != x.end();) {
                 sst << (*iterx) << " " << (*itery);
-                sst << "\n";
+                // sst << "\n";
                 cmd(sst.str());
                 sst.str("");
                 iterx++;

@@ -148,21 +148,7 @@ Intersection results are shown in :numref:`fig-bo_case1`.
    :align: center 
 
    Normal intersections
-   
 
-Benchmark
--------------------------------
-
-Random Segments
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Different amount of segments have been randomly generated. The methods mentioned have been tested.
-
-.. figure:: fig/benchmark.png
-   :alt: Figure intersection benchmark
-   :align: center 
-
-   benchmark of two intersection methods
 
 
 

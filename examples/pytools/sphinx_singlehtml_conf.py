@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, datetime
 
 sys.path.insert(0, os.path.abspath('extensions'))
 
@@ -18,7 +18,7 @@ exclude_patterns = []
 #modindex_common_prefix = []
 numfig = True
 project = u'Carpio'
-copyright = u'2022, Chengsi ZHOU'
+copyright = u'2024, Chengsi ZHOU'
 
 math_numfig = True
 math_eqref_format   = "Eq.{number}"
@@ -30,7 +30,8 @@ release = ''
 html_sidebars = {
     '**': [
         'about.html',
-        'navigation.html',
+        'localtoc.html'
+        # 'navigation.html',
 #         'relations.html',
 #         'searchbox.html',
 #         'donate.html',
@@ -38,9 +39,14 @@ html_sidebars = {
 }
 html_theme = 'alabaster'
 html_theme_options = {
-    "font_family": '"Times New Roman", Times, serif;',
+    "font_family": 'Palatino, "Times New Roman", Times, serif;',
+    'page_width': '900px',  # text with 650 figure width 634
+    'sidebar_width': '250px',
+    "font_size" : '16px'
 }
-page_width = 800
+html_context = {
+    'current_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+}
 # html_theme_path = ['themes']
 # html_title = "Music for Geeks and Nerds"
 #html_short_title = None

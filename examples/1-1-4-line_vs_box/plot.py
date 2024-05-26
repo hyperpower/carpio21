@@ -7,8 +7,8 @@ import multiprocessing
 from multiprocessing import Pool
 
 # matplotlib.rcParams['text.usetex']        = True
-matplotlib.rcParams['font.family']        = 'serif'
-matplotlib.rcParams['font.size']          = 14
+# matplotlib.rcParams['font.family']        = 'serif'
+# matplotlib.rcParams['font.size']          = 14
 
 PATH_CASES    = os.path.abspath(os.path.join(__file__, "../.."))
 PATH_THIS     = os.path.abspath(os.path.join(__file__, "../"))
@@ -17,12 +17,13 @@ PATH_FIG      = os.path.abspath(os.path.join(PATH_THIS, "fig"))
 PATH_PROJECT  = os.path.abspath(os.path.join(PATH_CASES, "../"))
 PATH_PYTOOLS  = os.path.abspath(os.path.join(PATH_CASES, "pytools"))
 
+plt.style.use(os.path.join(PATH_PYTOOLS, "web.mplstyle"))
 # sys.path.append(PATH_PYTOOLS)
 # import filetool as FT
 
 # plot figure for illustration
 def figure_1():
-    plt.figure(figsize=(6,6))
+    # plt.figure(figsize=(6,6))
     frame = plt.gca()
     ax = plt.axes()
     ax.set_aspect("equal")
@@ -31,7 +32,7 @@ def figure_1():
     plot_annotation(plt)
 
     plt.axis('off')
-    plt.savefig(PATH_FIG + "/" +"illustration.png")
+    plt.savefig(PATH_FIG + "/" +"illustration")
 
 
 box = np.array([[0.0, 0.0],

@@ -1,7 +1,7 @@
 Problem Description
 ===================
 
-We want to find intersection results of a line vs box. 
+We want to find intersection results of a Line vs Box. 
 
 .. figure:: fig/illustration.png
    :align: center 

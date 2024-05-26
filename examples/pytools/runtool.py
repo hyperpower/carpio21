@@ -137,7 +137,7 @@ class Runer:
 
     def show_info(self):
         for k, v in self._info.items():
-            print("%10s : " % k, v)
+            print("%15s : " % k, v)
 
     def mkdir_all(self):
         # creat the last level of folder

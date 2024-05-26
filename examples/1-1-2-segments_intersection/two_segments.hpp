@@ -20,37 +20,55 @@ int plot_a_case(const std::string& case_name,
                 const Segment& seg1,
                 const Segment& seg2,
                 const Point&   interp){
+    // terminald pngcairo add dpi
+	float dpi    = 300;       // dpi (variable)
+	float width  = 5.98;    // inch (variable)
+	float height = 4.485;  // inch (variable)
+
+	// 1 inch = 72 pt
+	float pt2in = 0.013888; // mm (fixed)
+
+	float ptscale = std::round(pt2in*dpi);
+	// round(x) = x - floor(x) < 0.5 ? floor(x) : ceil(x);
+	float wpx = std::round(width * dpi);
+	float hpx = std::round(height * dpi);
+ 	std::stringstream sst_add;
+    sst_add << "fontscale " << ptscale << " linewidth "
+                << ptscale << " pointscale " << ptscale;
+    // Plot
+
     Gnuplot gnu;
-    gnu.set_terminal_png("./fig/" + case_name);
+    gnu.set_terminal_png("./fig/" + case_name,
+            wpx, hpx, "Palatino", 10, sst_add.str() );
     gnu.set_xrange(-5, 5);
     gnu.set_yrange(-5, 5);
     gnu.set_label(1, case_name, -4.5, 4);
 
     auto a1 = ToGnuplotActor(seg1);
-    a1.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#00A4EF\"");
+    a1.style("with points pointtype 7 pointsize 2 lw 2 lc rgb \"#00A4EF\"");
     auto nv1 = seg1.normal_unit_vector();
     double ratio = 0.2;
     std::ostringstream sst;
-    sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
+    sst << "front textcolor rgb \"#00A4EF\" offset first " 
         << nv1.x() * ratio << ", " << nv1.y() * ratio; 
     gnu.set_label(1, seg1.get_name(), seg1.pc().x(), seg1.pc().y(),  sst.str());
     auto a11 = ToGnuplotActorAsVector(seg1);
     a11.title("Segment " + seg1.get_name());
-    a11.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
+    a11.style("with vector head filled size screen 0.03,15,135 lw 2 lc rgb \"#00A4EF\"");
 
     auto a2 = ToGnuplotActor(seg2);
-    a2.style("with points pointtype 7 pointsize 3 lw 3 lc rgb \"#F25022\"");
+    a2.style("with points pointtype 7 pointsize 2 lw 2 lc rgb \"#F25022\"");
     nv1 = seg2.normal_unit_vector();
     sst.str("");
-    sst << "front font \", 18\" textcolor rgb \"#F25022\" offset first " 
+    sst << "front textcolor rgb \"#F25022\" offset first " 
         << nv1.x() * ratio << ", " << nv1.y() * ratio; 
     gnu.set_label(2, seg2.get_name(), seg2.pc().x(), seg2.pc().y(),  sst.str());
     auto a21 = ToGnuplotActorAsVector(seg2);
     a21.title("Segment " + seg2.get_name());
-    a21.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#F25022\"");
+    a21.style("with vector head filled size screen 0.03,15,135 lw 2 lc rgb \"#F25022\"");
 
     auto a3 = ToGnuplotActor(interp);
-    a3.style("with points pointtype 1 pointsize 3 lw 3 lc black");
+    a3.style("with points pointtype 1 pointsize 2 lw 2 lc black");
     a3.title("Intersection point " + ToString(interp));
 
     gnu.set_grid();
@@ -63,7 +81,6 @@ int plot_a_case(const std::string& case_name,
 
     gnu.plot();
     return 0;
-
 }
 
 int a_case(const Point& p1,

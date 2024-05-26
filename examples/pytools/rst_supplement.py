@@ -11,23 +11,6 @@ def generate_0_svg(p):
     f.write("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"0\"/>")
     f.close()
 
-def text_runing_time(info):
-    text = """
-
-Run time infomation:
-.. table:: Summary of Running Time.
-    :widths: auto
-    :align: center 
-
-    ============= =====================
-     Steps         Wall Time (s)            
-    ============= ====================="""
-
-    tstr = """
-     make          %s
-    """ % float_sec_to_str(info["make_wall_time"]) 
-
-    return text + tstr
 
 def float_sec_to_str(sec):
     # sec in seconds
@@ -53,8 +36,8 @@ def revise_report_rst(dir_in, info, dir_out):
     f.close()
 
     # order is important !!!
-    fstr = add_hidden_toc(info, fstr)
     fstr = add_title(info, fstr)
+    # fstr = add_hidden_toc(info, fstr)
 
     fstr = append_sys_info(fstr)
     fstr = append_wall_time_table(info, fstr)
@@ -73,20 +56,35 @@ def add_title(info, fstr):
 %s
 %s
 %s
-
 """ % (sl, cn, sl)
 
-    return text + fstr
+    text2 = """
+.. |date| date::
+.. |time| date:: %H:%M
+
+This document was generated on |date| at |time|
+
+"""
+    return text + text2 + fstr
 
 
 def add_hidden_toc(info, fstr):
     text = """
-.. toctree::
-    :hidden:
-
-    report
+.. contents::
+   :local:
+   :backlinks: none
 
 """
+
+#    text = """
+#.. toctree::
+#    :maxdepth: 3
+#    :hidden:
+#
+#    self
+#    development
+#
+#"""
     return text + fstr
 
 

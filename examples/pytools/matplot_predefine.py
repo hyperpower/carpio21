@@ -5,7 +5,7 @@ import os
 # pytools dir
 _RUNTOOL_DIR_   = os.path.abspath(os.path.join(__file__, "../"))
 
-plt.style.use('dark_background')
+plt.style.use(os.path.join(_RUNTOOL_DIR_, "web.mplstyle"))
 
 def plot_test_fig():
     fig, ax = plt.subplots()
@@ -15,10 +15,17 @@ def plot_test_fig():
     ncolors = len(plt.rcParams['axes.prop_cycle'])
     shift = np.linspace(0, L, ncolors, endpoint=False)
     for s in shift:
-        ax.plot(x, np.sin(x + s), 'o-')
+        ax.plot(x, np.sin(x + s), '-')
+
+    plt.text(1.0, 0.0, 
+            r"$\frac{W_c}{W_e} (\frac{T_9}{T_6})^{0.5}=0.25$")
+    plt.text(1.0, 0.5, 
+            r"$\text{web.mplstyle}$")
     ax.set_xlabel('x-axis')
     ax.set_ylabel('y-axis')
-    ax.set_title("'dark_background' style sheet")
+    ax.set_title("web.mplstyle style sheet")
+
+    plt.grid()
 
     plt.savefig(os.path.join(_RUNTOOL_DIR_, "test_style"))
 
