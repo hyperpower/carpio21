@@ -27,7 +27,6 @@ void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
         gnu.add(a1);
         index++;
     }
-
 }
 
 template<class LISTSEGRES>
@@ -49,7 +48,7 @@ void PlotListIntersectionResult(Gnuplot& gnu, const LISTSEGRES& l){
 
 template<class LISTSEG>
 void OutputCSV(const std::string& filename, const LISTSEG& ls){
-    TextFile file("fig/" + filename);
+    TextFile file("data/" + filename);
     file.add_line(tfm::format("%15s,%15s,%15s,%15s", "x1", "y1", "x2", "y2"));
     for (auto& s : ls){
         auto line = tfm::format("%15.3f,%15.3f,%15.3f,%15.3f", s[0][0], s[0][1], s[1][0], s[1][1]);
@@ -132,13 +131,13 @@ void MultiSegTestCase1N2(const std::string& filename, const std::list<Segment>& 
 }
 
 template<class LISTSEG>
-void MultiSegTest_BenOtt(const std::string& filename, const LISTSEG& sl){
+void MultiSegTest_BenOtt(const std::string& filename, 
+                         const LISTSEG& sl){
     // auto sl = GenerateSegmentsCase1<Segment>();
     // auto sl = GenerateRandomSegments(50, 0, 100, 0, 100);
     std::cout << "Segments n = " << sl.size() << std::endl;
     ProfileStart("Intersect Ben");
     
-
     typedef IntersectionBenOtt_<Segment> Inter;
     Inter inter(sl, filename);
     inter._set_debug_case_name(filename);
@@ -171,6 +170,7 @@ int main_simple(){
     auto ls = GenerateSegmentsCase1<Segment>();
     OutputCSV("bo_case1.txt", ls);
     MultiSegTest_BenOtt("bo_case1", ls);
+
     ls = GenerateSegmentsCase2<Segment>();
     MultiSegTest_BenOtt("bo_case2", ls);
     return 1;

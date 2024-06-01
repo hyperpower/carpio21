@@ -455,8 +455,7 @@ TEST(avl_tree, speed){
     ProfileEnd();
 
     ProfileListShow();
-
-
+    ProfileClean();
 }
 
 }

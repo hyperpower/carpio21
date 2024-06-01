@@ -234,10 +234,10 @@ public:
     static Profile *Get();
 };
 
-Profile* Profile::pinstance_{nullptr};
-std::mutex Profile::mutex_;
+inline Profile* Profile::pinstance_{nullptr};
+inline std::mutex Profile::mutex_;
 
-Profile *Profile::Get(){
+inline Profile *Profile::Get(){
     std::lock_guard<std::mutex> lock(mutex_);
     if (pinstance_ == nullptr){
         pinstance_ = new Profile();

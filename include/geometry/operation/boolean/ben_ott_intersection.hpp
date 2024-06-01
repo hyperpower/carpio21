@@ -101,7 +101,7 @@ protected:
 #ifdef _DEBUG_MODE_
     typedef std::list<Segment> ListSegment;
     ListSegment listseg;
-    Segment diagonal;
+    Segment     diagonal;
     std::string _case_name;
     std::string _debug_case_name;
     int _loop_i;
@@ -128,9 +128,9 @@ public:
     }
 
     auto execute(){
-        #ifdef _DEBUG_MODE_
+    #ifdef _DEBUG_MODE_
         _loop_i = 0;
-        #endif
+    #endif
         ListResult _list_res;
         
         Point p_sweep(0,0);
@@ -143,34 +143,22 @@ public:
                 // && _loop_i< 6
             #endif
             ){
-            #ifdef _DEBUG_MODE_
+        #ifdef _DEBUG_MODE_
             gnu.clear();
             std::cout << "loop index = " << _loop_i << std::endl;
             if(_debug_condition()){
-                gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i));
-                gnu.set_equal_ratio();
-                gnu.set_grid();
-                auto dx = MaxX(diagonal) - MinX(diagonal);
-                auto dy = MaxY(diagonal) - MinY(diagonal);
-                gnu.set_xrange(MinX(diagonal) - dx * 0.2, MaxX(diagonal) + dx * 0.2);
-                gnu.set_yrange(MinY(diagonal) - dy * 0.2, MaxY(diagonal) + dy * 0.2);
-                gnu.set_xlabel("x " + _case_name + " i = " + ToString(_loop_i));
-                // gnu.set_key("left top");
-                gnu.set_key("right top");
-                gnu.set_key("outside");
-                _PlotListSegment(gnu, this->listseg);
-
+                _plot_setup(gnu);
             }
-            #endif
+        #endif
 
             Event event = queue.top();
             auto& point = event.get_point();
             
-            #ifdef _DEBUG_MODE_
-            if(_case_name == _debug_case_name){
+        #ifdef _DEBUG_MODE_
+            if(_debug_condition()){
                 _plot_sweep_line(gnu, point, diagonal);
             }
-            #endif
+        #endif
 
             // HANDLE EVENT POINT(point)
             // 1. Let L(p) be the set of segments whose Left endpoint is p;
@@ -180,7 +168,7 @@ public:
             auto& r_set = queue.begin()->second[2];
 
             #ifdef _DEBUG_MODE_
-            if(_case_name == _debug_case_name){
+            if(_debug_condition()){
                 _PlotListpSegment(gnu, l_set, "l set", "#FBBC04" );
                 _PlotListpSegment(gnu, c_set, "c set", "#F35426" );
                 _PlotListpSegment(gnu, r_set, "r set", "#81BC06" );
@@ -367,6 +355,7 @@ protected:
             this->listsegproxy.emplace_back(SegProxy(seg));
         }
     }
+
     void _find_neighboors(const Point& p, 
                           const StatusTree& tree,
                           cpSegProxy& above, cpSegProxy& below) {
@@ -527,6 +516,21 @@ protected:
             listseg.push_back(seg);
         }
     }
+    void _plot_setup(Gnuplot& gnu){
+        gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i));
+        gnu.set_equal_ratio();
+        gnu.set_grid();
+        auto dx = MaxX(diagonal) - MinX(diagonal);
+        auto dy = MaxY(diagonal) - MinY(diagonal);
+        gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
+        gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
+        gnu.set_xlabel("x " + _case_name + " i = " + ToString(_loop_i));
+                // gnu.set_key("left top");
+        gnu.set_key("right top");
+        gnu.set_key("outside");
+        _PlotListSegment(gnu, this->listseg);
+    }
+
     void _plot_sweep_line(Gnuplot& gnu, const Point& p,
                                       const Segment& dia){
         auto a = ToGnuplotActor(p);
@@ -588,7 +592,7 @@ protected:
         // return _case_name == _debug_case_name && _loop_i == 5;
         return _case_name == _debug_case_name && _loop_i == _loop_index_any(_loop_i);
     }
-    #endif
+#endif
 
 };
 

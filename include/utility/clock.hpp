@@ -58,8 +58,7 @@ namespace carpio {
 
 
 /* Cross platform millisecond sleep */
-void sleep_ms(unsigned long int time_to_sleep_in_ms)
-{
+inline void sleep_ms(unsigned long int time_to_sleep_in_ms) {
    sleep_function_name ( sleep_time_multiplier_for_ms * time_to_sleep_in_ms );
 }
 /// A tick is the basic unit of the high-resolution timer. If MATH_TICK_IS_FLOAT is defined,

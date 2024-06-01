@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "utility/big_int.hpp"
+#include "algebra/number/big_int.hpp"
 
 
 TEST(Bigint, construct) {
