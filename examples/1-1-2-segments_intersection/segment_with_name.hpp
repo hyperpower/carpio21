@@ -34,7 +34,6 @@ public:
 	typedef const Point& const_ref_Point;
 protected:
     std::string name;
-
 public:
 	SegmentWithName_() :
 			Base() {};
@@ -59,6 +58,9 @@ public:
     std::string get_name() const{
         return name;
     }
+	void foo(){
+		return;
+	}
 };
 
 

@@ -6,6 +6,8 @@
 
 #ifdef _DEBUG_MODE_
 #include "geometry/io/ggnuplot_actor_maker.hpp"
+#include "utility/tinyformat.hpp"
+DEFINE_HAS_MEMBER(get_name);
 #endif
 
 namespace carpio {
@@ -100,12 +102,13 @@ public:
 protected:
 #ifdef _DEBUG_MODE_
     typedef std::list<Segment> ListSegment;
+    int _loop_i;
     ListSegment listseg;
     Segment     diagonal;
     std::string _case_name;
     std::string _debug_case_name;
-    int _loop_i;
     Gnuplot gnu;
+    std::ofstream ofs;
 #endif
     EventQueue queue;
     ListSegProxy listsegproxy;    
@@ -115,15 +118,26 @@ public:
                 IsContainer<CONTAINER>::value
             &&  IsSegment<typename CONTAINER::value_type>::value 
         , bool>::type = true>
-    IntersectionBenOtt_(const CONTAINER& con,
+    IntersectionBenOtt_(
+        const CONTAINER& con,
         const std::string& case_name = ""){
-        _build_list_segproxy(con);
-        _build_priority_queue(this->listsegproxy);
     #ifdef _DEBUG_MODE_
         _build_list_segment(con);
         _case_name = case_name;
         _debug_case_name = "case9";
         _loop_i = 0;
+        _output_list_segment(con);
+    #endif
+        _build_list_segproxy(con);
+    #ifdef _DEBUG_MODE_
+        _output_seg_with_slope(this->listsegproxy);
+    #endif
+        _build_priority_queue(this->listsegproxy);
+    }
+
+    ~IntersectionBenOtt_(){
+    #ifdef _DEBUG_MODE_
+        ofs.close();
     #endif
     }
 
@@ -516,6 +530,46 @@ protected:
             listseg.push_back(seg);
         }
     }
+    template<class CONTAINER> 
+    void _output_list_segment(const CONTAINER& con){
+        std::ofstream ofstream;
+        ofstream.open("./data/debug_output_" + _case_name + ".txt");
+        tfm::format(ofstream, "## Input Segments\n");
+        tfm::format(ofstream, "%5s, %5s, %15s, %15s, %15s, %15s\n", 
+            "Order", "Name", "start X", "start Y", "end X", "end Y");
+        int count = 0;
+        for(auto& seg : con){
+            _output_a_seg(ofstream, seg, count);
+            count++;
+        }
+        ofs.close();
+    }
+    template<class SEGMENT, 
+             typename std::enable_if<
+                Has_get_name<SEGMENT, std::string(void)>::value, 
+                bool>::type = true
+             >
+    void _output_a_seg(std::ofstream& ofs, const SEGMENT& seg, int count){
+        tfm::format(ofs, "%5d, %5s, %15.4f, %15.4f, %15.4f, %15.4f\n",
+                count, seg.get_name(), seg.psx(), seg.psy(), seg.pex(), seg.pey());
+    }
+
+    template<class CONTAINER>
+    void _output_seg_with_slope(const CONTAINER& con){
+       std::ofstream ofstream;
+        ofstream.open("./data/debug_output_" + _case_name + "_slope.txt");
+        tfm::format(ofstream, "## Segments with slope\n");
+        tfm::format(ofstream, "%5s, %5s, %15s\n", 
+            "Order", "Name", "Slope");
+        int count = 0;
+        for(auto& seg : con){
+            tfm::format(ofstream, "%5d, %5s, %15.8f\n",
+                count, seg.get_name(), seg.slope_value());
+            count++;
+        }
+        ofs.close(); 
+    }
+
     void _plot_setup(Gnuplot& gnu){
         gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i));
         gnu.set_equal_ratio();

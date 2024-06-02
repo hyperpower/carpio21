@@ -6,11 +6,14 @@
 #include "geometry/predicate.hpp"
 #include "geometry/objects/objects.hpp"
 
+DEFINE_HAS_MEMBER(data);
 
 namespace carpio{
 
 template<typename ARR,  
-          typename std::enable_if<HasData<ARR>::value, bool>::type = true>
+          typename std::enable_if<
+                Has_data<ARR,typename ARR::value_type*(void)>::value,
+            bool>::type = true>
 double Orient(
         const ARR& v1,
         const ARR& v2,
@@ -19,7 +22,7 @@ double Orient(
 }
 
 template<typename ARR,  
-          typename std::enable_if<HasData<ARR>::value, bool>::type = true>
+          typename std::enable_if<Has_data<ARR, typename ARR::value_type*(void)>::value, bool>::type = true>
 double Orient(
         const ARR& v1,
         const ARR& v2,

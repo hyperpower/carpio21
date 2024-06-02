@@ -22,7 +22,7 @@ void a_function(){
      ProfileEnd();
 }
 
-TEST(profile, clock){
+TEST(profile, a_function){
     ProfileStart("main");
     for (int i = 0 ; i< 10 ;i++){
         ProfileStart("inner_fun");
@@ -33,7 +33,7 @@ TEST(profile, clock){
 
     ProfileListShow();
 }
-TEST(profile, clock2){
+TEST(profile, two_functions){
     ProfileClean();
     ProfileStart("main");
     for (int i = 0 ; i< 10 ;i++){
