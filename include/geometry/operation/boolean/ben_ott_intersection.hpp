@@ -525,9 +525,8 @@ protected:
         gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
         gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
         gnu.set_xlabel("x " + _case_name + " i = " + ToString(_loop_i));
-                // gnu.set_key("left top");
-        gnu.set_key("right top");
-        gnu.set_key("outside");
+        // gnu.set_key("right top");
+        // gnu.set_key("outside");
         _PlotListSegment(gnu, this->listseg);
     }
 
