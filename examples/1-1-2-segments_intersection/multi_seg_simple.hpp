@@ -69,9 +69,9 @@ auto GenerateSegmentsCase1(){
     lseg.push_back(Seg(21, 33, 35, 20));
     lseg.push_back(Seg(18, 33, 25, 35));
     lseg.push_back(Seg(28, 38, 15, 18));
-    int count = 1;
+    int count = 0;
     for(auto& seg : lseg){
-        seg.set_name(ToString(count));
+        seg.set_name("s" + ToString(count));
         count++;
     }
     // SegmentsPlot("case1", lseg);
@@ -171,9 +171,9 @@ int main_simple(){
     OutputCSV("bo_case1.txt", ls);
     MultiSegTest_BenOtt("bo_case1", ls);
 
-    ls = GenerateSegmentsCase2<Segment>();
-    MultiSegTest_BenOtt("bo_case2", ls);
-    return 1;
+    // ls = GenerateSegmentsCase2<Segment>();
+    // MultiSegTest_BenOtt("bo_case2", ls);
+    // return 1;
 }
 
 

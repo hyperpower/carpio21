@@ -8,7 +8,10 @@
 
 #include "algebra/number/number_define.hpp"
 #include "geometry/objects/objects.hpp"
-
+#ifdef _DEBUG_MODE_
+#include "geometry/io/ggnuplot_actor_maker.hpp"
+#include "utility/tinyformat.hpp"
+#endif
 namespace carpio{
 
 
@@ -124,7 +127,10 @@ public:
     
     inline const Slope& slope() const {
         return this->_slope;
-    }    
+    }
+    inline const typename Slope::Vt& slope_value() const {
+        return this->_slope.value;
+    }
 
     inline bool is_vertical() const{
         return _slope.type == Slope::_INFINITY_;
@@ -137,8 +143,8 @@ class SweepEvent_ {
 private:
     typedef typename SEG::Point Point;
     typedef typename Point::value_type value_type;
-    typedef std::shared_ptr<Point> spObj;
-    spObj _sppoint; 
+    typedef std::shared_ptr<Point> spPoint;
+    spPoint _sppoint; 
 public:
     SweepEvent_() : _sppoint() {};
 
@@ -151,8 +157,7 @@ public:
     }
     bool operator<(const SweepEvent_& e) const{
         return CompareLess(*_sppoint, *e._sppoint);
-    }
-    
+    }  
 };
 
 
@@ -167,7 +172,7 @@ public:
 
 
     void add(const EVENT& event) {
-        Setcp set_empty; //empty vector
+        Setcp set_empty;  //empty vector
         this->insert(std::pair<EVENT, ArrSetcp> (event, {set_empty, set_empty, set_empty}));
     }
     void add_event(const EVENT& event, const int& idx, typename Setcp::value_type assoc) {
@@ -202,6 +207,12 @@ public:
     bool mem(const EVENT& value) {
         return (this->find(value) != this->end());
     }
+
+    #ifdef _DEBUG_MODE_
+    void output(std::ofstream& ofs) const{
+
+    }
+    #endif
 };
 
 // StatusTree

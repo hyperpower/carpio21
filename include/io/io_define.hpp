@@ -226,7 +226,7 @@ inline std::string GetWorkingPath()
 
 inline bool FileAccessCheck( //
         const std::string &filename, //
-        int mode //
+        int mode = 0 //
         ) {
     if (mode < 0 || mode > 7) {
         std::cerr << " >! Input mode is wrong  =" << mode

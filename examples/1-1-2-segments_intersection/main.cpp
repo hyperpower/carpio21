@@ -10,6 +10,6 @@ using namespace carpio;
 int main(int argc, char** argv) {
     MakeDir("./fig/");
 
-    two_segments_test();
+    // two_segments_test();
     main_simple();
 } 

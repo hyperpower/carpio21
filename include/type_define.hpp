@@ -205,20 +205,63 @@ struct HasBeginEnd
     static bool const beg_value = sizeof(f<T>(0)) == 1;
     static bool const end_value = sizeof(g<T>(0)) == 1;
 };
-template <typename C>
-struct HasData
-{
-    typedef char yes;
-    typedef long no;
+// template <typename C>
+// struct HasData
+// {
+//     typedef char yes;
+//     typedef long no;
 
-    template<class T>
-    static yes has_data(int i,
-            typename T::value_type* = C().data());
-    template<class T>
-    static no has_data(...);
+//     template<class T>
+//     static yes has_data(int i,
+//             typename T::value_type* = C().data());
+//     template<class T>
+//     static no has_data(...);
 
-    static bool const value = sizeof(has_data<C>(0)) == sizeof(yes);
-};
+//     static bool const value = sizeof(has_data<C>(0)) == sizeof(yes);
+// };
+
+#define DEFINE_HAS_MEMBER(ooo)  \
+template <typename, typename T> \
+struct Has_##ooo {                \
+    static constexpr bool value = false; \
+};\
+template <typename C, typename Ret, typename... Args> \
+struct Has_##ooo<C, Ret(Args...)> { \
+private:                          \
+    template <typename T>         \
+    static constexpr auto check(T*) \
+        -> typename std::is_same<   \
+            decltype(std::declval<T>().ooo(std::declval<Args>()...)), \
+            Ret    \
+        >::type; \
+    template <typename> \
+    static constexpr std::false_type check(...); \
+    using type = decltype(check<C>(nullptr)); \
+public: \
+    static constexpr bool value = type::value; \
+};\
+
+
+// template <typename, typename T> 
+// struct Has_foo {                
+//     static constexpr bool value = false; 
+// };
+// template <typename C, typename Ret, typename... Args> 
+// struct Has_foo<C, Ret(Args...)> { 
+// private:                          
+//     template <typename T>         
+//     static constexpr auto check(T*) 
+//         -> typename std::is_same<   
+//             decltype(std::declval<T>().foo(std::declval<Args>()...)), 
+//             Ret    
+//         >::type; 
+//     template <typename> 
+//     static constexpr std::false_type check(...); 
+//     using type = decltype(check<C>(nullptr)); 
+// public: 
+//     static constexpr bool value = type::value; 
+// };
+
 
 template<typename T> 
 struct IsContainer : std::integral_constant<bool, 
@@ -240,7 +283,7 @@ inline const char* GetTypeName() {
   template<>                               \
   inline const char* GetTypeName<type>() { \
     return type_name;                      \
-  }
+}
 
 DEFINE_TYPE_NAME(int, "int")
 DEFINE_TYPE_NAME(long, "long")
