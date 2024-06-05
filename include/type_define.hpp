@@ -236,8 +236,8 @@ private:                          \
         >::type; \
     template <typename> \
     static constexpr std::false_type check(...); \
-    using type = decltype(check<C>(nullptr)); \
 public: \
+    using type = decltype(check<C>(nullptr)); \
     static constexpr bool value = type::value; \
 };\
 
