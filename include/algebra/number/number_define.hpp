@@ -25,6 +25,16 @@ template<class T>
 auto Zero(const T& num){
     return T(0.0);
 }
+template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
+T EpsilonForComparison(const T& x, const T& y){
+    auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
+    return std::numeric_limits<T>::epsilon()*maxXYOne;
+}
+template<class T ,
+         typename std::enable_if<std::is_integral<T>::value, bool>::type = true>
+inline bool IsEqual(const T& x, const T& y){
+    return x == y;
+}
 //compare float number
 template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
 bool IsEqual(const T& x, const T& y){
