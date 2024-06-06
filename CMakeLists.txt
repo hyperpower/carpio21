@@ -39,7 +39,7 @@ endif()
 
 
 # openmp
-OPTION(ENABLE_OPENMP "Enable openmp" OFF) # Enabled by default¢
+OPTION(ENABLE_OPENMP "Enable openmp" ON) # Enabled by default¢
 if (ENABLE_OPENMP)
     message(STATUS "======== LOOKING FOR OPENMP ========================")
     find_package(OpenMP REQUIRED)

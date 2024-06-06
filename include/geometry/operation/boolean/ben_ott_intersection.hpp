@@ -554,6 +554,16 @@ protected:
                 count, seg.get_name(), seg.psx(), seg.psy(), seg.pex(), seg.pey());
     }
 
+    template<class SEGMENT, 
+             typename std::enable_if<
+                ! Has_get_name<SEGMENT, std::string(void)>::value, 
+                bool>::type = true
+             >
+    void _output_a_seg(std::ofstream& ofs, const SEGMENT& seg, int count){
+        tfm::format(ofs, "%5d, %15.4f, %15.4f, %15.4f, %15.4f\n",
+                count, seg.psx(), seg.psy(), seg.pex(), seg.pey());
+    }
+
     template<class CONTAINER>
     void _output_seg_with_slope(const CONTAINER& con){
        std::ofstream ofstream;
@@ -563,11 +573,21 @@ protected:
             "Order", "Name", "Slope");
         int count = 0;
         for(auto& seg : con){
-            tfm::format(ofstream, "%5d, %5s, %15.8f\n",
+            if constexpr (Has_get_name<decltype(seg), std::string(void)>::value){
+            tfm::format(ofstream, "%5d, %10s, %15.8f\n",
                 count, seg.get_name(), seg.slope_value());
+            }else{
+            tfm::format(ofstream, "%5d, %15.8f\n",
+                count,  seg.slope_value());
+            }
             count++;
         }
         ofs.close(); 
+    }
+
+    template<class CONTAINER>
+    void _output_event_queue(const CONTAINER& con){
+    
     }
 
     void _plot_setup(Gnuplot& gnu){
