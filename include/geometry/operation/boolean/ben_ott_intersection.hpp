@@ -248,7 +248,7 @@ public:
             } else {
                 auto s_min  = _find_min_slope(ulc);
                 auto s_max  = _find_max_slope(ulc);
-                #ifdef _DEBUG_MODE_
+            #ifdef _DEBUG_MODE_
                 if(_debug_condition()){
                 if(s_max){
                     std::cout << "s_max = " << s_max->seg() << std::endl;
@@ -259,25 +259,25 @@ public:
                     PlotpSegment(gnu, s_min->cpseg(), "#A0C347" );
                 }
                 }
-                #endif
+            #endif
                 auto s_lower = _find_lower_neighboor(s_min, status);
-                #ifdef _DEBUG_MODE_
+            #ifdef _DEBUG_MODE_
                 if(_debug_condition()){
                 if(s_lower){
                     std::cout << "s_lower = " << s_lower->seg() << std::endl;
                 }
                 }
-                #endif
+            #endif
                 auto s_upper = _find_upper_neighboor(s_max, status);
 
-                #ifdef _DEBUG_MODE_
+            #ifdef _DEBUG_MODE_
                 if(_debug_condition()){
                 if(s_upper){
                     std::cout << "s_upper = " << s_upper->seg() << std::endl;
                     PlotpSegment(gnu, s_upper->cpseg(), "#F04137" );
                 }
                 }
-                #endif
+            #endif
 
 
                 #ifdef _DEBUG_MODE_
@@ -305,14 +305,14 @@ public:
             
             queue.pop();
             #ifdef _DEBUG_MODE_
-            if(_debug_condition()){
-            this->_plot_status_tree(gnu, status, p_sweep);
-            this->_plot_res_points(gnu, _list_res);
-            gnu.plot();
-            gnu.clear();
-            }
-            std::cout << " end loop ========== " << std::endl;
-            _loop_i++;
+                if(_debug_condition()){
+                    this->_plot_status_tree(gnu, status, p_sweep);
+                    this->_plot_res_points(gnu, _list_res);
+                    gnu.plot();
+                    gnu.clear();
+                }
+                std::cout << " end loop ========== " << std::endl;
+                _loop_i++;
             #endif
             // std::cout << "Geo Set size = " << _set.size() << std::endl;
         }
