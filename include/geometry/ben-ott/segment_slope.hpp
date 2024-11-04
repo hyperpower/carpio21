@@ -1,6 +1,7 @@
 #ifndef _BEN_OTT_SEGMENT_SLOPE_HPP_
 #define _BEN_OTT_SEGMENT_SLOPE_HPP_
 
+#include <iostream>
 #include "algebra/number/number_define.hpp"
 // #include "geometry/operation/boolean/segment_segment.hpp"
 
@@ -82,8 +83,11 @@ struct SegmentSlope_ {
                 return value < s.value;
             }
         }
+        default:
+            return false;
         }
     }
+
     bool operator==(const Self &rhs) const{
         if(!(this->operator<(rhs)) && !rhs.operator<(*this)){
             return true;
@@ -91,7 +95,31 @@ struct SegmentSlope_ {
             return false;
         }
     }
+
 };
+
+template<class SEG>
+std::ostream& operator<<(std::ostream& stream, const SegmentSlope_<SEG>& slope){
+        typedef SegmentSlope_<SEG> Slope;
+        stream << "Type : ";
+        switch (slope.type)
+        {
+        case Slope::_NAG_INF_:
+            stream << " NAG_INF ";
+            break;
+        case Slope::_POS_INF_:
+            stream << " POS_INF ";
+            break;
+        case Slope::_RATIONAL_:
+            stream << " RATIONAL ";
+            break;
+        default:
+            stream << " INVALID ";
+            break;
+        }
+        stream << "V : " << slope.value;
+        return stream;
+}
 
 
 } //namespace

@@ -31,27 +31,31 @@ T EpsilonForComparison(const T& x, const T& y){
     return std::numeric_limits<T>::epsilon()*maxXYOne;
 }
 template<class T ,
-         typename std::enable_if<std::is_integral<T>::value, bool>::type = true>
+         typename std::enable_if<
+            std::is_integral<T>::value, bool>::type = true>
 inline bool IsEqual(const T& x, const T& y){
     return x == y;
 }
 //compare float number
-template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
-bool IsEqual(const T& x, const T& y){
+template<class T, typename = std::enable_if_t<
+        !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
+inline bool IsEqual(const T& x, const T& y){
     auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
     return std::fabs(x - y) <= std::numeric_limits<T>::epsilon()*maxXYOne ;
 }
 
-template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
-bool IsLess(const T& x, const T& y){  // x < y
+template<class T, typename = std::enable_if_t<
+        !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
+inline bool IsLess(const T& x, const T& y){  // x < y
     auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
-    return std::fabs(y - x) > std::numeric_limits<T>::epsilon()*maxXYOne ;
+    return y - x > std::numeric_limits<T>::epsilon()*maxXYOne ;
 }
 
-template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
-bool IsGreater(const T& x, const T& y){  // x > y
+template<class T, typename = std::enable_if_t<
+        !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
+inline bool IsGreater(const T& x, const T& y){  // x > y
     auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
-    return std::fabs(x- y) > std::numeric_limits<T>::epsilon()*maxXYOne ;
+    return x - y > std::numeric_limits<T>::epsilon()*maxXYOne ;
 }
 
 
