@@ -33,7 +33,6 @@ template<class CONTAINER,
 auto Intersect(const CONTAINER& con, const std::string& method = ""){
     typedef typename CONTAINER::value_type GEO;
     typedef typename GEO::Tag Tag;
-//     typedef IntersectionReturn_<GEO> RetType;
     return Intersect(con, method, Tag());
 }
 }

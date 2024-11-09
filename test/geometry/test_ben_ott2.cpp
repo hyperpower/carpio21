@@ -12,6 +12,8 @@
 
 #include "geometry/ben-ott/segment_slope.hpp"
 #include "geometry/ben-ott/segment_with_slope.hpp"
+#include "geometry/ben-ott/sweep_event.hpp"
+#include "geometry/ben-ott/sweep_event_queue.hpp"
 
 using namespace carpio;
 
@@ -43,9 +45,9 @@ TEST(ben_ott, slope){
     SegmentSlope_<Segment> slopeup(sup);
     SegmentSlope_<Segment> slopedown(sdown);
 
-    std::cout << "slope 1 = " << slope1 << std::endl;
-    std::cout << "slope 2 = " << slope2 << std::endl;
-    std::cout << "slope up = " << slopeup << std::endl;
+    std::cout << "slope 1    = " << slope1 << std::endl;
+    std::cout << "slope 2    = " << slope2 << std::endl;
+    std::cout << "slope up   = " << slopeup << std::endl;
     std::cout << "slope down = " << slopedown << std::endl;
 
     EXPECT_EQ(slope1.value , 0);
@@ -60,10 +62,20 @@ TEST(ben_ott, slope){
 }
 
 TEST(ben_ott, is_less){
+    typedef typename Point::coord_value_type Cvt;
+    std::cout<< "epsilon = " << std::numeric_limits<Cvt>::epsilon() << std::endl;
     Point p1(0, 0);
     Point p2(5, 0);
     EXPECT_TRUE(IsLess(p1, p2)); //p1 < p2
     Point p3(0, 0.0);
     Point p4(0, -1.0);
     EXPECT_TRUE(IsLess(p4, p3)); //p3 < p4
+    p3 = p4;
+    EXPECT_FALSE(IsLess(p4, p3)); //p3 = p4
+    p3.x(p3.x() + 1e-16);
+    p3.x(p3.x() + 1e-16);
+    p3.x(p3.x() + 1e-16);
+    std::cout << "p3 = " << p3 << std::endl;
+    std::cout << "p4 = " << p4 << std::endl;
+    EXPECT_TRUE(IsLess(p4, p3)); //p4 < p3
 }

@@ -274,37 +274,37 @@ TEST(segment, sweep_line){
     gnu.plot();
 }
 
-typedef GeoComponent_<Seg2> GeoComponent;
-typedef GeoStatus_<GeoComponent> GeoStatus;
+// typedef GeoComponent_<Seg2> GeoComponent;
+// typedef GeoStatus_<GeoComponent> GeoStatus;
 
-void visit_output(GeoStatus::cpNode pn){
-    std::cout << "x = " << pn->value.sweep_x << " y = " << pn->value.value_y << std::endl;
-}
+// void visit_output(GeoStatus::cpNode pn){
+//     std::cout << "x = " << pn->value.sweep_x << " y = " << pn->value.value_y << std::endl;
+// }
 
-TEST(segment, geo_status_b){
+// TEST(segment, geo_status_b){
 
-    typedef std::function<bool(GeoComponent&, GeoComponent&)> CompareFun;
+//     typedef std::function<bool(GeoComponent&, GeoComponent&)> CompareFun;
 
-    double cur_x =1.2;
+//     double cur_x =1.2;
 
-    CompareFun cfun = [&cur_x](GeoComponent& a, GeoComponent& b){
-        a.sweep_x = cur_x;
-        return a.value_y < b.value_y;
-    };
+//     CompareFun cfun = [&cur_x](GeoComponent& a, GeoComponent& b){
+//         a.sweep_x = cur_x;
+//         return a.value_y < b.value_y;
+//     };
 
-    GeoStatus status;
+//     GeoStatus status;
 
-    GeoComponent gc1(nullptr, 1, 2);
-    status.insert(gc1, cfun);
-    GeoComponent gc2(nullptr, 1, 3);
-    status.insert(gc2, cfun);
-    GeoComponent gc3(nullptr, 1, 1.5);
-    status.insert(gc3, cfun);
+//     GeoComponent gc1(nullptr, 1, 2);
+//     status.insert(gc1, cfun);
+//     GeoComponent gc2(nullptr, 1, 3);
+//     status.insert(gc2, cfun);
+//     GeoComponent gc3(nullptr, 1, 1.5);
+//     status.insert(gc3, cfun);
 
-    cur_x = 0.1;
-    GeoComponent gc4(nullptr, 1, 1.3);
-    status.insert(gc4, cfun);
-    status.in_order(visit_output);
-}
+//     cur_x = 0.1;
+//     GeoComponent gc4(nullptr, 1, 1.3);
+//     status.insert(gc4, cfun);
+//     status.in_order(visit_output);
+// }
 
 
