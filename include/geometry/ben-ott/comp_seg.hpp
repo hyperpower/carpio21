@@ -5,7 +5,14 @@
 #include <memory>
 #include <set>
 #include <iostream>
+#include "algebra/number/number_define.hpp"
+#include "segment_slope.hpp"
 
+#ifdef _DEBUG_MODE_
+#include "geometry/io/ggnuplot_actor_maker.hpp"
+#include "utility/tinyformat.hpp"
+DEFINE_HAS_MEMBER(get_name);
+#endif
 
 namespace carpio {
 // Compare Seg at sweep point
@@ -18,18 +25,17 @@ struct CompareSeg_ {
     typedef const Segment* cpSegment;
     typedef std::set<cpSegment> Setcp;
     typedef typename SEG::coord_value_type Vt;
-    typedef SegSlope_<SEG>   Slope;
+    typedef SegmentSlope_<SEG>   Slope;
 
     Point* _ppoint;
     Setcp* _pset;
 
-    double _e;
 
-    CompareSeg_(): _ppoint(nullptr), _pset(nullptr), _e(1e-14) {};
+    CompareSeg_(): _ppoint(nullptr), _pset(nullptr) { };
 
-    CompareSeg_(Point* c) : _ppoint(c), _pset(nullptr), _e(1e-14){ }; 
+    CompareSeg_(Point* c) : _ppoint(c), _pset(nullptr){ }; 
 
-    CompareSeg_(Point* c, Setcp* s) : _ppoint(c), _pset(s), _e(1e-14){ }; 
+    CompareSeg_(Point* c, Setcp* s) : _ppoint(c), _pset(s){ }; 
 
     bool operator() (cpSegment a, cpSegment b) const{
         if(_pset != nullptr && !(_pset->empty())){
@@ -41,9 +47,7 @@ struct CompareSeg_ {
                 }
             }
         }
-        // ProfileStart("Less");
         bool res =  this->less(*a, *b, *(this->_ppoint)); 
-        // ProfileEnd();
         return res;
     }
 
@@ -77,7 +81,7 @@ struct CompareSeg_ {
         auto ay = y_at_sweep_point(a, p_sweep);
         auto by = y_at_sweep_point(b, p_sweep);
         // ProfileEnd();
-        if(std::abs(ay - by) > _e){
+        if(IsGreater(ay, by)){
             return ay < by;
         }else{
             auto sa = a.slope();
@@ -100,7 +104,16 @@ struct CompareSeg_ {
         }
     }
 
-   
+#ifdef _DEBUG_MODE_
+    std::string _debug_this_name;
+    std::string fig_name;
+    Gnuplot gnu;
+
+    CompareSeg_(Point* c, Setcp* s, const std::string& name) :
+         _ppoint(c), _pset(s), fig_name(name){
+            gnu.set_title(name);
+        };
+#endif
 };
 
 } //namespace

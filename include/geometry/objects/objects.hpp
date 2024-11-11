@@ -11,12 +11,15 @@
 #include "basic/ray.hpp"
 #include "basic/point_chain.hpp"
 #include "basic/segment.hpp"
+#include "basic/box.hpp"
 
 #include "curve/curve.hpp"
 #include "curve/bezier.hpp"
 #include "curve/bezier_quadratic.hpp"
 #include "curve/bezier_cubic.hpp"
 #include "curve/bezier_high_order.hpp"
+
+#include "ts/trisurface.hpp"
 //#include "_box.hpp"
 //#include "_line.hpp"
 //#include "_segment.hpp"

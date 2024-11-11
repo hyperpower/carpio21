@@ -3,9 +3,12 @@
 
 #include <algorithm>
 #include "geometry/geometry_define.hpp"
+#include "geometry/objects/objects.hpp"
 #include <array>
 #include <iterator>
 #include <type_traits>
+
+
 
 namespace carpio{
 

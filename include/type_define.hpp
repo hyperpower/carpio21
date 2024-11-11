@@ -239,28 +239,7 @@ private:                          \
 public: \
     using type = decltype(check<C>(nullptr)); \
     static constexpr bool value = type::value; \
-};\
-
-
-// template <typename, typename T> 
-// struct Has_foo {                
-//     static constexpr bool value = false; 
-// };
-// template <typename C, typename Ret, typename... Args> 
-// struct Has_foo<C, Ret(Args...)> { 
-// private:                          
-//     template <typename T>         
-//     static constexpr auto check(T*) 
-//         -> typename std::is_same<   
-//             decltype(std::declval<T>().foo(std::declval<Args>()...)), 
-//             Ret    
-//         >::type; 
-//     template <typename> 
-//     static constexpr std::false_type check(...); 
-//     using type = decltype(check<C>(nullptr)); 
-// public: 
-//     static constexpr bool value = type::value; 
-// };
+};
 
 
 template<typename T> 

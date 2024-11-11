@@ -407,7 +407,10 @@ protected:
 //
 template<typename TYPE, St DIM>
 inline std::ostream& operator<<(std::ostream& o, const Segment_<TYPE, DIM>& p) {
-	return o << p.ps() << "-->" << p.pe();
+	// o << std::fixed;
+	o << std::setiosflags (std::ios::scientific);
+	o << std::setprecision(4);
+	return o << p.ps() << " --> " << p.pe();
 }
 template<typename TYPE, St DIM>
 inline std::string ToString(const Segment_<TYPE, DIM>& p){

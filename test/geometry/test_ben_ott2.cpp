@@ -14,6 +14,7 @@
 #include "geometry/ben-ott/segment_with_slope.hpp"
 #include "geometry/ben-ott/sweep_event.hpp"
 #include "geometry/ben-ott/sweep_event_queue.hpp"
+#include "geometry/ben-ott/comp_seg.hpp"
 
 using namespace carpio;
 
@@ -32,6 +33,10 @@ TEST(ben_ott, mkdir){
     }
     // Do not disable this test
     MakeDir("./fig/");
+
+    #ifdef _DEBUG_MODE_
+    std::cout << "[ IN DEBUG MODE ]" << std::endl;
+    #endif
 }
 
 TEST(ben_ott, slope){
@@ -78,4 +83,21 @@ TEST(ben_ott, is_less){
     std::cout << "p3 = " << p3 << std::endl;
     std::cout << "p4 = " << p4 << std::endl;
     EXPECT_TRUE(IsLess(p4, p3)); //p4 < p3
+}
+
+int compare_seg(const Segment& s1, const Segment& s2){
+    typedef CompareSeg_<Segment> CompSeg;
+    Point p(0.5, 0.5);
+    CompSeg compare(&p, nullptr, "a_fig");
+    return compare(&s1, &s2);
+}
+
+
+TEST(ben_ott, comp_seg){
+    Segment s1(Point(0.0, 0.0), Point(1.0, 1.0));
+    Segment s2(Point(0.5, 0.0), Point(0.8, 1.0));
+    std::cout << "s1 = " << s1 << std::endl;       
+    std::cout << "s2 = " << s2 << std::endl;       
+    auto res = compare_seg(s1, s2);
+    std::cout << "res= " << res << std::endl;
 }
