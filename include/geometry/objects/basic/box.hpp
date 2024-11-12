@@ -237,8 +237,8 @@ public:
 
 template<typename TYPE, St DIM>
 std::ostream& operator<<(std::ostream& stream, const Box_<TYPE, DIM>& box) {
-	stream << "max = " << box.max();
-	stream << "  min = " << box.min();
+	stream << "min = " << box.min();
+	stream << "  max = " << box.max();
 	return stream;
 }
 
@@ -359,6 +359,16 @@ bool IsInOn(
 		}
 	}
 	return true;
+}
+
+template<typename TYPE, St DIM>
+Box_<TYPE, DIM> Union(
+		const Box_<TYPE, DIM>& b1,
+		const Box_<TYPE, DIM>& b2){
+	typedef Box_<TYPE, DIM> Box;
+	Box res;
+	res = b1 + b2;
+	return res;
 }
 
 }

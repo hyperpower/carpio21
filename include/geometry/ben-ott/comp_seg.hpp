@@ -80,17 +80,50 @@ struct CompareSeg_ {
         // ProfileStart("Y_at_sweep");
         auto ay = y_at_sweep_point(a, p_sweep);
         auto by = y_at_sweep_point(b, p_sweep);
+        #ifdef _DEBUG_MODE_
+        Gnuplot gnu;
+        gnu.set_terminal_png("./fig/" + fig_name);
+        auto a_box = a.box();
+        auto b_box = b.box();
+        auto u_box = Union(a_box, b_box);
+        std::vector<double> sa = {1.3, 1.3};
+        Scale(u_box, sa, u_box.center());
+        gnu.set_xrange(u_box.xmin(), u_box.xmax());
+        gnu.set_yrange(u_box.ymin(), u_box.ymax());
+        // gnu.set_label(1, strtype, 1.0, 4);
+        gnu.add(ToGnuplotActor(a).line_color_red().line_width(3).title("seg a"));
+        gnu.add(ToGnuplotActor(b).line_color_blue().line_width(3).title("seg b"));
+        gnu.add(ToGnuplotActor(p_sweep)
+                 .title("sweep point")
+                 .point_type(7)
+                 .point_size(3)
+                 .line_color_black());
+        gnu.add(ToGnuplotActor(Segment(Point(p_sweep.x(), u_box.ymax()),
+                                       Point(p_sweep.x(), u_box.ymin())))
+                 .dash_type(3)
+                 .line_color_black()
+                 .line_width(2));
+        gnu.cmd("set obj 10 rect at 0,0 size char 3+1, char 1.2 fc rgb \"cyan\"");
+        gnu.set_label(1, "ay = " + ToString(ay), u_box.xmin() , ay);
+        gnu.add(ToGnuplotActor(Segment(Point(u_box.xmin(), ay),
+                                       Point(p_sweep.x(),  ay)))
+                 .dash_type(2)
+                 .line_color_black()
+                 .line_width(2));
+        gnu.set_label(2, "by = " + ToString(by), u_box.xmin() , by);
+        gnu.add(ToGnuplotActor(Segment(Point(u_box.xmin(), by),
+                                       Point(p_sweep.x(),  by)))
+                 .dash_type(2)
+                 .line_color_black()
+                 .line_width(2));
+        // gnu.add(ToGnuplotActor(np));
+        gnu.plot();
+        #endif
         // ProfileEnd();
         if(IsGreater(ay, by)){
             return ay < by;
         }else{
-            auto sa = a.slope();
-            auto sb = b.slope();
-            if(sa == sb){
-                return &a < &b;
-            }else{
-                return sa < sb;
-            }
+            return less_slope(a, b);
         }
     }
 
@@ -105,14 +138,14 @@ struct CompareSeg_ {
     }
 
 #ifdef _DEBUG_MODE_
-    std::string _debug_this_name;
+    bool _debug_flag;
     std::string fig_name;
-    Gnuplot gnu;
 
-    CompareSeg_(Point* c, Setcp* s, const std::string& name) :
-         _ppoint(c), _pset(s), fig_name(name){
-            gnu.set_title(name);
+    CompareSeg_(Point* c, Setcp* s, const std::string& name, bool flag = true) :
+         _ppoint(c), _pset(s), fig_name(name), _debug_flag(flag){
         };
+    
+
 #endif
 };
 

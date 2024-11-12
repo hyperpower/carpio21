@@ -157,6 +157,11 @@ public:
         this->_set_cmd(this->_scmd, "pointtype", ToString(size));
         return *this;
     }
+    
+    GnuplotActor& dash_type(const int& size){
+        this->_set_cmd(this->_scmd, "dt ", ToString(size));
+        return *this;
+    }
 
     GnuplotActor& line_color(const int& idx){
         this->_set_cmd(this->_scmd, "lc", " " + ToString(idx) + " ");
@@ -172,6 +177,10 @@ public:
     }
     GnuplotActor& line_color_red(){
         this->_set_cmd(this->_scmd, "lc", " rgb \"#F25022\"");
+        return *this;
+    }
+    GnuplotActor& line_color_black(){
+        this->_set_cmd(this->_scmd, "lc", " rgb \"#151C23\"");
         return *this;
     }
     
