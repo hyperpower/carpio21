@@ -670,6 +670,23 @@ public:
         cmd("unset label");
         return *this;
     }
+    inline Gnuplot& set_label_with_box(
+            int tag,
+            const std::string & label,
+            const double& x, const double& y,
+            const std::string &append = "") {
+        ASSERT(tag > 0);
+        std::ostringstream cmdbox;
+        cmdbox << "set obj " << tag << " rect front at first " << x
+                << ", " << y << " size char " << label.size() + 1 <<" , char 1.2" 
+                << "fs solid 1.0 noborder fillcolor \"#FFFFFF\"";
+        cmd(cmdbox.str());
+        std::ostringstream cmdstr;
+        cmdstr << "set label " << tag << " \"" << label << "\" front at first " << x
+                << ", " << y << " center" << append;
+        cmd(cmdstr.str());
+        return *this;
+    }
     template<class POINTS>
     Gnuplot& set_object2d(
             int                tag,

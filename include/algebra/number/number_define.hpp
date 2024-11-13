@@ -58,6 +58,18 @@ inline bool IsGreater(const T& x, const T& y){  // x > y
     return x - y > std::numeric_limits<T>::epsilon()*maxXYOne ;
 }
 
+//implements ULP method
+//use this when you are only concerned about floating point precision issue
+//for example, if you want to see if a is 1.0 by checking if its within
+//10 closest representable floating point numbers around 1.0.
+template<typename T>
+inline bool IsWithinPrecisionInterval(T a, T b, unsigned int interval_size = 1)
+{
+    T min_a = a - (a - std::nextafter(a, std::numeric_limits<T>::lowest())) * interval_size;
+    T max_a = a + (std::nextafter(a, std::numeric_limits<T>::max()) - a) * interval_size;
+
+    return min_a <= b && max_a >= b;
+}
 
 // true = overflow
 // false = not overflow

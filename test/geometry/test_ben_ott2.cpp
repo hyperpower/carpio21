@@ -87,7 +87,7 @@ TEST(ben_ott, is_less){
 
 int compare_seg(const Segment& s1, const Segment& s2){
     typedef CompareSeg_<Segment> CompSeg;
-    Point p(0.6, 0.5);
+    Point p(0.5, 0.5);
     CompSeg compare(&p, nullptr, "compare_seg_1");
     return compare(&s1, &s2);
 }
@@ -95,7 +95,7 @@ int compare_seg(const Segment& s1, const Segment& s2){
 
 TEST(ben_ott, comp_seg){
     Segment s1(Point(0.0, 0.0), Point(1.0, 1.0));
-    Segment s2(Point(0.5, 0.0), Point(0.8, 1.0));
+    Segment s2(Point(0.2, 0.0), Point(0.8, 1.0));
     std::cout << "s1 = " << s1 << std::endl;       
     std::cout << "s2 = " << s2 << std::endl;       
     auto res = compare_seg(s1, s2);
