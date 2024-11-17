@@ -568,7 +568,6 @@ public:
         const double& x2, const double& y2):
         ActorGroup(), Shape(x1, y1, x2, y2){    
         double dis = Distance(this->_p1, this->_p2);
-
         // this->build_actors();
     }
 
@@ -615,10 +614,7 @@ public:
             ao.data().push_back("");
             this->_actors.push_back(std::make_shared<GnuplotActor>(ao));
         }
-        
-
     }
-
 };
 
 

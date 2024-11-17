@@ -59,13 +59,13 @@ struct CompareSeg_ {
             auto py = p.y();
             auto ly = seg.psy();
             auto ry = seg.pey();
-            if(py < ly) // ?
+            if(py < ly)
                 return ly;
             else if(py > ry)
                 return ry;
             else
                 return py;
-        }else {
+        }else {  // normal case
             auto& left  = seg.ps();
             auto& right = seg.pe();
             auto xa = left.x();
@@ -82,17 +82,33 @@ struct CompareSeg_ {
         auto by = y_at_sweep_point(b, p_sweep);
     #ifdef _DEBUG_MODE_
         Gnuplot gnu;
-        plot_less(gnu, a, b, p_sweep, ay, by);
+        if (_debug_flag){
+            std::cout << "ay = " << ay << std::endl;
+            std::cout << "by = " << by << std::endl;
+            plot_less(gnu, a, b, p_sweep, ay, by);
+        }
     #endif
-        // ProfileEnd();
         if(IsLess(ay, by)){
+            // ay < by
+    #ifdef _DEBUG_MODE_
+        if (_debug_flag)
+            gnu.plot();
+    #endif
             return true;
         }else if(IsLess(by, ay)){
-            return false;
-        }else{
+            // ay > by
     #ifdef _DEBUG_MODE_
-        gnu.set_label_with_box(3, "by == ay", 0.0, 1.0);
-        gnu.plot();
+        if (_debug_flag)
+            gnu.plot();
+    #endif
+            return false;
+        }else{ // ay == by
+    #ifdef _DEBUG_MODE_
+        if (_debug_flag){
+            std::cout << "ay == by --> compare slope" << std::endl;
+            gnu.set_label_with_box(3, "by == ay", 0.0, 1.0);
+            gnu.plot();
+        }
     #endif
             return less_slope(a, b);
         }
@@ -101,18 +117,39 @@ struct CompareSeg_ {
     bool less_slope(const Segment& a, const Segment& b) const{
         auto sa = a.slope();
         auto sb = b.slope();
-        if(sa == sb){
-            return &a < &b;
+    #ifdef _DEBUG_MODE_
+        std::cout << " slop a = " << sa << std::endl;
+        std::cout << " slop b = " << sb << std::endl;
+    #endif
+        if(sa < sb){
+    #ifdef _DEBUG_MODE_
+        std::cout << "sa < sb" << std::endl;
+    #endif
+            return true;
+        }else if(sb < sa){
+    #ifdef _DEBUG_MODE_
+        std::cout << "sa > sb" << std::endl;
+    #endif
+            return false;
         }else{
-            return sa < sb;
+    #ifdef _DEBUG_MODE_
+        std::cout << " slop a == b --> compare adress" << std::endl;
+        std::cout << "  get adress" << std::endl;
+        std::cout << "  &a = " << &sa << std::endl;
+        std::cout << "  &b = " << &sb << std::endl;
+    #endif
+            return &sa < &sb;
         }
+
     }
 
 #ifdef _DEBUG_MODE_
     bool _debug_flag;
     std::string fig_name;
 
-    CompareSeg_(Point* c, Setcp* s, const std::string& name, bool flag = true) :
+    typedef typename Segment::Base Seg;
+
+    CompareSeg_(Point* c, Setcp* s, const std::string& name, bool flag = false) :
          _ppoint(c), _pset(s), fig_name(name), _debug_flag(flag){
         };
     
@@ -136,28 +173,26 @@ struct CompareSeg_ {
                  .point_type(7)
                  .point_size(3)
                  .line_color_black());
-        gnu.add(ToGnuplotActor(Segment(Point(p_sweep.x(), u_box.ymax()),
-                                       Point(p_sweep.x(), u_box.ymin())))
+        gnu.add(ToGnuplotActor(Seg(Point(p_sweep.x(), u_box.ymax()),
+                                   Point(p_sweep.x(), u_box.ymin())))
+                 .dash_type(2)
+                 .line_color_black()
+                 .line_width(2));
+        gnu.set_label_with_box(1, "ay = " + ToString(ay), 0.2 , ay);
+        gnu.add(ToGnuplotActor(Seg(Point(u_box.xmin(), ay),
+                                   Point(p_sweep.x(),  ay)))
                  .dash_type(3)
                  .line_color_black()
                  .line_width(2));
-        gnu.set_label_with_box(1, "ay = " + ToString(ay), 0  , ay);
-        gnu.add(ToGnuplotActor(Segment(Point(u_box.xmin(), ay),
-                                       Point(p_sweep.x(),  ay)))
-                 .dash_type(2)
+        gnu.set_label_with_box(2, "by = " + ToString(by), 0.2 , by);
+        gnu.add(ToGnuplotActor(Seg(Point(u_box.xmin(), by),
+                                   Point(p_sweep.x(),  by)))
+                 .dash_type(3)
                  .line_color_black()
                  .line_width(2));
-        gnu.set_label_with_box(2, "by = " + ToString(by), 0 , by);
-        gnu.add(ToGnuplotActor(Segment(Point(u_box.xmin(), by),
-                                       Point(p_sweep.x(),  by)))
-                 .dash_type(2)
-                 .line_color_black()
-                 .line_width(2));
-
         }
-    
-
 #endif
+
 };
 
 } //namespace

@@ -15,22 +15,34 @@ template<class P,
             std::is_base_of<PointTag, typename P::Tag>::value, 
         bool>::type = true >
 inline bool IsLess(const P& p1, const P& p2){  // x < y
-    typedef typename P::coord_value_type CVT;
-    auto maxXYOne = std::max( { CVT(1.0), std::fabs(p1[0]) , std::fabs(p2[0]) } ) ;
-    auto dx = p2[0] - p1[0];
-    if(dx > std::numeric_limits<CVT>::epsilon()*maxXYOne){
-        return true;
-    }else{
-        return std::fabs(dx) <= std::numeric_limits<CVT>::epsilon() * maxXYOne
-               && IsLess(p1[1],p2[1]);
+    for(auto d = 0; d < P::Dim; d++){
+        if(IsLess(p1[d], p2[d])){
+            return true;
+        }else if(IsLess(p2[d], p1[d])){
+            return false;
+        }
     }
+    return false;
 }
-
+template<class P,
+        typename std::enable_if<
+            std::is_base_of<PointTag, typename P::Tag>::value, 
+        bool>::type = true >
+inline bool IsLessEqual(const P& p1, const P& p2){  // x < y
+    for(auto d = 0; d < P::Dim; d++){
+        if(IsLess(p1[d], p2[d])){
+            return true;
+        }else if(IsLess(p2[d], p1[d])){
+            return false;
+        }
+    }
+    return true;
+}
 
 struct SegmentWithSlopeTag: public SegmentTag {};
 
 template<class SEG>
-class SegWithSlope_:public SEG{
+class SegWithSlope_: public SEG{
 public:
 	static const St Dim = SEG::Dim;
     typedef SEG Base;
@@ -44,7 +56,7 @@ public:
     typedef SegmentWithSlopeTag Tag;
 
 protected:
-    cpSegment _cpseg; //point to original object
+    cpSegment _cpseg;  //point to original object
     Slope     _slope;
 
 public:
@@ -52,7 +64,7 @@ public:
 
     SegWithSlope_(const Segment& seg):
         Base(seg), _cpseg(&seg){
-        if(CompareLess(Base::pe(), Base::ps())){
+        if(IsLess(Base::pe(), Base::ps())){
             this->change_orientation();
         }
         _slope = Slope(this->ps(), this->pe());

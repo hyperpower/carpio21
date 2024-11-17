@@ -132,10 +132,18 @@ public:
 	Point& ps() {
 		return this->at(0);
 	}
+	Point& ps(const Point& other) {
+		this->at(0) = other;
+		return this->at(0);
+	}
 	const Point& ps() const {
 		return this->at(0);
 	}
 	Point& pe() {
+		return this->at(1);
+	}
+	Point& pe(const Point& other) {
+		this->at(1) = other;
 		return this->at(1);
 	}
 	const Point& pe() const {

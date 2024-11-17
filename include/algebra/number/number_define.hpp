@@ -57,7 +57,16 @@ inline bool IsGreater(const T& x, const T& y){  // x > y
     auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
     return x - y > std::numeric_limits<T>::epsilon()*maxXYOne ;
 }
-
+template<class T, typename = std::enable_if_t<
+        !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
+inline bool IsLessEqual(const T& x, const T& y){  // x < y
+    return !IsGreater(x, y);
+}
+template<class T, typename = std::enable_if_t<
+        !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
+inline bool IsGreaterEqual(const T& x, const T& y){  // x < y
+    return !IsLess(x, y);
+}
 //implements ULP method
 //use this when you are only concerned about floating point precision issue
 //for example, if you want to see if a is 1.0 by checking if its within

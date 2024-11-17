@@ -62,14 +62,14 @@ struct SegmentSlope_ {
         }
         case _NAG_INF_: {
             if(s.type == _NAG_INF_){
-                return value < s.value;
+                return IsLess(value , s.value);
             } else {
                 return true;
             }
         }
         case _POS_INF_: {
             if(s.type == _POS_INF_){
-                return value < s.value;
+                return IsLess(value , s.value);
             } else {
                 return false;
             }
@@ -80,7 +80,7 @@ struct SegmentSlope_ {
             }else if(s.type == _POS_INF_){
                 return true;
             }else{
-                return value < s.value;
+                return IsLess(value , s.value);
             }
         }
         default:
