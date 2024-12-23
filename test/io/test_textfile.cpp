@@ -46,20 +46,24 @@ TEST(aline_to_arrayd , textfile) {
     ASSERT_EQ(arr[2], 67);
 }
 TEST(write, textfile) {
-    MakeDir("./test_output/");
+    MakeDir("./data/");
 //     std::cout << " parse a line " << std::endl;
     std::string fn = "out_text.txt";
-    TextFile f("./test_output/out_text.txt");
+    TextFile f("./data/out_text.txt");
     f.add_config_item("test", "10");
     f.add_config_item("arr", "10, 34, 567");
     f.add_line("123, 345, 67");
     f.add_line("456, 345, 67");
     f.write();
+
+    EXPECT_TRUE(FileAccessCheck("./data/out_text.txt"));
 }
-TEST(config1, textfile) {
+TEST(text_file_read, textfile) {
 //     std::cout << " parse a line " << std::endl; 
-    TextFile f("./test_output/out_text.txt");
+    TextFile f("./test/input_files/textfile.txt");
     f.read();
     f.parse_config();
     f.show_config();
+    EXPECT_NO_THROW(f.get_config("col"));
+    std::cout << "config get col" << f.get_config("col")<< std::endl;
 }

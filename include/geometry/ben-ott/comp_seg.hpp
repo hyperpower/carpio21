@@ -1,7 +1,6 @@
 #ifndef _BEN_OTT_COMP_SEG_HPP_
 #define _BEN_OTT_COMP_SEG_HPP_
 
-
 #include <memory>
 #include <set>
 #include <iostream>
@@ -13,6 +12,7 @@
 #include "utility/tinyformat.hpp"
 DEFINE_HAS_MEMBER(get_name);
 #endif
+// #define _DEBUG_BEN_OTT_COMP_SEG_ 
 
 namespace carpio {
 // Compare Seg at sweep point
@@ -80,7 +80,7 @@ struct CompareSeg_ {
         // ProfileStart("Y_at_sweep");
         auto ay = y_at_sweep_point(a, p_sweep);
         auto by = y_at_sweep_point(b, p_sweep);
-    #ifdef _DEBUG_MODE_
+    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
         Gnuplot gnu;
         if (_debug_flag){
             std::cout << "ay = " << ay << std::endl;
@@ -90,20 +90,20 @@ struct CompareSeg_ {
     #endif
         if(IsLess(ay, by)){
             // ay < by
-    #ifdef _DEBUG_MODE_
+    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
         if (_debug_flag)
             gnu.plot();
     #endif
             return true;
         }else if(IsLess(by, ay)){
             // ay > by
-    #ifdef _DEBUG_MODE_
+    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
         if (_debug_flag)
             gnu.plot();
     #endif
             return false;
         }else{ // ay == by
-    #ifdef _DEBUG_MODE_
+    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
         if (_debug_flag){
             std::cout << "ay == by --> compare slope" << std::endl;
             gnu.set_label_with_box(3, "by == ay", 0.0, 1.0);
@@ -117,22 +117,22 @@ struct CompareSeg_ {
     bool less_slope(const Segment& a, const Segment& b) const{
         auto sa = a.slope();
         auto sb = b.slope();
-    #ifdef _DEBUG_MODE_
+    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
         std::cout << " slop a = " << sa << std::endl;
         std::cout << " slop b = " << sb << std::endl;
     #endif
         if(sa < sb){
-    #ifdef _DEBUG_MODE_
+    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
         std::cout << "sa < sb" << std::endl;
     #endif
             return true;
         }else if(sb < sa){
-    #ifdef _DEBUG_MODE_
+    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
         std::cout << "sa > sb" << std::endl;
     #endif
             return false;
         }else{
-    #ifdef _DEBUG_MODE_
+    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
         std::cout << " slop a == b --> compare adress" << std::endl;
         std::cout << "  get adress" << std::endl;
         std::cout << "  &a = " << &sa << std::endl;

@@ -34,46 +34,6 @@ public:
     typedef PointChain_<TYPE, DIM> PointChain;
 
 public:
-    // static void ReadPointChain(const std::string& fn, PointChain& pc) {
-    //     pc.clear();
-    //     TextFile txtf(fn);
-    //     txtf.read();
-    //     txtf.parse_config();
-
-    //     const St dimf = St(std::stoi(txtf.get_config("Dim")));
-    //     const St size = St(std::stoi(txtf.get_config("Size")));
-    //     const std::string type = txtf.get_config("Type");
-    //     ASSERT(type == "PointChain");
-
-    //     for (auto& line : txtf.content()) {
-    //         std::vector<std::string> tokens;
-    //         if (line == "") {
-    //             continue;
-    //         }
-    //         TextFile::Tokenize(line, tokens);
-    //         if (tokens[0] == "##") {
-    //             /// ignore dict line
-    //             continue;
-    //         }
-    //         if (tokens[0] == "#") {
-    //             /// ignore comment line
-    //             continue;
-    //         }
-    //         /// data line
-    //         std::vector<std::string> tokens_d;
-    //         TextFile::Tokenize(line, tokens_d, ",");
-    //         if (tokens_d.size() > 0) {
-    //             Point p(0);
-    //             for (St i = 0; i < dimf; i++) {
-    //                 if (i < Dim) {
-    //                     p[i] = Vt(std::stod(tokens_d[i]));
-    //                 }
-    //             }
-    //             pc.push_back(p);
-    //         }
-    //     }
-    // }
-
     static void _WritePointsHead(TextFile& txtf, St size) {
         // write head
         int d = Dim;

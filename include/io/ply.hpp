@@ -122,17 +122,17 @@ protected:
         return Type::INVALID;
     }
 
-    void parse_internal(std::istream & is) {
+    void parse_internal(std::istream & in_stream) {
         std::string type;
-        is >> type;
+        in_stream >> type;
         if (type == "list") {
             std::string countType;
-            is >> countType >> type;
+            in_stream >> countType >> type;
             listType = property_type_from_string(countType);
             isList = true;
         }
         propertyType = property_type_from_string(type);
-        is >> name;
+        in_stream >> name;
     }
 
 };

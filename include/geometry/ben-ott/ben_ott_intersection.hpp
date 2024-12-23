@@ -145,6 +145,7 @@ public:
 
     auto execute(){
     #ifdef _DEBUG_MODE_
+        std::cout << "Ben-Ott execute()" << std::endl;
         _loop_i = 0;
     #endif
         ListResult _list_res;

@@ -137,11 +137,11 @@ auto GenerateSegmentsCase1(){ // mulit right
     typedef SEG_TYPE Seg;
     typedef std::vector<SEG_TYPE> ListSegment;
     ListSegment lseg;
-    lseg.push_back(Seg(Point(0, 10), Point(15, 26)));
+    lseg.push_back(Seg(Point(0,  10), Point(15, 26)));
     lseg.push_back(Seg(Point(15, 26), Point(10, 40)));
     lseg.push_back(Seg(Point(15, 26), Point(2,  20))); //
     lseg.push_back(Seg(Point(15, 26), Point(10,  30)));
-    lseg.push_back(Seg(Point(6, 18),  Point(20,  35))); //
+    lseg.push_back(Seg(Point(6,  18), Point(20,  35))); //
     
     return lseg;
 }
@@ -149,14 +149,7 @@ auto GenerateSegmentsCase1(){ // mulit right
 TEST(ben_ott, case1){
     auto sl = GenerateSegmentsCase1<Segment>();
     std::cout << "Input segmnets = " << sl.size() << std::endl;
-    Inter inter(sl);
+    Inter inter(sl, "case1");
     auto lres = inter.execute();
     std::cout << "Find  inter    = " << lres.size() << std::endl;
-
-    // PlotIntersection("case1", sl, lres);
-    // auto lresn2 = Intersect(sl, "n2");
-    // std::cout << "Find  inter n2 = " << lresn2.size() << std::endl;
-    
-    // EXPECT_EQ(lres.size(),   4);
-    // EXPECT_EQ(lresn2.size(), 9);
 }

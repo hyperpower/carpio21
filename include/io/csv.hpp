@@ -25,7 +25,7 @@ class Row {
 public:
 	typedef std::string Str;
 	typedef std::fstream fst;
-	public:
+public:
 	Row(const std::vector<Str> &header) :
 			_header(header) {
 
@@ -54,7 +54,7 @@ public:
 private:
 	const std::vector<Str> _header;
 	std::vector<Str> _values;
-	public:
+public:
 	template<typename T>
 	const T get_value(uInt pos) const {
 		if (pos < _values.size()) {
