@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "io/text_file.hpp"
+#include "io/data_file.hpp"
 #include <math.h>
 
 using namespace carpio; 
@@ -11,6 +12,8 @@ TEST(config, textfile) {
     f.parse_config_a_line(line);
     f.show_config();
 }
+
+
 
 TEST(aline_to_double , textfile) {
     std::cout << " === parse to double ===  " << std::endl; 
@@ -66,4 +69,38 @@ TEST(text_file_read, textfile) {
     f.show_config();
     EXPECT_NO_THROW(f.get_config("col"));
     std::cout << "config get col" << f.get_config("col")<< std::endl;
+}
+
+TEST(token, t1) {
+    std::cout << " === parse a line with command ===  " << std::endl; 
+    std::vector<std::string> tokens;
+    std::string a = " 12, 34, # command";
+    Tokenize(a, tokens, "#");
+    ASSERT_EQ(tokens.size(), 2);
+    for(auto t : tokens){
+        std::cout << t << std::endl;
+    }
+    std::cout<< "------" << std::endl;
+    std::string b = " ## aa sfef command";
+    std::cout << "first of #  " << b.find_first_of("#") << std::endl;
+    std::cout << "first of ## " << b.find_first_of("##") << std::endl;
+    std::cout << (std::string::npos == b.find_first_of("z")) << std::endl;
+    tokens.clear();
+    Tokenize(b, tokens, "#");
+    EXPECT_EQ(tokens.size(), 2);\
+    int num = 0;
+    for(auto t : tokens){
+        std::cout << num << " "<< t << std::endl;
+        num++;
+    }
+}
+
+
+TEST(datafile, read) {
+    std::cout << " === read a datafile ===  " << std::endl; 
+    DataFile df("./test/input_files/textfile.txt");
+    df.read();
+    std::cout << "size block = " << df.size_block() << std::endl;
+    df.block(0).show();
+
 }

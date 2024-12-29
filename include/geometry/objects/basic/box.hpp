@@ -107,13 +107,13 @@ public:
 		return _min[_X_];
 	}
 	CV xmax() const {
-		return _max[_X_];;
+		return _max[_X_];
 	}
 	CV ymin() const {
-		return _min[_Y_];;
+		return _min[_Y_];
 	}
 	CV ymax() const {
-		return _max[_Y_];;
+		return _max[_Y_];
 	}
 
 	CV center(int a) const {
