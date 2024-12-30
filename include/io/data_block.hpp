@@ -29,6 +29,12 @@ public:
     void add_line(const str& line) {
         this->_content.push_back(line);
     }
+
+    void remove_last_line(const unsigned int& n = 1){
+        for(unsigned int i = 0; i < n && this->_content.size()> 0; i++){
+            this->_content.pop_back();
+        }
+    }
     
     void add_config_item(const str& key, const str& value){
         this->_config[key] = value;
@@ -54,12 +60,10 @@ public:
     void parse_as_config(const std::string& line){
         // input line was trimed and start with "##"
         std::vector<std::string> tokens;
-        Tokenize(line, tokens, "#");
+        Tokenize(line, tokens, "##");
         // the First token is useful
         if(tokens.size() >= 1){
-            std::cout << tokens.size() << std::endl;
             auto t = Trim(tokens[1]);
-            std::cout <<"t = " << t << std::endl;
             std::vector<std::string> kvtokens;
             Tokenize(t, kvtokens, ":");
             this->_config[Trim(kvtokens[0])] = Trim(kvtokens[1]);
@@ -89,15 +93,29 @@ public:
         }
     }
     
-    void show_content() const{
-        for (auto& str : _content) {
-            std::cout << str << "\n";
+    void show_content(const bool show_all = false) const{
+        if (show_all || this->_content.size() < 6){
+            for (auto& str : _content) {
+                std::cout << str << "\n";
+            }
+        }else{
+            for(auto iter = _content.begin(); 
+                     iter != std::next(_content.begin(), 3); 
+                     ++iter){
+                std::cout << *iter << std::endl;
+            }
+            std::cout << ". . ." << std::endl;
+            for(auto iter = std::prev(_content.end(), 3); 
+                     iter != _content.end(); 
+                     ++iter){
+                std::cout << *iter << std::endl;
+            }
         }
     }
 
-    void show() const{
+    void show(const bool show_all = false) const{
         this->show_config();
-        this->show_content();
+        this->show_content(show_all);
     }
 
     std::string get_config(const std::string& key) const {

@@ -101,6 +101,11 @@ TEST(datafile, read) {
     DataFile df("./test/input_files/textfile.txt");
     df.read();
     std::cout << "size block = " << df.size_block() << std::endl;
+    std::cout << "block 0 =======" << std::endl;
     df.block(0).show();
+    std::cout << "block 1 =======" << std::endl;
+    df.block(1).show(true);
+    std::cout << "block 2 =======" << std::endl;
+    df.block(2).show(true);
 
 }

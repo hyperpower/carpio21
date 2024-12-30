@@ -12,7 +12,7 @@ public:
     typedef std::shared_ptr<Block> spBlock;
     typedef std::string str;
     typedef std::fstream fst;
-    typedef std::list<spBlock> Content;
+    typedef std::list<spBlock> ListBlock;
 protected:
     /// a text file is consisted from three parts
     ///  1. filename
@@ -21,8 +21,8 @@ protected:
     ///  1. three consecutive empty lines
     ///  2. change none configure line to configure line
 
-    str      _filename;
-    Content  _content;
+    str        _filename;
+    ListBlock  _listb;
 
     static const short EMPLTY_LINE = 0;
     static const short CONFIG_LINE = 1;
@@ -30,15 +30,15 @@ protected:
 public:
     DataFile() :
             _filename("") {
-        _init_content();
+        _init_list_blocks();
     }
     DataFile(const str& filename) :
             _filename(filename){
-        _init_content();
+        _init_list_blocks();
     }
-    DataFile(const str& filename, const Content& content) {
+    DataFile(const str& filename, const ListBlock& list_b) {
         _filename = filename;
-        _content  = content;
+        _listb  = list_b;
     }
 
     int pre_parse_a_line(std::string& line) const{
@@ -47,7 +47,8 @@ public:
             return EMPLTY_LINE; //EMPTYLINE
         }
 
-        if(nl.find_first_of("##") == 0){ // "##" is the first charactor
+        if(0 == nl.find_first_of("##")){ // "##" is the first charactor
+            std::cout<< "first of ## " << nl << std::endl;
             return CONFIG_LINE; // config line
         }else{
             if( 0 == nl.find_first_of("#")){ // "#" is the first charactor
@@ -62,11 +63,11 @@ public:
     }
 
     void add_new_block(){
-        this->_content.emplace_back(std::make_shared<Block>());
+        this->_listb.emplace_back(std::make_shared<Block>());
     }
 
-    auto block(const Content::size_type& idx){
-        auto iter = std::next(this->_content.begin(), idx);
+    auto block(const ListBlock::size_type& idx){
+        auto iter = std::next(this->_listb.begin(), idx);
         return *(*iter);
     }
 
@@ -82,23 +83,26 @@ public:
             flag = pre_parse_a_line(sline);
             switch (flag){
                 case EMPLTY_LINE:{
-                    auto b = this->_content.back();
+                    auto b = this->_listb.back();
                     b->add_line(sline); 
                     ec +=1;
                     break;
                 }
                 case CONFIG_LINE:{
-                    if(ec > 3 || prevf == NORMAL_LINE){
+                    if(ec >= 3 || prevf == EMPLTY_LINE || prevf == NORMAL_LINE){
                         this->add_new_block();
                         ec = 0;
                     }
-                    auto b = this->_content.back();
-                    std::cout << sline << std::endl;
+                    auto b = this->_listb.back();
                     b->parse_as_config(sline); 
                     break;
                 }
                 case NORMAL_LINE:{
-                    auto b = this->_content.back();
+                    if(ec >= 3){
+                        this->add_new_block();
+                        ec = 0;
+                    }
+                    auto b = this->_listb.back();
                     b->add_line(sline); 
                     break;
                 }
@@ -107,14 +111,14 @@ public:
     }
 
     auto size_block() const{
-        return this->_content.size();
+        return this->_listb.size();
     }
 
-    Content& content(){
-        return this->_content;
+    ListBlock& list_b(){
+        return this->_listb;
     }
-    const Content& content() const{
-        return this->_content;
+    const ListBlock& list_b() const{
+        return this->_listb;
     }
 
 // Write ===========================
@@ -123,7 +127,7 @@ public:
         fst outs;
         this->_open_write(outs);
         outs.seekg(0, std::ios::beg);
-        for (const auto& spb : this->_content) {
+        for (const auto& spb : this->_listb) {
             spb->write(outs);
         }
     }
@@ -146,9 +150,9 @@ protected:
         }
     }
 
-    void _init_content(){
+    void _init_list_blocks(){
         // initial the first block
-        this->_content.emplace_back(std::make_shared<Block>());
+        this->_listb.emplace_back(std::make_shared<Block>());
     }
 
     
