@@ -1,18 +1,19 @@
 import sys
 import os
-import platform
 import shutil
 import requests
+from examples.pytools.env_para import *
 
 _FILE_PATH_ = os.path.abspath(__file__)
 _FILE_DIR_  = os.path.abspath(os.path.join(_FILE_PATH_,  "../"))
 _O_WORKING_ = os.path.abspath(os.getcwd())
 
-os_name = platform.system()
-os_version = platform.version()
-os_info = platform.platform()
-release = platform.release()
-architecture = platform.architecture()
+_PIP_PACKAGE_REQUIRED_ = [
+    "sphinx",
+    "matplotlib",
+    "numpy",
+    "plotly",
+]
 
 def check_path():
     cwd = os.path.abspath(os.getcwd())
@@ -91,10 +92,15 @@ def file_name_not_has(fn, str):
     else:
         return True
 
-    
+def check_pip_packages(l):
+    print(TermColor.YELLOW + "Check PIP packages" + TermColor.RESET)
+    for p in l:
+        check_pip_package(p)
+
 def main():
     check_path()
     check_python()
+    check_pip_packages(_PIP_PACKAGE_REQUIRED_)
     check_and_new_folder("external")
     check_and_new_folder("fig")
     if not os.path.isdir("./external/googletest"):

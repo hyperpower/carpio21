@@ -11,6 +11,7 @@ from path import *
 import pathlib
 # sphinx should be installed
 from sphinx.cmd.build import main as sphinx_main
+from env_para import *
 
 # 
 from rst_supplement import *
@@ -181,7 +182,9 @@ class Runer:
         # result = subprocess.Popen(cmd)
         # print(result.stdout)
         print(result.read())
-
+    
+    def print_bar(self, name):
+        print(TermColor.BLUE + "==== %10s ====" % (name) + TermColor.RESET )
 
     def execute(self):
         current = os.getcwd()
@@ -286,7 +289,7 @@ class Runer:
     def _run_all(self):
         run_flag = True
         self.clean()
-        print("make ===== ")
+        self.print_bar("make")
         t  = time.perf_counter()
         #
         self.mkdir_all()
@@ -361,11 +364,11 @@ class Runer:
             self.build_doc()
             self._info["document_wall_time"] = time.perf_counter() - t
 
-        
+
         if len(record) == 0:
-            print("run_all ==== ")
+            print("==== Run_all ==== ")
             record["run_all"] = True
             self._run_all()
-            
-        
+
+
         # print(self._info)
