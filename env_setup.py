@@ -8,6 +8,11 @@ _FILE_PATH_ = os.path.abspath(__file__)
 _FILE_DIR_  = os.path.abspath(os.path.join(_FILE_PATH_,  "../"))
 _O_WORKING_ = os.path.abspath(os.getcwd())
 
+os_name = platform.system()
+os_version = platform.version()
+os_info = platform.platform()
+release = platform.release()
+architecture = platform.architecture()
 
 def check_path():
     cwd = os.path.abspath(os.getcwd())
@@ -92,9 +97,10 @@ def main():
     check_python()
     check_and_new_folder("external")
     check_and_new_folder("fig")
-    download_googletest()
-    # if not check_ffmpeg():
-        # download_ffmpeg()
+    if not os.path.isdir("./external/googletest"):
+        download_googletest()
+    else:
+        print("./external/googletest exist")
     restore_path()    
 
 if __name__ == '__main__':

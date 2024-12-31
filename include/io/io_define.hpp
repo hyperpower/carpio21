@@ -138,6 +138,9 @@ inline std::string Trim(const std::string &s) {
     return RTrim(LTrim(s));
 }
 
+inline bool StartsWith(const std::string& str, const std::string& prefix) {
+    return str.find(prefix) == 0;
+}
 inline std::string ToStringAsAxes(const St& d){
     ASSERT(d < 3);
     if (d == 0) {

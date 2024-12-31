@@ -1,6 +1,7 @@
 #ifndef _DATA_FILE_HPP_
 #define _DATA_FILE_HPP_
 
+#include "utility/tinyformat.hpp"
 #include "io_define.hpp"
 #include "data_block.hpp"
 
@@ -47,11 +48,11 @@ public:
             return EMPLTY_LINE; //EMPTYLINE
         }
 
-        if(0 == nl.find_first_of("##")){ // "##" is the first charactor
+        if(StartsWith(nl, "##")){ // "##" is the first charactor
             std::cout<< "first of ## " << nl << std::endl;
             return CONFIG_LINE; // config line
         }else{
-            if( 0 == nl.find_first_of("#")){ // "#" is the first charactor
+            if(StartsWith(nl, "#")){ // "#" is the first charactor
                 line.clear(); 
                 return EMPLTY_LINE;
             }
@@ -67,6 +68,10 @@ public:
     }
 
     auto block(const ListBlock::size_type& idx){
+        if(idx >= this->_listb.size()){
+            auto emsg = tfm::format("index %d out of %d", idx, this->_listb.size());
+            throw std::out_of_range(emsg);
+        }
         auto iter = std::next(this->_listb.begin(), idx);
         return *(*iter);
     }
@@ -100,6 +105,9 @@ public:
                 case NORMAL_LINE:{
                     if(ec >= 3){
                         this->add_new_block();
+                        ec = 0;
+                    }
+                    if(prevf == EMPLTY_LINE){
                         ec = 0;
                     }
                     auto b = this->_listb.back();

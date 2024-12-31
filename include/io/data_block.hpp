@@ -118,6 +118,15 @@ public:
         this->show_content(show_all);
     }
 
+    bool has_config(const std::string& key) const{
+        typename dict::const_iterator iter = this->_config.find(key);
+        if (iter == this->_config.end()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     std::string get_config(const std::string& key) const {
         typename dict::const_iterator iter = this->_config.find(key);
         if (iter == this->_config.end()) {

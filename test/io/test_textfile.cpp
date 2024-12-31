@@ -13,8 +13,6 @@ TEST(config, textfile) {
     f.show_config();
 }
 
-
-
 TEST(aline_to_double , textfile) {
     std::cout << " === parse to double ===  " << std::endl; 
     TextFile f;
@@ -81,13 +79,16 @@ TEST(token, t1) {
         std::cout << t << std::endl;
     }
     std::cout<< "------" << std::endl;
-    std::string b = " ## aa sfef command";
-    std::cout << "first of #  " << b.find_first_of("#") << std::endl;
-    std::cout << "first of ## " << b.find_first_of("##") << std::endl;
-    std::cout << (std::string::npos == b.find_first_of("z")) << std::endl;
+    std::string b1 = "  ## aa sfef command";
+    std::string b2 = "  # aa sfef command";
+    std::cout << "first of #  " << b1.find_first_of("#") << std::endl;
+    EXPECT_EQ(b1.find_first_of("#"), 2);
+    EXPECT_EQ(b2.find_first_of("#"), 2);
+    std::cout << "first of ## " << b2.find_first_of("##") << std::endl;
+    std::cout << (std::string::npos == b1.find_first_of("z")) << std::endl;
     tokens.clear();
-    Tokenize(b, tokens, "#");
-    EXPECT_EQ(tokens.size(), 2);\
+    Tokenize(b1, tokens, "#");
+    EXPECT_EQ(tokens.size(), 2);
     int num = 0;
     for(auto t : tokens){
         std::cout << num << " "<< t << std::endl;
@@ -103,9 +104,14 @@ TEST(datafile, read) {
     std::cout << "size block = " << df.size_block() << std::endl;
     std::cout << "block 0 =======" << std::endl;
     df.block(0).show();
+    EXPECT_EQ(df.block(0).has_config("key"), true);
     std::cout << "block 1 =======" << std::endl;
+    EXPECT_EQ(df.block(1).has_config("col"), true);
     df.block(1).show(true);
-    std::cout << "block 2 =======" << std::endl;
-    df.block(2).show(true);
-
+    try{
+        std::cout << "block 2 =======" << std::endl;
+        df.block(2).show(true);
+    }catch (const std::out_of_range& e) {
+        std::cout << "Caught an exception: " << e.what() << std::endl;
+    }
 }
