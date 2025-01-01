@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from env_para import *
 
-# pytools dir
-_RUNTOOL_DIR_   = os.path.abspath(os.path.join(__file__, "../"))
-
-plt.style.use(os.path.join(_RUNTOOL_DIR_, "web.mplstyle"))
+plt.style.use(os.path.join(DIR_PYTOOLS, "web.mplstyle"))
 
 def plot_test_fig():
     fig, ax = plt.subplots()
@@ -27,7 +25,7 @@ def plot_test_fig():
 
     plt.grid()
 
-    plt.savefig(os.path.join(_RUNTOOL_DIR_, "test_style"))
+    plt.savefig(os.path.join(DIR_FIG, "test_style"))
 
 
 if __name__ == '__main__':

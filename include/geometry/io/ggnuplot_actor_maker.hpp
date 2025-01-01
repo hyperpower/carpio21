@@ -10,7 +10,7 @@
 #define _GEOMETRY_GNUPLOT_ACTOR_MAKER_HPP_
 
 #include "geometry/geometry_define.hpp"
-#include "geometry/objects/shapes/distance_indicator.hpp"
+#include "geometry/shape/distance_indicator.hpp"
 #include <array>
 #include "geometry/objects/objects.hpp"
 #include "io/gnuplot.hpp"

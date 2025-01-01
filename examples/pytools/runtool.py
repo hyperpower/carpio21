@@ -62,9 +62,11 @@ def is_code_file_in(path, fn):
     else:
         return False
 
+def print_bar(name):
+        print(TermColor.BLUE + '===== {:^10s} ====='.format(name)+ TermColor.RESET )
 
 def clean(path, original_files):
-    print("clean ====== ")
+    print_bar("clean")
     ori_ff = []
     ori_fd = []
     for f in original_files:
@@ -184,7 +186,7 @@ class Runer:
         print(result.read())
     
     def print_bar(self, name):
-        print(TermColor.BLUE + "==== %10s ====" % (name) + TermColor.RESET )
+        print(TermColor.BLUE + '===== {:^10s} ====='.format(name)+ TermColor.RESET )
 
     def execute(self):
         current = os.getcwd()
@@ -289,18 +291,18 @@ class Runer:
     def _run_all(self):
         run_flag = True
         self.clean()
-        self.print_bar("make")
+        print_bar("make")
         t  = time.perf_counter()
         #
         self.mkdir_all()
         self.cmake()
         #
         self._info["make_wall_time"] = time.perf_counter() - t
-        print("build ======== ")
+        print_bar("build")
         t  = time.perf_counter()
         self.build()
         self._info["build_wall_time"] = time.perf_counter() - t
-        print("execute ====== ")
+        print_bar("execute")
         t  = time.perf_counter()
         if(self._num_mpi > 1):
             run_flag = self.execute_mpi()
@@ -309,13 +311,13 @@ class Runer:
         self._info["execute_wall_time"] = time.perf_counter() - t
         if run_flag is not True:
             return run_flag
-        print("plot ====== ")
+        print_bar("plot")
         t  = time.perf_counter()
         self.plot()
         self._info["plot_wall_time"] = time.perf_counter() - t
-        print("build doc ====")
+        print_bar("build doc")
         self.build_doc()
-        print("Info  ========")
+        print_bar("info")
         self.show_info()
 
 
@@ -366,7 +368,7 @@ class Runer:
 
 
         if len(record) == 0:
-            print("==== Run_all ==== ")
+            self.print_bar("run all")
             record["run_all"] = True
             self._run_all()
 

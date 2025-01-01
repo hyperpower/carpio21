@@ -7,7 +7,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 set(Sources
     # test_box.cpp
-    # test_box3.cpp
+    test_box3.cpp
     # test_point.cpp
     # test_affine.cpp
     # test_point_chain.cpp
@@ -17,7 +17,7 @@ set(Sources
     # test_predicate.cpp
     # test_polygon_partition.cpp
     # test_segment.cpp
-    test_ben_ott2.cpp
+    # test_ben_ott2.cpp
 )
 set(Sources_Bezier test_bezier.cpp)
 

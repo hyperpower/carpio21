@@ -120,7 +120,6 @@ Run time information
 
     return fstr + text
 
-
 def comma_to_space(input):
     return input.replace(",", " ")
 

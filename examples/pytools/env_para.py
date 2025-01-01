@@ -4,6 +4,14 @@ import os
 import platform
 import importlib
 
+# define folder path
+DIR_PYTOOLS  = os.path.abspath(os.path.join(__file__, "../"))
+DIR_EXAMPLES = os.path.abspath(os.path.join(__file__, "../../"))
+DIR_PROJECT  = os.path.abspath(os.path.join(__file__, "../../../"))
+DIR_DATA     = os.path.abspath(os.path.join(DIR_PROJECT, "./data/"))
+DIR_FIG      = os.path.abspath(os.path.join(DIR_PROJECT, "./fig/"))
+DIR_TEST     = os.path.abspath(os.path.join(DIR_PROJECT, "./test/"))
+
 # os info
 OsName    = platform.system()
 OsVersion = platform.version()
@@ -13,11 +21,11 @@ OsArchitecture = platform.architecture()
 
 # define color of terminal
 class TermColor():
-    BLACK  = '\033[30m'
-    RED    = '\033[31m'
-    GREEN  = '\033[32m'
-    YELLOW = '\033[33m'
-    BLUE   = '\033[34m'
+    BLACK   = '\033[30m'
+    RED     = '\033[31m'
+    GREEN   = '\033[32m'
+    YELLOW  = '\033[33m'
+    BLUE    = '\033[34m'
     MAGENTA = '\033[35m'
     CYAN    = '\033[36m'
     WHITE   = '\033[37m'
@@ -39,4 +47,5 @@ def check_pip_package(name):
 
 if __name__ == '__main__':
     check_pip_package("platform")
-    check_pip_package("platform3")
+
+    print(DIR_FIG)
