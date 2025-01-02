@@ -49,7 +49,6 @@ public:
         }
 
         if(StartsWith(nl, "##")){ // "##" is the first charactor
-            std::cout<< "first of ## " << nl << std::endl;
             return CONFIG_LINE; // config line
         }else{
             if(StartsWith(nl, "#")){ // "#" is the first charactor

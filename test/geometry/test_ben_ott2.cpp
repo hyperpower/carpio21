@@ -7,6 +7,7 @@
 #include "gtest/gtest.h"
 
 #include "io/io_define.hpp"
+#include "io/data_file.hpp"
 #include "geometry/objects/basic/point.hpp"
 #include "geometry/objects/basic/segment.hpp"
 #include "geometry/operation/boolean/intersection_base.hpp"
@@ -153,3 +154,28 @@ TEST(ben_ott, case1){
     auto lres = inter.execute();
     std::cout << "Find  inter    = " << lres.size() << std::endl;
 }
+
+auto ReadSegmentsFromFile(const std::string& fn){
+    typedef std::vector<Segment> ListSegment;
+    ListSegment lseg;
+    DataFile df(fn);
+    df.read();
+    auto b = df.block(0);
+    for(auto& row : b.content()){
+        auto rd = b.parse_as_vector_double(row);
+        if(!rd.empty()){
+            lseg.push_back(Segment(rd[0],rd[2],rd[1],rd[3]));
+        }
+    }
+    return lseg;
+}
+
+TEST(ben_ott, case1_from_file){
+    std::cout << " === read a datafile ===  " << std::endl; 
+    auto lseg = ReadSegmentsFromFile("./test/input_files/segments_intersection/case1.txt");
+    for(auto& seg : lseg){
+        std::cout << seg << std::endl;
+    }
+}
+
+

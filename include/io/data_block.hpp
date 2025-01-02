@@ -63,7 +63,7 @@ public:
         Tokenize(line, tokens, "##");
         // the First token is useful
         if(tokens.size() >= 1){
-            auto t = Trim(tokens[1]);
+            auto t = Trim(tokens[0]);
             std::vector<std::string> kvtokens;
             Tokenize(t, kvtokens, ":");
             this->_config[Trim(kvtokens[0])] = Trim(kvtokens[1]);
@@ -142,9 +142,9 @@ public:
         double v = std::stod(tvalue);
         return v;
     }
-    std::vector<std::string> get_config_as_array_string(const std::string& key) const{
-        std::string value(this->get_config(key));
-        auto tvalue = Trim(value);
+
+    std::vector<std::string> parse_as_vector_string(const std::string& line) const{
+        auto tvalue = Trim(line);
         std::vector<std::string> tokens;
         Tokenize(tvalue, tokens, ",");
         for(auto& v : tokens){
@@ -152,14 +152,40 @@ public:
         }
         return tokens;
     }
+    
+    std::vector<double> parse_as_vector_double(const std::string& line) const{
+        auto tvalue = Trim(line);
+        std::vector<std::string> tokens;
+        Tokenize(tvalue, tokens, ",");
+        std::vector<double> vecd(tokens.size());
+        auto iterv = vecd.begin();
+        for(auto& v : tokens){
+            (*iterv) = std::stod(Trim(v));
+            iterv++;
+        }
+        return vecd;
+    }
+
+    std::vector<std::string> get_config_as_vector_string(const std::string& key) const{
+        std::string value(this->get_config(key));
+        return this->parse_as_vector_string(value); 
+    }
 
     std::vector<double> get_config_as_array_double(const std::string& key) const{
-        std::vector<std::string> arrs = get_config_as_array_string(key);
+        std::vector<std::string> arrs = get_config_as_vector_string(key);
         std::vector<double> arrd(arrs.size());
         for(auto i = 0; i < arrs.size(); ++i){
             arrd[i] = std::stod(arrs[i]);
         }
         return arrd;
+    }
+
+    std::vector<double> get_content_row_as_vector_double(const lines::size_type& index) const{
+        if(index >= this->_content.size()){
+            throw std::out_of_range("");
+        }
+        auto iter_row = std::next(this->_content.begin(), index);
+        return this->parse_as_vector_double(*iter_row);
     }
     // Write ===========================
     // =================================
