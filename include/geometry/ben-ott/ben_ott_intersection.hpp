@@ -9,6 +9,7 @@
 #ifdef _DEBUG_MODE_
 #include "geometry/io/ggnuplot_actor_maker.hpp"
 #include "utility/tinyformat.hpp"
+#include "ben-ott_debug_helper.hpp"
 #endif
 
 namespace carpio {
@@ -103,6 +104,7 @@ public:
     typedef SegmentSlope_<Segment> Slope;
 protected:
 #ifdef _DEBUG_MODE_
+    typedef DebugIntersectionBenOtt_<SEG> Debug;
     typedef std::list<Segment> ListSegment;
     int _loop_i;
     ListSegment listseg;
@@ -111,6 +113,8 @@ protected:
     std::string _debug_case_name;
     Gnuplot gnu;
     std::ofstream ofs;
+
+    Debug de;
 #endif
     EventQueue queue;
     ListSegProxy listsegproxy;    
