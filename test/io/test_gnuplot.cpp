@@ -12,6 +12,22 @@ typedef Point_<double, 2>         Point;
 typedef Segment_<double, 2>       Seg;
 typedef GGnuplotActor_<double, 2> GA;
 
+TEST(gnuplot, test) {
+	Gnuplot gnu;
+	if (FileAccessCheck("./fig")){
+		gnu.set_terminal_png(
+			"./fig/test", //const std::string& filename,
+			800,
+			600,
+			"Fira Code",
+			12
+			);
+	}else{
+		std::cerr << "!> Output Folder fig Not exist!" << std::endl;
+		FAIL();
+	}
+	gnu.test();
+}
 
 TEST(gnuplot, change_dpi) {
     std::cout << "Test gnuplot" << std::endl;

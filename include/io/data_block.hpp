@@ -142,6 +142,13 @@ public:
         double v = std::stod(tvalue);
         return v;
     }
+    
+    int get_config_as_int(const std::string& key) const{
+        std::string value(this->get_config(key));
+        auto tvalue = Trim(value);
+        double v = std::stoi(tvalue);
+        return v;
+    }
 
     std::vector<std::string> parse_as_vector_string(const std::string& line) const{
         auto tvalue = Trim(line);

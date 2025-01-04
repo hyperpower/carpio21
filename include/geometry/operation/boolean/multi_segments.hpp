@@ -28,10 +28,8 @@ auto IntersectN2(const CONTAINER& con, SegmentTag){
         auto& seg1 = *iter;
         for(auto iterin = std::next(iter); iterin != con.end(); ++iterin){
             auto& seg2 = *iterin;
-            // ProfileStart("Inter2Seg");
             Inter inter(seg1, seg2);
             auto res = inter.execute();
-            // ProfileEnd();
             if(res.type != _SS_NO_ && res.type != _SS_INVALID_){
                 lres.push_back(res);
             }

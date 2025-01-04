@@ -4,61 +4,20 @@
 #include "geometry/ben-ott/comp_seg.hpp"
 #include "geometry/ben-ott/sweep_event.hpp"
 #include "geometry/ben-ott/sweep_event_queue.hpp"
-#include "geometry/operation/boolean/segment_segment.hpp"
+#include "geometry/boolean/boolean_base.hpp"
+#include "geometry/boolean/boolean.hpp"
 
 #ifdef _DEBUG_MODE_
 #include "geometry/io/ggnuplot_actor_maker.hpp"
 #include "utility/tinyformat.hpp"
-#include "ben-ott_debug_helper.hpp"
+#include "ben_ott_debug_helper.hpp"
 #endif
 
 namespace carpio {
 #ifdef _DEBUG_MODE_
     
-    template<class LISTSEG>
-    void _PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
-        // gnu.set_label(1, strtype, -4.5, 4);
-        int index = 1;
-        for(auto seg : sl){
-            auto a = ToGnuplotActor(seg);
-            a.style("with points pointtype 7 pointsize 1 lw 3 lc rgb \"#B5B5B5\"");
-            auto nv = seg.normal_unit_vector();
-            double ratio = 0.5;
-            // std::ostringstream sst;
-            // sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
-                // << nv.x() * ratio << ", " << nv.y() * ratio; 
-            // gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
-            auto a1 = ToGnuplotActorAsVector(seg);
-            // a1.title("Segment " + seg.get_name());
-            a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#B5B5B5\"");
-            gnu.add(a);
-            gnu.add(a1);
-            index++;
-        }
-    }
-    template<class LISTSEG>
-    void _PlotListpSegment(Gnuplot& gnu, 
-                          const LISTSEG& sl, 
-                          const std::string& t = "",
-                          const std::string& color_code = "#00A4EF"){
-    int i = 0;
-    if(sl.size() == 0 ){
-        auto a = ToGnuplotActorAsVector(Segment_<double, 2>(0,0,1,1));
-        a.title(t + " n=" + ToString(sl.size()));
-        a.style("with vector head filled size screen 0.03,10,155 lw 2 lc rgb \"" + color_code +"\"");
-        gnu.add(a);
-    }else{
-        for(auto seg : sl){
-            auto a1 = ToGnuplotActorAsVector(*seg);
-            if(i == 0){
-                a1.title(t + " n=" + ToString(sl.size()));
-            }
-            a1.style("with vector head filled size screen 0.03,10,155 lw 2 lc rgb \"" + color_code +"\"");
-            gnu.add(a1);
-            i++;
-            }
-        }
-    }
+    
+    
     template<class SEG>
     void PlotpSegment(Gnuplot& gnu, 
                       const SEG* seg, 
@@ -114,7 +73,9 @@ protected:
     Gnuplot gnu;
     std::ofstream ofs;
 
-    Debug de;
+    // friend class DebugIntersectionBenOtt_<SEG>;
+    Debug* pde;
+
 #endif
     EventQueue queue;
     ListSegProxy listsegproxy;    
@@ -125,14 +86,14 @@ public:
             &&  IsSegment<typename CONTAINER::value_type>::value 
         , bool>::type = true>
     IntersectionBenOtt_(
-        const CONTAINER& con,
-        const std::string& case_name = ""){
+        const CONTAINER& con
     #ifdef _DEBUG_MODE_
-        _build_list_segment(con);
-        _case_name = case_name;
-        _debug_case_name = "case9";
-        _loop_i = 0;
-        _output_list_segment(con);
+        ,Debug* p = nullptr
+    #endif
+    ){
+    #ifdef _DEBUG_MODE_
+        pde = p;
+        pde->build_list_segment(con);
     #endif
         _build_list_segproxy(con);
     #ifdef _DEBUG_MODE_
@@ -165,19 +126,18 @@ public:
             #endif
             ){
         #ifdef _DEBUG_MODE_
-            gnu.clear();
             std::cout << "loop index = " << _loop_i << std::endl;
-            if(_debug_condition()){
-                _plot_setup(gnu);
-            }
+            this->pde->set_loop_i(_loop_i);
         #endif
-
             Event event = queue.top();
             auto& point = event.get_point();
             
         #ifdef _DEBUG_MODE_
-            if(_debug_condition()){
-                _plot_sweep_line(gnu, point, diagonal);
+            if(this->pde->is_debug()){
+                pde->gnu_setup("");
+                pde->add_list_seg(listsegproxy);
+                pde->add_sweep_line(point);
+                
             }
         #endif
 
@@ -189,10 +149,10 @@ public:
             auto& r_set = queue.begin()->second[2];
 
             #ifdef _DEBUG_MODE_
-            if(_debug_condition()){
-                _PlotListpSegment(gnu, l_set, "l set", "#FBBC04" );
-                _PlotListpSegment(gnu, c_set, "c set", "#F35426" );
-                _PlotListpSegment(gnu, r_set, "r set", "#81BC06" );
+            if(this->pde->is_debug()){
+                pde->add_list_pseg(l_set, "left set",   "#FBBC04");
+                pde->add_list_pseg(c_set, "center set", "#F35426");
+                pde->add_list_pseg(r_set, "right set",  "#81BC06");
             }
             #endif
 
@@ -208,15 +168,17 @@ public:
 
             // ProfileStart("BO_SetSize");
             auto set_size = l_set.size() + c_set.size() + r_set.size();
-            // std::cout << "three set size = " << set_size << std::endl;
-            // ProfileEnd();
+            #ifdef _DEBUG_MODE_
+            if(this->pde->is_debug()){
+                std::cout <<"3Set size = " << set_size << std::endl;
+                this->pde->add_label_set_size(set_size);
+            }
+            #endif
+
             if(set_size > 1){
-                // ProfileStart("BO_ReportRes");
                 _new_result(event, _list_res);
-                // ProfileEnd();
             }
             //4. Delete the segents in R(p) and C(p) from T
-            // ProfileStart("BO_DeleteRC");
             for(auto s : r_set){
                 auto r = _erase_seg_in_status(status, s);
                 if(r == 0)
@@ -226,11 +188,11 @@ public:
                 auto r = _erase_seg_in_status(status, s);
                 if(r == 0)
                     throw std::invalid_argument(ToString(*s) + " should in status tree!");
-                // status.erase(s);
             }
-            // ProfileEnd();
+
             p_sweep.x(point.x());
             p_sweep.y(point.y());
+
             //5. insert l_set and c_set in status tree
             ulc.clear();
             std::set_union(l_set.begin(), l_set.end(),
@@ -240,36 +202,37 @@ public:
             for(auto s : ulc){
                 it_hint = status.insert(it_hint, s);
             }
+            
+            #ifdef _DEBUG_MODE_
+            if(this->pde->is_debug()){
+                this->pde->add_label_status_tree_size(status);
+            }
+            #endif
+            
             // for(auto s : ulc){
                 // status.insert(s);
             // }
 
-            // std::cout << "status size = "<< status.size() << std::endl;
-            // ProfileStart("BO_FindNew");
             if(ulc.size() == 0){
                 cpSegProxy s_a, s_b;
                 _find_neighboors(p_sweep, status, s_a, s_b); 
-                // ProfileStart("FindN_0");
                 _compute_new_events(s_a, s_b, event);
-                // ProfileEnd();
             } else {
                 auto s_min  = _find_min_slope(ulc);
                 auto s_max  = _find_max_slope(ulc);
             #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
+                if(this->pde->is_debug()){
                 if(s_max){
                     std::cout << "s_max = " << s_max->seg() << std::endl;
-                    PlotpSegment(gnu, s_max->cpseg(), "#A0C347" );
                 }
                 if(s_min){
                     std::cout << "s_min = " << s_min->seg() << std::endl;
-                    PlotpSegment(gnu, s_min->cpseg(), "#A0C347" );
                 }
                 }
             #endif
                 auto s_lower = _find_lower_neighboor(s_min, status);
             #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
+                if(this->pde->is_debug()){
                 if(s_lower){
                     std::cout << "s_lower = " << s_lower->seg() << std::endl;
                 }
@@ -278,23 +241,22 @@ public:
                 auto s_upper = _find_upper_neighboor(s_max, status);
 
             #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
+                if(this->pde->is_debug()){
                 if(s_upper){
                     std::cout << "s_upper = " << s_upper->seg() << std::endl;
-                    PlotpSegment(gnu, s_upper->cpseg(), "#F04137" );
                 }
                 }
             #endif
 
 
                 #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
+                if(this->pde->is_debug()){
                     std::cout << "call min vs lower -> ";
                 }
                 #endif
                 _compute_new_events(s_min, s_lower, event); 
                 #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
+                if(this->pde->is_debug()){
                     std::cout << "call max vs upper -> ";
                 }
                 #endif
@@ -312,11 +274,10 @@ public:
             
             queue.pop();
             #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
-                    this->_plot_status_tree(gnu, status, p_sweep);
-                    this->_plot_res_points(gnu, _list_res);
-                    gnu.plot();
-                    gnu.clear();
+                if(this->pde->is_debug()){
+                    pde->add_status_tree(status, p_sweep);
+                    // this->_plot_res_points(gnu, _list_res);
+                    pde->plot();
                 }
                 std::cout << " end loop ========== " << std::endl;
                 _loop_i++;
@@ -417,7 +378,7 @@ protected:
     cpSegProxy _find_lower_neighboor(cpSegProxy cps, const StatusTree& tree) const{
         auto iter = tree.find(cps);
         if(iter == tree.end()){
-            throw std::invalid_argument(ToString(cps->seg()) + " should in tree!");
+            throw std::invalid_argument(ToString(cps->seg()) + " should in status tree!");
         }
         if(iter == tree.begin()){
             return nullptr;
@@ -429,7 +390,7 @@ protected:
     cpSegProxy _find_upper_neighboor(cpSegProxy s, const StatusTree& tree) const{
         auto iter = tree.find(s);
         if(iter == tree.end()){
-            throw std::invalid_argument(ToString(s->seg()) + " should in tree!");
+            throw std::invalid_argument(ToString(s->seg()) + " should in status tree!");
         }
         if(++iter == tree.end())
             return nullptr;
@@ -439,7 +400,11 @@ protected:
 
     cpSegProxy _find_min_slope(const SetcpSeg& v) const{
         auto it = v.begin();
-        auto min = *(v.begin());
+        auto min = *(it);
+      
+        if(v.size() == 1){
+            return min;
+        }
 
         while(++it != v.end()) {
             if((*it)->slope() < min->slope())
@@ -449,7 +414,11 @@ protected:
     }
     cpSegProxy _find_max_slope(const SetcpSeg& v) const{
         auto it = v.begin();
-        auto max = *(v.begin());
+        auto max = *(it);
+
+        if(v.size() == 1){
+            return max;
+        }
 
         while(++it != v.end()) {
             if(max->slope() < (*it)->slope())
@@ -463,9 +432,9 @@ protected:
             InterTwo inter(s0->seg(), s1->seg());
             auto res = inter.execute();
             #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
-                    std::cout << ToString(res.type) << std::endl;
-                }
+            if(pde->is_debug()){
+                std::cout << "new intersect " << ToString(res.type) << std::endl;
+            }
             #endif
             if (IsLessEqual(current.get_point(), res.point) ){
                 if(res.type == _SS_INTERSECT_){
@@ -477,14 +446,9 @@ protected:
                         v.insert(s1);
                         queue.insert(std::pair<Event, typename EventQueue::ArrSetcp> (ev_i, {set_empty, v, set_empty}));
                     }
-                #ifdef _DEBUG_MODE_
-                if(_debug_condition()){
-                    PlotNewPoint(gnu, res.point);
-                }
-                #endif
                 }else if(res.type == _SS_TOUCH_ || res.type == _SS_OVERLAP_){
                     #ifdef _DEBUG_MODE_
-                    if(_debug_condition()){
+                    if(pde->is_debug()){
                         std::cout << " touch or overlap" << std::endl;
                     }
                     #endif
@@ -493,7 +457,7 @@ protected:
                         if(pos == _PS_IN_){
                             queue.add_event(Event(s0->cpseg()->p(i)), 1, s1);
                             #ifdef _DEBUG_MODE_
-                            if(_debug_condition()){
+                            if(pde->is_debug()){
                                 PlotNewPoint(gnu, s0->cpseg()->p(i));
                             }
                             #endif
@@ -505,7 +469,7 @@ protected:
                             queue.add_event(Event(s1->cpseg()->p(i-2)), 1, s0);
                             // break;
                             #ifdef _DEBUG_MODE_
-                            if(_debug_condition()){
+                            if(pde->is_debug()){
                                 std::cout << s1->p(i-2) << std::endl;
                                 PlotNewPoint(gnu, s1->cpseg()->p(i-2));
                             }
@@ -515,13 +479,13 @@ protected:
                 }
             }
             #ifdef _DEBUG_MODE_
-            else if(_debug_condition()){
+            else if(pde->is_debug()){
                 std::cout << " oo " << std::endl;
             }
             #endif
         }
         #ifdef _DEBUG_MODE_
-        else if(_debug_condition()){
+        else if(pde->is_debug()){
             std::cout << " xx " << std::endl;
         }
         #endif
@@ -592,25 +556,6 @@ protected:
         ofs.close(); 
     }
 
-    template<class CONTAINER>
-    void _output_event_queue(const CONTAINER& con){
-    
-    }
-
-    void _plot_setup(Gnuplot& gnu){
-        gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i));
-        gnu.set_equal_ratio();
-        gnu.set_grid();
-        auto dx = MaxX(diagonal) - MinX(diagonal);
-        auto dy = MaxY(diagonal) - MinY(diagonal);
-        gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
-        gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
-        gnu.set_xlabel("x " + _case_name + " i = " + ToString(_loop_i));
-        // gnu.set_key("right top");
-        // gnu.set_key("outside");
-        _PlotListSegment(gnu, this->listseg);
-    }
-
     void _plot_sweep_line(Gnuplot& gnu, const Point& p,
                           const Segment& dia){
         auto a = ToGnuplotActor(p);
@@ -660,18 +605,10 @@ protected:
             index++;
         }
     }
+    
 
-    void _set_debug_case_name(const std::string& name){
-        this->_debug_case_name = name;
-    }
-
-    inline int _loop_index_any(int index){
-        return index;
-    }
-    bool _debug_condition(){
-        // return _case_name == _debug_case_name && _loop_i == 5;
-        return _case_name == _debug_case_name && _loop_i == _loop_index_any(_loop_i);
-    }
+    
+    
 #endif
 
 };

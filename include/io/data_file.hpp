@@ -74,6 +74,14 @@ public:
         auto iter = std::next(this->_listb.begin(), idx);
         return *(*iter);
     }
+    auto block(const ListBlock::size_type& idx) const{
+        if(idx >= this->_listb.size()){
+            auto emsg = tfm::format("index %d out of %d", idx, this->_listb.size());
+            throw std::out_of_range(emsg);
+        }
+        auto iter = std::next(this->_listb.begin(), idx);
+        return *(*iter);
+    }
 
     void read() {
         fst ins;

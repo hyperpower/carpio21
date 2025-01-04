@@ -1,13 +1,13 @@
-#ifndef _BOOLEAN_INTERSECTION_HPP_
-#define _BOOLEAN_INTERSECTION_HPP_
+#ifndef _BOOLEAN_HPP_
+#define _BOOLEAN_HPP_
 
-#include "intersection_base.hpp"
-#include "segment_segment.hpp"
-#include "multi_segments.hpp"
+#include "geometry/objects/objects.hpp"
+#include "intersection_two_segments.hpp"
+#include "intersection_multi_segments.hpp"
+// #include "multi_segments.hpp"
 
 
 namespace carpio{
-
 
 // Interface Function
 template<class GEO1, class GEO2, 

@@ -41,3 +41,6 @@
 /external/
 /doc-gen/html/
 
+#other
+*.DS_Store
+

@@ -8,13 +8,6 @@
 
 namespace carpio{
 
-
-// template<class VEC>
-// inline VEC Cross(const VEC& a, const VEC& b){
-//     return VEC(a[1]*b[2]-b[1]*a[2], 
-//                b[0]*a[2]-a[0]*b[2],
-//                a[0]*b[1]-b[0]*a[1]);
-// }
 template<class VEC>
 inline Vt Dot(const VEC& a, const VEC& b){
     return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; 

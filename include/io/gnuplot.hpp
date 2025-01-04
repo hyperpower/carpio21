@@ -183,6 +183,14 @@ public:
         this->_set_cmd(this->_scmd, "lc", " rgb \"#151C23\"");
         return *this;
     }
+    GnuplotActor& line_color_grey(){
+        this->_set_cmd(this->_scmd, "lc", " rgb \"#B5B5B5\"");
+        return *this;
+    }
+    GnuplotActor& line_color_pink(){
+        this->_set_cmd(this->_scmd, "lc", " rgb \"#EA8982\"");
+        return *this;
+    }
     
     GnuplotActor& line_width(const int& idx){
         this->_set_cmd(this->_scmd, "lw", " " + ToString(idx) + " ");

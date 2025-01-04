@@ -11,8 +11,8 @@ cmake_minimum_required(VERSION 3.10)
   # 'project(gtest)' above.
   include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
   include_directories(${PROJECT_SOURCE_DIR}/include)
-  # 查找 Google Benchmark 包
-  find_package(benchmark REQUIRED)
+  # find Google Benchmark 
+  # find_package(benchmark REQUIRED)
   ##############
   # Unit Tests -- Add test_gtest
   ##############
@@ -22,7 +22,8 @@ cmake_minimum_required(VERSION 3.10)
   add_executable(TestGTest ${Source})
 
   # Standard linking to gtest stuff.
-  target_link_libraries(TestGTest PUBLIC gtest gtest_main benchmark::benchmark)
+  # target_link_libraries(TestGTest PUBLIC gtest gtest_main benchmark::benchmark)
+  target_link_libraries(TestGTest PUBLIC gtest gtest_main)
 
   # Extra linking for the project.
   # target_link_libraries(TestGTest add)
