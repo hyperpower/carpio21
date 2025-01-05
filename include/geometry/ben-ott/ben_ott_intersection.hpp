@@ -137,7 +137,6 @@ public:
                 pde->gnu_setup("");
                 pde->add_list_seg(listsegproxy);
                 pde->add_sweep_line(point);
-                
             }
         #endif
 
@@ -170,7 +169,18 @@ public:
             auto set_size = l_set.size() + c_set.size() + r_set.size();
             #ifdef _DEBUG_MODE_
             if(this->pde->is_debug()){
-                std::cout <<"3Set size = " << set_size << std::endl;
+                std::cout <<"left   Set size  = " << l_set.size() << std::endl;
+                std::cout <<"center Set size  = " << c_set.size() << std::endl;
+                std::cout <<"right  Set size  = " << r_set.size() << std::endl;
+                std::cout <<"  3    Set size  = " << set_size << std::endl;
+                std::cout <<"Before Tree size = " << status.size() << std::endl;
+                for(auto& k : status){
+                    std::cout << k << std::endl;
+                }
+                // std::cout <<"old ulc = " << ulc.size() << std::endl;
+                // for(auto& v : ulc){
+                    // std::cout << v << std::endl;
+                // }
                 this->pde->add_label_set_size(set_size);
             }
             #endif
@@ -180,6 +190,7 @@ public:
             }
             //4. Delete the segents in R(p) and C(p) from T
             for(auto s : r_set){
+                std::cout << "delete right seg = " << *s << std::endl;
                 auto r = _erase_seg_in_status(status, s);
                 if(r == 0)
                     throw std::invalid_argument(ToString(*s) + " should in status tree!");
@@ -189,29 +200,36 @@ public:
                 if(r == 0)
                     throw std::invalid_argument(ToString(*s) + " should in status tree!");
             }
+            #ifdef _DEBUG_MODE_
+            if(this->pde->is_debug()){
+                std::cout <<"Delete r and c set in tree" << std::endl;
+                std::cout <<"After Tree size = " << status.size() << std::endl;
+                std::cout <<"Before inster Tree size = " << status.size() << std::endl;
+            }
+            #endif
 
             p_sweep.x(point.x());
             p_sweep.y(point.y());
 
             //5. insert l_set and c_set in status tree
-            ulc.clear();
+            ulc.clear();  
             std::set_union(l_set.begin(), l_set.end(),
                             c_set.begin(), c_set.end(),
                             std::inserter(ulc, ulc.begin()));
-            auto it_hint = status.begin();
+            // auto it_hint = status.begin();
             for(auto s : ulc){
-                it_hint = status.insert(it_hint, s);
+                std::cout << "inster = " << s << std::endl; 
+                status.insert(s);
             }
             
             #ifdef _DEBUG_MODE_
             if(this->pde->is_debug()){
+                std::cout <<"ulc size = " << ulc.size() << std::endl;
+                std::cout <<"After inster Tree size = " << status.size() << std::endl;
                 this->pde->add_label_status_tree_size(status);
             }
             #endif
             
-            // for(auto s : ulc){
-                // status.insert(s);
-            // }
 
             if(ulc.size() == 0){
                 cpSegProxy s_a, s_b;
@@ -275,14 +293,15 @@ public:
             queue.pop();
             #ifdef _DEBUG_MODE_
                 if(this->pde->is_debug()){
-                    pde->add_status_tree(status, p_sweep);
-                    // this->_plot_res_points(gnu, _list_res);
+                    std::cout << "Tree Size = " << status.size() << std::endl; 
+                    pde->add_status_tree(status);
+                    // pde->save_plot_cmd();
                     pde->plot();
                 }
-                std::cout << " end loop ========== " << std::endl;
+                std::cout << " ======= end loop ========== " << std::endl;
+                std::cout << std::endl;
                 _loop_i++;
             #endif
-            // std::cout << "Geo Set size = " << _set.size() << std::endl;
         }
         return _list_res;
     }
@@ -471,7 +490,7 @@ protected:
                             #ifdef _DEBUG_MODE_
                             if(pde->is_debug()){
                                 std::cout << s1->p(i-2) << std::endl;
-                                PlotNewPoint(gnu, s1->cpseg()->p(i-2));
+                                // PlotNewPoint(gnu, s1->cpseg()->p(i-2));
                             }
                             #endif
                         }
@@ -491,16 +510,7 @@ protected:
         #endif
     }
 #ifdef _DEBUG_MODE_
-    template<class CONTAINER>
-    void _build_list_segment(const CONTAINER& con){
-        if(! con.empty()){
-            diagonal = *(con.begin()); 
-        }
-        for(auto& seg : con){
-            diagonal = EnclosureDiagonal(seg, diagonal);
-            listseg.push_back(seg);
-        }
-    }
+    
     template<class CONTAINER> 
     void _output_list_segment(const CONTAINER& con){
         std::ofstream ofstream;
@@ -555,60 +565,6 @@ protected:
         }
         ofs.close(); 
     }
-
-    void _plot_sweep_line(Gnuplot& gnu, const Point& p,
-                          const Segment& dia){
-        auto a = ToGnuplotActor(p);
-        a.point_size(1);
-        a.point_type(5);
-        auto dy = MaxY(dia) - MinY(dia);
-        Point pup(p[0],  MaxY(dia) + dy * 0.2);
-        Point plow(p[0], MinY(dia) - dy * 0.2);
-        Segment seg(plow, pup);
-        auto aseg = ToGnuplotActor(seg);
-
-        gnu.add(a);
-        gnu.add(aseg);
-    }
-
-    void _plot_status_tree(Gnuplot& gnu, const StatusTree& tree, const Point& sweep){
-        gnu.unset_label();
-        int index = 1;
-        for(auto seg : tree){
-            auto a1 = ToGnuplotActorAsVector(*seg);
-            std::string color_code = "#EA8982" ;
-            a1.style("with vector head filled size screen 0.03,5,80 lw 2 lc rgb \"" + color_code +"\"");
-            gnu.add(a1);
-            auto nv = seg->normal_unit_vector();
-            double ratio = 0.5;
-            std::ostringstream sst;
-            sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
-                << nv.x() * ratio << ", " << nv.y() * ratio; 
-            gnu.set_label(index, ToString(index), seg->pc().x(), seg->pc().y(), sst.str());
-            index++;
-        }
-    }
-    void _plot_res_points(Gnuplot& gnu, const ListResult& list){
-        gnu.unset_label();
-        int index = 1;
-        for(auto res : list){
-            auto p = res.point;
-            auto a1 = ToGnuplotActor(p);
-            a1.line_color("#202125");
-            a1.point_type(4);
-            a1.point_size(2);
-            // a1.style("with vector head filled size screen 0.03,5,80 lw 2 lc rgb \"" + color_code +"\"");
-            gnu.add(a1);
-            std::ostringstream sst;
-            sst << "right front font \", 18\" textcolor rgb \"#202125\""; 
-            gnu.set_label(index, ToString(index), p.x(), p.y(), sst.str());
-            index++;
-        }
-    }
-    
-
-    
-    
 #endif
 
 };

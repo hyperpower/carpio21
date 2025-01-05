@@ -97,7 +97,8 @@ public:
     }
 
     void gnu_setup(Gnuplot& gnu, const std::string& append_name){
-        gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i)+ "_" + append_name);
+        std::string a = append_name == "" ? "" : ("_"+ append_name);
+        gnu.set_terminal_png("./fig/"+ _case_name +"_"+ ToString(_loop_i) + a);
         gnu.set_equal_ratio();
         gnu.set_grid();
         auto dx = MaxX(diagonal) - MinX(diagonal);
@@ -106,22 +107,33 @@ public:
         gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
         gnu.set_xlabel("x " + _case_name + " i = " + ToString(_loop_i) + " " + append_name);
     }
+
     void plot_input_segments(){
-        this->gnu_setup(this->gnu,"");
-        this->gnu.set_terminal_png("./fig/"+ _case_name + "_input");
-        gnu.set_xlabel("x " + _case_name + " input");
+        gnu.set_terminal_png("./fig/"+ _case_name + "_input");
+        gnu.set_equal_ratio();
+        gnu.set_grid();
+        auto dx = MaxX(diagonal) - MinX(diagonal);
+        auto dy = MaxY(diagonal) - MinY(diagonal);
+        gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
+        gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
+        gnu.set_xlabel(_case_name + " input");
         this->add_list_seg(this->listseg);        
-        this->gnu.plot();
-        this->gnu.clear();
+        gnu.plot();
     }
 
     void plot_result(const ListResult& lres){
-        this->gnu_setup(this->gnu,"");
-        this->gnu.set_terminal_png("./fig/"+ _case_name + "_result");
+        gnu.set_terminal_png("./fig/"+ _case_name + "_result");
+        gnu.set_equal_ratio();
+        gnu.set_grid();
+        auto dx = MaxX(diagonal) - MinX(diagonal);
+        auto dy = MaxY(diagonal) - MinY(diagonal);
+        gnu.set_xrange(MinX(diagonal) - dx * 0.1, MaxX(diagonal) + dx * 0.1);
+        gnu.set_yrange(MinY(diagonal) - dy * 0.1, MaxY(diagonal) + dy * 0.1);
         gnu.set_xlabel(_case_name + " result");
+
         this->add_list_seg(this->listseg);  
 
-        gnu.unset_label();
+        // gnu.unset_label();
         int index = 1;
         for(auto r : lres){
             auto p = r.point;
@@ -142,14 +154,15 @@ public:
             index++;
         }
               
-        this->gnu.plot();
-        this->gnu.clear();
-
+        gnu.plot();
     }
 
     void plot(){
         this->gnu.plot();
-        this->gnu.clear();
+    }
+
+    void save_plot_cmd(){
+        this->gnu.save_cmd("./fig/"+ _case_name +"_"+ ToString(_loop_i) + ".txt");
     }
     template<class LISTSEG>
     void add_proxy_segments(const LISTSEG& sl){
@@ -210,7 +223,7 @@ public:
                        const std::string &t = "",
                        const std::string &color_code = "#00A4EF"){
         int i = 0;
-        if (sl.size() == 0){
+        if (sl.empty()){
             auto a = ToGnuplotActorAsVector(Segment_<double, 2>(0, 0, 1, 1));
             a.title(t + " n=" + ToString(sl.size()));
             a.style("with vector head filled size screen 0.03,10,155 lw 2 lc rgb \"" + color_code + "\"");
@@ -249,14 +262,16 @@ public:
         auto maxx = MaxX(diagonal);
         auto minx = MinX(diagonal);
         auto dx = maxx - minx;
-        gnu.set_label(1, "Set Size = " + ToString(size), 
+        gnu.set_label(1, "SetSize = " + ToString(size), 
                          maxx + dx * 0.11,
                          maxy + dy * 0.09, 
                         "enhanced");
     }
 
-    void add_status_tree(const StatusTree& tree, const Point& sweep){
-        // gnu.unset_label();
+    void add_status_tree(const StatusTree& tree){
+        if(tree.empty()){
+            return;
+        }
         int index = 1;
         for(auto seg : tree){
             auto a1 = ToGnuplotActorAsVector(*seg);

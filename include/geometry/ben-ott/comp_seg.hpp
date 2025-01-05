@@ -38,11 +38,18 @@ struct CompareSeg_ {
     CompareSeg_(Point* c, Setcp* s) : _ppoint(c), _pset(s){ }; 
 
     bool operator() (cpSegment a, cpSegment b) const{
+    #if defined(_DEBUG_MODE_) && false
+        std::cout << "CompareSeg ===== " << std::endl;
+        std::cout << "&a =" << a << std::endl;
+        std::cout << "&b =" << b << std::endl;
+        std::cout << "a =" << *a << std::endl;
+        std::cout << "b =" << *b << std::endl;
+    #endif
         if(_pset != nullptr && !(_pset->empty())){
             auto itera = _pset->find(a);
-            if(itera != _pset->end()){
+            if(itera != _pset->end()){     // a in set
                 auto iterb = _pset->find(b);
-                if(iterb != _pset->end()){
+                if(iterb != _pset->end()){ // b in set
                     return this->less_slope(*a, *b);
                 }
             }
@@ -80,35 +87,35 @@ struct CompareSeg_ {
         // ProfileStart("Y_at_sweep");
         auto ay = y_at_sweep_point(a, p_sweep);
         auto by = y_at_sweep_point(b, p_sweep);
-    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
-        Gnuplot gnu;
-        if (_debug_flag){
+    #if defined(_DEBUG_MODE_) && false
+        // Gnuplot gnu;
+        // if (_debug_flag){
             std::cout << "ay = " << ay << std::endl;
             std::cout << "by = " << by << std::endl;
-            plot_less(gnu, a, b, p_sweep, ay, by);
-        }
+            // plot_less(gnu, a, b, p_sweep, ay, by);
+        // }
     #endif
         if(IsLess(ay, by)){
             // ay < by
-    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
-        if (_debug_flag)
-            gnu.plot();
+    #if defined(_DEBUG_MODE_) && false
+        // if (_debug_flag)
+            // gnu.plot();
     #endif
             return true;
         }else if(IsLess(by, ay)){
             // ay > by
-    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
-        if (_debug_flag)
-            gnu.plot();
+    #if defined(_DEBUG_MODE_) && false
+        // if (_debug_flag)
+            // gnu.plot();
     #endif
             return false;
         }else{ // ay == by
-    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
-        if (_debug_flag){
+    #if defined(_DEBUG_MODE_) && false
+        // if (_debug_flag){
             std::cout << "ay == by --> compare slope" << std::endl;
-            gnu.set_label_with_box(3, "by == ay", 0.0, 1.0);
-            gnu.plot();
-        }
+            // gnu.set_label_with_box(3, "by == ay", 0.0, 1.0);
+            // gnu.plot();
+        // }
     #endif
             return less_slope(a, b);
         }
@@ -117,28 +124,26 @@ struct CompareSeg_ {
     bool less_slope(const Segment& a, const Segment& b) const{
         auto sa = a.slope();
         auto sb = b.slope();
-    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
+    #if defined(_DEBUG_MODE_) && false
         std::cout << " slop a = " << sa << std::endl;
         std::cout << " slop b = " << sb << std::endl;
     #endif
         if(sa < sb){
-    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
+    #if defined(_DEBUG_MODE_) && false
         std::cout << "sa < sb" << std::endl;
     #endif
             return true;
         }else if(sb < sa){
-    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
+    #if defined(_DEBUG_MODE_) && false
         std::cout << "sa > sb" << std::endl;
     #endif
             return false;
         }else{
-    #if defined(_DEBUG_MODE_) && defined(_DEBUG_BEN_OTT_COMP_SEG_)
+    #if defined(_DEBUG_MODE_) && false
         std::cout << " slop a == b --> compare adress" << std::endl;
-        std::cout << "  get adress" << std::endl;
-        std::cout << "  &a = " << &sa << std::endl;
-        std::cout << "  &b = " << &sb << std::endl;
+        std::cout << " &sa < &sb = " << ToString(&a < &b) << std::endl;
     #endif
-            return &sa < &sb;
+            return &a < &b;
         }
 
     }

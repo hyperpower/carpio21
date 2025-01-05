@@ -131,21 +131,16 @@ TEST(ben_ott, comp_seg){
     res = compare_seg("vertial", s1, s2);
     std::cout << "res = " << ToString(res) << std::endl;
     EXPECT_TRUE(res);
-}
-
-
-template<class SEG_TYPE>
-auto GenerateSegmentsCase1(){ // mulit right
-    typedef SEG_TYPE Seg;
-    typedef std::vector<SEG_TYPE> ListSegment;
-    ListSegment lseg;
-    lseg.push_back(Seg(Point(0,  10), Point(15, 26)));
-    lseg.push_back(Seg(Point(15, 26), Point(10, 40)));
-    lseg.push_back(Seg(Point(15, 26), Point(2,  20))); //
-    lseg.push_back(Seg(Point(15, 26), Point(10,  30)));
-    lseg.push_back(Seg(Point(6,  18), Point(20,  35))); //
     
-    return lseg;
+    s1.ps(Point(1.0,  0.0));
+    s1.pe(Point(10.0, 0.0));
+    s2.ps(Point(8.0,  0.));
+    s2.pe(Point(12.0, 0.));
+    std::cout << "s1 = " << s1 << std::endl;       
+    std::cout << "s2 = " << s2 << std::endl;       
+    res = compare_seg("Horizen", s1, s2);
+    std::cout << "res = " << ToString(res) << std::endl;
+    // EXPECT_TRUE(false);
 }
 
 
@@ -162,46 +157,17 @@ auto GetSegments(const DataFile& df){
     return lseg;
 }
 
-
-TEST(ben_ott, case1_from_file){
+void case_test_from_file(const std::string& filename ){
     std::cout << " === read a datafile ===  " << std::endl; 
-    std::string fn = "./test/input_files/segments_intersection/case1.txt";
-    std::cout << "file_name = " << fn << std::endl;
+    std::string fn = "./test/input_files/segments_intersection/" + filename + ".txt";
+    std::cout << "file_name = " << filename << std::endl;
     DataFile df(fn);
     df.read();
     auto lseg = GetSegments(df);
-    Debug de("case1");
+    Debug de(filename);
     Inter inter(lseg, &de);
-    // inter.set_debug(de);
+    // de.set_debug_loop_i(7);
     de.plot_input_segments();
-    // de.plot_proxy_segments(inter);
-    auto res = inter.execute();
-    std::cout << "Result size = " << res.size() << std::endl;
-    de.plot_result(res);
-
-    auto b = df.block(0);
-    auto rs = b.get_config_as_int("res_size");
-    EXPECT_EQ(res.size(), rs);
-    int count = 1;
-    for (auto r : res){
-        std::cout << count << "  " << std::endl;
-        r.show();
-        std::cout << std::endl;
-        count++;
-    }
-}
-
-TEST(ben_ott, case2_from_file){
-    std::cout << " === read a datafile ===  " << std::endl; 
-    std::string fn = "./test/input_files/segments_intersection/case2.txt";
-    std::cout << "file_name = " << fn << std::endl;
-    DataFile df(fn);
-    df.read();
-    auto lseg = GetSegments(df);
-    Debug de("case2");
-    Inter inter(lseg, &de);
-    de.plot_input_segments();
-    // de.plot_proxy_segments(inter);
     auto res = inter.execute();
     std::cout << "Result size = " << res.size() << std::endl;
     de.plot_result(res);
@@ -219,56 +185,17 @@ TEST(ben_ott, case2_from_file){
 }
 
 
-TEST(ben_ott, case3_from_file){
-    std::cout << " === read a datafile ===  " << std::endl; 
-    std::string fn = "./test/input_files/segments_intersection/case3.txt";
-    std::cout << "file_name = " << fn << std::endl;
-    DataFile df(fn);
-    df.read();
-    auto lseg = GetSegments(df);
-    Debug de("case3");
-    Inter inter(lseg, &de);
-    // inter.set_debug(de);
-    de.plot_input_segments();
-    // de.plot_proxy_segments(inter);
-    auto res = inter.execute();
-    std::cout << "Result size = " << res.size() << std::endl;
-    de.plot_result(res);
-
-    auto b = df.block(0);
-    auto rs = b.get_config_as_int("res_size");
-    EXPECT_EQ(res.size(), rs);
-    int count = 1;
-    for (auto r : res){
-        std::cout << count << "  " << std::endl;
-        r.show();
-        std::cout << std::endl;
-        count++;
-    }
-}
-TEST(ben_ott, case4_from_file){
-    std::cout << " === read a datafile ===  " << std::endl; 
-    std::string fn = "./test/input_files/segments_intersection/case4.txt";
-    std::cout << "file_name = " << fn << std::endl;
-    DataFile df(fn);
-    df.read();
-    auto lseg = GetSegments(df);
-    Debug de("case4");
-    Inter inter(lseg, &de);
-    de.plot_input_segments();
-    // de.plot_proxy_segments(inter);
-    auto res = inter.execute();
-    std::cout << "Result size = " << res.size() << std::endl;
-    de.plot_result(res);
-
-    auto b = df.block(0);
-    auto rs = b.get_config_as_int("res_size");
-    EXPECT_EQ(res.size(), rs);
-    int count = 1;
-    for (auto r : res){
-        std::cout << count << "  " << std::endl;
-        r.show();
-        std::cout << std::endl;
-        count++;
+TEST(ben_ott, cases_from_file){
+    std::vector<std::string> vfn = {
+        // "case1",
+        // "case2",
+        // "case3",
+        "case4",
+        "case5",
+        // "case6",
+        // "case7"
+    };
+    for(auto& fn : vfn){
+        case_test_from_file(fn);
     }
 }

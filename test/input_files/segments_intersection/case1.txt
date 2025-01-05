@@ -1,5 +1,5 @@
 ## case_num : 1
-## note: the first segment intersection case
+## note: intersection point at right of many segments
 ## res_size : 4 
 # x, y, x, y
 0,  10, 15, 26

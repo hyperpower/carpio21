@@ -1228,6 +1228,7 @@ public:
     Gnuplot& plot(){
         this->plot(this->_actors);
         this->clear();
+        this->unset_label();
         return *this;
     }
 
