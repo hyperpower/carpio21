@@ -1,5 +1,5 @@
 function(foo)
-    file(WRITE "./out.txt" CMake_Version : ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}\n)
+    file(WRITE "./out.txt"  CMake_Version : ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}\n)
     file(APPEND "./out.txt" System_Name : ${CMAKE_SYSTEM_NAME}\n)
     file(APPEND "./out.txt" System_Verion : ${CMAKE_SYSTEM_VERSION}\n)
     file(APPEND "./out.txt" System_Processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}\n)

@@ -1248,7 +1248,7 @@ template<typename X, typename Y,
     && IsContainer<Y>::value, 
     bool>::type = true>
 auto ToGnuplotActor(const X& x, const Y& y,
-            const std::string &pcmd = "using 1:2 title \"\" ",
+            const std::string &pcmd = "using 1:2 with lines title \"\" ",
             const std::string& scmd = ""){
     GnuplotActor actor;
     actor.command(pcmd);
@@ -1273,7 +1273,7 @@ template<typename X,
     && IsContainer<X>::value,
     bool>::type = true>
 auto ToGnuplotActor(const X& x, 
-            const std::string &pcmd = "using 1:2 title \"\" ",
+            const std::string &pcmd = "using 1:2 with lines title \"\"",
             const std::string& scmd = ""){
     GnuplotActor actor;
     actor.command(pcmd);
