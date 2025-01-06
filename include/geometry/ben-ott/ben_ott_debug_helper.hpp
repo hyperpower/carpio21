@@ -5,7 +5,6 @@
 #include "geometry/ben-ott/sweep_event.hpp"
 #include "geometry/ben-ott/sweep_event_queue.hpp"
 #include "geometry/boolean/intersection_two_segments.hpp"
-#include "geometry/boolean/boolean.hpp"
 
 
 #include "geometry/io/ggnuplot_actor_maker.hpp"

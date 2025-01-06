@@ -2,7 +2,7 @@
 #define _DISTANCE_ANNOTATION_HPP_
 
 #include "geometry/objects/basic/point.hpp"
-#include "geometry/operation/affine.hpp"
+#include "geometry/affine.hpp"
 #include <array>
 #include <sstream>
 #include <iostream>

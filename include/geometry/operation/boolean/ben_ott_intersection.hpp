@@ -73,6 +73,8 @@ namespace carpio {
         gnu.add(a);
     }
 #endif
+
+
 template<class SEG>
 class IntersectionBenOtt_{
 public:

@@ -6,12 +6,14 @@
 #include <iostream>
 #include <set>
 
-#include "intersection_two_segments.hpp"
-// #include "utility/profile.hpp"
-// #include "utility/avl_tree.hpp"
+// #include "intersection_two_segments.hpp"
+#include "geometry/boolean/boolean_base.hpp"
 #include "geometry/ben-ott/ben_ott_intersection.hpp"
 
 namespace carpio{
+
+
+
 
 template<class CONTAINER>
 auto IntersectN2(const CONTAINER& con, SegmentTag){
@@ -46,14 +48,15 @@ template<class CONTAINER,
         , bool>::type = true>
 auto Intersect(const CONTAINER& con, const std::string& method, SegmentTag){
     typedef typename CONTAINER::value_type Seg;  
+    typedef IntersectionBenOtt_<Seg> InterBenOtt;
     std::string m = ToLowerCase(method);
-    // if (m == "bentley_ottmann"){
-    //     IntersectionBenOtt_<Seg> inter(con);
-    //     return inter.execute();
-    // }
-    // else{
+    if (m == "bentley_ottmann"){
+        InterBenOtt inter(con);
+        return inter.execute();
+    }
+    else{
         return IntersectN2(con, SegmentTag());
-    // }
+    }
 }
 }
 

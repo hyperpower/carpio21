@@ -23,7 +23,10 @@
 
 #include "objects/objects.hpp"
 
-#include "geometry/operation/operation.hpp"
+#include "geometry/affine.hpp"
+#include "geometry/boolean/boolean.hpp"
+
+// #include "geometry/operation/operation.hpp"
 
 #include "geometry/io/ggnuplot_actor.hpp"
 #include "geometry/io/ggnuplot_actor_maker.hpp"

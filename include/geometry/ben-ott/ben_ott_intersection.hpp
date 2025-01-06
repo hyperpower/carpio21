@@ -5,7 +5,8 @@
 #include "geometry/ben-ott/sweep_event.hpp"
 #include "geometry/ben-ott/sweep_event_queue.hpp"
 #include "geometry/boolean/boolean_base.hpp"
-#include "geometry/boolean/boolean.hpp"
+#include "geometry/boolean/intersection_two_segments.hpp"
+// #include "geometry/boolean/boolean.hpp"
 
 #ifdef _DEBUG_MODE_
 #include "geometry/io/ggnuplot_actor_maker.hpp"
@@ -14,26 +15,6 @@
 #endif
 
 namespace carpio {
-#ifdef _DEBUG_MODE_
-    
-    
-    
-    template<class SEG>
-    void PlotpSegment(Gnuplot& gnu, 
-                      const SEG* seg, 
-                      const std::string& color_code = "#00A4EF"){
-        auto a1 = ToGnuplotActorAsVector(*seg);
-        a1.style("with vector head filled size screen 0.03,15,145 lw 3 lc rgb \"" + color_code +"\"");
-        gnu.add(a1);
-    }
-    template<class POINT>
-    void PlotNewPoint(Gnuplot& gnu,
-                      const POINT& p){
-        auto a = ToGnuplotActor(p);
-        a.style("with points pointtype 12 pointsize 3 lw 2 lc rgb \"#151516\"");
-        gnu.add(a);
-    }
-#endif
 
 template<class SEG>
 class IntersectionBenOtt_{
@@ -190,7 +171,6 @@ public:
             }
             //4. Delete the segents in R(p) and C(p) from T
             for(auto s : r_set){
-                std::cout << "delete right seg = " << *s << std::endl;
                 auto r = _erase_seg_in_status(status, s);
                 if(r == 0)
                     throw std::invalid_argument(ToString(*s) + " should in status tree!");
@@ -218,7 +198,6 @@ public:
                             std::inserter(ulc, ulc.begin()));
             // auto it_hint = status.begin();
             for(auto s : ulc){
-                std::cout << "inster = " << s << std::endl; 
                 status.insert(s);
             }
             
@@ -477,7 +456,7 @@ protected:
                             queue.add_event(Event(s0->cpseg()->p(i)), 1, s1);
                             #ifdef _DEBUG_MODE_
                             if(pde->is_debug()){
-                                PlotNewPoint(gnu, s0->cpseg()->p(i));
+                                // PlotNewPoint(gnu, s0->cpseg()->p(i));
                             }
                             #endif
                         }
@@ -510,7 +489,6 @@ protected:
         #endif
     }
 #ifdef _DEBUG_MODE_
-    
     template<class CONTAINER> 
     void _output_list_segment(const CONTAINER& con){
         std::ofstream ofstream;

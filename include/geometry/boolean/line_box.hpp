@@ -7,7 +7,7 @@
 #include "geometry/objects/analytic/line.hpp"
 #include "geometry/objects/analytic/plane.hpp"
 #include "geometry/objects/basic/point_chain.hpp"
-#include "geometry/operation/affine.hpp"
+#include "geometry/affine.hpp"
 
 #include "algebra/algebra.hpp"
 

@@ -3,12 +3,16 @@
 
 #include "geometry/objects/objects.hpp"
 #include "intersection_two_segments.hpp"
+#include "geometry/ben-ott/ben_ott_intersection.hpp"
 #include "intersection_multi_segments.hpp"
 // #include "multi_segments.hpp"
+
+#include "line_box.hpp"
 
 
 namespace carpio{
 
+// typedef IntersectionBenOtt_<Segment_<double, 2> > Intera;
 // Interface Function
 template<class GEO1, class GEO2, 
         typename std::enable_if<
@@ -32,6 +36,8 @@ auto Intersect(const CONTAINER& con, const std::string& method = ""){
     typedef typename GEO::Tag Tag;
     return Intersect(con, method, Tag());
 }
+
+
 }
 
 #endif

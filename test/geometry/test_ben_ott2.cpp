@@ -18,8 +18,8 @@
 #include "geometry/ben-ott/comp_seg.hpp"
 #include "geometry/ben-ott/ben_ott_intersection.hpp"
 #include "geometry/ben-ott/ben_ott_debug_helper.hpp"
-
-
+#include "geometry/boolean/intersection_multi_segments.hpp"
+#include "geometry/boolean/boolean.hpp"
 
 using namespace carpio;
 
@@ -182,18 +182,22 @@ void case_test_from_file(const std::string& filename ){
         std::cout << std::endl;
         count++;
     }
+
+    auto resn2 = Intersect(lseg, "");
 }
 
 
 TEST(ben_ott, cases_from_file){
     std::vector<std::string> vfn = {
-        // "case1",
-        // "case2",
-        // "case3",
+        "case1",
+        "case2",
+        "case3",
         "case4",
         "case5",
-        // "case6",
-        // "case7"
+        "case6",
+        "case7",
+        "case8",
+        "case9",
     };
     for(auto& fn : vfn){
         case_test_from_file(fn);
