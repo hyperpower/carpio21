@@ -4,6 +4,7 @@
 #include "domain/base/base_gnuplot_actor.hpp"
 #include "domain/structure/grid/sgrid.hpp"
 #include "domain/structure/grid/uniform.hpp"
+#include "domain/structure/field/sfield_center.hpp"
 #include "io/gnuplot.hpp"
 #include "s_stringify.hpp"
 

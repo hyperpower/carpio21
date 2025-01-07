@@ -11,7 +11,9 @@ On MacOS
 -------------------
 Install OpenMPI by Homebrew
 
-`brew install open-mpi`
+.. code-block:: bash
+    
+    brew install open-mpi
 
 
 

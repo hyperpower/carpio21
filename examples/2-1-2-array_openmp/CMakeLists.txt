@@ -4,6 +4,8 @@ project(array_openmp)
 message(STATUS "CXX COMPILER NAME    = ${CMAKE_CXX_COMPILER}")
 message(STATUS "CXX COMPILER VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
 
+cmake_policy(SET CMP0074 NEW) 
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
   set(CMAKE_CXX20_EXTENSION_COMPILE_OPTION "-std:c++latest")
@@ -62,7 +64,6 @@ INCLUDE_DIRECTORIES(
 
 add_executable(main ${SOURCE_FILES})
 
-# target_link_directories(main PUBLIC "/opt/homebrew/opt/libomp/lib/")
 
 if(PYTHON_LIBRARIES)
   TARGET_LINK_LIBRARIES(main ${PYTHON_LIBRARIES})

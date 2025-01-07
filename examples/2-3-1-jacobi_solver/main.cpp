@@ -25,7 +25,7 @@ void plot_residual(const std::string& fn, const Solver& s){
 	gnu.set_terminal_png(fn);
 	gnu.set_grid();
 	gnu.set_ylogscale();
-	gnu.set_xlogscale();
+	// gnu.set_xlogscale();
 	gnu.set_yformat("%L");
 	gnu.set_xlabel("Iterations (-)");
 	gnu.set_ylabel("Residual (-)");
@@ -54,7 +54,7 @@ void SolverTest(const MatSCR& mat){
 
 	Arr    b(mat.size_i());
 	b.assign(1.0);
-	Solver solver(100000, 1e-7);
+	Solver solver(10000, 1e-7);
 	solver.solve(mat, x, b);
 	auto end = std::chrono::system_clock::now();
 	plot_residual("./fig/residual", solver);
@@ -64,7 +64,7 @@ void SolverTest(const MatSCR& mat){
 
 double SolverTimeTest(const MatSCR& mat, int nt){
     auto start = std::chrono::system_clock::now();
-	Solver solver(100000, 1e-7);
+	Solver solver(10000, 1e-7);
 #ifdef OPENMP
 	omp_set_num_threads(nt);
 	Arr    x(mat.size_i());
@@ -76,8 +76,8 @@ double SolverTimeTest(const MatSCR& mat, int nt){
 	std::cout << "No OpenMP " << std::endl;
 #endif
 	auto end = std::chrono::system_clock::now();
-  	double dt = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
-	std::cout << "D Time = " << dt << "s" << std::endl;
+  	double dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	std::cout << "D Time = " << dt << "ms" << std::endl;
 	return dt;
 }
 

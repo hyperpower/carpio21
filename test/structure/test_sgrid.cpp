@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
-#include "domain/structure/structure.hpp"
+#include "domain/structure/grid/uniform.hpp"
+#include "domain/structure/ghost/regular.hpp"
+#include "domain/structure/order/xyz.hpp"
+// #include "domain/structure/structure.hpp"
 // #include "domain/structure/io/splotly_actor.hpp"
 #include "domain/structure/io/sgnuplot_actor.hpp"
 
@@ -8,7 +11,7 @@ using namespace carpio;
 const std::string OUTPUTPATH = "./fig/";
 
 const int fig_width  = 900;
-const int fig_height = 900;
+const int fig_height = 600;
 
 
 TEST(sgrid, initial){
@@ -165,7 +168,7 @@ TEST(sgrid, initial_1_non){
 		ly.push_back(0.0);
 	}
 	auto aloc = ToGnuplotActor(lx, ly);
-	aloc.title("Center scalar location");
+	aloc.title("Scalar location");
 	aloc.style("with points ps 3 pt 7");
 	gnu.add(aloc);
 
@@ -192,6 +195,8 @@ TEST(sgrid, initial_1_non){
     gnu.set_terminal_png(OUTPUTPATH + "NonUniformSturctureGrid1", fig_width, fig_height);
 	gnu.plot();
 }
+
+
 TEST(structure, nonuniform){
 	typedef std::shared_ptr<SGrid_<2> > spGrid;
 	typedef SGridNonUniform_<2> GridNonUniform;
@@ -209,6 +214,5 @@ TEST(structure, nonuniform){
     gnu.set_terminal_png(OUTPUTPATH + "NonUniformSturctureGrid", 
 	                    fig_width, fig_height);
 	gnu.plot();
-
 }
 
