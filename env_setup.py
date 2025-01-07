@@ -13,6 +13,8 @@ _PIP_PACKAGE_REQUIRED_ = [
     "matplotlib",
     "numpy",
     "plotly",
+    "platform",
+    "jinja2"
 ]
 
 def check_path():
