@@ -1,16 +1,17 @@
-
 #ifndef _S_SGRIDNONUNIFORM_HPP
 #define _S_SGRIDNONUNIFORM_HPP
 
+#include <array>
+
+#include "sgrid.hpp"
 #include "domain/structure/structure_define.hpp"
 #include "domain/structure/sindex.hpp"
-#include "sgrid.hpp"
-#include <array>
 
 #undef max
 #undef min
 
 namespace carpio{
+
 class SGridNonUniformTag : public SGridTag{};
 
 template<St DIM>

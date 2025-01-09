@@ -4,6 +4,8 @@
 #include <iostream>
 #include <list>
 #include <algorithm>
+#include <string>
+
 #include "domain/domain_define.hpp"
 
 #include "domain/structure/grid/sgrid.hpp"
@@ -19,8 +21,8 @@ Strings _StringifyHead(const ANY& a, StructureTag){
     Strings res;
     res.push_back(tfm::format("## TYPE_NAME : %s",
         a.type_name()));
-    res.push_back(tfm::format("## DIMENSION : %d",
-        ANY::Dim));
+    auto d = ANY::Dim;
+    res.push_back(tfm::format("## DIMENSION : %d", d));
     return res;      
 };
 
@@ -76,22 +78,24 @@ Strings _StringifyData(const ANY& grid, SGridTag){
             for (Idx i = 0; i < grid.n(_X_); ++i) {
                 typename ANY::Index index(i, j, k);
                 res.splice(res.end(), 
-                           _StringifyCell(grid, index, SGridTag(), ANY::DimTag()));
+                           _StringifyCell(grid, index, SGridTag(), typename ANY::DimTag()));
                 res.push_back("");
             }
         }
     }
     return res;
 };
-
-
-template<class ANY>
-Strings _Stringify(const ANY& a,  StructureTag tag){
+template<class ANY, class TAG,
+        typename std::enable_if<
+            std::is_base_of<StructureTag, TAG>::value,
+        bool>::type = true >
+Strings _Stringify(const ANY& a,  TAG t){
     typedef typename ANY::Tag Tag;
     auto res = _StringifyHead(a, Tag());
     res.splice(res.end(), _StringifyData(a, Tag()));
     return res;
 }
+
 template<class ANY, class INDEX>
 Strings _StringifyCell(const ANY& grid, const INDEX& index, SGridTag, Dim3Tag){
     Strings res;

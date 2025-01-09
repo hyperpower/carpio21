@@ -298,7 +298,7 @@ protected:
 
     bool _valid;
     /*
-     * Opens up a gnuplot session, ready to receive commands
+     * \brief up a gnuplot session, ready to receive commands
      */
     void _init() {
         //------------------------------------------------------------------------------

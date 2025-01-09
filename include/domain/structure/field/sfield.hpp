@@ -99,7 +99,7 @@ public:
 
     Self& operator+=(const Self& rhs){
         // actual addition of rhs to *this
-        ASSERT(is_compatible(rhs));
+        ASSERT(this->is_compatible(rhs));
         _arr += rhs._arr;
         return *this;
     }
@@ -132,7 +132,7 @@ public:
     }
 
     Self& operator*=(const Self& rhs) {
-        ASSERT(is_compatible(rhs));
+        ASSERT(this->is_compatible(rhs));
         _arr *= rhs._arr;
         return *this;
     }
@@ -148,7 +148,7 @@ public:
         return *this;
     }
     Self& operator/=(const Self& rhs) {
-        ASSERT(is_compatible(rhs));
+        ASSERT(this->is_compatible(rhs));
         _arr /= rhs._arr;
         return *this;
     }

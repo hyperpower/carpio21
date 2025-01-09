@@ -6,11 +6,15 @@
 
 namespace carpio{
 
+struct SOrderTag:  public StructureTag{};
+
 template<St DIM, class GRID, class GHOST>
 class SOrder_:public OrderBase_<DIM>{
 public:
+    static const St Dim = DIM;
     typedef GRID  Grid;
     typedef GHOST Ghost;
+    typedef SOrderTag Tag;
     typedef std::shared_ptr<Grid> spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
     typedef typename Grid::Index Index;

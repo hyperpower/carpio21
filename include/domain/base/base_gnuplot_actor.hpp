@@ -20,6 +20,12 @@ GnuplotActor ToGnuplotActorLines(const ANY& a){
 }
 
 template<class ANY>
+GnuplotActor ToGnuplotActorWireFrame(const ANY& a){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorWireFrame(a, Tag()); 
+}
+
+template<class ANY>
 GnuplotActor ToGnuplotActorContour(const ANY& a){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorContour(a, Tag()); 
@@ -29,6 +35,15 @@ GnuplotActor ToGnuplotActorContourWire(const ANY& a){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorContourWire(a, Tag()); 
 }
+// a      : any objects
+// config : configure string
+template<class ANY>
+GnuplotActor ToGnuplotActorLabel(const ANY& a, const std::string& config = ""){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorLabel(a, config, Tag()); 
+}
+
+
 }
 
 #endif

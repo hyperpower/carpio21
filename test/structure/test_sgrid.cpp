@@ -28,7 +28,7 @@ TEST(sgrid, initial){
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 3.5);
 	gnu.set_equal_aspect_ratio();
-	gnu.add(ToGnuplotActorLines(*spsg));
+	gnu.add(ToGnuplotActorWireFrame(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "UniformSturctureGrid", fig_width, fig_height);
 	gnu.plot();
 
@@ -63,7 +63,7 @@ TEST(sgrid, initial1){
 	gnu.set_equal_aspect_ratio();
 	gnu.set_key_spacing(1.5);
 	
-	auto agrid = ToGnuplotActorLines(*spgrid);
+	auto agrid = ToGnuplotActorWireFrame(*spgrid);
 	agrid.title("Grid");
 	agrid.line_width(2);
 	gnu.add(agrid);
@@ -155,7 +155,7 @@ TEST(sgrid, initial_1_non){
 	gnu.set_equal_aspect_ratio();
 	gnu.set_key_spacing(1.5);
 	
-	auto agrid = ToGnuplotActorLines(*spgrid);
+	auto agrid = ToGnuplotActorWireFrame(*spgrid);
 	agrid.title("Grid");
 	agrid.line_width(2);
 	gnu.add(agrid);
@@ -210,7 +210,7 @@ TEST(structure, nonuniform){
 	gnu.set_xrange(-0.5, 3.5);
 	gnu.set_yrange(-0.5, 3.5);
 	gnu.set_equal_aspect_ratio();
-	gnu.add(ToGnuplotActorLines(*spsg));
+	gnu.add(ToGnuplotActorWireFrame(*spsg));
     gnu.set_terminal_png(OUTPUTPATH + "NonUniformSturctureGrid", 
 	                    fig_width, fig_height);
 	gnu.plot();

@@ -1,6 +1,8 @@
 #ifndef _S_GNUPLOT_ACTOR_HPP
 #define _S_GNUPLOT_ACTOR_HPP
 
+#include <string>
+
 #include "domain/base/base_gnuplot_actor.hpp"
 #include "domain/structure/grid/sgrid.hpp"
 #include "domain/structure/grid/uniform.hpp"
@@ -10,12 +12,38 @@
 
 namespace carpio{
 
-// ToGunplotActor
-//  - ToGnuplotActorDim
-//   - ToGnuplotActor
+// ToGnuplotActorXXX(ANY)
+// _ToGunplotActorXXX(ANY, XXXTag)
+// _ToGnuplotActorXXXDim(ANY, XXXTag, DimTag)
+
+// Objects to be plotted:
+//  1. Grid
+//  2. Ghost
+//  3. Order
+//  4. Field Center
+//  5. Field Face
+//  6. Vector Center
+//  7. Vector Face
+
+// Type can be plotted 
+//  Points, Lines, LinesPoints, WireFrame, Contour, ContourWire, Label，
+
+//         Type  : Dim  : Config
+// Points: Grid  : 1 2  : center, facecenter, vertex
+//       : Ghost : 1 2  : center, facecenter, vertex
+//       : FC    : 1 2  : vari_color
+//       : FF    : 1 2  : vari_color
+//       : VC    : 1 2  : vari_color
+
+// LinesPoints
+// Lines : Grid  x
+//       : Ghost x
+//       : FC    : 1    : vari_color
+//       : FF    : 1    : vari_color
+//       : VC    : 1    : vari_color
 
 template<class ANY>
-GnuplotActor _ToGnuplotActorLinesDim(const ANY& grid, SGridTag, Dim1Tag){
+GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& grid, SGridTag, Dim1Tag){
     GnuplotActor actor; 
     actor.command( "using 1:2 title \"\" ");
     actor.style( "with line lc 0");
@@ -50,7 +78,7 @@ GnuplotActor _ToGnuplotActorLinesDim(const ANY& grid, SGridTag, Dim1Tag){
 }
 
 template<class ANY>
-GnuplotActor _ToGnuplotActorLinesDim(const ANY& grid, SGridTag, Dim2Tag){
+GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& grid, SGridTag, Dim2Tag){
     GnuplotActor actor;
     actor.command("using 1:2 title \"\" ");
     actor.style("with line lc 0");
@@ -69,12 +97,12 @@ GnuplotActor _ToGnuplotActorLinesDim(const ANY& grid, SGridTag, Dim2Tag){
 }
 
 template<class ANY>
-GnuplotActor _ToGnuplotActorLines(const ANY& a, SGridTag){
+GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SGridTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
     Tag t;
     DimTag dt;
-    return _ToGnuplotActorLinesDim(a, t, dt); 
+    return _ToGnuplotActorWireFrameDim(a, t, dt); 
 }
 
 template<class ANY>
@@ -132,6 +160,37 @@ GnuplotActor _ToGnuplotActorContourWire(const ANY& a, SFieldCenterTag){
     typedef typename ANY::DimTag DimTag;
     return _ToGnuplotActorContourWireDim(a, Tag(), DimTag()); 
 }
+
+
+template<class ANY>
+GnuplotActor  _ToGnuplotActorLabel(const ANY& order, 
+                                const std::string& config, 
+                                SOrderXYZTag){
+    GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with labels center textcolor lt 2");
+    
+    auto &grid  = order.grid();
+    typedef typename ANY::Index Index;
+    auto fun = [&grid, &actor, &order, &config](const Index &idx)
+    {
+        auto cp = grid.c(idx);
+        auto o  = order.get_order(idx);
+        std::string text = "";
+        if (config == "index"){
+            text =  ToString(idx);
+        }else if(config == "order"){
+            text =  ToString(o);
+        }else{
+            text =  ToString(idx);
+        }
+        actor.data().push_back(
+                    ToString(cp(_X_), cp(_Y_)," ") + " \"" + text + "\"");
+    };
+    grid.for_each(fun);
+    return actor;
+}
+
 }
 
 #endif

@@ -1,13 +1,16 @@
 #include "gtest/gtest.h"
-#include "domain/structure/structure.hpp"
+#include "domain/structure/field/sfield_center.hpp"
+#include "domain/structure/grid/uniform.hpp"
+#include "domain/structure/ghost/regular.hpp"
+#include "domain/structure/order/xyz.hpp"
 // #include "domain/structure/io/splotly_actor.hpp"
-// #include "domain/structure/io/sgnuplot_actor.hpp"
+#include "domain/structure/io/sgnuplot_actor.hpp"
 
 using namespace carpio;
 
 const std::string OUTPUTPATH = "./fig/";
 
-const int fig_width  = 900;
+const int fig_width  = 1200;
 const int fig_height = 900;
 
 TEST(field, initial){
@@ -63,9 +66,7 @@ TEST(field, initial){
 	EXPECT_EQ (12.0, c(idx));
 }
 
-
-
-TEST(field, coutour_DISABLED){
+TEST(field, coutour){
 	const std::size_t dim = 2;
 	typedef SGridUniform_<dim> Grid;
 	typedef std::shared_ptr<Grid> spGrid;
@@ -97,8 +98,8 @@ TEST(field, coutour_DISABLED){
 	});
 
 	Gnuplot gnu;
-	gnu.set_xrange(-0.2, 1.2);
-	gnu.set_yrange(-0.2, 1.2);
+	gnu.set_xrange(-0.0, 1.0);
+	gnu.set_yrange(-0.0, 1.0);
 	gnu.set_zrange(-1.0, 1.0);
 	gnu.set_equal_aspect_ratio();
 	gnu.set_palette_blue_red();
