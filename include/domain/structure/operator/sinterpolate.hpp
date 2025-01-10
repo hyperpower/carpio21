@@ -7,7 +7,8 @@
 namespace carpio{
 
 template<class FIELD, St DIM, class VT, class GRID, class GHOST, class ORDER>
-class InterpolateCenterToFaceImplement_<FIELD, DIM, VT, GRID, GHOST, ORDER, StructureTag>: public SOperatorCommon_<FIELD, DIM, VT, GRID, GHOST, ORDER>{
+class InterpolateCenterToFaceImplement_<FIELD, DIM, VT, GRID, GHOST, ORDER, StructureTag>:
+        public SOperatorCommon_<FIELD, DIM, VT, GRID, GHOST, ORDER>{
 public:
     InterpolateCenterToFaceImplement_(){
         std::cout << "InterpolateCenterToFaceImplement_" << std::endl;
