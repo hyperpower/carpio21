@@ -20,9 +20,9 @@ public:
     typedef SIndex_<DIM> Index;
     typedef GRID  Grid;
     typedef SOrderXYZTag Tag;
-    typedef std::shared_ptr<Grid> spGrid;
+    typedef typename std::shared_ptr<Grid> spGrid;
     typedef GHOST Ghost;
-    typedef std::shared_ptr<Ghost> spGhost;
+    typedef typename std::shared_ptr<Ghost> spGhost;
 
     typedef std::vector<Index> OrderVector;
     typedef typename OrderVector::iterator iterator;
@@ -35,19 +35,25 @@ protected:
 
     OrderVector _ov;  // order vector
     OrderMatrix _om;  // order matrix
+
+    Axes _face_axes;
 #ifdef OPENMP
     St _nt;
     std::vector<iterator> _ov_iter; // store the separate index of _ov
     std::vector<const_iterator> _ov_citer; // store the separate index of _ov
 #endif
 public:
-    SOrderXYZ_(spGrid spgrid, spGhost spghost, St num_threads = 1):
-        _grid(spgrid), _ghost(spghost), _ov(_ghost->size_normal()),
+    SOrderXYZ_(spGrid spgrid, 
+               spGhost spghost,
+               St num_threads = 1
+               ):
+        _grid(spgrid), _ghost(spghost),
+        _ov(_ghost->size_normal()),
         _om(_grid->n(_X_), _grid->n(_Y_), _grid->n(_Z_))
 #ifdef OPENMP
-       ,_nt(num_threads),
-        _ov_iter(num_threads + 1),
-        _ov_citer(num_threads + 1)
+       ,_nt(num_threads)
+       ,_ov_iter(num_threads + 1)
+       ,_ov_citer(num_threads + 1)
 #endif
     {
         _build_ov();
@@ -55,7 +61,19 @@ public:
 #ifdef OPENMP
         _build_ovt();
 #endif
+    };
+
+    SOrderXYZ_(spGrid spgrid, 
+               spGhost spghost,
+               Axes    a):
+        _grid(spgrid), _ghost(spghost), _face_axes(a),
+        _ov(_ghost->size_normal()),
+        _om(_grid->n(_X_), _grid->n(_Y_), _grid->n(_Z_)){
+            std::cout << "here" << std::endl;
+        _build_ov_for_face();
+        _build_om_for_face();
     }
+
     St size() const{
         return _ov.size();
     }
@@ -139,6 +157,33 @@ protected:
 
     void _build_om() {
         // call after _build_ov
+        for(typename OrderVector::size_type ii = 0; ii < _ov.size(); ++ii ){
+            _om(_ov[ii].i(), _ov[ii].j(), _ov[ii].k()) = ii;
+        }
+    }
+    void _build_ov_for_face(Axes a = _X_) {
+        St count = 0;
+        St in = _grid->n(_X_) + (a == _X_ ? 1 : 0);
+        St jn = (DIM >= 2) ? _grid->n(_Y_) + (a == _Y_ ? 1 : 0) : 1;
+        St kn = (DIM >= 3) ? _grid->n(_Z_) + (a == _Z_ ? 1 : 0) : 1;
+        for (auto k = 0; k < kn; ++k) {
+            for (auto j = 0; j < jn; ++j) {
+                for (auto i = 0; i < in ; ++i) {
+                    Index index(i,j,k);
+                    if(!(_ghost->is_ghost(index))){
+                        _ov[count] = index;
+                        count++;
+                    }
+                }
+            }
+        }
+    }
+    void _build_om_for_face(Axes a = _X_) {
+        // call after _build_ov_for_face
+        St in = _grid->n(_X_) + (a == _X_ ? 1 : 0);
+        St jn = (DIM >= 2) ? _grid->n(_Y_) + (a == _Y_ ? 1 : 0) : 1;
+        St kn = (DIM >= 3) ? _grid->n(_Z_) + (a == _Z_ ? 1 : 0) : 1;
+        _om.reconstruct(in, jn, kn);
         for(typename OrderVector::size_type ii = 0; ii < _ov.size(); ++ii ){
             _om(_ov[ii].i(), _ov[ii].j(), _ov[ii].k()) = ii;
         }

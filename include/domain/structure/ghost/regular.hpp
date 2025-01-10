@@ -18,7 +18,7 @@ namespace carpio{
 ///
 //z
 
-struct SGhostRegularTag:  public SGhostTag{};
+struct SGhostRegularTag:  public SGhostTag, GhostBaseTag{};
 
 template<St DIM, class GRID>
 class SGhostRegular_ : public SGhost_<DIM, GRID>{

@@ -85,11 +85,12 @@ Strings _StringifyData(const ANY& grid, SGridTag){
     }
     return res;
 };
-template<class ANY, class TAG,
-        typename std::enable_if<
-            std::is_base_of<StructureTag, TAG>::value,
-        bool>::type = true >
-Strings _Stringify(const ANY& a,  TAG t){
+// template<class ANY, class TAG,
+        // typename std::enable_if<
+            // std::is_base_of<StructureTag, TAG>::value,
+        // bool>::type = true >
+template<class ANY>
+Strings _Stringify(const ANY& a,  StructureTag t){
     typedef typename ANY::Tag Tag;
     auto res = _StringifyHead(a, Tag());
     res.splice(res.end(), _StringifyData(a, Tag()));

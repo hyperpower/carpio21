@@ -8,7 +8,7 @@
 
 namespace carpio{
     
-struct SGridTag:  public StructureTag{};
+struct SGridTag:  public StructureTag, GridBaseTag{};
 
 template<St DIM>
 class SGrid_ {

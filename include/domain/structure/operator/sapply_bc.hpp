@@ -7,7 +7,8 @@
 
 namespace carpio{
 // BC Implement 
-template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
+template<class FIELD, St DIM, 
+         class GRID, class GHOST, class ORDER>
 class ApplyBCImplement_<
     FIELD, DIM, 
     LinearPolynomial_<Vt, typename GRID::Index>, 

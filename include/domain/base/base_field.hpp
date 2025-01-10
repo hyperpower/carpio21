@@ -6,6 +6,7 @@
 
 namespace carpio{
 
+struct GridBaseTag{};
 template<St DIM>
 class GridBase_{
 public:
@@ -15,6 +16,8 @@ public:
 
     virtual ~GridBase_(){}
 };
+
+struct GhostBaseTag{};
 template<St DIM>
 class GhostBase_{
 public:
@@ -24,6 +27,7 @@ public:
 
     virtual ~GhostBase_(){};
 };
+struct OrderBaseTag{};
 template<St DIM>
 class OrderBase_{
 public:
@@ -35,7 +39,6 @@ public:
 };
 
 struct FieldBaseTag{};
-
 template<St DIM, 
          class VT, 
          class GRID, 
@@ -121,7 +124,56 @@ public:
     }
     
 };
-}
+
+#define DEF_FIELD_TAG(FIELD_TYPE)     \
+    typedef typename FIELD_TYPE::Tag      FieldTag; \
+    typedef typename FIELD_TYPE::DimTag   DimTag; \
+    typedef typename FIELD_TYPE::GridTag  GridTag; \
+    typedef typename FIELD_TYPE::GhostTag GhostTag; \
+    typedef typename FIELD_TYPE::OrderTag OrderTag; \
+    typedef typename FIELD_TYPE::DimTag   DimTag;
+
+template<St DIM, 
+         class VT,
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_{
+public:
+    static void InitAValue(){
+        std::cout << "Abstract" << std::endl;
+    }
+};
+
+template<St DIM, 
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_<DIM, Vt, GRID, GHOST, ORDER>{
+public:
+    typedef typename GRID::Index  Index;
+
+    static Vt InitAValue(const Index&){
+        return 0.0;
+    }
+};
+
+template<St DIM, 
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_<DIM, 
+                    LinearPolynomial_<Vt, typename GRID::Index>,
+                    GRID, GHOST, ORDER>{
+public:
+    typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
+    typedef typename GRID::Index  Index;
+    static Poly InitAValue(const Index& index){
+        return Poly();
+    }
+};
 
 
+
+} //end namespace
 #endif

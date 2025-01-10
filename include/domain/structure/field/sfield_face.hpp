@@ -1,29 +1,29 @@
-#ifndef S_FIELD_CENTER_HPP
-#define S_FIELD_CENTER_HPP
+#ifndef S_FIELD_FACE_HPP
+#define S_FIELD_FACE_HPP
 
 #include "domain/structure/field/sfield.hpp"
 
 namespace carpio{
 
-struct SFieldCenterTag: public SFieldTag{};
+struct SFieldFaceTag: public SFieldTag{};
 
 template<St DIM, 
          class VT,
          class GRID, 
          class GHOST, 
          class ORDER>
-class SFieldCenter_: public SField_<DIM, VT, GRID, GHOST, ORDER>{
+class SFieldFace_: public SField_<DIM, VT, GRID, GHOST, ORDER>{
 public:
     static const St Dim = DIM;
 
-    typedef SFieldCenterTag Tag;
+    typedef SFieldFaceTag Tag;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
     typedef VT    ValueType;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Base;
-    typedef SFieldCenter_<Dim, VT, GRID, GHOST, ORDER> Self;
+    typedef SFieldFace_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
 
     typedef std::shared_ptr<Grid>  spGrid;
@@ -36,22 +36,24 @@ public:
 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
     typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;
+protected:
+    Axes _axe;
 public:
-    SFieldCenter_(spGrid spg, spGhost spgh){
+    SFieldFace_(spGrid spg, spGhost spgh, Axes af): _axe(af){
         this->_spgrid  = spg;
         this->_spghost = spgh; 
         // Initall a default order_xyz
-        this->_sporder = spOrder(new Order(spg, spgh));
+        this->_sporder = spOrder(new Order(spg, spgh, af));
         _initial_arr();
     }
-    SFieldCenter_(spGrid spg, spGhost spgh, spOrder spo)
+    SFieldFace_(spGrid spg, spGhost spgh, spOrder spo)
         :Base(spg, spgh, spo){
         _initial_arr();
     }
-    SFieldCenter_(const Self&  other): Base(other){}
-    SFieldCenter_(      Self&& other): Base(std::move(other)){}
-    SFieldCenter_(const Base&  b) :Base(b) {}
-    SFieldCenter_(      Base&& b) :Base(std::move(b)) {}
+    SFieldFace_(const Self&  other): Base(other){}
+    SFieldFace_(      Self&& other): Base(std::move(other)){}
+    SFieldFace_(const Base&  b) :Base(b) {}
+    SFieldFace_(      Base&& b) :Base(std::move(b)) {}
 
     Self& operator=(const Self& other) {
         if (this == &other) {
@@ -70,11 +72,22 @@ public:
         return *this;
     }
     
-    ValueType&      operator()(St i, St j = 0, St k = 0){
-        return this->_arr[this->_sporder->get_order(i,j,k)];
+    ValueType&      operator()(Orientation o, St i, St j = 0, St k = 0){
+        St arr_idx, ni = i, nj =j, nk = k;
+        if(o == _P_){
+            ni += _axe == _X_? 1 : 0;
+            if constexpr (Self::Dim >= 2){
+                nj += _axe == _Y_? 1 : 0;
+            }
+            if constexpr (Self::Dim >= 3){
+                nk += _axe == _Z_? 1 : 0;
+            }
+        }
+        arr_idx = this->_sporder->get_order(ni,nj,nk);
+        return this->_arr[arr_idx];
     }
 
-    const ValueType& operator()(St i, St j = 0, St k = 0) const{
+    const ValueType& operator()(Orientation o, St i, St j = 0, St k = 0) const{
         return this->_arr[this->_sporder->get_order(i,j,k)];
     }
 
@@ -100,7 +113,7 @@ public:
         return *this;
     }
     template<class VT2>
-    Self& operator+=(const SFieldCenter_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+    Self& operator+=(const SFieldFace_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
         Base::operator+=(rhs);
         return *this;
     }
@@ -113,7 +126,7 @@ public:
         return *this;
     }
     template<class VT2>
-    Self& operator-=(const SFieldCenter_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+    Self& operator-=(const SFieldFace_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
         Base::operator-=(rhs);
         return *this;
     }
@@ -126,7 +139,7 @@ public:
         return *this;
     }
     template<class VT2>
-    Self& operator*=(const SFieldCenter_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
+    Self& operator*=(const SFieldFace_<Dim, VT2, GRID, GHOST, ORDER>& rhs){
         Base::operator*=(rhs);
         return *this;
     }
@@ -190,70 +203,72 @@ protected:
     }
 };
 
-template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
-operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
-          const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+template<St DIM, class VT, 
+         class GRID, class GHOST, class ORDER>
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER>
+operator+(      SFieldFace_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+          const SFieldFace_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+    lhs += rhs;
+    return lhs;
+}
+template<St    DIM,  class VT,    class VT2,
+         class GRID, class GHOST, class ORDER>
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER>
+operator+(      SFieldFace_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
+          const SFieldFace_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
     lhs += rhs;
     return lhs;
 }
 template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
-operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
-          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
-    lhs += rhs;
-    return lhs;
-}
-template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
-operator-(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
-          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER>
+operator-(      SFieldFace_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
+          const SFieldFace_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
     lhs -= rhs;
     return lhs;
 }
 template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
-operator*(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
-          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER>
+operator*(      SFieldFace_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
+          const SFieldFace_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
     lhs *= rhs;
     return lhs;
 }
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
-operator*(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
-          const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER>
+operator*(      SFieldFace_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+          const SFieldFace_<DIM, VT, GRID, GHOST, ORDER>& rhs){
     lhs *= rhs;
     return lhs;
 }
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
-operator*(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER>
+operator*(      SFieldFace_<DIM, VT, GRID, GHOST, ORDER> lhs, 
           const VT& rhs){
     lhs *= rhs;
     return lhs;
 }
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER>
 operator/(
-          SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
-    const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+          SFieldFace_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+    const SFieldFace_<DIM, VT, GRID, GHOST, ORDER>& rhs){
     lhs /= rhs;
     return lhs;
 }
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER>
 operator/(
-    SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
+    SFieldFace_<DIM, VT, GRID, GHOST, ORDER> lhs, const Vt& rhs){
     lhs /= rhs;
     return lhs;
 }
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> operator/(
+inline SFieldFace_<DIM, VT, GRID, GHOST, ORDER> operator/(
     const Vt& lhs, 
-    const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
-    SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> res(rhs);
+    const SFieldFace_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+    SFieldFace_<DIM, VT, GRID, GHOST, ORDER> res(rhs);
     res.assign(lhs);
     res /= rhs;
     return res;
