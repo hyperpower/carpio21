@@ -92,7 +92,15 @@ FIELD IntVolume(const FIELD& field){
     typename FIELD::Tag t; 
     return IntVolume(field, t);
 }
-// Interpolate
+// Interpolate ==========================
+template<class FIELD>
+auto InterpolateCenterToFace(const FIELD& field){
+    typename FIELD::Tag field_tag; 
+    std::cout << "Base Interpolate C to F" << std::endl;
+    // return 0;
+    return InterpolateCenterToFace(field, field_tag);
+}
+
 template<class FIELD, class BDYIDX>
 typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){
     std::cout << "Interpolate" << std::endl;

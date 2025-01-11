@@ -18,13 +18,13 @@ template<St DIM>
 class SGridNonUniform_ :public SGrid_<DIM>{
 public:
     static const St Dim = DIM;
+    static const St NumVertex = DIM == 1 ? 2 : (DIM == 2 ? 4 : 8);
+    static const St NumFace = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
     typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef SGridNonUniformTag Tag;
     typedef ArrayListV_<double> Arr;
     typedef Point_<double, Dim> Point;
     typedef SIndex_<Dim> Index;
-    static const St NumVertex = DIM == 1 ? 2 : (DIM == 2 ? 4 : 8);
-    static const St NumFace = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
 protected:
     Point   _min, _max;
     Index _n, _ng;  // number of node and number of node and ghost
@@ -170,20 +170,40 @@ public:
         return _c[2][_IDX(k)];
     }
 
-    St num_cells() const {
+    St size_cell() const {
         St res = 1;
         for (St d = 0; d < Dim; ++d) {
             res *= _n[d];
         }
         return res;
     }
+    St size_vertex() const {
+        St res = 1;
+        for (St d = 0; d < Dim; ++d) {
+            res *= (_n[d] + 1);
+        }
+        return res;
+    }
+    St size_face() const {
+        St res = 0;
+        for (St d = 0; d < Dim; ++d) {
+            res += this->size_face(ToAxes(d));
+        }
+        return res;
+    }
+    St size_face(Axes a) const {
+        St res = 1;
+        for (St d = 0; d < Dim; ++d) {
+            if (ToAxes(d) == a){
+                res *= (_n[d] + 1);
+            }else{
+                res *= _n[d];
+            }
+        }
+        return res;
+    }
 
-    St num_vertex() const {
-        return NumVertex;
-    }
-    St num_face() const {
-        return NumFace;
-    }
+
     Vt min_size() const {
         Vt mins = std::numeric_limits<Vt>::max();
         for (St d = 0; d < Dim; ++d) {
@@ -295,6 +315,19 @@ public:
         return c;
     }
 
+    //  face index to p cell idx on the negative direction
+    //  for example:
+    //  f  c  f  c  f  c  f  c  f
+    //  |--+--|--+--|--+--|--+--|
+    //  0  0  1  1  2  2  3  3  4  
+    //        ^  ^           |  ^
+    //input fidx |           |   
+    //    return 1       return 3
+    Index face_index_to_cell_index(const Index& fidx, const Axes& a) const{
+        Index cidx(fidx);
+        cidx[a] -= (fidx[a] >= (_n[a]))? 1 : 0;
+        return cidx;
+    }
 
     // Point is in the range
     inline bool is_in_on(Point p) {

@@ -8,7 +8,7 @@
 
 namespace carpio{
     
-struct SGridTag:  public StructureTag{};
+struct SGridTag:  public StructureTag, GridBaseTag{};
 
 template<St DIM>
 class SGrid_ {
@@ -62,9 +62,9 @@ public:
     virtual Vt cy(Idx i, Idx j = 0, Idx k = 0) const {return 0;}
     virtual Vt cz(Idx i, Idx j = 0, Idx k = 0) const {return 0;}
 
-    virtual St num_cells()  const  {return 0;}
-    virtual St num_vertex() const  {return 0;}
-    virtual St num_face()   const  {return 0;}
+    virtual St size_cell()  const  {return 0;}
+    virtual St size_vertex() const  {return 0;}
+    virtual St size_face()   const  {return 0;}
 
     virtual Vt min_size()   const {return 0;}
     virtual Vt min_size(St) const {return 0;}

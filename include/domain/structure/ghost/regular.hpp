@@ -18,7 +18,7 @@ namespace carpio{
 ///
 //z
 
-struct SGhostRegularTag:  public SGhostTag{};
+struct SGhostRegularTag:  public SGhostTag, GhostBaseTag{};
 
 template<St DIM, class GRID>
 class SGhostRegular_ : public SGhost_<DIM, GRID>{
@@ -60,6 +60,18 @@ public:
     }
 
     virtual bool is_ghost(const Index& index) const{
+        for (St d = 0; d < DIM; ++d) {
+            Idx res = index.value(d);
+            if (res < 0) {
+                return true;
+            } else if (res >= this->_grid->n().value(d)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    virtual bool is_ghost(const Axes& a, const Index& index) const{
         for (St d = 0; d < DIM; ++d) {
             Idx res = index.value(d);
             if (res < 0) {
@@ -130,11 +142,17 @@ public:
         return idxb;
     }
 
-    virtual St size_normal() const{
-        return _grid->num_cells();
+    virtual St size_cell_normal() const{
+        return _grid->size_cell();
+    }
+    virtual St size_face_normal() const{
+        return _grid->size_face();
+    }
+    virtual St size_face_normal(const Axes& a) const{
+        return _grid->size_face(a);
     }
     virtual St size_not_ghost() const{
-        return _grid->num_cells();
+        return _grid->size_cell();
     }
 };
 

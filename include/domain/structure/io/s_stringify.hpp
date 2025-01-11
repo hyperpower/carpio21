@@ -85,11 +85,12 @@ Strings _StringifyData(const ANY& grid, SGridTag){
     }
     return res;
 };
-template<class ANY, class TAG,
-        typename std::enable_if<
-            std::is_base_of<StructureTag, TAG>::value,
-        bool>::type = true >
-Strings _Stringify(const ANY& a,  TAG t){
+// template<class ANY, class TAG,
+        // typename std::enable_if<
+            // std::is_base_of<StructureTag, TAG>::value,
+        // bool>::type = true >
+template<class ANY>
+Strings _Stringify(const ANY& a,  StructureTag t){
     typedef typename ANY::Tag Tag;
     auto res = _StringifyHead(a, Tag());
     res.splice(res.end(), _StringifyData(a, Tag()));
@@ -100,7 +101,7 @@ template<class ANY, class INDEX>
 Strings _StringifyCell(const ANY& grid, const INDEX& index, SGridTag, Dim3Tag){
     Strings res;
     short order[] = { 0, 1, 3, 2, 6, 4, 5, 7 };
-    for (short o = 0; o < grid.num_vertex(); ++o){
+    for (short o = 0; o < ANY::NumVertex; ++o){
         auto p = grid.v(order[o], index);
         res.push_back(ToString(p.value(_X_),
                                p.value(_Y_),
@@ -118,7 +119,7 @@ template<class ANY, class INDEX>
 Strings _StringifyCell(const ANY& grid, const INDEX& index, SGridTag, Dim2Tag){
     Strings res;
     short order[] = { 0, 1, 3, 2 };
-    for (short o = 0; o < grid.num_vertex(); ++o){
+    for (short o = 0; o < ANY::NumVertex; ++o){
         auto p = grid.v(order[o], index);
         res.push_back(ToString(p.value(_X_),
                                p.value(_Y_),
@@ -134,7 +135,7 @@ template<class ANY, class INDEX>
 Strings _StringifyCell(const ANY& grid, const INDEX& index, SGridTag, Dim1Tag){
     Strings res;
     short order[] = { 0, 1 };
-    for (short o = 0; o < grid.num_vertex(); ++o){
+    for (short o = 0; o < ANY::NumVertex; ++o){
         auto p = grid.v(order[o], index);
         res.push_back(ToString(p.value(_X_),
                                0.0,

@@ -66,7 +66,10 @@ public:
                                  const St&    ori) const{
                                      return Index();
                                  };
-    virtual St size_normal() const{
+    virtual St size_cell_normal() const{
+        return 0;
+    }
+    virtual St size_face_normal(const Axes& a) const{
         return 0;
     }
     virtual St size_not_ghost() const{

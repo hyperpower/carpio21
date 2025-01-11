@@ -27,7 +27,7 @@ TEST(sgrid_io, uniform_to_string){
 
     auto out = Stringify(*spsg);
     // for(auto& s : out){
-    //     std::cout << s << std::endl;
+        // std::cout << s << std::endl;
     // }
     EXPECT_EQ(out.front(), "## TYPE_NAME : SGridUniform");
 }

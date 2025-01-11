@@ -7,6 +7,8 @@
 
 namespace carpio{
 
+
+
 struct SFieldTag: public StructureTag, public FieldBaseTag{};
 
 template<St DIM, 
@@ -20,6 +22,9 @@ public:
 
     typedef SFieldTag Tag;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
+    typedef typename GRID::Tag  GridTag;
+    typedef typename GHOST::Tag GhostTag;
+    typedef typename ORDER::Tag OrderTag;
     
     typedef GRID  Grid;
     typedef GHOST Ghost;
@@ -323,45 +328,7 @@ SField_<DIM, VT, GRID, GHOST, ORDER> Sqrt(const SField_<DIM, VT, GRID, GHOST, OR
     return res;
 }
 
-template<St DIM, 
-         class VT,
-         class GRID, 
-         class GHOST, 
-         class ORDER>
-class _DataInitial_{
-public:
-    static void InitAValue(){
-        std::cout << "Abstract" << std::endl;
-    }
-};
 
-template<St DIM, 
-         class GRID, 
-         class GHOST, 
-         class ORDER>
-class _DataInitial_<DIM, Vt, GRID, GHOST, ORDER>{
-public:
-    typedef typename GRID::Index  Index;
-
-    static Vt InitAValue(const Index&){
-        return 0.0;
-    }
-};
-
-template<St DIM, 
-         class GRID, 
-         class GHOST, 
-         class ORDER>
-class _DataInitial_<DIM, 
-                    LinearPolynomial_<Vt, typename GRID::Index>,
-                    GRID, GHOST, ORDER>{
-public:
-    typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
-    typedef typename GRID::Index  Index;
-    static Poly InitAValue(const Index& index){
-        return Poly();
-    }
-};
 
 }
 

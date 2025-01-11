@@ -6,7 +6,7 @@
 
 namespace carpio{
 
-struct SOrderTag:  public StructureTag{};
+struct SOrderTag:  public StructureTag, OrderBaseTag{};
 
 template<St DIM, class GRID, class GHOST>
 class SOrder_:public OrderBase_<DIM>{
