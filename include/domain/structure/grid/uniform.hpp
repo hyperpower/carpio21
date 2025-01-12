@@ -358,10 +358,10 @@ public:
         Index c(index.value(0) + _gl, index.value(1) + _gl, index.value(2) + _gl);
         return c;
     }
-    inline bool is_last(const Index& idx, const Axes& a){
-        return idx[a] == this->_n[a];
+    inline bool is_last(const Index& cidx, const Axes& a) const{
+        return cidx[a] == (this->_n[a]-1);
     }
-    Index to_face_index(const Index& index, const Orientation& o, const Axes& a) const{
+    Index cell_index_to_face_index(const Index& index, const Orientation& o, const Axes& a) const{
         Index fidx(index);
         fidx[a] += (o == _P_)? 1 : 0;
         return fidx;

@@ -44,7 +44,7 @@ public:
         }
         _set_uniform_grid();
     }
-    SGridNonUniform_(const Point& min,           // mimun location
+    SGridNonUniform_(const Point& min,  // mimun location
             const Idx& gl,          // ghost layer
             const Arr& csx,         //
             const Arr& csy = Arr(), //

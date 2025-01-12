@@ -10,15 +10,19 @@
 namespace carpio{
 
 
-template<class ANY>
-GnuplotActor _ToGnuplotActorLines(const ANY& a, const DomainTag& tag){};
+// template<class ANY>
+// GnuplotActor _ToGnuplotActorLines(const ANY& a, const DomainTag& tag){};
 
+// template<class ANY>
+// GnuplotActor ToGnuplotActorLines(const ANY& a){
+//     typedef typename ANY::Tag Tag;
+//     return _ToGnuplotActorLines(a, Tag()); 
+// }
 template<class ANY>
-GnuplotActor ToGnuplotActorLines(const ANY& a){
+GnuplotActor ToGnuplotActorPointContour(const ANY& a){
     typedef typename ANY::Tag Tag;
-    return _ToGnuplotActorLines(a, Tag()); 
+    return _ToGnuplotActorPointContour(a, Tag()); 
 }
-
 template<class ANY>
 GnuplotActor ToGnuplotActorWireFrame(const ANY& a){
     typedef typename ANY::Tag Tag;
