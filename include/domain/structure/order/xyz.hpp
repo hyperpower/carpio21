@@ -69,7 +69,6 @@ public:
         _grid(spgrid), _ghost(spghost), _face_axes(a),
         _ov(_ghost->size_normal()),
         _om(_grid->n(_X_), _grid->n(_Y_), _grid->n(_Z_)){
-            std::cout << "here" << std::endl;
         _build_ov_for_face();
         _build_om_for_face();
     }
