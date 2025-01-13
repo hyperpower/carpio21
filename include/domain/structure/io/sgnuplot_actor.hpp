@@ -191,6 +191,78 @@ GnuplotActor  _ToGnuplotActorLabel(const ANY& order,
     grid.for_each(fun);
     return actor;
 }
+
+template<class ANY>
+GnuplotActor  _ToGnuplotActorLabel(const ANY& ff, 
+                                const std::string& config, 
+                                SFieldFaceTag ft){
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorLabel(ff, config, ft, DimTag());
+}
+template<class ANY>
+GnuplotActor  _ToGnuplotActorLabel(const ANY& ff, 
+                                const std::string& config, 
+                                SFieldFaceTag, Dim1Tag){
+    GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with labels center textcolor lt -1");
+    auto& order = ff.order();
+    auto& grid  = ff.grid();
+    typedef typename ANY::Index Index;
+	for(auto& fidx : ff.order()){
+		auto cidx = ff.grid().face_index_to_cell_index(fidx, ff.face_axe());
+		auto fp = ff.grid().f(ff.face_axe(), _M_, cidx);
+        std::string text = "";
+        if (config == "index"){
+            text =  ToString(fidx);
+        }else if(config == "order"){
+            auto o = order.get_order_face_index(fidx, ff.face_axe());
+            text =  ToString(o);
+        }else{
+            text =  ToString(fidx);
+        }
+        actor.data().push_back(
+                    ToString(fp(_X_), -0.1," ") + " \"" + text + "\"");
+        if(grid.is_last(cidx, ff.face_axe())){// not a good code
+		    fp = ff.grid().f(ff.face_axe(), _P_, cidx);
+            text = "";
+            if (config == "index"){
+                text = ToString(fidx);
+            }
+            else if (config == "order"){
+                auto o = order.get_order_face_index(fidx, ff.face_axe());
+                text = ToString(o);
+            }else{
+                text = ToString(fidx);
+            }
+            actor.data().push_back(
+                ToString(fp(_X_), -0.1, " ") + " \"" + text + "\"");
+        }
+    }
+    return actor;
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim1Tag){
+    
+    std::list<double> lx, ly, lv;
+	for(auto& fidx : ff.order()){
+		auto cidx = ff.grid().face_index_to_cell_index(fidx, ff.face_axe());
+		auto p = ff.grid().f(ff.face_axe(), _M_, cidx);
+		lx.push_back(p.value(_X_));
+		ly.push_back(ff(_M_, cidx));
+        lv.push_back(ff(_M_, cidx));
+
+		if(ff.grid().is_last(cidx, ff.face_axe())){
+			p = ff.grid().f(ff.face_axe(), _P_, cidx);
+			lx.push_back(p.value(_X_));
+			ly.push_back(ff(_P_, cidx));
+            lv.push_back(ff(_P_, cidx));
+		}
+	}
+	auto aloc = ToGnuplotActor(lx, ly, lv);
+	aloc.style("with points ps 2 pointtype 13 lc palette");
+    return aloc;
+}
 template<class ANY>
 GnuplotActor _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
     

@@ -84,13 +84,13 @@ public:
 
     ValueType& operator()(const Orientation& o, const Index& index) {
         auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
-        auto arr_idx = this->_sporder->get_order_face_idx(fidx, this->_axe);
+        auto arr_idx = this->_sporder->get_order_face_index(fidx, this->_axe);
         return this->_arr[arr_idx];
     }
 
     const ValueType& operator()(const Orientation& o, const Index& index) const {
         auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
-        auto arr_idx = this->_sporder->get_order_face_idx(fidx, this->_axe);
+        auto arr_idx = this->_sporder->get_order_face_index(fidx, this->_axe);
         return this->_arr[arr_idx];
     }
 
@@ -211,7 +211,7 @@ protected:
         // make data by order
         this->_arr.reconstruct(this->_sporder->size());
         for(auto& idx : (*(this->_sporder))){
-            auto arr_idx = this->_sporder->get_order_face_idx(idx, _axe);
+            auto arr_idx = this->_sporder->get_order_face_index(idx, _axe);
             this->_arr[arr_idx] = _DataInit::InitAValue(idx);
         }
     }

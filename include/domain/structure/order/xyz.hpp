@@ -125,7 +125,7 @@ public:
         Index idx(i,j,k);
         return get_order(idx);
     }
-    St get_order_face_idx(const Index& face_idx,const Axes& a) const{
+    St get_order_face_index(const Index& face_idx,const Axes& a) const{
         auto cidx = this->_grid->face_index_to_cell_index(face_idx, a);
         if(!(_ghost->is_ghost(cidx))){
             return _om(face_idx.i(), face_idx.j(), face_idx.k());
