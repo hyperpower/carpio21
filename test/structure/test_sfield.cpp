@@ -92,8 +92,8 @@ TEST(field, coutour){
 
 	a.assign([](typename Field::ValueType x,
 	            typename Field::ValueType y,
-				typename Field::ValueType z,
-				double t){
+				typename Field::ValueType z
+				){
 		return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
 	});
 

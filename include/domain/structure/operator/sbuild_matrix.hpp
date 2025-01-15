@@ -46,9 +46,9 @@ public:
         std::size_t nz = 0;
         for(auto& index : order){
             auto& exp = expf(index);
-            auto   nr   = exp.size();
+            auto   nr = exp.size();
             nz       += nr;
-            auto   row  = order.get_order(index);
+            auto  row = order.get_order(index);
             b[row]    = -(exp.value());  // negative is here !!!
         }
         // Loop 2 ================

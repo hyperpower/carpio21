@@ -2,6 +2,7 @@
 #define _BASE_FIELD_HPP
 
 #include <iostream>
+#include "algebra/misc/linear_polynomial.hpp"
 #include "domain/domain_define.hpp"
 
 namespace carpio{
@@ -89,8 +90,8 @@ public:
         return DIM;
     };
 
-    virtual const ValueType& operator()(const Index&) const = 0;
-    virtual       ValueType& operator()(const Index&)       = 0;
+    // virtual const ValueType& operator()(const Index&) const = 0;
+    // virtual       ValueType& operator()(const Index&)       = 0;
 
     Grid&  grid() {return *_spgrid;};
     const Grid&  grid() const{return *_spgrid;};

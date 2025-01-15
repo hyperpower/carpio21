@@ -46,12 +46,12 @@ public:
         this->_sporder = spOrder(new Order(spg, spgh, af));
         _initial_arr();
     }
-    SFieldFace_(spGrid spg, spGhost spgh, spOrder spo)
-        :Base(spg, spgh, spo){
+    SFieldFace_(spGrid spg, spGhost spgh, spOrder spo, Axes axe)
+        :Base(spg, spgh, spo), _axe(axe){
         _initial_arr();
     }
-    SFieldFace_(const Self&  other): Base(other){}
-    SFieldFace_(      Self&& other): Base(std::move(other)){}
+    SFieldFace_(const Self&  other): Base(other),_axe(other._axe){}
+    SFieldFace_(      Self&& other): Base(std::move(other)), _axe(std::move(other._axe)){}
     SFieldFace_(const Base&  b) :Base(b) {}
     SFieldFace_(      Base&& b) :Base(std::move(b)) {}
 
@@ -72,32 +72,33 @@ public:
         return *this;
     }
     
-    ValueType&      operator()(Orientation o, St i, St j = 0, St k = 0){
-        St arr_idx, ni = i, nj =j, nk = k;
-        if(o == _P_){
-            ni += _axe == _X_? 1 : 0;
-            if constexpr (Self::Dim >= 2){
-                nj += _axe == _Y_? 1 : 0;
-            }
-            if constexpr (Self::Dim >= 3){
-                nk += _axe == _Z_? 1 : 0;
-            }
-        }
-        arr_idx = this->_sporder->get_order(ni,nj,nk);
+    ValueType&      operator()(const Orientation& o, St i, St j = 0, St k = 0){
+        Index fidx(i,j,k);
+        return this->operator()(o, fidx);
+    }
+
+    const ValueType& operator()(const Orientation& o, St i, St j = 0, St k = 0) const{
+        Index fidx(i,j,k);
+        return this->operator()(o, fidx);
+    }
+
+    ValueType& operator()(const Orientation& o, const Index& index) {
+        auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
+        auto arr_idx = this->_sporder->get_order_face_idx(fidx, this->_axe);
         return this->_arr[arr_idx];
     }
 
-    const ValueType& operator()(Orientation o, St i, St j = 0, St k = 0) const{
-        return this->_arr[this->_sporder->get_order(i,j,k)];
+    const ValueType& operator()(const Orientation& o, const Index& index) const {
+        auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
+        auto arr_idx = this->_sporder->get_order_face_idx(fidx, this->_axe);
+        return this->_arr[arr_idx];
     }
 
-    ValueType& operator()(const Index& index) {
-        return this->_arr[this->_sporder->get_order(index)];
+    Axes face_axe() const{
+        return _axe;
     }
 
-    const ValueType& operator()(const Index& index) const {
-        return this->_arr[this->_sporder->get_order(index)];
-    }
+    
     // ===========================================
     // arithmatic operator
     // ===========================================
@@ -159,24 +160,36 @@ public:
         Base::assign(other);
     }
     void assign(FunXYZT_Value fun, Vt t = 0.0){
-        for(auto& idx : (*this->_sporder)){
-            auto cp = this->_spgrid->c(idx);
-            this->operator ()(idx) = fun(cp.value(_X_),
-                                         cp.value(_Y_),
-                                         cp.value(_Z_), t);
+        for(auto& fidx : (*this->_sporder)){
+            auto cidx = this->_spgrid->face_index_to_cell_index(fidx, this->_axe);
+            auto cp = this->_spgrid->c(cidx);
+            auto fp = this->_spgrid->f(this->_axe, _M_, cidx);
+            auto value = fun(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), t);
+            this->operator ()(_M_, cidx) = value;
+            if(this->_spgrid->is_last(cidx, this->_axe)){
+                auto fp = this->_spgrid->f(this->_axe, _P_, cidx);
+                auto value = fun(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), t);
+                this->operator ()(_P_, cidx) = value;
+            }
         }
     }
     void assign(FunXYZ_Value fun){
-        for(auto& idx : (*this->_sporder)){
-            auto cp = this->_spgrid->c(idx);
-            this->operator ()(idx) = fun(cp.value(_X_),
-                                         cp.value(_Y_),
-                                         cp.value(_Z_));
+        for(auto& fidx : (*this->_sporder)){
+            auto cidx = this->_spgrid->face_index_to_cell_index(fidx, this->_axe);
+            auto cp = this->_spgrid->c(cidx);
+            auto fp = this->_spgrid->f(this->_axe, _M_, cidx);
+            auto value = fun(fp.value(_X_), fp.value(_Y_), fp.value(_Z_));
+            this->operator ()(_M_, cidx) = value;
+            if(this->_spgrid->is_last(cidx, this->_axe)){
+                auto fp = this->_spgrid->f(this->_axe, _P_, cidx);
+                auto value = fun(fp.value(_X_), fp.value(_Y_), fp.value(_Z_));
+                this->operator ()(_P_, cidx) = value;
+            }
         }
     }
     // return a new scalar with compatible gird, ghost and order
     Self new_compatible() const{
-        Self res(this->_spgrid, this->_spghost, this->_sporder);
+        Self res(this->_spgrid, this->_spghost, this->_sporder, this->_axe);
         return res;
     }
     Self new_inverse_volume() const{
@@ -198,7 +211,8 @@ protected:
         // make data by order
         this->_arr.reconstruct(this->_sporder->size());
         for(auto& idx : (*(this->_sporder))){
-            this->operator()(idx) = _DataInit::InitAValue(idx);
+            auto arr_idx = this->_sporder->get_order_face_idx(idx, _axe);
+            this->_arr[arr_idx] = _DataInit::InitAValue(idx);
         }
     }
 };

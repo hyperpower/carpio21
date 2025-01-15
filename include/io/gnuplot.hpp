@@ -1266,6 +1266,38 @@ auto ToGnuplotActor(const X& x, const Y& y,
     return actor;
 }
 
+template<typename X, typename Y, typename V,
+    typename std::enable_if<
+       (! HasTag<X>::value)   //no tag
+    && (! HasTag<Y>::value)   //no tag
+    && (! HasTag<V>::value)   //no tag
+    && std::is_arithmetic<typename X::value_type>::value
+    && IsContainer<X>::value
+    && std::is_arithmetic<typename Y::value_type>::value
+    && IsContainer<Y>::value 
+    && std::is_arithmetic<typename V::value_type>::value
+    && IsContainer<V>::value, 
+    bool>::type = true>
+auto ToGnuplotActor(const X& x, const Y& y, const V& v,
+            const std::string &pcmd = "using 1:2:3 title \"\" ",
+            const std::string& scmd = ""){
+    GnuplotActor actor;
+    actor.command(pcmd);
+    actor.style(scmd);
+    ASSERT(x.size() == y.size());
+    auto xiter = x.begin();
+    auto yiter = y.begin();
+    auto viter = v.begin();
+    for (; xiter != x.end();) {
+        std::ostringstream sst;
+        sst << (*xiter) << " " << (*yiter) << " " << (*viter);
+        actor.data().push_back(sst.str());
+        xiter++;
+        yiter++;
+        viter++;
+    }
+    return actor;
+}
 template<typename X, 
     typename std::enable_if<
        (! HasTag<X>::value)   //no tag

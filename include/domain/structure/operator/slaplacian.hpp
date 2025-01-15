@@ -226,7 +226,6 @@ public:
     typedef std::shared_ptr<BI> spBI;
 public:
     LaplacianImplement_(){
-        // std::cout << "IntLaplacian Exp Structure" << std::endl;
     };
 
     int set_method(const std::string& method){

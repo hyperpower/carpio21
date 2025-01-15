@@ -154,20 +154,38 @@ public:
         return _c[2][_IDX(k)];
     }
 
-    St num_cells() const {
+    St size_cell() const {
         St res = 1;
         for (St d = 0; d < Dim; ++d) {
             res *= _n[d];
         }
         return res;
     }
-    St num_vertex() const {
-        return NumVertex;
+    St size_vertex() const {
+        St res = 1;
+        for (St d = 0; d < Dim; ++d) {
+            res *= (_n[d] + 1);
+        }
+        return res;
     }
-    St num_face() const {
-        return NumFace;
+    St size_face() const {
+        St res = 0;
+        for (St d = 0; d < Dim; ++d) {
+            res += this->size_face(ToAxes(d));
+        }
+        return res;
     }
-
+    St size_face(Axes a) const {
+        St res = 1;
+        for (St d = 0; d < Dim; ++d) {
+            if (ToAxes(d) == a){
+                res *= (_n[d] + 1);
+            }else{
+                res *= _n[d];
+            }
+        }
+        return res;
+    }
     Vt min_size() const {
         return _cs;
     }
@@ -207,6 +225,7 @@ public:
         }
     }
 
+    // face area
     Vt fa(St dim,  int ori, const Index& index) const {
         if (DIM == 1){
             return 1.0;
@@ -339,7 +358,27 @@ public:
         Index c(index.value(0) + _gl, index.value(1) + _gl, index.value(2) + _gl);
         return c;
     }
-
+    inline bool is_last(const Index& cidx, const Axes& a) const{
+        return cidx[a] == (this->_n[a]-1);
+    }
+    Index cell_index_to_face_index(const Index& index, const Orientation& o, const Axes& a) const{
+        Index fidx(index);
+        fidx[a] += (o == _P_)? 1 : 0;
+        return fidx;
+    }
+    //  face index to p cell idx on the negative direction
+    //  for example:
+    //  f  c  f  c  f  c  f  c  f
+    //  |--+--|--+--|--+--|--+--|
+    //  0  0  1  1  2  2  3  3  4  
+    //        ^  ^           |  ^
+    //input fidx |           |   
+    //    return 1       return 3
+    Index face_index_to_cell_index(const Index& fidx, const Axes& a) const{
+        Index cidx(fidx);
+        cidx[a] -= (fidx[a] >= (_n[a]))? 1 : 0;
+        return cidx;
+    }
     void for_each(FunIndex fun){
         St nx = this->n(_X_);
         St ny = Dim > 1? this->n(_Y_):1;

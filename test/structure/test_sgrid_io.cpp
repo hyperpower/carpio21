@@ -17,7 +17,7 @@ const int fig_width  = 900;
 const int fig_height = 900;
 
 
-TEST(sgrid_io, initial){
+TEST(sgrid_io, uniform_to_string){
     typedef SGridUniform_<2> GridUniform;
     typedef std::shared_ptr<GridUniform> spGridUniform;
 
@@ -32,7 +32,7 @@ TEST(sgrid_io, initial){
     EXPECT_EQ(out.front(), "## TYPE_NAME : SGridUniform");
 }
 
-TEST(sgrid_io, nonuniform){
+TEST(sgrid_io, nonuniform_to_string){
     typedef SGridNonUniform_<2> GridNonUniform;
     typedef std::shared_ptr<GridNonUniform> spGridNonUniform;
 

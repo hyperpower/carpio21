@@ -135,7 +135,6 @@ class DataFile:
             arr.append(ma)
         return min(arr), max(arr)
         
-    
     def get_block_list_by(self, k):
         res = []
         for b in self._block:

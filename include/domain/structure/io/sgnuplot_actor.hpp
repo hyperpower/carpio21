@@ -7,6 +7,7 @@
 #include "domain/structure/grid/sgrid.hpp"
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/field/sfield_center.hpp"
+#include "domain/structure/field/sfield_face.hpp"
 #include "io/gnuplot.hpp"
 #include "s_stringify.hpp"
 
@@ -106,9 +107,9 @@ GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SGridTag){
 }
 
 template<class ANY>
-GnuplotActor _ToGnuplotActorLines(const ANY& a, SFieldCenterTag){
+GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SFieldCenterTag){
     auto& grid = a.grid();
-    return _ToGnuplotActorLines(grid, SGridTag()); 
+    return _ToGnuplotActorWireFrame(grid, SGridTag()); 
 }
 template<class ANY>
 GnuplotActor _ToGnuplotActorContourDim(const ANY& f, SFieldCenterTag, Dim2Tag){
@@ -189,6 +190,35 @@ GnuplotActor  _ToGnuplotActorLabel(const ANY& order,
     };
     grid.for_each(fun);
     return actor;
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
+    
+    std::list<double> lx, ly, lv;
+	for(auto& fidx : ff.order()){
+		auto cidx = ff.grid().face_index_to_cell_index(fidx, ff.face_axe());
+		auto p = ff.grid().f(ff.face_axe(), _M_, cidx);
+		lx.push_back(p.value(_X_));
+		ly.push_back(p.value(_Y_));
+        lv.push_back(ff(_M_, cidx));
+
+		if(ff.grid().is_last(cidx, ff.face_axe())){
+			p = ff.grid().f(ff.face_axe(), _P_, cidx);
+			lx.push_back(p.value(_X_));
+			ly.push_back(p.value(_Y_));
+            lv.push_back(ff(_P_, cidx));
+		}
+	}
+	auto aloc = ToGnuplotActor(lx, ly, lv);
+	aloc.style("with points ps 2 pointtype 13 lc palette");
+    return aloc;
+}
+
+template<class ANY>
+GnuplotActor _ToGnuplotActorPointContour(const ANY& a, SFieldFaceTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
 }
 
 }

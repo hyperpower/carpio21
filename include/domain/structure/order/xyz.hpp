@@ -48,7 +48,7 @@ public:
                St num_threads = 1
                ):
         _grid(spgrid), _ghost(spghost),
-        _ov(_ghost->size_normal()),
+        _ov(_ghost->size_cell_normal()),
         _om(_grid->n(_X_), _grid->n(_Y_), _grid->n(_Z_))
 #ifdef OPENMP
        ,_nt(num_threads)
@@ -67,10 +67,10 @@ public:
                spGhost spghost,
                Axes    a):
         _grid(spgrid), _ghost(spghost), _face_axes(a),
-        _ov(_ghost->size_normal()),
+        _ov(_ghost->size_face_normal(a)),
         _om(_grid->n(_X_), _grid->n(_Y_), _grid->n(_Z_)){
-        _build_ov_for_face();
-        _build_om_for_face();
+        _build_ov_for_face(a);
+        _build_om_for_face(a);
     }
 
     St size() const{
@@ -113,17 +113,26 @@ public:
         return _ov_citer[tn + 1];
     }
 #endif
-    St get_order(const Index& index) const{
-        if(!(_ghost->is_ghost(index))){
-            return _om(index.i(), index.j(), index.k());
+    St get_order(const Index& cell_idx) const{
+        if(!(_ghost->is_ghost(cell_idx))){
+            return _om(cell_idx.i(), cell_idx.j(), cell_idx.k());
         }
-        std::cerr<< ">! Error Index = " << index << std::endl;
+        std::cerr<< ">! Error Index = " << cell_idx << std::endl;
         SHOULD_NOT_REACH;
         return 0;
     }
     St get_order(int i, int j = 0, int k = 0) const{
         Index idx(i,j,k);
         return get_order(idx);
+    }
+    St get_order_face_idx(const Index& face_idx,const Axes& a) const{
+        auto cidx = this->_grid->face_index_to_cell_index(face_idx, a);
+        if(!(_ghost->is_ghost(cidx))){
+            return _om(face_idx.i(), face_idx.j(), face_idx.k());
+        }
+        std::cerr<< ">! Error Index = " << face_idx << std::endl;
+        SHOULD_NOT_REACH;
+        return 0;
     }
      
     const Grid& grid() const {
@@ -160,24 +169,25 @@ protected:
             _om(_ov[ii].i(), _ov[ii].j(), _ov[ii].k()) = ii;
         }
     }
-    void _build_ov_for_face(Axes a = _X_) {
+    void _build_ov_for_face(const Axes& a) {
         St count = 0;
-        St in = _grid->n(_X_) + (a == _X_ ? 1 : 0);
-        St jn = (DIM >= 2) ? _grid->n(_Y_) + (a == _Y_ ? 1 : 0) : 1;
-        St kn = (DIM >= 3) ? _grid->n(_Z_) + (a == _Z_ ? 1 : 0) : 1;
-        for (auto k = 0; k < kn; ++k) {
-            for (auto j = 0; j < jn; ++j) {
-                for (auto i = 0; i < in ; ++i) {
+        for (auto k = 0; k < ((DIM == 3) ? _grid->n(_Z_) : 1); ++k) {
+            for (auto j = 0; j < ((DIM >= 2) ? _grid->n(_Y_) : 1); ++j) {
+                for (auto i = 0; i < _grid->n(_X_); ++i) {
                     Index index(i,j,k);
                     if(!(_ghost->is_ghost(index))){
                         _ov[count] = index;
                         count++;
+                        if(index[a] == _grid->n(a) - 1){
+                            _ov[count] = CellIndexToFaceIndex(index, a, _P_);
+                            count++;
+                        }
                     }
                 }
             }
         }
     }
-    void _build_om_for_face(Axes a = _X_) {
+    void _build_om_for_face(const Axes& a) {
         // call after _build_ov_for_face
         St in = _grid->n(_X_) + (a == _X_ ? 1 : 0);
         St jn = (DIM >= 2) ? _grid->n(_Y_) + (a == _Y_ ? 1 : 0) : 1;
