@@ -58,7 +58,7 @@ This folder include all the examples for Carpio project.
 
 #### 2-3 Solver
 
-   2-3-1 :construction: Jacobi Solver
+   2-3-1 :ballot_box_with_check: Jacobi Solver
 
 ### :three: Domain
  
@@ -66,13 +66,11 @@ This folder include all the examples for Carpio project.
 
    3-1-1 :ballot_box_with_check: Field Define
 
-   3-1-2 :ballot_box_with_check: Vector Center and Face Define
+   3-1-2 :ballot_box_with_check: Boundary Value
 
-   3-1-3 Corner Define
+   3-1-3 Interpolation 
 
-   3-1-4 Field Interpolation
-
-   3-1-5 Cut Cell
+   3-1-4 Cut Cell
 
 #### 3-2 Octree
 

@@ -38,7 +38,7 @@ auto _ToPlotlyActorLinesDim(const ANY& grid, SGridTag, Dim3Tag){
 }
 
 template<class ANY>
-auto _ToPlotlyActorLines(const ANY& a, SGridTag){
+auto _ToPlotlyActorWireFrame(const ANY& a, SGridTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
     Tag t;

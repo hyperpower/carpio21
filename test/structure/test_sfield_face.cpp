@@ -140,6 +140,28 @@ TEST(field_face, dim1){
 	gnu.add(aloc);
 	
 	gnu.plot();
-	
-
 }
+
+TEST(field_face, dim3){
+	typedef SGridUniform_<3> Grid;
+	typedef std::shared_ptr<Grid> spGrid;
+
+	typedef SGhostRegular_<3, Grid> Ghost;
+	typedef std::shared_ptr<Ghost> spGhost;
+
+	typedef SOrderXYZ_<3, Grid, Ghost> Order;
+	typedef std::shared_ptr<Order> spOrder;
+
+    typedef SFieldFace_<3, double, Grid, Ghost, Order> FieldFace;
+
+	Point_<Vt, 3> pmin(0, 0, 0);
+	Point_<Vt, 3> pmax(1, 1, 1);
+	spGrid spgrid(new Grid(pmin, {7, 7, 7}, 0.5, 2));
+	
+	spGhost spghost(new Ghost(spgrid));
+
+    FieldFace ff(spgrid, spghost, _X_);
+
+	
+}
+

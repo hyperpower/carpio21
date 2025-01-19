@@ -328,6 +328,10 @@ public:
         cidx[a] -= (fidx[a] >= (_n[a]))? 1 : 0;
         return cidx;
     }
+    
+    inline bool is_last(const Index& cidx, const Axes& a) const{
+        return cidx[a] == (this->_n[a]-1);
+    }
 
     // Point is in the range
     inline bool is_in_on(Point p) {

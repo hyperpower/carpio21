@@ -11,6 +11,7 @@ template<St DIM, class GRID>
 class SGhost_{
 public:
     static const St Dim = DIM;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
     
     typedef SIndex_<Dim> Index;
     typedef GRID         Grid;

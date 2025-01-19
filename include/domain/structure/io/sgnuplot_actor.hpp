@@ -47,7 +47,7 @@ template<class ANY>
 GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& grid, SGridTag, Dim1Tag){
     GnuplotActor actor; 
     actor.command( "using 1:2 title \"\" ");
-    actor.style( "with line lc 0");
+    actor.style( "with line lc 3");
     Vt tik = 0.1;
 
     Vt xs=0.0, xe=0.0;
@@ -75,9 +75,71 @@ GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& grid, SGridTag, Dim1Tag){
     actor.data().push_back(ToString(xs, 0.0, " "));
     actor.data().push_back(ToString(xe, 0.0, " "));
 
+    // boundary
+    actor.data().push_back(ToString(xs, 0.0, " "));
+    actor.data().push_back(ToString(xs, 2.0 * tik, " "));
+    actor.data().push_back("");
+
+    actor.data().push_back(ToString(xe, 0.0, " "));
+    actor.data().push_back(ToString(xe, 2.0 * tik, " "));
+    actor.data().push_back("");
+
     return actor;
 }
+template<class ANY>
+GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& ghost, SGhostTag, Dim1Tag){
+    GnuplotActor actor; 
+    actor.command( "using 1:2 title \"\" ");
+    actor.style( "with line");
+    Vt tik = 0.1;
 
+    auto& grid = ghost.grid();
+    auto gl    = ghost.ghost_layer();
+
+    Vt xs=0.0, xe=0.0;
+    for (int i = -gl; i <= 0; i++){
+        typename ANY::Index index(i);
+        auto p = grid.f(_X_, _M_, index);
+        actor.data().push_back(
+            ToString(p.value(_X_), -0.0,  " "));
+        actor.data().push_back(
+            ToString(p.value(_X_), tik, " "));
+        actor.data().push_back("");
+        if(i == -gl){
+            xs = p.value(_X_);
+        }
+        if(i == 0){
+            xe = p.value(_X_);
+        }
+    }
+    actor.data().push_back(
+        ToString(xs, 0.0,  " "));
+    actor.data().push_back(
+        ToString(xe, 0.0, " "));
+    actor.data().push_back("");
+    
+    for (int i = grid.n(_X_) - 1; i < grid.n(_X_) + gl; i++){
+        typename ANY::Index index(i);
+        auto p = grid.f(_X_, _P_, index);
+        actor.data().push_back(
+            ToString(p.value(_X_), -0.0,  " "));
+        actor.data().push_back(
+            ToString(p.value(_X_), tik, " "));
+        actor.data().push_back("");
+        if(i == grid.n(_X_) - 1){
+            xs = p.value(_X_);
+        }
+        if(i == grid.n(_X_) + gl -1 ){
+            xe = p.value(_X_);
+        }
+    }
+    actor.data().push_back(
+        ToString(xs, 0.0,  " "));
+    actor.data().push_back(
+        ToString(xe, 0.0, " "));
+    actor.data().push_back("");
+    return actor;
+}
 template<class ANY>
 GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& grid, SGridTag, Dim2Tag){
     GnuplotActor actor;
@@ -105,7 +167,14 @@ GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SGridTag){
     DimTag dt;
     return _ToGnuplotActorWireFrameDim(a, t, dt); 
 }
-
+template<class ANY>
+GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SGhostTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    Tag t;
+    DimTag dt;
+    return _ToGnuplotActorWireFrameDim(a, t, dt); 
+}
 template<class ANY>
 GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SFieldCenterTag){
     auto& grid = a.grid();
@@ -264,6 +333,21 @@ GnuplotActor _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim1Tag){
     return aloc;
 }
 template<class ANY>
+GnuplotActor _ToGnuplotActorPointContour(const ANY& fcenter, SFieldCenterTag, Dim1Tag){
+    
+    std::list<double> lx, ly, lv;
+	for(auto& cidx : fcenter.order()){
+		auto p = fcenter.grid().c(cidx);
+		lx.push_back(p.value(_X_));
+		ly.push_back(fcenter(cidx));
+        lv.push_back(fcenter(cidx));
+	}
+	auto aloc = ToGnuplotActor(lx, ly, lv);
+	aloc.style("with points ps 2 pointtype 13 lc palette");
+    return aloc;
+}
+
+template<class ANY>
 GnuplotActor _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
     
     std::list<double> lx, ly, lv;
@@ -293,6 +377,12 @@ GnuplotActor _ToGnuplotActorPointContour(const ANY& a, SFieldFaceTag){
     return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
 }
 
+template<class ANY>
+GnuplotActor _ToGnuplotActorPointContour(const ANY& a, SFieldCenterTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
+}
 }
 
 #endif

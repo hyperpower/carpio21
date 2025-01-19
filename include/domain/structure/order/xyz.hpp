@@ -179,7 +179,7 @@ protected:
                         _ov[count] = index;
                         count++;
                         if(index[a] == _grid->n(a) - 1){
-                            _ov[count] = CellIndexToFaceIndex(index, a, _P_);
+                            _ov[count] = _grid->cell_index_to_face_index(index, _P_, a);
                             count++;
                         }
                     }
