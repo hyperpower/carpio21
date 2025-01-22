@@ -99,7 +99,14 @@ public:
             return false;
         }
     }
-
+    virtual bool is_boundary_face(
+            const Index& findex,
+            const St&    a) const{
+        ASSERT(a < DIM);
+        Idx idx = findex.value(a);
+        return (idx == 0) || (idx == _grid->n().value(a)); 
+    };
+    
     virtual bool is_cut(const Index& index) const{
         return false;
     }

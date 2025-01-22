@@ -252,6 +252,14 @@ struct IsNumber : std::integral_constant<bool,
       std::is_arithmetic<T>::value> { 
 };
 
+struct ArithmeticTag: public BaseTag{};
+
+template<class ValueType,
+         typename std::enable_if<
+            (! HasTag<ValueType>::value)   //no tag
+            && std::is_arithmetic<ValueType>::value
+        , bool>::type = true>
+struct ValueTagTraits_ {using Type = ArithmeticTag;};
 
 template<typename T>
 inline const char* GetTypeName() {

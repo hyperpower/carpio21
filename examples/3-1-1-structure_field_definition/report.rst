@@ -7,6 +7,13 @@ This test case illustrates definition of a field on structure field.
 Field Center
 ===================
 
+**Field** (`field_wiki`_) is a set on which addition, subtraction, multiplication, 
+and division are defined 
+and behave as the corresponding operations on rational and real numbers. 
+
+Here, we defined a field on structure grid. The numbers are located on the center of 
+each grid cells.
+
 1 Dimension
 -------------
 The data store on the center of the grid. :numref:`fig-uniform1` shows the uniform structure grid 
@@ -73,13 +80,16 @@ Field Face
 
 The data store on the face of grid cell.
 
-
-
-Dimension 2
+1 Dimension
 -------------
 
 
-Dimension 3
-------------
+2 Dimension
+-------------
 
 
+3 Dimension
+-------------
+
+
+.. _field_wiki: https://en.wikipedia.org/wiki/Field_(mathematics)

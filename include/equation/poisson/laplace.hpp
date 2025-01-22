@@ -25,8 +25,10 @@ public:
     typedef typename Domain::spGhost   spGhost;
     typedef typename Domain::Order       Order;
     typedef typename Domain::spOrder   spOrder;
-    typedef typename Domain::FieldCenter FieldCenter;
-    typedef std::shared_ptr<FieldCenter> spFieldCenter;
+    typedef typename Domain::FieldCenter     FieldCenter;
+    typedef typename Domain::spFieldCenter spFieldCenter;
+    typedef typename Domain::FieldCenterExp     FieldCenterExp;
+    typedef typename Domain::spFieldCenterExp spFieldCenterExp;
 
     typedef MatrixSCR_<Vt>    Mat;
     typedef ArrayListV_<Vt>   Arr;
@@ -53,7 +55,7 @@ public:
         if(name == "explicit"){
             _one_step_explicit(step, time);
         }else if(name == "implicit"){
-            // _one_step_implicit(step);
+            _one_step_implicit(step, time);
         }else if(name == "CN"){
             // _one_step_cn(step);
         }else if(name == "CNgeneral"){
@@ -91,17 +93,14 @@ public:
         auto expf     = this->new_field_exp();
         auto bis      = this->get_boundary_index("phi");
 
-        auto res = IntLaplacian((*expf), (*bis));
+        auto res = IntegralLaplacian((*expf), (*bis));
 
         Mat a;
         Arr b;
         BuildMatrix(res, a, b);
-        // prepare x
         Arr x = phi.to_array();
         this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
-        // std::cout << "return code = " << any_cast<int>(this->_configs["solver_return_code"]) << std::endl;
         phi.assign(x);
-//        x.show();
         return 0;
     }
 
@@ -114,36 +113,33 @@ protected:
         auto& phi  = *(this->_fields["phi"]);
         auto& invv = *(this->_fields["inverse_volume"]);
         auto  bis  = this->get_boundary_index("phi");
-        Vt    dt   = this->_time->dt();
+        auto  dt   = this->_time->dt();
 
-        phi = IntLaplacian(phi, (*bis), time) * dt * invv + phi;
+        phi = IntegralLaplacian(phi, (*bis), time) * dt * invv + phi;
 
         return 0;
     }
 
     // Implicit
-//     virtual int _one_step_implicit(St step, Vt time){
-//         auto& phi  = *(this->_fields["phi"]);
-//         auto& invv = *(this->_fields["inverse_volume"]);
-//         auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
-//         auto bis      = this->get_boundary_index("phi");
+    virtual int _one_step_implicit(St step, Vt time){
+        auto& phi  = *(this->_fields["phi"]);
+        auto& invv = *(this->_fields["inverse_volume"]);
+        auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        auto bis      = this->get_boundary_index("phi");
 
-//         auto spphif    = any_cast<spExpField>(this->_configs["field_exp"]);
-//         Vt    dt       = this->_time->dt();
+        auto spphif    = this->new_field_exp();
+        Vt   dt        = this->_time->dt();
 
-//         auto res = IntLaplacian(phi, (*bis), time) * dt * invv - (*spphif) + phi;
+        auto res =  IntegralLaplacian(phi, (*bis), time) * dt * invv - (*spphif) + phi;
 
-//         Mat a;
-//         Arr b;
-//         BuildMatrix(res, a, b);
-//         // prepare x
-//         Arr x = phi.to_array();
-//         this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
-//         // std::cout << "return code = " << any_cast<int>(this->_configs["solver_return_code"]) << std::endl;
-//         phi.assign(x);
-// //        x.show();
-//         return 0;
-//     }
+        Mat a;
+        Arr b;
+        BuildMatrix(res, a, b);
+        Arr x = phi.to_array();
+        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        phi.assign(x);
+        return 0;
+    }
 
 };
 

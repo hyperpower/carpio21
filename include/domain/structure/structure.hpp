@@ -49,13 +49,15 @@ public:
     typedef std::shared_ptr<Ghost> spGhost;
     typedef std::shared_ptr<Order> spOrder;
 
+    typedef std::shared_ptr<FieldCenter>    spFieldCenter;
+    typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
+
     typedef StructureDomain_<DIM, Grid, Ghost, Order> Self;
 
 public:
     spGrid  _spgrid; 
     spGhost _spghost; 
     spOrder _sporder;
-
 public:
     StructureDomain_(){};
 

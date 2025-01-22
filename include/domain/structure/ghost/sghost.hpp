@@ -50,6 +50,11 @@ public:
             const St&    o) const{
         return false;
     };
+    virtual bool is_boundary_face(
+            const Index& findex,
+            const St&    a) const{
+        return false;
+    };
     virtual bool is_cut(
             const Index& index) const{return false;};
     virtual bool is_normal(const Index& index) const{return false;};

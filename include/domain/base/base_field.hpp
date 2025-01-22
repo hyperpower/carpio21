@@ -126,13 +126,25 @@ public:
     
 };
 
-#define DEF_FIELD_TAG(FIELD_TYPE)     \
+#define EXPAND_FIELD_TAG(FIELD_TYPE)     \
     typedef typename FIELD_TYPE::Tag      FieldTag; \
     typedef typename FIELD_TYPE::DimTag   DimTag; \
     typedef typename FIELD_TYPE::GridTag  GridTag; \
     typedef typename FIELD_TYPE::GhostTag GhostTag; \
     typedef typename FIELD_TYPE::OrderTag OrderTag; \
-    typedef typename FIELD_TYPE::DimTag   DimTag;
+    typedef typename FIELD_TYPE::DimTag   DimTag; \
+    typedef typename FIELD_TYPE::ValueTag ValueTag;
+
+#define EXPAND_FIELD(FIELD_TYPE)     \
+    typedef typename FIELD_TYPE::Self Field; \
+    typedef typename FIELD_TYPE::Index Index; \
+    typedef typename FIELD_TYPE::ValueType ValueType; \
+    typedef typename FIELD_TYPE::Grid  Grid; \
+    typedef typename FIELD_TYPE::Ghost Ghost; \
+    typedef typename FIELD_TYPE::Order Order; \
+    typedef typename FIELD_TYPE::spGrid  spGrid; \
+    typedef typename FIELD_TYPE::spGhost spGhost; \
+    typedef typename FIELD_TYPE::spOrder spOrder; 
 
 template<St DIM, 
          class VT,
@@ -153,6 +165,7 @@ template<St DIM,
 class _DataInitial_<DIM, Vt, GRID, GHOST, ORDER>{
 public:
     typedef typename GRID::Index  Index;
+    typedef ArithmeticTag ValueTag;
 
     static Vt InitAValue(const Index&){
         return 0.0;
@@ -168,6 +181,7 @@ class _DataInitial_<DIM,
                     GRID, GHOST, ORDER>{
 public:
     typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
+    typedef LinearPolynomialTag ValueTag;
     typedef typename GRID::Index  Index;
     static Poly InitAValue(const Index& index){
         return Poly();

@@ -108,7 +108,7 @@ public:
     }
 
     bool has_flag(int f) const {
-        return (_flag | f) == _flag ? true : false;
+        return (this->_flag | f) == this->_flag ? true : false;
     }
 
     virtual bool is_condition_event() const{

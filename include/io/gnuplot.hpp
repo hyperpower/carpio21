@@ -1322,6 +1322,25 @@ auto ToGnuplotActor(const X& x,
     return actor;
 }
 
+template<typename X, typename Y,
+    typename std::enable_if<
+       (! HasTag<X>::value)   //no tag
+    && (! HasTag<Y>::value)   //no tag
+    && std::is_arithmetic<X>::value
+    && std::is_arithmetic<Y>::value,
+    bool>::type = true>
+auto ToGnuplotActorLabel(
+        const X& x, const Y& y, const std::string& l, 
+        const std::string &pcmd = "using 1:2:3 title \"\" ",
+        const std::string& scmd = "with labels center textcolor lt -1"){
+    GnuplotActor actor;
+    actor.command(pcmd);
+    actor.style(scmd);
+    std::ostringstream sst;
+    sst << x << " " << y << " " << l;
+    actor.data().push_back(sst.str());
+    return actor;
+}
 
 }
 

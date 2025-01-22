@@ -634,7 +634,7 @@ void ArrayListV_<V>::reconstruct(size_type Len) {
     if (Len == 0 && this->m_Len == 0) {
         return;
     }
-    if (Len == 0 && NULL != this->m_p) {
+    if (Len == 0 && nullptr != this->m_p) {
         delete[] this->m_p;
         return;
     }

@@ -146,12 +146,18 @@ public:
         return _c[0][_IDX(i)];
     }
     Vt cy(Idx i, Idx j = 0, Idx k = 0) const {
-        ASSERT(Dim >= 2);
-        return _c[1][_IDX(j)];
+        if constexpr(Dim >= 2){
+            return _c[1][_IDX(j)];
+        }else{
+            return 0.0;
+        }
     }
     Vt cz(Idx i, Idx j = 0, Idx k = 0) const {
-        ASSERT(Dim >= 3);
-        return _c[2][_IDX(k)];
+        if constexpr(Dim >= 3){
+            return _c[2][_IDX(k)];
+        }else{
+            return 0.0;
+        }
     }
 
     St size_cell() const {
@@ -195,7 +201,13 @@ public:
 
 
     // face  ===================================
-    Point f(St dim, int fb, const Index& index) const {
+    Point f(Axes dim, Orientation fb, const Index& index) const {
+        return f(dim, fb, index.i(), index.j(), index.k());
+    }
+    Point f(const Index& index, Axes dim, Orientation fb) const {
+        return f(dim, fb, index.i(), index.j(), index.k());
+    }
+    Point f(const Index& index, Orientation fb, Axes dim) const {
         return f(dim, fb, index.i(), index.j(), index.k());
     }
 
@@ -214,7 +226,7 @@ public:
 
     Vt f_(St dim, int ori, Idx idx) const {
         Vt halfs = hs_(dim, idx);
-        Vt cen = c_(dim, idx);
+        Vt cen   = c_(dim, idx);
         if (ori == _P_) {         //right face
             return cen + halfs;
         } else if (ori == _M_) {  //left face
@@ -361,7 +373,9 @@ public:
     inline bool is_last(const Index& cidx, const Axes& a) const{
         return cidx[a] == (this->_n[a]-1);
     }
-    Index cell_index_to_face_index(const Index& index, const Orientation& o, const Axes& a) const{
+    Index cell_index_to_face_index(
+        const Index& index, const Orientation& o, const Axes& a) const
+    {
         Index fidx(index);
         fidx[a] += (o == _P_)? 1 : 0;
         return fidx;

@@ -53,7 +53,7 @@ public:
         _font          = "Helvetica";
         _size_font     = 12;
 
-        _init_fun_plot();
+        // _init_fun_plot();
     }
 
     EventGnuplotField_(const std::string& sname, FunPlot fun,
@@ -129,18 +129,18 @@ protected:
 //        _spgnu->clear();
 //    }
 
-    void _init_fun_plot(){
-        this->_fun = [](Gnuplot& gnu, const Field& f, St step , Vt t, int fob, pEqu pd){
-            if(DIM == 1){
-                gnu.add(GnuplotActor::Lines(f));
-            }else if(DIM == 2){
-                gnu.add(GnuplotActor::Contour(f));
-            }
-            gnu.plot();
-            gnu.clear();
-            return 1;
-        };
-    }
+    // void _init_fun_plot(){
+    //     this->_fun = [](Gnuplot& gnu, const Field& f, St step , Vt t, int fob, pEqu pd){
+    //         if(DIM == 1){
+    //             gnu.add(GnuplotActor::Lines(f));
+    //         }else if(DIM == 2){
+    //             gnu.add(GnuplotActor::Contour(f));
+    //         }
+    //         gnu.plot();
+    //         gnu.clear();
+    //         return 1;
+    //     };
+    // }
 
     std::string _file_name(St step, Vt t, int fob) const{
         std::stringstream ss;

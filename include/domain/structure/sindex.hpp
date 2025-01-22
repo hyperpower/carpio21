@@ -47,11 +47,9 @@ public:
         Self res(*this);
         if (dim == 0) {
             res[0] += 1;
-        }
-        if (dim == 1) {
+        }else if (dim == 1) {
             res[1] += 1;
-        }
-        if (dim == 2) {
+        }else { // dim == 2
             res[2] += 1;
         }
         return res;
@@ -226,7 +224,18 @@ void Shift(SIndex_<DIM>& index, St dim, St ori, St step = 1) {
         index[dim] = index[dim] + step;
     }
 }
-
+template<St DIM>
+SIndex_<DIM> Plus(const SIndex_<DIM>& index, St dim, St step = 1) {
+    SIndex_<DIM> res(index);
+    res[dim] = index[dim] + step;
+    return res;
+}
+template<St DIM>
+SIndex_<DIM> Minus(const SIndex_<DIM>& index, St dim, St step = 1) {
+    SIndex_<DIM> res(index);
+    res[dim] = index[dim] - step;
+    return res;
+}
 template<St DIM>
 SIndex_<DIM> GetDeltaIndex(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     SIndex_<DIM> res(c);
@@ -236,15 +245,15 @@ SIndex_<DIM> GetDeltaIndex(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     return res;
 }
 template<St DIM>
-St GetDeltaAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
+Axes GetDeltaAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     auto d = GetDeltaIndex(c, g);
     for(int i = 0; i < DIM; ++i){
         if(d[i] != 0){
-            return i;
+            return ToAxes(i);
         }
     }
     SHOULD_NOT_REACH;
-    return 0;
+    return _X_;
 }
 template<St DIM>
 Orientation GetDeltaOrient(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {

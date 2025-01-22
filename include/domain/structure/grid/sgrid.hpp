@@ -118,8 +118,6 @@ public:
     virtual void for_each(FunIndex) const{}
     virtual void for_each_INDEX(FunIndex){}
 
-
-
 };
 
 }

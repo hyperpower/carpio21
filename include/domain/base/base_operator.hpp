@@ -3,23 +3,12 @@
 
 #include <iostream>
 #include "type_define.hpp"
+#include "domain/boundary/boundary_index.hpp"
 #include "base_operator_impl.hpp"
 
 namespace carpio{
 
-// template<class FIELD, class BI>
-// FIELD IntLaplacian(const FIELD& field, BI bi, const std::string& method){
-//     IntLaplacianImplement_<FIELD,   FIELD::Dim,
-//                         typename FIELD::ValueType,
-//                         typename FIELD::Grid, 
-//                         typename FIELD::Ghost,
-//                         typename FIELD::Order,
-//                         typename FIELD::Tag
-//                         > imp;
-//     // std::cout << "[  Laplace ] field, bi" << std::endl;
-//     imp.set_method(method);
-//     return imp.execute(field, bi);
-// }
+//deprecate -->
 template<class FIELD, class BI>
 FIELD IntLaplacian(const FIELD& field, BI bi, double t=0.0){
     // std::cout << "IntLaplacian field with bi" << std::endl;
@@ -32,6 +21,16 @@ FIELD IntLaplacian(const FIELD& field, BI bi, double t=0.0){
                         > imp;
     return imp.execute(field, bi, t); 
 }
+// <--- deprecate
+
+
+template<class FIELD, class BI>
+FIELD IntegralLaplacian(const FIELD& field, const BI& bi, double t=0.0){
+    typename FIELD::Tag field_tag; 
+    return IntegralLaplacian(field, bi, t, field_tag);
+}
+
+
 // Laplacian Finite Difference Method
 template<class FIELD, class BI>
 FIELD Laplacian(const FIELD& field, BI bi, double t=0.0){
@@ -94,31 +93,46 @@ FIELD IntVolume(const FIELD& field){
 }
 // Interpolate ==========================
 template<class FIELD>
-auto InterpolateCenterToFace(const FIELD& field){
+auto InterpolateCenterToFace(const FIELD& field, Axes a){
     typename FIELD::Tag field_tag; 
-    std::cout << "Base Interpolate C to F" << std::endl;
-    // return 0;
-    return InterpolateCenterToFace(field, field_tag);
+    return InterpolateCenterToFace(field, a, field_tag);
+}
+template<class FIELD>
+auto InterpolateCenterToFace(const FIELD& field, const BoundaryIndex& bi, Axes a){
+    typename FIELD::Tag field_tag; 
+    return InterpolateCenterToFace(field, bi, a, field_tag);
+}
+template<class FIELD>
+typename FIELD::ValueType Value(
+    const FIELD& field,
+    const BoundaryIndex& bi,
+    const typename FIELD::Index& idxc,
+    const typename FIELD::Index& idxg,
+    const Axes&            axe,
+    const Orientation&     ori,
+    const Vt&            time = 0.0)
+{
+    typedef typename FIELD::Tag Tag; 
+    return Value(field, bi, idxc, idxg, axe, ori, time, Tag());
 }
 
-template<class FIELD, class BDYIDX>
-typename FIELD::ValueType Interpolate(const FIELD& field, const BDYIDX bi){
-    std::cout << "Interpolate" << std::endl;
-    return 0;
+template<class FIELD>
+void ApplyBoundaryValue(
+     FIELD& field,
+    const BoundaryIndex& bi,
+    const Vt&            time = 0.0)
+{
+    typedef typename FIELD::Tag Tag; 
+    typedef typename FIELD::ValueTag ValueTag;
+    ApplyBoundaryValue(field, bi, time, Tag(), ValueTag());
 }
 
 // BuildMatrix
 template<class FIELD, class MAT, class ARR>
 int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){
-    // std::cout << "[   INFO   ] Fuction Build Matix" << std::endl;
-    BuildMatrixImplement_<FIELD, FIELD::Dim,
-                        typename FIELD::ValueType,
-                        typename FIELD::Grid, 
-                        typename FIELD::Ghost,
-                        typename FIELD::Order,
-                        typename FIELD::Tag
-                        > imp;
-    imp.execute(field, mat, b);
+    typedef typename FIELD::Tag Tag; 
+    typedef typename FIELD::ValueTag ValueTag;
+    _BuildMatrix(field, mat, b, Tag(), ValueTag());
     return 0;
 }
 

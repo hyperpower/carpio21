@@ -33,6 +33,7 @@ public:
     typedef ArrayListV_<ValueType> Arr; 
 
     typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef typename _DataInit::ValueTag ValueTag;
 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
     typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;
@@ -91,6 +92,16 @@ public:
     const ValueType& operator()(const Orientation& o, const Index& index) const {
         auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
         auto arr_idx = this->_sporder->get_order_face_index(fidx, this->_axe);
+        return this->_arr[arr_idx];
+    }
+    
+    ValueType& operator()(const Index& findex) {
+        auto arr_idx = this->_sporder->get_order_face_index(findex, this->_axe);
+        return this->_arr[arr_idx];
+    }
+
+    const ValueType& operator()(const Index& findex) const {
+        auto arr_idx = this->_sporder->get_order_face_index(findex, this->_axe);
         return this->_arr[arr_idx];
     }
 

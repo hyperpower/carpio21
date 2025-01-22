@@ -19,6 +19,7 @@ public:
 
 	// get
 	virtual int type() const {return 1;}
+	virtual Vt value() const {return 0.0;}
 	virtual Vt value(Vt , Vt, Vt , Vt) const {return 0.0;}
 
 };

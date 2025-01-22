@@ -41,7 +41,7 @@ public:
 
     virtual int execute(St step, Vt t, int fob, EquationBase& equ) {
         _record_time(step, t);
-        _output(step, t);
+        _output(step, t, fob);
         return -1;
     }
 protected:
@@ -57,13 +57,23 @@ protected:
         return (cpu_l - cpu_ll);
     }
 
-    void _output(const St& step, const Vt& t) {
+    void _output(const St& step, const Vt& t, int fob) {
+
         Vt d_cpu  = Clock::TicksToSecondsD(_d_last(_l_cpu));
         Vt d_wall = Clock::TicksToSecondsD(_d_last(_l_wall));
-
-        tfm::format(*_stream,
+        if(fob == Event::START){
+            tfm::format(*_stream,
+                    "step: %8s t: %8.5f cpu: %8.5f wall: %8.5f\n",
+                    "START", t, d_cpu, d_wall);
+        }else if(fob == Event::END){
+            tfm::format(*_stream,
+                    "step: %8s t: %8.5f cpu: %8.5f wall: %8.5f\n",
+                    "END", t, d_cpu, d_wall);
+        }else{
+            tfm::format(*_stream,
                     "step: %8d t: %8.5f cpu: %8.5f wall: %8.5f\n",
                     step, t, d_cpu, d_wall);
+        }
     }
 
     void _record_time(const St& step, Vt& t) {

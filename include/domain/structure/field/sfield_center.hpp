@@ -33,6 +33,7 @@ public:
     typedef ArrayListV_<ValueType> Arr; 
 
     typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef typename _DataInit::ValueTag ValueTag;
 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
     typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;
@@ -197,19 +198,48 @@ operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs,
     lhs += rhs;
     return lhs;
 }
-template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
+template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER,
+            typename = std::enable_if_t<!std::is_arithmetic<VT>::value> >
 inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
-operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
-          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
+operator+(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>  lhs, 
+          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs) 
+{
     lhs += rhs;
     return lhs;
 }
-template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
+template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER,
+            typename = std::enable_if_t<!std::is_arithmetic<VT2>::value> >
+inline SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>
+operator+(const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>&  lhs, 
+                SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER> rhs) 
+{
+    rhs += lhs;
+    return rhs;
+}
+template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
-operator-(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>   lhs, 
-          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs){
+operator-(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> lhs, 
+          const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& rhs){
+    lhs += rhs;
+    return lhs;
+}
+template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER,
+            typename = std::enable_if_t<!std::is_arithmetic<VT>::value> >
+inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
+operator-(      SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>  lhs, 
+          const SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>& rhs) 
+{
     lhs -= rhs;
     return lhs;
+}
+template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER,
+            typename = std::enable_if_t<!std::is_arithmetic<VT2>::value> >
+inline SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER>
+operator-(const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& lhs, 
+                SFieldCenter_<DIM, VT2, GRID, GHOST, ORDER> rhs) 
+{
+    (-rhs) += lhs;
+    return rhs;
 }
 template<St DIM, class VT, class VT2, class GRID, class GHOST, class ORDER>
 inline SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>
