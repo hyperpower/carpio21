@@ -99,7 +99,7 @@ protected:
     int _solve_finite_volume_2(){
         FieldCenter&    phi  = *(this->_fields["phi"]);
         auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
-        auto expf     = this->new_field_exp();
+        auto expf     = this->new_field_exp_zero();
         auto bis      = this->get_boundary_index("phi");
 
         auto res = IntLaplacian((*expf), (*bis)) - IntVolume(*(this->_fields["source"]));
@@ -120,7 +120,7 @@ protected:
     int _solve_finite_difference_2(){
         FieldCenter&    phi  = *(this->_fields["phi"]);
         auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
-        auto expf     = this->new_field_exp();
+        auto expf     = this->new_field_exp_zero();
         auto bis      = this->get_boundary_index("phi");
 
         auto res = Laplacian((*expf), (*bis)) - (*(this->_fields["source"]));

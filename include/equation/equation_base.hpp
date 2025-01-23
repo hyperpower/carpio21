@@ -299,11 +299,16 @@ protected:
         }
     }
 
-    spFieldCenterExp new_field_exp() const{
-        return spFieldCenterExp(new FieldCenterExp(
+    spFieldCenterExp new_field_exp_zero() const{
+        spFieldCenterExp spfexp(new FieldCenterExp(
                     this->_spgrid,
                     this->_spghost,
                     this->_sporder));
+        return spfexp;
+    }
+    spFieldCenterExp new_field_exp_coe_one() const{
+        return Domain::NewspFieldCenterExpCoeOne(
+                    this->_spgrid, this->_spghost, this->_sporder);
     }
 
     template<class Container>

@@ -167,7 +167,7 @@ TEST(equation, equation_base){
 
 //     auto& phi = equ.field("phi");
 
-//     auto exact = equ.field("phi").new_compatible();
+//     auto exact = equ.field("phi").new_compatible_zero();
 //     exact.assign([](typename Domain::ValueType x,
 //                     typename Domain::ValueType y,
 //                     typename Domain::ValueType z){

@@ -22,6 +22,7 @@
 #include "io/s_stringify.hpp"
 
 #include "operator/slaplacian.hpp"
+#include "operator/sintegral_laplacian.hpp"
 #include "operator/sbuild_matrix.hpp"
 
 #include <memory>
@@ -43,6 +44,7 @@ public:
     typedef typename Grid::Index   Index;
     typedef SFieldCenter_<Dim, ValueType, Grid, Ghost, Order> FieldCenter;
     typedef LinearPolynomial_<Vt, typename GRID::Index> Exp;
+    typedef Exp    ExpType;
     typedef SFieldCenter_<Dim, Exp, Grid, Ghost, Order> FieldCenterExp;
 
     typedef std::shared_ptr<Grid>  spGrid;
@@ -54,15 +56,34 @@ public:
 
     typedef StructureDomain_<DIM, Grid, Ghost, Order> Self;
 
-public:
-    spGrid  _spgrid; 
-    spGhost _spghost; 
-    spOrder _sporder;
+protected:
+    // spGrid  _spgrid; 
+    // spGhost _spghost; 
+    // spOrder _sporder;
 public:
     StructureDomain_(){};
 
-    StructureDomain_(spGrid spgrid, spGhost spghost, spOrder sporder):
-        _spgrid(spgrid), _spghost(spghost), _sporder(sporder){};
+    // StructureDomain_(spGrid spgrid, spGhost spghost, spOrder sporder):
+    //     _spgrid(spgrid), _spghost(spghost), _sporder(sporder){};
+
+    static spFieldCenter NewspFieldCenterZero(
+        spGrid spgrid, spGhost spghost, spOrder sporder
+    ){
+        return spFieldCenter(new FieldCenter(spgrid, spghost, sporder));
+    }
+    static spFieldCenterExp NewspFieldCenterExpZero(
+        spGrid spgrid, spGhost spghost, spOrder sporder
+    ){
+        return spFieldCenterExp(new FieldCenterExp(spgrid, spghost, sporder));
+    }
+    static spFieldCenterExp NewspFieldCenterExpCoeOne(
+        spGrid spgrid, spGhost spghost, spOrder sporder
+    ){
+        auto fun =[](const Index& idx){
+            return Exp(idx);
+        };
+        return spFieldCenterExp(new FieldCenterExp(spgrid, spghost, sporder, fun));
+    }
 
 };
 

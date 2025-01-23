@@ -15,6 +15,7 @@
 
 #include "equation/poisson/laplace.hpp"
 #include "equation/equation.hpp"
+#include "equation/event/event.hpp"
 
 using namespace carpio;
 
@@ -68,6 +69,7 @@ TEST(equ_laplacian, solve){
     gnu.set_xrange(-0.1, 1.1);
     gnu.set_yrange(-0.1, 1.1);
     gnu.set_zrange( 0.0, 1.1);
+    gnu.set_cbrange(0.0, 1.0);
     // gnu.set_ylabel("y");
     // gnu.set_xlabel("x");
     gnu.set_equal_aspect_ratio();
@@ -149,8 +151,17 @@ TEST(equ_laplacian, explicit_step){
     egs.gnuplot().set_palette_blue_red();
     egs.set_path(FIG_PATH + "ex_");
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
+    // Add events Error Norm
+    typename Domain::FieldCenter exact(spgrid, spghost, sporder);
+    typedef EventErrorNorm_<Domain> EventErrorNorm;
+    auto speen = std::make_shared<EventErrorNorm>(exact, "phi", -1, -1, 1, Event::AFTER);
+    equ.add_event("ErrorPhi", speen);
 
     equ.run();
+
+    for(auto& v : speen->get_list_norm1()){
+        std::cout << v << std::endl;
+    }
 
     // Gnuplot gnu;
     // gnu.set_xrange(-0.1, 1.1);
@@ -198,13 +209,12 @@ TEST(equ_laplacian, implicit_step){
     spbi->insert(3, spbcxm);
     equ.set_boundary_index("phi", spbi);
 
-
     // Set solver
     equ.set_solver("Jacobi", 1000, 1e-4);
 
     // Set time term
-    equ.set_time_term(50, 2e-3);
-    equ.set_time_scheme("implicit");
+    equ.set_time_term(50, 5e-3);
+    equ.set_time_scheme("CNgeneral");
     
     // Add events
     typedef Event_<Domain> Event;

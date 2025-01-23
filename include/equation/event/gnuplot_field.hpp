@@ -34,7 +34,6 @@ protected:
     std::string _font;
     St          _size_font;
 
-
     FunPlot _fun;
 
 public:

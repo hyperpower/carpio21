@@ -30,7 +30,7 @@ FIELD _IntegralLaplacianCenter(
     EXPAND_FIELD_TAG(FIELD); 
     EXPAND_FIELD(FIELD);
 
-    auto  res  = phi.new_compatible();
+    auto  res  = phi.new_compatible_zero();
     auto& grid = phi.grid();
     for (auto &idx : phi.order()){
         std::array<Vt, Field::Dim> arr;
@@ -62,6 +62,8 @@ FIELD _IntegralLaplacianCenter(
 
     return res;
 }
+
+
 template<class FIELD>
 FIELD _IntegralLaplacianCenter( // No BoundaryIndex
         const FIELD& field, double t, 
@@ -69,7 +71,7 @@ FIELD _IntegralLaplacianCenter( // No BoundaryIndex
 {
     EXPAND_FIELD(FIELD);
     typedef ValueType Exp;
-    Field res(field);
+    Field res = field.new_compatible_zero();
     const auto& grid = res.grid();
     for (auto& idx : res.order()) {
         std::array<Exp, Field::Dim> arr;
@@ -77,7 +79,7 @@ FIELD _IntegralLaplacianCenter( // No BoundaryIndex
             Index idxp = idx.p(d);
             Index idxm = idx.m(d);
             Exp phi_m(idxm), phi_p(idxp);
-            Exp phi(idx);
+            Exp phi = field(idx);
             auto dfdx_m = (phi - phi_m)
                         / (grid.c_(d, idx ) - grid.c_(d, idxm));
             auto dfdx_p = (phi_p - phi) 

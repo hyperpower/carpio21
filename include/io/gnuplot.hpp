@@ -952,12 +952,15 @@ public:
     /// turns on/off log scaling for the specified zaxis (logscale is set by default)
     Gnuplot& set_zlogscale(const double base = 10) {
         std::ostringstream cmdstr;
-
         cmdstr << "set logscale z " << base;
         cmd(cmdstr.str());
-
         return *this;
-
+    }
+    Gnuplot& set_xyplane(const double zvalue){
+        std::ostringstream cmdstr;
+        cmdstr << "set xyplane at " << zvalue;
+        cmd(cmdstr.str());
+        return *this;
     }
     /*
      *  plot

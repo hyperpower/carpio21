@@ -107,7 +107,7 @@ public:
     FIELD execute(const FIELD& phi, const BI& bi, const Vt& time = 0.0) const{
         // std::cout << "Laplace Vt " << std::endl;
         ApplyBC abc;
-        Field res        = phi.new_compatible();
+        Field res        = phi.new_compatible_zero();
         const Grid& grid = phi.grid();
         for (auto& idx : phi.order()) {
             std::array<Vt, DIM> arr;
@@ -234,7 +234,7 @@ public:
     FIELD execute(const FIELD& phi, const BI& bi, const Vt& time = 0.0) const{
         // std::cout << "Laplace Vt " << std::endl;
         ApplyBC abc;
-        Field res        = phi.new_compatible();
+        Field res        = phi.new_compatible_zero();
         const Grid& grid = phi.grid();
         for (auto& idx : phi.order()) {
             std::array<Vt, DIM> arr;

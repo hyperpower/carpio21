@@ -17,25 +17,34 @@ void Assign(const ST& n, VT*, const VT&);
 
 template<typename ST, typename VT>
 void AddEqual(     const ST& , VT*, const VT*);
+template<typename ST, typename VT>
+void AddEqual(     const ST& , VT*, const VT&);
 template<typename ST, typename VT, typename VT2>
 void AddEqual(     const ST& , VT*, const VT2*);
+// template<typename ST, typename VT, typename VT2>
+// void AddEqual(     const ST& , VT*, const VT2&);
+
 template<typename ST, typename VT>
 void MinusEqual(   const ST& , VT*, const VT*);
+template<typename ST, typename VT>
+void MinusEqual(   const ST& , VT*, const VT&);
 template<typename ST, typename VT, typename VT2>
 void MinusEqual(   const ST& , VT*, const VT2*);
+
 template<typename ST, typename VT>
 void MultiplyEqual(const ST& , VT*, const VT*);
 template<typename ST, typename VT>
-void DivideEqual(  const ST& , VT*, const VT*);
+void MultiplyEqual(const ST& , VT*, const VT&);
+template<typename ST, typename VT, typename VT2>
+void MultiplyEqual(const ST& n, VT* src, const VT2*);
+template<typename ST, typename VT, typename VT2>
+void MultiplyEqual(const ST& n, VT* src, const VT2&);
 
 template<typename ST, typename VT>
-void AddEqual(     const ST& , VT*, const VT&);
-template<typename ST, typename VT>
-void MinusEqual(   const ST& , VT*, const VT&);
-template<typename ST, typename VT>
-void MultiplyEqual(const ST& , VT*, const VT&);
+void DivideEqual(  const ST& , VT*, const VT*);
 template<typename ST, typename VT>
 void DivideEqual(  const ST& , VT*, const VT&);
+
 
 
 template<typename ST, typename VT>
@@ -113,6 +122,13 @@ void MultiplyEqual(const ST& n, VT* src, const VT2* dst) {
 #pragma omp parallel for
 	for (int i = 0; i < n; ++i) {
 		src[i] *= dst[i];
+	}
+}
+template<typename ST, typename VT, typename VT2>
+void MultiplyEqual(const ST& n, VT* src, const VT2& dst) {
+#pragma omp parallel for
+	for (int i = 0; i < n; ++i) {
+		src[i] *= dst;
 	}
 }
 template<typename ST, typename VT>

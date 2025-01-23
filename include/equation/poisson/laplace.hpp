@@ -57,9 +57,9 @@ public:
         }else if(name == "implicit"){
             _one_step_implicit(step, time);
         }else if(name == "CN"){
-            // _one_step_cn(step);
+            _one_step_cn(step, time);
         }else if(name == "CNgeneral"){
-            // _one_step_cng(step);
+            _one_step_cng(step, time);
         }else{
             std::cout <<" >! Unknown time scheme " << name << std::endl;
             SHOULD_NOT_REACH;
@@ -76,6 +76,13 @@ public:
             }
             auto& phi = *(this->_fields["phi"]);
             this->_fields["inverse_volume"] = std::make_shared<FieldCenter>(phi.new_inverse_volume());
+            
+            auto name = any_cast<std::string>(this->_configs["set_time_scheme"]);   
+            if(name != "explicit"){
+                this->_configs["field_exp_coe_one"] = this->new_field_exp_coe_one();
+            }
+        }else{ // no time scheme --> slove
+            this->_configs["field_exp_coe_one"] = this->new_field_exp_coe_one();
         }
         if(! this->has_config("space_scheme")){  // set default space scheme
             this->set_space_scheme("finite_volume_2");  
@@ -90,7 +97,8 @@ public:
     virtual int solve(){
         FieldCenter&    phi  = *(this->_fields["phi"]);
         auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
-        auto expf     = this->new_field_exp();
+        auto expf = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
+        // auto expf = this->new_field_exp_coe_one();
         auto bis      = this->get_boundary_index("phi");
 
         auto res = IntegralLaplacian((*expf), (*bis));
@@ -127,10 +135,58 @@ protected:
         auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
         auto bis      = this->get_boundary_index("phi");
 
-        auto spphif    = this->new_field_exp();
+        auto spphif = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
         Vt   dt        = this->_time->dt();
 
-        auto res =  IntegralLaplacian(phi, (*bis), time) * dt * invv - (*spphif) + phi;
+        auto res =  IntegralLaplacian((*spphif), (*bis), time) * dt * invv - (*spphif) + phi;
+
+        Mat a;
+        Arr b;
+        BuildMatrix(res, a, b);
+        Arr x = phi.to_array();
+        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        phi.assign(x);
+        return 0;
+    }
+
+    // Crank–Nicolson method
+    virtual int _one_step_cn(St step, Vt time){
+        auto& phi  = *(this->_fields["phi"]);
+        auto& invv = *(this->_fields["inverse_volume"]);
+        auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        auto bis      = this->get_boundary_index("phi");
+
+        auto spphif = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
+        Vt   dt        = this->_time->dt();
+
+        auto lap_exp = IntegralLaplacian((*spphif), (*bis), time);
+        auto lap_v   = IntegralLaplacian(phi, (*bis), time);
+
+        auto res =  (lap_exp + lap_v) * dt * 0.5 * invv - (*spphif) + phi;
+
+        Mat a;
+        Arr b;
+        BuildMatrix(res, a, b);
+        Arr x = phi.to_array();
+        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        phi.assign(x);
+        return 0;
+    }
+
+    virtual int _one_step_cng(St step, Vt time){
+        auto& phi  = *(this->_fields["phi"]);
+        auto& invv = *(this->_fields["inverse_volume"]);
+        auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        auto bis      = this->get_boundary_index("phi");
+
+        auto spphif = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
+        Vt   dt        = this->_time->dt();
+        auto omega    = any_cast<Vt>(this->_configs["cn_omega"]);
+
+        auto lap_exp = IntegralLaplacian((*spphif), (*bis), time) * omega;
+        auto lap_v   = IntegralLaplacian(phi, (*bis), time) * (1.0 - omega);
+
+        auto res =  (lap_exp + lap_v) * dt * invv - (*spphif) + phi;
 
         Mat a;
         Arr b;

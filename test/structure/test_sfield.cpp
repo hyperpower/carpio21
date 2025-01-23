@@ -13,7 +13,7 @@ const std::string OUTPUTPATH = "./fig/";
 const int fig_width  = 1200;
 const int fig_height = 900;
 
-TEST(field, initial){
+TEST(field, DISABLED_init){
     typedef SGridUniform_<2> Grid;
     typedef std::shared_ptr<Grid> spGrid;
 
@@ -50,9 +50,6 @@ TEST(field, initial){
     a = a + a;
     EXPECT_EQ (2.0, a(idx));
     
-    a = a * a;
-    EXPECT_EQ (4.0, a(idx));
-
     a = a / 2.0;
     EXPECT_EQ (2.0, a(idx));
 
@@ -66,6 +63,189 @@ TEST(field, initial){
     EXPECT_EQ (12.0, c(idx));
 }
 
+
+TEST(field, add){
+    typedef SGridUniform_<2> Grid;
+    typedef std::shared_ptr<Grid> spGrid;
+
+    typedef SGhostRegular_<2, Grid> Ghost;
+    typedef std::shared_ptr<Ghost> spGhost;
+
+    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef std::shared_ptr<Order> spOrder;
+
+    typedef typename Grid::Index Index;
+
+    typedef LinearPolynomial_<double, typename Grid::Index> Exp;
+    typedef SFieldCenter_<2, double, Grid, Ghost, Order> FieldV;
+    typedef SFieldCenter_<2, Exp, Grid, Ghost, Order>    FieldExp;
+
+    Point_<Vt, 2> pmin(0, 0, 0);
+    Point_<Vt, 2> pmax(1, 1, 1);
+    spGrid spgrid(new Grid(pmin, {10, 10}, 0.3, 2));
+
+    spGhost spghost(new Ghost(spgrid));
+
+    spOrder sporder(new Order(spgrid,spghost));
+
+    FieldV a(spgrid, spghost, sporder);
+    a.assign(2);
+
+    FieldExp e(spgrid, spghost, sporder);
+    e.assign([](const FieldExp::Index& idx){return FieldExp::ValueType(idx);});
+
+    typename Grid::Index idx(1,2);
+    std::cout << "Access value a   " << idx << "  = " << a(idx) << std::endl; 
+    std::cout << "Access value aexp" << idx << "  = " << e(idx) << std::endl; 
+    
+    auto a2 = a + a;
+    EXPECT_EQ (4.0, a2(idx));
+    auto av3 = a + 3;
+    EXPECT_EQ (av3(idx), 5);
+    auto v3a = 3.0 + a;
+    EXPECT_EQ (5.0, v3a(idx));
+    std::cout << "exp field + value field" << std::endl;
+    auto ea = e + a;
+    std::cout << ea(idx) << std::endl;
+    EXPECT_EQ (ea(idx), e(idx) + a(idx) );
+    auto ae  = a + e;
+    // std::cout << ae(idx) << std::endl;
+    EXPECT_EQ (ae(idx), e(idx) + a(idx) );
+    auto ev2  = e + 2.0;
+    EXPECT_EQ (ev2(idx), e(idx) + 2.0 );
+    auto v2e = 2 + e;
+    EXPECT_EQ (v2e(idx), e(idx) + 2.0);
+    auto e2 = e + e;
+    EXPECT_EQ (e2(idx), e(idx) + e(idx));
+
+    Exp vexp(Index(1, 1));
+    auto eve = e + vexp;
+    EXPECT_EQ (eve(idx), e(idx) + vexp);
+    auto vee = vexp + e;
+    EXPECT_EQ (vee(idx), e(idx) + vexp);
+
+    auto ce = vexp + e + a + 3.0;
+    std::cout << "ce(idx) = " << ce(idx) << std::endl;
+
+}
+
+TEST(field, minus){
+    typedef SGridUniform_<2> Grid;
+    typedef std::shared_ptr<Grid> spGrid;
+
+    typedef SGhostRegular_<2, Grid> Ghost;
+    typedef std::shared_ptr<Ghost> spGhost;
+
+    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef std::shared_ptr<Order> spOrder;
+
+    typedef typename Grid::Index Index;
+
+    typedef LinearPolynomial_<double, typename Grid::Index> Exp;
+    typedef SFieldCenter_<2, double, Grid, Ghost, Order> FieldV;
+    typedef SFieldCenter_<2, Exp, Grid, Ghost, Order>    FieldExp;
+
+    Point_<Vt, 2> pmin(0, 0, 0);
+    Point_<Vt, 2> pmax(1, 1, 1);
+    spGrid spgrid(new Grid(pmin, {10, 10}, 0.3, 2));
+
+    spGhost spghost(new Ghost(spgrid));
+
+    spOrder sporder(new Order(spgrid,spghost));
+
+    FieldV a(spgrid, spghost, sporder);
+    a.assign(2);
+
+    FieldExp e(spgrid, spghost, sporder);
+    e.assign([](const FieldExp::Index& idx){return FieldExp::ValueType(idx);});
+
+    typename Grid::Index idx(1,2);
+    std::cout << "Access value a   " << idx << "  = " << a(idx) << std::endl; 
+    std::cout << "Access value aexp" << idx << "  = " << e(idx) << std::endl; 
+    
+    auto a2 = a - a;
+    EXPECT_EQ (0.0, a2(idx));
+    auto av3 = a - 3;
+    EXPECT_EQ (av3(idx), -1);
+    auto v3a = 3.0 - a;
+    EXPECT_EQ (1, v3a(idx));
+    std::cout << "exp field + value field" << std::endl;
+    auto ea = e - a;
+    std::cout << ea(idx) << std::endl;
+    EXPECT_EQ (ea(idx), e(idx) - a(idx) );
+    auto ae  = a - e;
+    // std::cout << ae(idx) << std::endl;
+    EXPECT_EQ (ae(idx), a(idx) - e(idx) );
+    auto ev2  = e - 2.0;
+    EXPECT_EQ (ev2(idx), e(idx) - 2.0 );
+    auto v2e = 2 - e;
+    EXPECT_EQ (v2e(idx), (2.0 - e(idx)));
+    auto e2 = e - e;
+    EXPECT_EQ (e2(idx), e(idx) - e(idx));
+
+    Exp vexp(Index(1, 1));
+    auto eve = e - vexp;
+    EXPECT_EQ (eve(idx), e(idx) - vexp);
+    auto vee = vexp - e;
+    EXPECT_EQ (vee(idx), vexp - e(idx));
+
+    auto ce = vexp + e + a + 3.0;
+    std::cout << "ce(idx) = " << ce(idx) << std::endl;
+
+}
+
+TEST(field, mutiply){
+    typedef SGridUniform_<2> Grid;
+    typedef std::shared_ptr<Grid> spGrid;
+
+    typedef SGhostRegular_<2, Grid> Ghost;
+    typedef std::shared_ptr<Ghost> spGhost;
+
+    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef std::shared_ptr<Order> spOrder;
+
+    typedef typename Grid::Index Index;
+
+    typedef LinearPolynomial_<double, typename Grid::Index> Exp;
+    typedef SFieldCenter_<2, double, Grid, Ghost, Order> FieldV;
+    typedef SFieldCenter_<2, Exp, Grid, Ghost, Order>    FieldExp;
+
+    Point_<Vt, 2> pmin(0, 0, 0);
+    Point_<Vt, 2> pmax(1, 1, 1);
+    spGrid spgrid(new Grid(pmin, {10, 10}, 0.3, 2));
+
+    spGhost spghost(new Ghost(spgrid));
+
+    spOrder sporder(new Order(spgrid,spghost));
+
+    FieldV a(spgrid, spghost, sporder);
+    a.assign(2);
+
+    FieldExp e(spgrid, spghost, sporder);
+    e.assign([](const FieldExp::Index& idx){return FieldExp::ValueType(idx);});
+
+    typename Grid::Index idx(1,2);
+    std::cout << "Access value a   " << idx << "  = " << a(idx) << std::endl; 
+    std::cout << "Access value aexp" << idx << "  = " << e(idx) << std::endl; 
+    
+    auto a2 = a * a;
+    EXPECT_EQ (4.0, a2(idx));
+    auto av3 = a * 3;
+    EXPECT_EQ (6.0, av3(idx));
+    auto v3a = 3.0 * a;
+    EXPECT_EQ (6.0, v3a(idx));
+    auto ea = e * a;
+    // std::cout << ea(idx) << std::endl;
+    EXPECT_EQ (ea(idx), e(idx) * a(idx) );
+    auto ae  = a * e;
+    // std::cout << ae(idx) << std::endl;
+    EXPECT_EQ (ae(idx), e(idx) * a(idx) );
+    auto e2  = e * 2.0;
+    EXPECT_EQ (e2(idx), e(idx) * 2.0 );
+    auto v2e = 2 * e;
+    EXPECT_EQ (v2e(idx), e(idx) * 2.0);
+    
+}
 TEST(field, coutour){
     const std::size_t dim = 2;
     typedef SGridUniform_<dim> Grid;
@@ -110,6 +290,62 @@ TEST(field, coutour){
                         fig_width, fig_height);
     gnu.splot();
 }
+
+TEST(field, divide){
+    typedef SGridUniform_<2> Grid;
+    typedef std::shared_ptr<Grid> spGrid;
+
+    typedef SGhostRegular_<2, Grid> Ghost;
+    typedef std::shared_ptr<Ghost> spGhost;
+
+    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef std::shared_ptr<Order> spOrder;
+
+    typedef typename Grid::Index Index;
+
+    typedef LinearPolynomial_<double, typename Grid::Index> Exp;
+    typedef SFieldCenter_<2, double, Grid, Ghost, Order> FieldV;
+    typedef SFieldCenter_<2, Exp, Grid, Ghost, Order>    FieldExp;
+
+    Point_<Vt, 2> pmin(0, 0, 0);
+    Point_<Vt, 2> pmax(1, 1, 1);
+    spGrid spgrid(new Grid(pmin, {10, 10}, 0.3, 2));
+
+    spGhost spghost(new Ghost(spgrid));
+
+    spOrder sporder(new Order(spgrid,spghost));
+
+    FieldV a(spgrid, spghost, sporder);
+    a.assign(2);
+
+    FieldExp e(spgrid, spghost, sporder);
+    e.assign([](const FieldExp::Index& idx){return FieldExp::ValueType(idx);});
+
+    typename Grid::Index idx(1,2);
+    std::cout << "Access value a   " << idx << "  = " << a(idx) << std::endl; 
+    std::cout << "Access value aexp" << idx << "  = " << e(idx) << std::endl; 
+    
+    auto a2 = a / a;
+    EXPECT_EQ (1, a2(idx));
+    auto av3 = a / 3;
+    EXPECT_EQ (av3(idx), 2.0 / 3.0);
+    auto v3a = 3.0 / a;
+    EXPECT_EQ (3 / 2.0, v3a(idx));
+    std::cout << "exp field + value field" << std::endl;
+    auto ea = e / a;
+    std::cout << ea(idx) << std::endl;
+    EXPECT_EQ (ea(idx), e(idx) / a(idx) );
+    // auto ae  = a / e;
+    // EXPECT_EQ (ae(idx), a(idx) / e(idx) );
+    auto ev2  = e / 2.0;
+    EXPECT_EQ (ev2(idx), e(idx) / 2.0 );
+    // auto v2e = 2 / e;
+    // EXPECT_EQ (v2e(idx), (2.0 / e(idx)));
+    // auto e2 = e / e;
+    // EXPECT_EQ (e2(idx), e(idx) / e(idx));
+
+}
+
 
 TEST(field, different_type){
     const std::size_t dim = 2;

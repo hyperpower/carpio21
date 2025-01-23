@@ -199,7 +199,7 @@ public:
         }
     }
     // return a new scalar with compatible gird, ghost and order
-    Self new_compatible() const{
+    Self new_compatible_zero() const{
         Self res(this->_spgrid, this->_spghost, this->_sporder, this->_axe);
         return res;
     }

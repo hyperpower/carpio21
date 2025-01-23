@@ -30,7 +30,6 @@ FIELD IntegralLaplacian(const FIELD& field, const BI& bi, double t=0.0){
     return IntegralLaplacian(field, bi, t, field_tag);
 }
 
-
 // Laplacian Finite Difference Method
 template<class FIELD, class BI>
 FIELD Laplacian(const FIELD& field, BI bi, double t=0.0){
