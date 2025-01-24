@@ -98,11 +98,13 @@ This folder include all the examples for Carpio project.
 
 #### 4-2 Poisson
 
-   4-2-1 :ballot_box_with_check: Time Scheme 1D
+   4-2-1 :white_check_mark: One Boundary
 
-   4-2-2 :ballot_box_with_check: Unit Sine Square
+   4-2-2 :white_check_mark: Sine Boundary Cube
 
-   4-2-3 :ballot_box_with_check: Unit Sine Cube
+   4-2-3 :white_check_mark: Unit Sine Square
+
+   4-2-4 :white_check_mark: Unit Sine Cube
 
    4-2-4 flower shape 
 

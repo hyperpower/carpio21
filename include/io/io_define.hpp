@@ -27,6 +27,8 @@
 #include <map>
 #include <algorithm>
 
+#include "utility/tinyformat.hpp"
+
 namespace carpio {
 template<class V1>
 std::string ToString(V1 a) {
@@ -45,7 +47,12 @@ std::string ToString(bool a) {
     }
     return sst.str();
 }
-
+template<class VALUE, 
+         typename std::enable_if<
+            std::is_floating_point<VALUE>::value, bool>::type = true>
+std::string ToString(const VALUE& a, const std::string& f) {
+    return tfm::format(f.c_str(), a);
+}
 template<class CONTAINER, 
          typename std::enable_if<IsContainer<CONTAINER>::value, bool>::type = true>
 std::string ToString(const CONTAINER& a, const std::string& sep) {

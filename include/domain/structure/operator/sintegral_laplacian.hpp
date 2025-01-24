@@ -104,6 +104,7 @@ FIELD _IntegralLaplacianCenter(
     auto res = _IntegralLaplacianCenter(phi, t, 
                 ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
     ApplyBoundaryValue(res,bi,t);
+
     return res;
 }
 

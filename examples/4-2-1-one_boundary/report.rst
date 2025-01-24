@@ -36,11 +36,83 @@ Iteration
 Explicit Scheme
 ^^^^^^^^^^^^^^^^
 
+.. _fig-ex-n1:
+.. figure:: fig/explicit_Norm1Compare.png
+   :alt: Fig of Explicit norm 1
+   :align: center 
+   
+   Error Norm 1 of explicit iteration
+
+.. _fig-ex-n2:
+.. figure:: fig/explicit_Norm2Compare.png
+   :alt: Fig of Explicit norm 1
+   :align: center 
+   
+   Error Norm 2 of explicit iteration
+
+.. _fig-ex-ninf:
+.. figure:: fig/explicit_NormInfCompare.png
+   :alt: Fig of Explicit norm Inf
+   :align: center 
+   
+   Error Norm inf of explicit iteration
+
+
 Implicit Scheme
 ^^^^^^^^^^^^^^^^
+
+The Process of interation shown in :numref:`fig-im-iter`. 
+The value of :math:`\phi` proximates to the solved value in :numref:`fig-solved`.
+
+.. _fig-im-iter:
+.. figure:: fig/implicit_iter.gif
+   :alt: Fig of Implicit norm 1
+   :align: center 
+   
+   Process of implicit iteration
+
+.. _fig-im-n1:
+.. figure:: fig/implicit_Norm1Compare.png
+   :alt: Fig of Implicit norm 1
+   :align: center 
+   
+   Error Norm 1 of implicit iteration
+
+.. _fig-im-n2:
+.. figure:: fig/implicit_Norm2Compare.png
+   :alt: Fig of Implicit norm 1
+   :align: center 
+   
+   Error Norm 2 of implicit iteration
+
+.. _fig-im-ninf:
+.. figure:: fig/implicit_NormInfCompare.png
+   :alt: Fig of Implicit norm Inf
+   :align: center 
+   
+   Error Norm inf of implicit iteration
 
 Crank–Nicolson Scheme
 ^^^^^^^^^^^^^^^^^^^^^^
 
+.. _fig-cn-n1:
+.. figure:: fig/CN_Norm1Compare.png
+   :alt: Fig of Crank–Nicolson norm 1
+   :align: center 
+   
+   Error Norm 1 of Crank–Nicolson iteration
 
+.. _fig-cn-n2:
+.. figure:: fig/CN_Norm2Compare.png
+   :alt: Fig of Crank–Nicolson norm 1
+   :align: center 
+   
+   Error Norm 2 of Crank–Nicolson iteration
+
+.. _fig-cn-ninf:
+.. figure:: fig/CN_NormInfCompare.png
+   :alt: Fig of Crank–Nicolson norm Inf
+   :align: center 
+   
+   Error Norm inf of Crank–Nicolson iteration
 

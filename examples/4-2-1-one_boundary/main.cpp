@@ -25,119 +25,7 @@ typedef SFieldCenter_<dim, double, Grid, Ghost, Order> Field;
 typedef StructureDomain_<dim, Grid, Ghost, Order> Domain;
 typedef Laplace_<Domain> Laplace;
 
-// void PlotFieldAsContour(const std::string& ffn, const Field& f){
-//     const int fig_width  = 800;
-//     const int fig_height = 600;
-//     Gnuplot gnu;
-// 	gnu.set_xrange(-0.1, 1.1);
-// 	gnu.set_yrange(-0.1, 1.1);
-// 	gnu.set_ylabel("y");
-// 	gnu.set_xlabel("x");
-// 	gnu.set_equal_aspect_ratio();
-// 	gnu.set_palette_blue_red();
-// 	gnu.add(ToGnuplotActorContour(f));
-//     gnu.set_terminal_png(OUTPUTPATH + ffn, fig_width, fig_height);
-// 	gnu.plot();
-// }
 
-// void PlotResidual(const std::string& ffn, 
-//                   const std::vector<int>& ln,
-//                   const std::list<std::list<double> >& lr){
-//     const int fig_width  = 800;
-//     const int fig_height = 600;
-//     Gnuplot gnu;
-//     gnu.set_ylogscale();
-// 	// gnu.set_xrange(-0.1, 1.1);
-// 	// gnu.set_yrange(-0.1, 1.1);
-// 	gnu.set_ylabel("Residual");
-// 	gnu.set_xlabel("Number of iteration");
-// 	// gnu.set_equal_aspect_ratio();
-// 	// gnu.set_palette_blue_red();
-//     auto itern = ln.begin();
-//     auto iterr = lr.begin();
-//     for(;itern != ln.end();){
-//         auto a = ToGnuplotActor(*iterr);
-//         a.title("Mesh n = " + ToString(*itern));
-//         a.style("with lines lw 2");
-// 	    gnu.add(a);
-//         itern++;
-//         iterr++;
-//     }
-//     gnu.set_terminal_png(OUTPUTPATH + ffn, fig_width, fig_height);
-// 	gnu.plot();
-// }
-// std::list<double> Reference(int order,
-//                const std::vector<int>& ln,
-//                const std::list<double>& l1){
-//     std::list<double> res;
-//     res.push_back(l1.front());
-//     auto itern = ln.begin();
-//     itern++;
-//     for(;itern != ln.end();itern++){
-//         auto nm = *(std::prev(itern));
-//         auto n  = (*itern);
-//         auto v  = res.back() / std::pow(double(n) / double(nm), double(order));
-//         res.push_back(v);
-//     }
-//     return res;
-// }
-// void PlotError(const std::string& ffn,
-//                const std::vector<int>& ln,
-//                const std::list<double> & l1,
-//                const std::list<double> & l2,
-//                const std::list<double> & li
-//                ){
-//     const int fig_width  = 800;
-//     const int fig_height = 600;
-//     Gnuplot gnu;
-//     gnu.set_xlogscale();
-//     gnu.set_ylogscale();
-// 	gnu.set_ylabel("Norm");
-// 	gnu.set_xlabel("1/n");
-//     gnu.set_yformat("10^{%L}");
-// 	// gnu.set_equal_aspect_ratio();
-// 	// gnu.set_palette_blue_red();
-//     std::list<double> lh;
-//     for(auto& n:ln){
-//         lh.push_back(1.0/n);
-//     }
-//     auto a1 = ToGnuplotActor(lh, l1);
-//     a1.title("L1-Norm");
-//     a1.style("with linespoints lw 2 pt 7");
-//     auto a2 = ToGnuplotActor(lh, l2);
-//     a2.title("L2-Norm");
-//     a2.style("with linespoints lw 2 pt 7");
-//     auto ai = ToGnuplotActor(lh, li);
-//     ai.title("Linf-Norm");
-//     ai.style("with linespoints lw 2 pt 7");
-//     gnu.add(a1);
-//     gnu.add(a2);
-//     gnu.add(ai);
-
-//     auto l1ref = Reference(2, ln, l1);
-//     auto a1r = ToGnuplotActor(lh, l1ref);
-//     // a1r.title("2 Order");
-//     a1r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
-
-//     auto l2ref = Reference(2, ln, l2);
-//     auto a2r = ToGnuplotActor(lh, l2ref);
-//     a2r.title("2 Order Reference");
-//     a2r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
-
-//     auto liref = Reference(2, ln, li);
-//     auto air = ToGnuplotActor(lh, liref);
-//     // a2r.title("2 Order");
-//     air.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
-
-//     gnu.add(a1r);
-//     gnu.add(a2r);
-//     gnu.add(air);
-
-//     gnu.set_terminal_png(OUTPUTPATH + ffn, fig_width, fig_height);
-//     gnu.set_key("top left");
-//     // gnu.test();
-// 	gnu.plot();
-// }
 auto SolvedSolution(int meshn){
     const int dim = 2;
     std::cout << "[  Laplace ] Solved Solution"<<std::endl;
@@ -193,7 +81,7 @@ auto SolvedSolution(int meshn){
     return equ.field("phi");
 }
 
-void Iterative(const std::string& method, const Field& fe,
+void Iterative(const std::string& method, const Field& fe, double dt,
                 std::list<Vt>& lt,
                 std::list<Vt>& ln1,
                 std::list<Vt>& ln2,
@@ -223,7 +111,8 @@ void Iterative(const std::string& method, const Field& fe,
     equ.set_solver("Jacobi", 1000, 1e-5);
 
     // Set time term
-    equ.set_time_term(50, 1e-4);
+    equ.set_time_term(50, dt);
+    equ.set_time_scheme(method);
     
     // Add events
     typedef Event_<Domain> Event;
@@ -239,86 +128,134 @@ void Iterative(const std::string& method, const Field& fe,
                      St step, Vt t, int fob,
                      typename EventGnuplotField::EquationBase& pd){
         gnu.add(ToGnuplotActorContourWire(f));
+        gnu.set_label(1, "Step = "+ToString(step), 0.0, 0.0, 1.0);
+        gnu.set_label(2, "Time = "+ToString(t, "%.2e"), 0.0, 0.0, 0.9);
+        // gnu.add(ToGnuplotActorLabel(0.0, 1, "Step = "+ToString(step)));
         gnu.splot();
         gnu.clear();
         return 1;
     };
     EventGnuplotField egs("phi", fun, -1, -1, 1, Event::AFTER );
+
     egs.set_figure_font("Fira Code");
     egs.set_figure_width(fig_width);
     egs.set_figure_height(fig_height);
+    egs.set_path(FIG_PATH + method + "_" );
+    egs.set_format_string("%s_%03d");
     egs.gnuplot().set_xrange(-0.1, 1.1);
+    egs.gnuplot().set_xlabel("x");
+    egs.gnuplot().set_ylabel("y");
+    egs.gnuplot().set_zlabel("phi");
+    egs.gnuplot().set_grid();
     egs.gnuplot().set_yrange(-0.1, 1.1);
     egs.gnuplot().set_zrange( 0.0, 1.1);
     egs.gnuplot().set_equal_aspect_ratio();
     egs.gnuplot().set_cbrange(0.0, 1.0);
     egs.gnuplot().set_palette_blue_red();
     egs.gnuplot().set_xyplane(0.0);
-    egs.set_path(FIG_PATH + method + "_");
-    equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
+    egs.gnuplot().set_view(45,30,1.0,1.5);
+    if(method == "implicit" && dt ==5e-4){
+        equ.set_time_term(150, dt);
+        equ.add_event("Gnuplotphi", std::make_shared<EventGnuplotField>(egs));
+    }
     // Add events Error Norm
     typedef EventErrorNorm_<Domain> EventErrorNorm;
     auto speen = std::make_shared<EventErrorNorm>(fe, "phi", -1, -1, 1, Event::AFTER);
     equ.add_event("ErrorPhi", speen);
 
     equ.run();
+    lt  = speen->get_list_time();
+    ln1 = speen->get_list_norm1();
+    ln2 = speen->get_list_norm2();
+    lni = speen->get_list_norminf();
 
-    Gnuplot gnu;
-    // gnu.set_xrange(-0.1, 1.1);
-    // gnu.set_yrange(-0.1, 1.1);
-    gnu.set_ylabel("Norm1");
-    gnu.set_xlabel("time");
-    // gnu.set_equal_aspect_ratio();
-    // gnu.set_palette_blue_red();
-    gnu.add(ToGnuplotActor(speen->get_list_time(), speen->get_list_norminf()));
-    gnu.set_terminal_png(FIG_PATH + method+ "_Norm2", 
-                    fig_width, fig_height, "Fira Code");
-    gnu.plot();
 }
 
-// void A_Interative(){
-//     std::list<Vt> ln1, ln2, lni, lt;
-//     Iterative("explicit", sf, lt, ln1, ln2, lni);
-// }
-
-int main(int argc, char** argv) {
-    std::cout << "[  Laplace ] Solver"<<std::endl;
-    std::cout << "[   INFO   ] Dim = " << dim << std::endl;
-    auto sf = SolvedSolution(32);
-    
+struct Res{
+    std::string method;
+    Vt dt;
     std::list<Vt> ln1, ln2, lni, lt;
-    Iterative("explicit", sf, lt, ln1, ln2, lni);
-    // std::cout << "[   INFO   ] n   = " << n << std::endl;
-    // ExactSolution();
-    // std::vector<int> vn = {10, 20, 40, 80};
-    // std::list<double> l1,l2,li;
-    // std::list<std::list<double> > lr;
-    // for(auto& n : vn){
-    //     PoissonSolver(n, l1, l2, li, lr);
-    // }
-    // // output to a file
-    // std::ofstream fout("./fig/error_table.txt",std::ios::out);
 
-    // tfm::format(fout, "n,L1-Norm,L2-Norm,Linf-Norm\n");
-    // auto itervn = vn.begin();
-    // auto iterl1 = l1.begin();
-    // auto iterl2 = l2.begin();
-    // auto iterli = li.begin();
-    // for(;itervn != vn.end();){
-    //     tfm::format(std::cout,
-    //                 "n: %8d N1: %10.5e N2: %10.5e Ni: %10.5e\n",
-    //                 *itervn, *iterl1, *iterl2, *iterli);
-    //     tfm::format(fout,
-    //                 "%8d,%10.5e,%10.5e,%10.5e\n",
-    //                 *itervn, *iterl1, *iterl2, *iterli);
-    //     itervn++;
-    //     iterl1++;
-    //     iterl2++;
-    //     iterli++;
-    // }
-    // fout.close();
+    Res(){}
 
-    // // plot residual
-    // PlotResidual("residual", vn, lr);
-    // PlotError("error", vn, l1, l2, li);
+    Res(const std::string& m, Vt _dt): method(m), dt(_dt){
+    }
+};
+
+void A_Iterative(Res& res, const Field& fe){
+    Iterative(res.method, fe, res.dt, res.lt, res.ln1, res.ln2, res.lni);
+}
+
+void set_gnu(const std::string& m, Gnuplot& gnu){
+    if(m == "explicit"){
+        gnu.set_yrange(1e-1, 100);
+        gnu.set_xrange(0, 0.02);
+    }else{
+        // gnu.set_xrange(0, 0.02);
+        gnu.set_yrange(1e-4, 1);
+    }
+    gnu.set_yformat("10^{%T}");
+    gnu.set_xlabel("time");
+    gnu.set_ylogscale();
+}
+
+int A_Run(std::string& method) {
+    std::cout << "[  Laplace ] Iterative"<<std::endl;
+    std::cout << "[   INFO   ] Dim    = " << dim << std::endl;
+    std::cout << "[   INFO   ] Method = " << method << std::endl;
+    auto sf = SolvedSolution(32);
+    std::vector<Vt> ldt{1e-4, 2.5e-4, 5e-4, 1e-3, 1e-2}; 
+    std::vector<Res> vres(ldt.size());
+
+    for(int i =0; i < ldt.size(); i++){
+        auto& res= vres[i];
+        res.method = method;
+        res.dt = ldt[i];
+        std::cout << "[   INFO   ] dt = " << res.dt << std::endl;
+        A_Iterative(res, sf);
+    }
+    Gnuplot gnu1, gnu2, gnui;
+    for(auto& res : vres){
+        auto an1 = ToGnuplotActor(res.lt, res.ln1);
+        an1.title("dt = " + ToString(res.dt, "%.1e"));
+        an1.style("with lines ");  
+        an1.line_width(2);
+        gnu1.add(an1);
+        auto an2 = ToGnuplotActor(res.lt, res.ln2);
+        an2.title("dt = " + ToString(res.dt, "%.1e"));
+        an2.style("with lines ");  
+        an2.line_width(2);
+        gnu2.add(an2);
+        
+        auto ani = ToGnuplotActor(res.lt, res.lni);
+        ani.title("dt = " + ToString(res.dt, "%.1e"));
+        ani.style("with lines ");  
+        ani.line_width(2);
+        gnui.add(ani);
+    }
+    set_gnu(method, gnu1);
+    gnu1.set_ylabel("L1-Norm");
+    gnu1.set_terminal_png(FIG_PATH + method +"_Norm1Compare", 
+                    fig_width, fig_height, "Fira Code");
+    gnu1.plot();
+    
+    set_gnu(method, gnu2);
+    gnu2.set_ylabel("L2-Norm");
+    gnu2.set_terminal_png(FIG_PATH + method +"_Norm2Compare", 
+                    fig_width, fig_height, "Fira Code");
+    gnu2.plot();
+
+    set_gnu(method, gnui);
+    gnui.set_ylabel("Linf-Norm");
+    gnui.set_terminal_png(FIG_PATH + method +"_NormInfCompare", 
+                    fig_width, fig_height, "Fira Code");
+    gnui.plot();
+    
+}
+int main(int argc, char** argv) {
+    std::list<std::string> lstr{"explicit", "implicit", "CN"};
+    for(auto& m : lstr){
+        A_Run(m);
+    }
+    return 0;
 }

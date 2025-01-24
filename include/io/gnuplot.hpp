@@ -187,6 +187,10 @@ public:
         this->_set_cmd(this->_scmd, "lc", " rgb \"#B5B5B5\"");
         return *this;
     }
+    GnuplotActor& line_color_green(){
+        this->_set_cmd(this->_scmd, "lc", " rgb \"#81BC06ß\"");
+        return *this;
+    }
     GnuplotActor& line_color_pink(){
         this->_set_cmd(this->_scmd, "lc", " rgb \"#EA8982\"");
         return *this;
@@ -671,6 +675,18 @@ public:
         std::ostringstream cmdstr;
         cmdstr << "set label " << tag << " \"" << label << "\" at first " << x
                 << ", " << y << " " << append;
+        cmd(cmdstr.str());
+        return *this;
+    }
+    inline Gnuplot& set_label(
+            int tag,
+            const std::string & label,
+            const double& x, const double& y, const double& z,
+            const std::string &append = "") {
+        ASSERT(tag > 0);
+        std::ostringstream cmdstr;
+        cmdstr << "set label " << tag << " \"" << label << "\" at first " << x
+                << ", " << y << ", " << z << " " << append;
         cmd(cmdstr.str());
         return *this;
     }
@@ -1308,8 +1324,8 @@ template<typename X,
     && IsContainer<X>::value,
     bool>::type = true>
 auto ToGnuplotActor(const X& x, 
-            const std::string &pcmd = "using 1:2 with lines title \"\"",
-            const std::string& scmd = ""){
+            const std::string &pcmd = "using 1:2 title \"\"",
+            const std::string& scmd = "with lines "){
     GnuplotActor actor;
     actor.command(pcmd);
     actor.style(scmd);

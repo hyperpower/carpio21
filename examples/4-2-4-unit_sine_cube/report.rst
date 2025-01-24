@@ -53,3 +53,4 @@ Reference
 .. [Spotz1996] Spotz, W. F., & Carey, G. F. (1996). 
                A high-order compact formulation for the 3D Poisson equation. 
                Numerical Methods for Partial Differential Equations, 12(2), 235–243.
+               https://doi.org/10.1002/(SICI)1098-2426(199603)12:2%3C235::AID-NUM6%3E3.0.CO;2-R

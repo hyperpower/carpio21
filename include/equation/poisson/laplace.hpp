@@ -96,20 +96,12 @@ public:
 
     virtual int solve(){
         FieldCenter&    phi  = *(this->_fields["phi"]);
-        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
         auto expf = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
-        // auto expf = this->new_field_exp_coe_one();
         auto bis      = this->get_boundary_index("phi");
 
         auto res = IntegralLaplacian((*expf), (*bis));
 
-        Mat a;
-        Arr b;
-        BuildMatrix(res, a, b);
-        Arr x = phi.to_array();
-        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
-        phi.assign(x);
-        return 0;
+        return this->_build_mat_and_solve(res, phi);
     }
 
     void set_phi(spFieldCenter spphi){
@@ -132,7 +124,6 @@ protected:
     virtual int _one_step_implicit(St step, Vt time){
         auto& phi  = *(this->_fields["phi"]);
         auto& invv = *(this->_fields["inverse_volume"]);
-        auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
         auto bis      = this->get_boundary_index("phi");
 
         auto spphif = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
@@ -140,20 +131,14 @@ protected:
 
         auto res =  IntegralLaplacian((*spphif), (*bis), time) * dt * invv - (*spphif) + phi;
 
-        Mat a;
-        Arr b;
-        BuildMatrix(res, a, b);
-        Arr x = phi.to_array();
-        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
-        phi.assign(x);
-        return 0;
+        return this->_build_mat_and_solve(res, phi);
+        
     }
 
     // Crank–Nicolson method
     virtual int _one_step_cn(St step, Vt time){
         auto& phi  = *(this->_fields["phi"]);
         auto& invv = *(this->_fields["inverse_volume"]);
-        auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
         auto bis      = this->get_boundary_index("phi");
 
         auto spphif = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
@@ -164,19 +149,12 @@ protected:
 
         auto res =  (lap_exp + lap_v) * dt * 0.5 * invv - (*spphif) + phi;
 
-        Mat a;
-        Arr b;
-        BuildMatrix(res, a, b);
-        Arr x = phi.to_array();
-        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
-        phi.assign(x);
-        return 0;
+        return this->_build_mat_and_solve(res, phi);
     }
 
     virtual int _one_step_cng(St step, Vt time){
         auto& phi  = *(this->_fields["phi"]);
         auto& invv = *(this->_fields["inverse_volume"]);
-        auto  spsolver = any_cast<spSolver>(this->_configs["solver"]);
         auto bis      = this->get_boundary_index("phi");
 
         auto spphif = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
@@ -188,13 +166,7 @@ protected:
 
         auto res =  (lap_exp + lap_v) * dt * invv - (*spphif) + phi;
 
-        Mat a;
-        Arr b;
-        BuildMatrix(res, a, b);
-        Arr x = phi.to_array();
-        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
-        phi.assign(x);
-        return 0;
+        return this->_build_mat_and_solve(res, phi);
     }
 
 };

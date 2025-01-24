@@ -251,7 +251,7 @@ auto operator+(const VALUE& lhs,
     typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Field;
     typedef typename Field::ValueTag ValueTag;
     typedef typename Field::Tag      Tag;
-    using VTag = std::conditional<
+    using VTag = typename std::conditional<
         !HasTag<VALUE>::value && std::is_arithmetic<VALUE>::value, 
         ArithmeticTag , 
         LinearPolynomialTag>::type;
@@ -264,7 +264,7 @@ auto operator+( const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& lhs,
     typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Field;
     typedef typename Field::ValueTag ValueTag;
     typedef typename Field::Tag      Tag;
-    using VTag = std::conditional<
+    using VTag = typename std::conditional<
         !HasTag<VALUE>::value && std::is_arithmetic<VALUE>::value, 
         ArithmeticTag , 
         LinearPolynomialTag>::type;
@@ -352,7 +352,7 @@ auto operator-(const VALUE& lhs,
     typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Field;
     typedef typename Field::ValueTag ValueTag;
     typedef typename Field::Tag      Tag;
-    using VTag = std::conditional<
+    using VTag =typename std::conditional<
         !HasTag<VALUE>::value && std::is_arithmetic<VALUE>::value, 
         ArithmeticTag , 
         LinearPolynomialTag>::type;
@@ -365,7 +365,7 @@ auto operator-( const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& lhs,
     typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Field;
     typedef typename Field::ValueTag ValueTag;
     typedef typename Field::Tag      Tag;
-    using VTag = std::conditional<
+    using VTag =typename std::conditional<
         !HasTag<VALUE>::value && std::is_arithmetic<VALUE>::value, 
         ArithmeticTag , 
         LinearPolynomialTag>::type;
@@ -462,7 +462,7 @@ auto operator*( const SFieldCenter_<DIM, VT, GRID, GHOST, ORDER>& lhs,
     typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Field;
     typedef typename Field::ValueTag ValueTag;
     typedef typename Field::Tag      Tag;
-    using VTag = std::conditional<
+    using VTag =typename std::conditional<
         !HasTag<VALUE>::value && std::is_arithmetic<VALUE>::value, 
         ArithmeticTag , 
         LinearPolynomialTag>::type;

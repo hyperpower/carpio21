@@ -18,6 +18,7 @@ ENDIF()
 # location of header files
 INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/../../include
+    ${PROJECT_SOURCE_DIR}/../include
 )
 
 add_executable(main ${SOURCE_FILES})

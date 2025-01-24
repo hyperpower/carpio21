@@ -118,34 +118,20 @@ protected:
         std::cerr << "EventGnuplotField: " << "Wrong terminal!" << std::endl;
     }
 
-//    void _plot(const Field& s){
-//        if(DIM == 1){
-//            _spgnu->add(GnuplotActor::Lines(s));
-//        }else if(DIM == 2){
-//            _spgnu->add(GnuplotActor::Contour(s));
-//        }
-//        _spgnu->plot();
-//        _spgnu->clear();
-//    }
-
-    // void _init_fun_plot(){
-    //     this->_fun = [](Gnuplot& gnu, const Field& f, St step , Vt t, int fob, pEqu pd){
-    //         if(DIM == 1){
-    //             gnu.add(GnuplotActor::Lines(f));
-    //         }else if(DIM == 2){
-    //             gnu.add(GnuplotActor::Contour(f));
-    //         }
-    //         gnu.plot();
-    //         gnu.clear();
-    //         return 1;
-    //     };
-    // }
-
     std::string _file_name(St step, Vt t, int fob) const{
-        std::stringstream ss;
-        ss << _path;
-        tfm::format(ss, _format.c_str() , _sn, step, t);
-        return ss.str();
+        std::list<std::string> tokens;
+        Tokenize(_format, tokens ,"%");
+        if(tokens.size() == 1){
+            return tfm::format(_format.c_str(), _path + _sn);
+        }else if (tokens.size() == 2){
+            return tfm::format(_format.c_str(), _path + _sn, step);
+        }else if (tokens.size() == 3){
+            return tfm::format(_format.c_str(), _path + _sn, step, t);
+        }else if (tokens.size() == 4){
+            return tfm::format(_format.c_str(), _path +_sn, step, t, fob);
+        }
+        SHOULD_NOT_REACH;
+        return "";
     }
 };
 

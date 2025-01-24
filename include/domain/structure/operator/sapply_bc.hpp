@@ -551,21 +551,20 @@ typename FIELD::ValueType GetGhostCenterExpType3(
         const typename FIELD::Index& idxg,
         const Axes&            axe,
         const Orientation&     ori,
-        const Vt&            time = 0.0)
+        const Vt&              time = 0.0)
 {
     typedef typename FIELD::ValueType Exp;
     // only works for regular ghost
-    auto &grid = fc.grid();
+    auto& grid = fc.grid();
     auto  n = grid.n(axe);
     auto ig = idxg[axe];
     typename FIELD::Index idxp(idxg);
     if (ig >= n){
         idxp[axe] = ig % n;
-    }
-    else if (ig < 0){
+    }else if (ig < 0){
         idxp[axe] = n - std::abs(ig) % n;
     }
-    return fc(idxp);
+    return Exp(idxp);
 }
 
 template<class FIELD>
@@ -662,7 +661,7 @@ void _ApplyBoundaryValue(
             if(ghost.is_ghost(idxg)){
                 auto axe  = GetDeltaAxe(idx, idxg);
                 auto ori  = GetDeltaOrient(idx, idxg);
-                auto v = Value(field, bi, idx, idxg, axe, ori, time);
+                auto v    = Value(field, bi, idx, idxg, axe, ori, time);
                 res += v * term.second;
             }else{
                 res.insert(term.second, term.first);
@@ -670,6 +669,7 @@ void _ApplyBoundaryValue(
         }
         field(idx) = res;
     }
+
 }
 } // namespace carpio
 

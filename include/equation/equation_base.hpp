@@ -344,6 +344,16 @@ protected:
         }
         return spsolver;
     }
+
+    virtual int _build_mat_and_solve(const FieldCenterExp& fexp, FieldCenter& fres){
+        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        Mat a;  Arr b;
+        BuildMatrix(fexp, a, b);
+        Arr x = fres.to_array();
+        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        fres.assign(x);
+        return any_cast<int>(this->_configs["solver_return_code"]);
+    }
 };
 
 
