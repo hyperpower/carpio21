@@ -9,18 +9,18 @@
 namespace carpio{
 
 //deprecate -->
-template<class FIELD, class BI>
-FIELD IntLaplacian(const FIELD& field, BI bi, double t=0.0){
-    // std::cout << "IntLaplacian field with bi" << std::endl;
-    IntLaplacianImplement_<FIELD,   FIELD::Dim,
-                        typename FIELD::ValueType,
-                        typename FIELD::Grid, 
-                        typename FIELD::Ghost,
-                        typename FIELD::Order,
-                        typename FIELD::Tag
-                        > imp;
-    return imp.execute(field, bi, t); 
-}
+// template<class FIELD, class BI>
+// FIELD IntLaplacian(const FIELD& field, BI bi, double t=0.0){
+//     // std::cout << "IntLaplacian field with bi" << std::endl;
+//     IntLaplacianImplement_<FIELD,   FIELD::Dim,
+//                         typename FIELD::ValueType,
+//                         typename FIELD::Grid, 
+//                         typename FIELD::Ghost,
+//                         typename FIELD::Order,
+//                         typename FIELD::Tag
+//                         > imp;
+//     return imp.execute(field, bi, t); 
+// }
 // <--- deprecate
 
 
@@ -90,7 +90,7 @@ FIELD IntVolume(const FIELD& field){
     typename FIELD::Tag t; 
     return IntVolume(field, t);
 }
-// Interpolate ==========================
+// Interpolate =============================
 template<class FIELD>
 auto InterpolateCenterToFace(const FIELD& field, Axes a){
     typename FIELD::Tag field_tag; 
@@ -101,20 +101,29 @@ auto InterpolateCenterToFace(const FIELD& field, const BoundaryIndex& bi, Axes a
     typename FIELD::Tag field_tag; 
     return InterpolateCenterToFace(field, bi, a, field_tag);
 }
-template<class FIELD>
-typename FIELD::ValueType Value(
-    const FIELD& field,
-    const BoundaryIndex& bi,
-    const typename FIELD::Index& idxc,
-    const typename FIELD::Index& idxg,
-    const Axes&            axe,
-    const Orientation&     ori,
-    const Vt&            time = 0.0)
-{
-    typedef typename FIELD::Tag Tag; 
-    return Value(field, bi, idxc, idxg, axe, ori, time, Tag());
+template<class VECTOR>
+auto InterpolateCenterToFace(const VECTOR& field){
+    typedef typename VECTOR::Tag Tag; 
+    return InterpolateCenterToFace(field, Tag());
+}
+template<class VECTOR>
+auto InterpolateCenterToFace(const VECTOR& field,
+    const BoundaryIndex& bix, 
+    const BoundaryIndex& biy = BoundaryIndex(),
+    const BoundaryIndex& biz = BoundaryIndex()){
+    typedef typename VECTOR::Tag Tag; 
+    return InterpolateCenterToFace(field, bix, biy, biz, Tag());
+}
+// Advection ===============================
+template<class VECTORF, class FIELD, class BI>
+FIELD UdotNabla(const VECTORF& vec, const FIELD& field, const BI& bi, 
+                double time = 0.0, const std::string& method = ""){
+    typedef typename FIELD::Tag FieldTag; 
+    typedef typename VECTORF::Tag VectorTag;
+    return UdotNabla(vec, field, bi, time, method, VectorTag(), FieldTag());
 }
 
+// BoundaryValue ===========================
 template<class FIELD>
 void ApplyBoundaryValue(
      FIELD& field,
@@ -126,7 +135,20 @@ void ApplyBoundaryValue(
     ApplyBoundaryValue(field, bi, time, Tag(), ValueTag());
 }
 
-// BuildMatrix
+template<class FIELD>
+typename FIELD::ValueType Value(
+    const FIELD& field,
+    const BoundaryIndex& bi,
+    const typename FIELD::Index& idxc,
+    const typename FIELD::Index& idxg,
+    const Axes&            axe,
+    const Orientation&     ori,
+    const Vt&              time = 0.0)
+{
+    typedef typename FIELD::Tag Tag; 
+    return Value(field, bi, idxc, idxg, axe, ori, time, Tag());
+}
+// BuildMatrix =============================
 template<class FIELD, class MAT, class ARR>
 int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){
     typedef typename FIELD::Tag Tag; 

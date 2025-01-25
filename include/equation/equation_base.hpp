@@ -29,6 +29,7 @@ public:
     typedef typename Domain::Order       Order;
     typedef typename Domain::spOrder     spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
+    typedef typename Domain::FieldCenter FieldFace;
     typedef typename Domain::FieldCenterExp FieldCenterExp;
 
     typedef EquationBase_<D> Self;
@@ -40,11 +41,13 @@ public:
     typedef std::shared_ptr<EventCondition>spEventCondition;
 
     typedef std::shared_ptr<FieldCenter>    spFieldCenter;
+    typedef std::shared_ptr<FieldFace>      spFieldFace;
     typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
     typedef std::shared_ptr<BoundaryIndex> spBoundaryIndex;
 
     typedef std::map<std::string, Any>             Configures;
     typedef std::map<std::string, spFieldCenter>   Fields;
+    typedef std::map<std::string, spFieldFace>     FieldFaces;
     typedef std::map<std::string, spBoundaryIndex> BIs;
     typedef std::map<std::string, spEvent>         Events;
 

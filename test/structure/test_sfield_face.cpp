@@ -5,13 +5,14 @@
 #include "domain/structure/order/xyz.hpp"
 // #include "domain/structure/io/splotly_actor.hpp"
 #include "domain/structure/io/sgnuplot_actor.hpp"
+#include "test_define.hpp"
 
 using namespace carpio;
 
-const std::string OUTPUTPATH = "./fig/";
+// const std::string FIG_PATH = "./fig/";
 
-const int fig_width  = 1200;
-const int fig_height = 900;
+// const int fig_width  = 1200;
+// const int fig_height = 900;
 
 TEST(field_face, dim2){
 
@@ -68,7 +69,7 @@ TEST(field_face, dim2){
 	agrid.line_width(2);
 	gnu.add(agrid);
 
-	gnu.set_terminal_png(OUTPUTPATH + "SturctureFieldFace", 
+	gnu.set_terminal_png(FIG_PATH + "SturctureFieldFace", 
 	                    fig_width, fig_height);
 		
 	
@@ -131,7 +132,7 @@ TEST(field_face, dim1){
 	auto aidx = ToGnuplotActorLabel(ff, "index");
 	gnu.add(aidx);
 
-	gnu.set_terminal_png(OUTPUTPATH + "SturctureFieldFace1d", 
+	gnu.set_terminal_png(FIG_PATH + "SturctureFieldFace1d", 
 	                    fig_width, fig_height);
 		
 	

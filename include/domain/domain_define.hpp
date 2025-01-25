@@ -26,7 +26,7 @@ struct OctreeTag:    public DomainTag{};
 template<St DIM>
 auto ArrAxes(){
     SHOULD_NOT_REACH;
-    return 0.0;
+    return std::array<Axes, 1>{_X_};
 }
 template<>
 auto ArrAxes<1>(){

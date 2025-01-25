@@ -16,6 +16,8 @@
 #include "order/xyz.hpp"
 #include "field/sfield.hpp"
 #include "field/sfield_center.hpp"
+#include "field/svector_center.hpp"
+#include "field/svector_face.hpp"
 
 #include "io/sgnuplot_actor.hpp"
 // #include "io/splotly_actor.hpp"
@@ -43,9 +45,12 @@ public:
     typedef ORDER Order;
     typedef typename Grid::Index   Index;
     typedef SFieldCenter_<Dim, ValueType, Grid, Ghost, Order> FieldCenter;
+    typedef SFieldFace_<Dim, ValueType, Grid, Ghost, Order> FieldFace;
+    typedef SVectorCenter_<Dim, ValueType, Grid, Ghost, Order> VectorCenter;
     typedef LinearPolynomial_<Vt, typename GRID::Index> Exp;
     typedef Exp    ExpType;
     typedef SFieldCenter_<Dim, Exp, Grid, Ghost, Order> FieldCenterExp;
+    typedef SFieldFace_<Dim, Exp, Grid, Ghost, Order>   FieldFaceExp;
 
     typedef std::shared_ptr<Grid>  spGrid;
     typedef std::shared_ptr<Ghost> spGhost;
@@ -53,6 +58,8 @@ public:
 
     typedef std::shared_ptr<FieldCenter>    spFieldCenter;
     typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
+    typedef std::shared_ptr<FieldFace>      spFieldFace;
+    typedef std::shared_ptr<FieldFaceExp>   spFieldFaceExp;
 
     typedef StructureDomain_<DIM, Grid, Ghost, Order> Self;
 
@@ -63,27 +70,24 @@ protected:
 public:
     StructureDomain_(){};
 
-    // StructureDomain_(spGrid spgrid, spGhost spghost, spOrder sporder):
-    //     _spgrid(spgrid), _spghost(spghost), _sporder(sporder){};
-
-    static spFieldCenter NewspFieldCenterZero(
-        spGrid spgrid, spGhost spghost, spOrder sporder
-    ){
-        return spFieldCenter(new FieldCenter(spgrid, spghost, sporder));
-    }
-    static spFieldCenterExp NewspFieldCenterExpZero(
-        spGrid spgrid, spGhost spghost, spOrder sporder
-    ){
-        return spFieldCenterExp(new FieldCenterExp(spgrid, spghost, sporder));
-    }
-    static spFieldCenterExp NewspFieldCenterExpCoeOne(
-        spGrid spgrid, spGhost spghost, spOrder sporder
-    ){
-        auto fun =[](const Index& idx){
-            return Exp(idx);
-        };
-        return spFieldCenterExp(new FieldCenterExp(spgrid, spghost, sporder, fun));
-    }
+    // static spFieldCenter NewspFieldCenterZero(
+    //     spGrid spgrid, spGhost spghost, spOrder sporder
+    // ){
+    //     return spFieldCenter(new FieldCenter(spgrid, spghost, sporder));
+    // }
+    // static spFieldCenterExp NewspFieldCenterExpZero(
+    //     spGrid spgrid, spGhost spghost, spOrder sporder
+    // ){
+    //     return spFieldCenterExp(new FieldCenterExp(spgrid, spghost, sporder));
+    // }
+    // static spFieldCenterExp NewspFieldCenterExpCoeOne(
+    //     spGrid spgrid, spGhost spghost, spOrder sporder
+    // ){
+    //     auto fun =[](const Index& idx){
+    //         return Exp(idx);
+    //     };
+    //     return spFieldCenterExp(new FieldCenterExp(spgrid, spghost, sporder, fun));
+    // }
 
 };
 

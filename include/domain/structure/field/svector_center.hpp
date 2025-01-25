@@ -17,6 +17,8 @@ public:
     static const St Dim = DIM;
 
     typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Field;
+    typedef SVectorCenterTag Tag;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;

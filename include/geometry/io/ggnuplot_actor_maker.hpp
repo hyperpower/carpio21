@@ -555,7 +555,7 @@ auto ToGnuplotActorAsVector(const ANY& geo){
 class GnuplotActorDistanceIndicator : public GnuplotActorGroup, public DistanceIndicator{
 public:
     typedef std::shared_ptr<GnuplotActor> spActor;
-    typedef std::list<std::shared_ptr<GnuplotActor> > list_spActor;
+    typedef std::list<GnuplotActor> list_Actor;
     typedef GnuplotActorGroup ActorGroup;
     typedef DistanceIndicator Shape;
     typedef typename Shape::Point Point;
@@ -582,7 +582,7 @@ public:
         arrow.data().push_back(ToString(midp[0], midp[1], left[0] - midp[0], left[1] - midp[1] , " "));
         arrow.data().push_back(ToString(midp[0], midp[1], right[0] - midp[0], right[1] - midp[1], " "));
         arrow.data().push_back(" ");
-        this->_actors.push_back(std::make_shared<GnuplotActor>(arrow));
+        this->_actors.push_back(arrow);
         // normal line left
         GnuplotActor normall;
         Point l0 = this->normal_line_left(0);
@@ -592,7 +592,7 @@ public:
         normall.data().push_back(ToString(l0[0], l0[1] , " "));
         normall.data().push_back(ToString(l1[0], l1[1] , " "));
         normall.data().push_back(" ");
-        this->_actors.push_back(std::make_shared<GnuplotActor>(normall));
+        this->_actors.push_back(normall);
         // 
         GnuplotActor normalr;
         Point r0 = this->normal_line_right(0);
@@ -602,7 +602,7 @@ public:
         normalr.data().push_back(ToString(r0[0], r0[1] , " "));
         normalr.data().push_back(ToString(r1[0], r1[1] , " "));
         normalr.data().push_back(" ");
-        this->_actors.push_back(std::make_shared<GnuplotActor>(normalr));
+        this->_actors.push_back(normalr);
         // 
         if(this->is_offset()){
             GnuplotActor ao;
@@ -612,7 +612,7 @@ public:
             ao.data().push_back(ToString(midp[0], midp[1] , " "));
             ao.data().push_back(ToString(o[0], o[1] , " "));
             ao.data().push_back("");
-            this->_actors.push_back(std::make_shared<GnuplotActor>(ao));
+            this->_actors.push_back(ao);
         }
     }
 };

@@ -7,6 +7,10 @@ namespace carpio{
 
 struct SFieldFaceTag: public SFieldTag{};
 
+// ----x----|----x----|----x----|
+//    i-1        i        i+1       center index
+//          i        i+1       i+2  face   index
+
 template<St DIM, 
          class VT,
          class GRID, 

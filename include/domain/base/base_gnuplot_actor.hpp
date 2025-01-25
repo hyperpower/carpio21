@@ -19,7 +19,7 @@ namespace carpio{
 //     return _ToGnuplotActorLines(a, Tag()); 
 // }
 template<class ANY>
-GnuplotActor ToGnuplotActorPointContour(const ANY& a){
+auto ToGnuplotActorPointContour(const ANY& a){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorPointContour(a, Tag()); 
 }

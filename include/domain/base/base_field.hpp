@@ -88,6 +88,7 @@ public:
 };
 
 struct FieldBaseTag{};
+
 template<St DIM, 
          class VT, 
          class GRID, 
@@ -186,7 +187,7 @@ public:
     typedef typename FIELD_TYPE::ValueTag ValueTag;
 
 #define EXPAND_FIELD(FIELD_TYPE)     \
-    typedef typename FIELD_TYPE::Self Field; \
+    typedef typename FIELD_TYPE::Self  Field; \
     typedef typename FIELD_TYPE::Index Index; \
     typedef typename FIELD_TYPE::ValueType ValueType; \
     typedef typename FIELD_TYPE::Grid  Grid; \

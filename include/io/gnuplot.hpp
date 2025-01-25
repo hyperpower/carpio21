@@ -241,12 +241,13 @@ typedef std::shared_ptr<GnuplotActor> spGnuplotActor;
 
 class GnuplotActorGroup {
 public:
+    typedef GnuplotActor Actor;
     typedef std::shared_ptr<GnuplotActor> spActor;
-    typedef std::list<std::shared_ptr<GnuplotActor> > list_spActor;
-    typedef typename list_spActor::iterator  iterator;
-    typedef typename list_spActor::const_iterator  const_iterator;
+    typedef std::list<GnuplotActor> list_Actor;
+    typedef typename list_Actor::iterator  iterator;
+    typedef typename list_Actor::const_iterator  const_iterator;
 protected:
-    list_spActor _actors;
+    list_Actor _actors;
 public:
     GnuplotActorGroup(){
     }
@@ -263,6 +264,10 @@ public:
         this->_actors = other._actors;
         return *this;
     }
+
+    void push_back(const Actor& a){
+        this->_actors.push_back(a);
+    } 
 
     iterator begin(){
         return _actors.begin();
@@ -1223,7 +1228,7 @@ public:
     }
     Gnuplot& add(const GnuplotActorGroup& gag){
         for(auto& a : gag){
-            this->_actors.push_back(a);
+            this->_actors.push_back(std::make_shared<GnuplotActor>(a));
         }
         return *this;
     }

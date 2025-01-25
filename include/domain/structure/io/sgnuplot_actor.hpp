@@ -8,6 +8,7 @@
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/field/sfield_center.hpp"
 #include "domain/structure/field/sfield_face.hpp"
+#include "domain/structure/field/svector_face.hpp"
 #include "io/gnuplot.hpp"
 #include "s_stringify.hpp"
 
@@ -348,7 +349,7 @@ GnuplotActor  _ToGnuplotActorLabel(
 }
 
 template<class ANY>
-GnuplotActor _ToGnuplotActorPointContour(
+auto _ToGnuplotActorPointContour(
     const ANY& ff,
     SFieldFaceTag, Dim1Tag)
 {    
@@ -373,7 +374,7 @@ GnuplotActor _ToGnuplotActorPointContour(
 }
 
 template<class ANY>
-GnuplotActor _ToGnuplotActorPointContour(
+auto _ToGnuplotActorPointContour(
     const ANY& fcenter,
     SFieldCenterTag, Dim1Tag){
     
@@ -389,7 +390,7 @@ GnuplotActor _ToGnuplotActorPointContour(
     return aloc;
 }
 template<class ANY>
-GnuplotActor _ToGnuplotActorPointContour(const ANY& field, 
+auto _ToGnuplotActorPointContour(const ANY& field, 
         SFieldCenterTag, Dim2Tag){
     std::list<double> lx, ly, lv;
     for(auto& cidx : field.order()){
@@ -404,8 +405,7 @@ GnuplotActor _ToGnuplotActorPointContour(const ANY& field,
 }
 
 template<class ANY>
-GnuplotActor _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
-    
+auto _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
     std::list<double> lx, ly, lv;
     for(auto& fidx : ff.order()){
         auto cidx = ff.grid().face_index_to_cell_index(fidx, ff.face_axe());
@@ -425,14 +425,30 @@ GnuplotActor _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
     aloc.style("with points ps 2 pointtype 13 lc palette");
     return aloc;
 }
-
 template<class ANY>
-GnuplotActor _ToGnuplotActorPointContour(const ANY& a, SFieldFaceTag){
+GnuplotActorGroup _ToGnuplotActorPointContour(const ANY& vector_face, SVectorFaceTag, Dim2Tag){
+    GnuplotActorGroup gag;
+    for(auto& spface: vector_face){
+        auto& field_face = *spface;
+        auto a = _ToGnuplotActorPointContour(field_face, SFieldFaceTag());
+        // a.show_command();
+        gag.push_back(a);
+    }
+    return gag;    
+}
+template<class ANY>
+auto _ToGnuplotActorPointContour(const ANY& a, SFieldFaceTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
     return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
 }
 
+template<class ANY>
+auto _ToGnuplotActorPointContour(const ANY& a, SVectorFaceTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
+}    
 template<class ANY>
 GnuplotActor _ToGnuplotActorPointContour(const ANY& a, SFieldCenterTag){
     typedef typename ANY::Tag Tag;

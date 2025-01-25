@@ -8,11 +8,13 @@ set(Sources
     # test_bc_1d.cpp
     # test_sgrid_io.cpp
     # test_sorder.cpp
-    test_sfield.cpp
+    # test_sfield.cpp
     # test_sfield_face.cpp
     # test_sgrid.cpp
-    # test_sinterpolate.cpp
+    test_sinterpolate.cpp
     # test_sint_laplacian.cpp
+    # test_svector_face.cpp
+    # test_su_dot_nabla.cpp
 )
 
 add_executable(${This} ${Sources})

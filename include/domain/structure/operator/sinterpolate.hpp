@@ -4,6 +4,8 @@
 #include "scommon.hpp"
 #include "domain/base/base_operator.hpp"
 #include "domain/structure/field/sfield.hpp"
+#include "domain/structure/field/svector_center.hpp"
+#include "domain/structure/field/svector_face.hpp"
 #include "algebra/misc/interpolate.hpp"
 #include "domain/structure/operator/sapply_bc.hpp"
 
@@ -11,19 +13,37 @@
 namespace carpio{
 
 template<class FIELD>
-auto InterpolateCenterToFace(const FIELD& field, Axes a, SFieldTag){
+auto InterpolateCenterToFace(const FIELD& field, Axes a, SFieldCenterTag){
     EXPAND_FIELD_TAG(FIELD); 
     std::cout << "    SField Interpolate C to F" << std::endl;
     return _SInterpolateCenterToFace(field, a, 
            ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
 template<class FIELD>
-auto InterpolateCenterToFace(const FIELD& field, const BoundaryIndex& bi, Axes a, SFieldTag){
+auto InterpolateCenterToFace(const FIELD& field, const BoundaryIndex& bi, Axes a, 
+                            SFieldCenterTag){
     EXPAND_FIELD_TAG(FIELD); 
-    std::cout << "    SField Interpolate C to F with boundary" << std::endl;
+    // std::cout << "    SField Interpolate C to F with boundary" << std::endl;
     return _SInterpolateCenterToFace(field, bi, a, 
            ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
+template<class VECTOR>
+auto InterpolateCenterToFace(const VECTOR& field, SVectorFaceTag){
+    EXPAND_FIELD_TAG(VECTOR); 
+    return _SInterpolateCenterToFace(field, 
+           ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+}
+template<class VECTOR>
+auto InterpolateCenterToFace(const VECTOR& field,
+    const BoundaryIndex& bix, 
+    const BoundaryIndex& biy,
+    const BoundaryIndex& biz, SVectorFaceTag){
+    EXPAND_FIELD_TAG(VECTOR); 
+    return _SInterpolateCenterToFace(field, 
+           ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+}
+
+
 template<class FIELD>
 auto _SInterpolateCenterToFace(const FIELD& field, Axes a, 
     BaseTag, SGridTag, SGhostTag, SOrderTag, DimTag){
