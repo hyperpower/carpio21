@@ -80,4 +80,7 @@ TEST(vector_face, dim2){
 	// alocy.point_type(9);
 	gnu.add(aloc);
 	gnu.plot();
-} 
+}
+
+
+ 

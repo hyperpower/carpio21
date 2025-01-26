@@ -46,7 +46,11 @@ GnuplotActor ToGnuplotActorLabel(const ANY& a, const std::string& config = ""){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorLabel(a, config, Tag()); 
 }
-
+template<class ANY>
+GnuplotActor ToGnuplotActorVectors(const ANY& a, Vt unit_length = -1.0){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorVectors(a, unit_length, Tag()); 
+}
 
 }
 

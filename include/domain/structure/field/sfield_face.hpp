@@ -21,13 +21,13 @@ public:
     static const St Dim = DIM;
 
     typedef SFieldFaceTag Tag;
+    typedef SFieldFace_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
     typedef VT    ValueType;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Base;
-    typedef SFieldFace_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
 
     typedef std::shared_ptr<Grid>  spGrid;

@@ -26,20 +26,19 @@ public:
     typedef typename GHOST::Tag GhostTag;
     typedef typename ORDER::Tag OrderTag;
     
+    typedef VT    ValueType;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
-    typedef VT    ValueType;
+    typedef std::shared_ptr<Grid>  spGrid;
+    typedef std::shared_ptr<Ghost> spGhost;
+    typedef std::shared_ptr<Order> spOrder;
     typedef FieldBase_<Dim, VT, GRID, GHOST, ORDER> Base;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
 
     typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
     typedef typename _DataInit::ValueTag ValueTag;
-    
-    typedef std::shared_ptr<Grid>  spGrid;
-    typedef std::shared_ptr<Ghost> spGhost;
-    typedef std::shared_ptr<Order> spOrder;
 
     typedef ArrayListV_<ValueType> Arr; 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
@@ -165,6 +164,13 @@ public:
     Self& operator/=(const VT& rhs) {
         _arr /= rhs;
         return *this;
+    }
+
+    Vt max() const {
+        return this->_arr.max();
+    }
+    Vt min() const {
+        return this->_arr.min();
     }
 
     SField_():Base(){}

@@ -96,10 +96,22 @@ auto InterpolateCenterToFace(const FIELD& field, Axes a){
     typename FIELD::Tag field_tag; 
     return InterpolateCenterToFace(field, a, field_tag);
 }
+template<class CENTER, class FACE>
+void InterpolateCenterToFace(const CENTER& field, FACE& face){
+    typename CENTER::Tag center_tag; 
+    typename FACE::Tag face_tag; 
+    InterpolateCenterToFace(field, face, center_tag, face_tag);
+}
 template<class FIELD>
 auto InterpolateCenterToFace(const FIELD& field, const BoundaryIndex& bi, Axes a){
     typename FIELD::Tag field_tag; 
     return InterpolateCenterToFace(field, bi, a, field_tag);
+}
+template<class CENTER, class FACE>
+void InterpolateCenterToFace(const CENTER& field, FACE& face, const BoundaryIndex& bi){
+    typename CENTER::Tag center_tag; 
+    typename FACE::Tag face_tag; 
+    InterpolateCenterToFace(field, face, bi, center_tag, face_tag);
 }
 template<class VECTOR>
 auto InterpolateCenterToFace(const VECTOR& field){

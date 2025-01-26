@@ -16,7 +16,7 @@ class SVectorFace_{
 public:
     static const St Dim = DIM;
 
-    typedef SFieldFace_<DIM, VT, GRID, GHOST, ORDER> FieldFace;
+    typedef SFieldFace_<DIM, VT, GRID, GHOST, ORDER> Component;
     typedef SVectorFaceTag Tag;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef VT ValueType;
@@ -31,13 +31,13 @@ public:
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SVectorFace_<DIM, VT, GRID, GHOST, ORDER> Self;
-    typedef std::shared_ptr<FieldFace> spFieldFace;
+    typedef std::shared_ptr<Component> spComponent;
 
-    typedef typename std::array<spFieldFace, DIM>::iterator iterator;
-    typedef typename std::array<spFieldFace, DIM>::const_iterator const_iterator;
+    typedef typename std::array<spComponent, DIM>::iterator iterator;
+    typedef typename std::array<spComponent, DIM>::const_iterator const_iterator;
 
 protected:
-    std::array<spFieldFace, DIM> _arrs;
+    std::array<spComponent, DIM> _arrs;
 public:
     SVectorFace_() {
         FOR_EACH_DIM{
@@ -46,17 +46,15 @@ public:
     }
 
     SVectorFace_(
-            spFieldFace u,
-            spFieldFace v = nullptr,
-            spFieldFace w = nullptr){
-        spFieldFace a[] = {u,v,w};
+            spComponent u,
+            spComponent v = nullptr,
+            spComponent w = nullptr){
+        spComponent a[] = {u,v,w};
         FOR_EACH_DIM{
             ASSERT(a[d] != nullptr);
             _arrs[d] = a[d];
         }
     }
-
-
 
     ValueType& operator()(Axes a, Orientation o,
                    St i, St j = 0, St k = 0) {
@@ -78,7 +76,7 @@ public:
         return (*_arrs[a])(o, index);
     }
     
-    void set(Axes a, spFieldFace sps){
+    void set(Axes a, spComponent sps){
         ASSERT(a < DIM);
         _arrs[a] = sps;
     }
@@ -95,11 +93,11 @@ public:
         return _arrs[_X_]->ghost();
     }
 
-    FieldFace& operator[](St d){
+    Component& operator[](St d){
         return *(_arrs[d]);
     }
 
-    const FieldFace& operator[](St d) const{
+    const Component& operator[](St d) const{
         return *(_arrs[d]);
     }
 

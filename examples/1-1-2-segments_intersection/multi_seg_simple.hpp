@@ -18,7 +18,7 @@ void PlotListSegment(Gnuplot& gnu, const LISTSEG& sl){
         sst << "front font \", 18\" textcolor rgb \"#3A4044\" offset first " 
             << nv.x() * ratio << ", " << nv.y() * ratio; 
         gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
-        auto a1 = ToGnuplotActorAsVector(seg);
+        auto a1 = ToGnuplotActorVector(seg);
         if(index == 1){
             a1.title("Segment");
         }

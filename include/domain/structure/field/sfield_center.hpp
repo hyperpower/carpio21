@@ -214,6 +214,7 @@ public:
         }
         return res;
     }
+    
 protected:
     void _initial_arr(){
         // make data by order

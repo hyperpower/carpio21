@@ -178,7 +178,7 @@ public:
 };
 
 #define EXPAND_FIELD_TAG(FIELD_TYPE)     \
-    typedef typename FIELD_TYPE::Tag      FieldTag; \
+    typedef typename FIELD_TYPE::Tag      Tag; \
     typedef typename FIELD_TYPE::DimTag   DimTag; \
     typedef typename FIELD_TYPE::GridTag  GridTag; \
     typedef typename FIELD_TYPE::GhostTag GhostTag; \

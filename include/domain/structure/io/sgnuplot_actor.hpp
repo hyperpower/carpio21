@@ -8,6 +8,7 @@
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/field/sfield_center.hpp"
 #include "domain/structure/field/sfield_face.hpp"
+#include "domain/structure/field/svector_center.hpp"
 #include "domain/structure/field/svector_face.hpp"
 #include "io/gnuplot.hpp"
 #include "s_stringify.hpp"
@@ -407,15 +408,16 @@ auto _ToGnuplotActorPointContour(const ANY& field,
 template<class ANY>
 auto _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
     std::list<double> lx, ly, lv;
+    auto a = ff.face_axe();
     for(auto& fidx : ff.order()){
-        auto cidx = ff.grid().face_index_to_cell_index(fidx, ff.face_axe());
-        auto p = ff.grid().f(ff.face_axe(), _M_, cidx);
+        auto cidx = ff.grid().face_index_to_cell_index(fidx, a);
+        auto p = ff.grid().f(a, _M_, cidx);
         lx.push_back(p.value(_X_));
         ly.push_back(p.value(_Y_));
         lv.push_back(ff(_M_, cidx));
 
-        if(ff.grid().is_last(cidx, ff.face_axe())){
-            p = ff.grid().f(ff.face_axe(), _P_, cidx);
+        if(ff.grid().is_last(cidx, a)){
+            p = ff.grid().f(a, _P_, cidx);
             lx.push_back(p.value(_X_));
             ly.push_back(p.value(_Y_));
             lv.push_back(ff(_P_, cidx));
@@ -455,6 +457,119 @@ GnuplotActor _ToGnuplotActorPointContour(const ANY& a, SFieldCenterTag){
     typedef typename ANY::DimTag DimTag;
     return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
 }
+template<class ANY>
+GnuplotActor _ToGnuplotActorVectors(const ANY& vector_center, Vt unit_length, 
+        SVectorCenterTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorVectors(vector_center, unit_length, Tag(), DimTag());  
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorVectors(const ANY& ff, Vt unit_length, 
+        SFieldFaceTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorVectors(ff, unit_length, Tag(), DimTag());  
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorVectors(const ANY& vector_center, Vt unit_length, 
+        SVectorFaceTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorVectors(vector_center, unit_length, Tag(), DimTag());  
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorVectors(const ANY& vc, Vt unit_length, 
+        SVectorCenterTag, Dim1Tag){
+    GnuplotActor actor;
+    actor.command("using 1:2:3:4:5 title \"\" ");
+    actor.style("with vectors lw 2 lc palette head filled");
+    if (unit_length <= 0){
+        unit_length = vc[_X_].max() * 2.0;
+    }
+    auto gmin_size = vc.grid().min_size();
+
+    for (auto &index : vc.order()){
+        auto x = vc.grid().c_(_X_, index);
+        Vt   y = 0.0;
+        auto v = vc[_X_](index);
+        auto dx = v / unit_length * gmin_size;
+        Vt   dy = 0.0;
+        
+        actor.data().push_back(ToString(x, y, dx, dy, v, " "));
+    }
+    return actor;
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorVectors(const ANY& vc, Vt unit_length, 
+        SVectorCenterTag, Dim2Tag){
+    GnuplotActor actor;
+    actor.command("using 1:2:3:4:5 title \"\" ");
+    actor.style("with vectors lw 2 lc palette head filled");
+    if (unit_length <= 0)
+    {
+        auto xmax = vc[_X_].max() * 2.0;
+        auto ymax = vc[_Y_].max() * 2.0;
+        unit_length = std::max(xmax, ymax);
+    }
+    auto gmin_size = vc.grid().min_size();
+
+    for (auto &index : vc.order())
+    {
+        auto x = vc.grid().c_(_X_, index);
+        auto y = vc.grid().c_(_Y_, index);
+        auto vx = vc[_X_](index);
+        auto vy = vc[_Y_](index);
+        auto dx = vx / unit_length * gmin_size;
+        auto dy = vy / unit_length * gmin_size;
+
+        auto v = std::sqrt(vx * vx + vy * vy);
+        
+        actor.data().push_back(ToString(x, y, dx, dy, v, " "));
+    }
+    return actor;
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorVectors(const ANY& ff, Vt unit_length, 
+        SFieldFaceTag, Dim2Tag){
+    GnuplotActor actor;
+    actor.command("using 1:2:3:4:5 title \"\" ");
+    actor.style("with vectors lw 2 lc palette head filled");
+    if (unit_length <= 0){
+        unit_length = ff.max() * 2.0;;
+    }
+    auto gmin_size = ff.grid().min_size();
+    auto a = ff.face_axe();
+
+    for (auto &fidx : ff.order())
+    {
+        auto cidx = ff.grid().face_index_to_cell_index(fidx, a);
+        auto fm = ff.grid().f(a, _M_, cidx);
+        auto v  = ff(_M_, cidx);
+        auto dl = v / unit_length * gmin_size;
+
+        auto x = (a == _X_) ? fm(a) - (dl * 0.5) : fm.x();
+        auto y = (a == _X_) ? fm.y() : (fm(a) - (dl * 0.5));
+        auto dx = (a == _X_) ? dl : 0.0;
+        auto dy = (a == _X_) ? 0.0 : dl;
+
+        actor.data().push_back(ToString(x, y, dx, dy, v, " "));
+
+        if(ff.grid().is_last(cidx, a)){
+            fm = ff.grid().f(a, _P_, cidx);
+            v  = ff(_P_, cidx);
+            dl = v / unit_length * gmin_size;
+            x  = (a == _X_) ? fm(a) - (dl * 0.5) : fm.x();
+            y  = (a == _X_) ? fm.y() : (fm(a) - (dl * 0.5));
+            dx = (a == _X_) ? dl : 0.0;
+            dy = (a == _X_) ? 0.0 : dl;
+
+            actor.data().push_back(ToString(x, y, dx, dy, v, " "));
+        }
+    }
+    return actor;
+}
+
 }
 
 #endif

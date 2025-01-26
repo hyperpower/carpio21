@@ -384,7 +384,7 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& seg, SegmentTag){
     actor.data().push_back("");
 }
 template<typename ANY>
-void MakeGnuplotActorAsVector(GnuplotActor& actor, const ANY& seg, SegmentTag){
+void MakeGnuplotActorVector(GnuplotActor& actor, const ANY& seg, SegmentTag){
     actor.command("using 1:2:3:4 title \"\" ");
     actor.set_using(ANY::Dim * 2);
     actor.style("with vectors head filled lc 1"); // default color is 1
@@ -400,7 +400,7 @@ void MakeGnuplotActorAsVector(GnuplotActor& actor, const ANY& seg, SegmentTag){
     actor.data().push_back("");
 }
 template<typename ANY>
-void MakeGnuplotActorAsVector(GnuplotActor& actor, const ANY& pc, PointChainTag){
+void MakeGnuplotActorVector(GnuplotActor& actor, const ANY& pc, PointChainTag){
     actor.command() = "using 1:2:3:4 title \"\" ";
     actor.set_using(ANY::Dim * 2);
     actor.style()   = "with vectors lc 1"; // default color is 1
@@ -544,9 +544,9 @@ template<typename ANY,
         typename std::enable_if<
             IsGeometry<ANY>::value,
         bool>::type = true>
-auto ToGnuplotActorAsVector(const ANY& geo){
+auto ToGnuplotActorVector(const ANY& geo){
     GnuplotActor actor;
-    MakeGnuplotActorAsVector(actor, geo, typename ANY::Tag());    
+    MakeGnuplotActorVector(actor, geo, typename ANY::Tag());    
     return actor;
 }
 

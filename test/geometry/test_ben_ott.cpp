@@ -47,7 +47,7 @@ void AddListSegment(Gnuplot& gnu, const LISTSEG& sl){
         // sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
             // << nv.x() * ratio << ", " << nv.y() * ratio; 
         // gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
-        auto a1 = ToGnuplotActorAsVector(seg);
+        auto a1 = ToGnuplotActorVector(seg);
         // a1.title("Segment " + seg.get_name());
         a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#00A4EF\"");
         gnu.add(a);

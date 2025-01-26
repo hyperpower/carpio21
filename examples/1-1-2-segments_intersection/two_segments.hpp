@@ -52,7 +52,7 @@ int plot_a_case(const std::string& case_name,
     sst << "front textcolor rgb \"#00A4EF\" offset first " 
         << nv1.x() * ratio << ", " << nv1.y() * ratio; 
     gnu.set_label(1, seg1.get_name(), seg1.pc().x(), seg1.pc().y(),  sst.str());
-    auto a11 = ToGnuplotActorAsVector(seg1);
+    auto a11 = ToGnuplotActorVector(seg1);
     a11.title("Segment " + seg1.get_name());
     a11.style("with vector head filled size screen 0.03,15,135 lw 2 lc rgb \"#00A4EF\"");
 
@@ -63,7 +63,7 @@ int plot_a_case(const std::string& case_name,
     sst << "front textcolor rgb \"#F25022\" offset first " 
         << nv1.x() * ratio << ", " << nv1.y() * ratio; 
     gnu.set_label(2, seg2.get_name(), seg2.pc().x(), seg2.pc().y(),  sst.str());
-    auto a21 = ToGnuplotActorAsVector(seg2);
+    auto a21 = ToGnuplotActorVector(seg2);
     a21.title("Segment " + seg2.get_name());
     a21.style("with vector head filled size screen 0.03,15,135 lw 2 lc rgb \"#F25022\"");
 
