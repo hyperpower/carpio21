@@ -11,13 +11,13 @@ namespace carpio{
 
 
 template<class ANY>
-PlotlyActor _ToPlotlyActorLines(const ANY& a, const DomainTag& tag){};
+PlotlyActor _ToPlotlyActorWireFrame(const ANY& a, const DomainTag& tag){};
 
 template<class ANY>
-PlotlyActor ToPlotlyActorLines(const ANY& a){
+PlotlyActor ToPlotlyActorWireFrame(const ANY& a){
     typedef typename ANY::Tag Tag;
     Tag t;
-    return _ToPlotlyActorLines(a, t); 
+    return _ToPlotlyActorWireFrame(a, t); 
 }
 template<class ANY,
         typename std::enable_if<

@@ -5,6 +5,7 @@ set(This Equation)
 set(Sources
     # test_equation_base.cpp
     test_poisson.cpp
+    # test_laplacian.cpp
 )
 
 add_executable(${This} ${Sources})

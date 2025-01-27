@@ -1,5 +1,5 @@
 #ifndef _POISSON_HPP_
-#define _POISOON_HPP_
+#define _POISSON_HPP_
 
 #include "type_define.hpp"
 #include "equation/poisson/laplace.hpp"
@@ -19,14 +19,16 @@ public:
     typedef Laplace_<D>        Base;
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
-    typedef typename Domain::Grid         Grid;
-    typedef typename Domain::spGrid      spGrid;
+    typedef typename Domain::Grid        Grid;
+    typedef typename Domain::spGrid    spGrid;
     typedef typename Domain::Ghost       Ghost;
-    typedef typename Domain::spGhost     spGhost;
+    typedef typename Domain::spGhost   spGhost;
     typedef typename Domain::Order       Order;
-    typedef typename Domain::spOrder     spOrder;
-    typedef typename Domain::FieldCenter FieldCenter;
-    typedef std::shared_ptr<FieldCenter> spFieldCenter;
+    typedef typename Domain::spOrder   spOrder;
+    typedef typename Domain::FieldCenter     FieldCenter;
+    typedef typename Domain::spFieldCenter spFieldCenter;
+    typedef typename Domain::FieldCenterExp     FieldCenterExp;
+    typedef typename Domain::spFieldCenterExp spFieldCenterExp;
 
     typedef MatrixSCR_<Vt>    Mat;
     typedef ArrayListV_<Vt>   Arr;
@@ -43,6 +45,7 @@ public:
 public:
     Poisson_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
+            this->new_field("phi");
             this->new_field("source");
     }
 
@@ -72,7 +75,7 @@ public:
                 return _solve_finite_volume_2();
             }
             if(m == "finite_difference_2"){
-                return _solve_finite_difference_2();
+                // return _solve_finite_difference_2();
             }
             return 0;
         } else{
@@ -97,43 +100,34 @@ public:
     }
 protected:
     int _solve_finite_volume_2(){
-        FieldCenter&    phi  = *(this->_fields["phi"]);
-        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
-        auto expf     = this->new_field_exp();
+        FieldCenter& phi  = *(this->_fields["phi"]);
+        auto expf = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
         auto bis      = this->get_boundary_index("phi");
+        auto& fsource = *(this->_fields["source"]);
 
-        auto res = IntLaplacian((*expf), (*bis)) - IntVolume(*(this->_fields["source"]));
+        auto res = IntegralLaplacian((*expf), (*bis)) 
+                    - IntVolume(fsource);
 
-        // typename Domain::Index itest(0,9);
-        // std::cout << "res(" << itest << ") = " << res(itest) << std::endl;
-
-        Mat a;
-        Arr b;
-        BuildMatrix(res, a, b);
-        // prepare x
-        Arr x = phi.to_array();
-        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
-        phi.assign(x);
-        return any_cast<int>(this->_configs["solver_return_code"]);
+        return this->_build_mat_and_solve(res, phi);
     }
 
-    int _solve_finite_difference_2(){
-        FieldCenter&    phi  = *(this->_fields["phi"]);
-        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
-        auto expf     = this->new_field_exp();
-        auto bis      = this->get_boundary_index("phi");
+    // int _solve_finite_difference_2(){
+    //     FieldCenter&    phi  = *(this->_fields["phi"]);
+    //     auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
+    //     auto expf     = this->new_field_exp_zero();
+    //     auto bis      = this->get_boundary_index("phi");
 
-        auto res = Laplacian((*expf), (*bis)) - (*(this->_fields["source"]));
+    //     auto res = Laplacian((*expf), (*bis)) - (*(this->_fields["source"]));
 
-        Mat a;
-        Arr b;
-        BuildMatrix(res, a, b);
-        // prepare x
-        Arr x = phi.to_array();
-        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
-        phi.assign(x);
-        return any_cast<int>(this->_configs["solver_return_code"]);
-    }
+    //     Mat a;
+    //     Arr b;
+    //     BuildMatrix(res, a, b);
+    //     // prepare x
+    //     Arr x = phi.to_array();
+    //     this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+    //     phi.assign(x);
+    //     return any_cast<int>(this->_configs["solver_return_code"]);
+    // }
 };
 
 

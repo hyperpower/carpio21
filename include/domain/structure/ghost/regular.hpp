@@ -24,6 +24,7 @@ template<St DIM, class GRID>
 class SGhostRegular_ : public SGhost_<DIM, GRID>{
 public:
     typedef SIndex_<DIM> Index;
+    typedef typename DimTagTraits_<DIM>::Type DimTag;
     typedef GRID Grid;
     typedef std::shared_ptr<Grid> spGrid;
     typedef SGhostRegularTag Tag;
@@ -98,7 +99,14 @@ public:
             return false;
         }
     }
-
+    virtual bool is_boundary_face(
+            const Index& findex,
+            const St&    a) const{
+        ASSERT(a < DIM);
+        Idx idx = findex.value(a);
+        return (idx == 0) || (idx == _grid->n().value(a)); 
+    };
+    
     virtual bool is_cut(const Index& index) const{
         return false;
     }

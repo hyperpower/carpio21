@@ -34,6 +34,10 @@ public:
 		return _type;
 	}
 
+	Vt value() const {
+		return _value;
+	}
+	
 	Vt value(Vt, Vt, Vt, Vt) const {
 		return _value;
 	}

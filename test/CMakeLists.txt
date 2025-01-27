@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 3.10)
   # 'project(gtest)' above.
   include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
   include_directories(${PROJECT_SOURCE_DIR}/include)
+  include_directories(${PROJECT_SOURCE_DIR}/test)
   # find Google Benchmark 
   # find_package(benchmark REQUIRED)
   ##############

@@ -7,6 +7,8 @@
 
 namespace carpio {
 
+struct LinearPolynomialTag : public BaseTag{};
+
 template<class T>
 struct IsZero_ {
 	bool operator()(const T& number) const {
@@ -22,6 +24,7 @@ public:
 	typedef std::map<TERM, COE, COMPARE_TERM> Base;
 	typedef LinearPolynomial_<COE, TERM, IS_ZERO, COMPARE_TERM> Self;
 	typedef Self& ref_Self;
+	typedef LinearPolynomialTag Tag;
 
 	typedef typename Base::iterator iterator;
 

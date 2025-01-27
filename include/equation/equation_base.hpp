@@ -29,6 +29,7 @@ public:
     typedef typename Domain::Order       Order;
     typedef typename Domain::spOrder     spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
+    typedef typename Domain::FieldCenter FieldFace;
     typedef typename Domain::FieldCenterExp FieldCenterExp;
 
     typedef EquationBase_<D> Self;
@@ -40,11 +41,13 @@ public:
     typedef std::shared_ptr<EventCondition>spEventCondition;
 
     typedef std::shared_ptr<FieldCenter>    spFieldCenter;
+    typedef std::shared_ptr<FieldFace>      spFieldFace;
     typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
     typedef std::shared_ptr<BoundaryIndex> spBoundaryIndex;
 
     typedef std::map<std::string, Any>             Configures;
     typedef std::map<std::string, spFieldCenter>   Fields;
+    typedef std::map<std::string, spFieldFace>     FieldFaces;
     typedef std::map<std::string, spBoundaryIndex> BIs;
     typedef std::map<std::string, spEvent>         Events;
 
@@ -71,6 +74,7 @@ protected:
 
     Configures _configs;
     Fields     _fields;
+    FieldFaces _ffaces;
     BIs        _bis;
     Events     _events; 
 
@@ -214,6 +218,20 @@ public:
             throw std::invalid_argument( key + "is not fields" );
         }
     }
+    bool has_field_face(const std::string& key) const {
+        auto it = this->_ffaces.find(key);
+        if (it != this->_ffaces.end()) {
+            return true;
+        }
+        return false;
+    }
+    const FieldFace& field_face(const std::string& key) const{
+        if(this->has_field(key)){
+            return *(this->_ffaces.at(key));
+        }else{
+            throw std::invalid_argument( key + "is not fields" );
+        }
+    }
     bool has_config(const std::string& key) const {
         auto it = this->_configs.find(key);
         if (it != this->_configs.end()) {
@@ -299,11 +317,16 @@ protected:
         }
     }
 
-    spFieldCenterExp new_field_exp() const{
-        return spFieldCenterExp(new FieldCenterExp(
-                    this->_spgrid,
-                    this->_spghost,
-                    this->_sporder));
+    spFieldCenterExp new_field_exp_zero() const{
+        return Domain::NewspFieldCenterExpZero(
+            this->_spgrid,
+            this->_spghost,
+            this->_sporder 
+        );
+    }
+    spFieldCenterExp new_field_exp_coe_one() const{
+        return Domain::NewspFieldCenterExpCoeOne(
+                    this->_spgrid, this->_spghost, this->_sporder);
     }
 
     template<class Container>
@@ -338,6 +361,16 @@ protected:
             spsolver = spSolver(new Solver_Jacobi(500, 1e-7));
         }
         return spsolver;
+    }
+
+    virtual int _build_mat_and_solve(const FieldCenterExp& fexp, FieldCenter& fres){
+        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
+        Mat a;  Arr b;
+        BuildMatrix(fexp, a, b);
+        Arr x = fres.to_array();
+        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        fres.assign(x);
+        return any_cast<int>(this->_configs["solver_return_code"]);
     }
 };
 

@@ -16,7 +16,10 @@ class SVectorCenter_{
 public:
     static const St Dim = DIM;
 
-    typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Field;
+    typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Component;
+    typedef SVectorCenterTag Tag;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
+    typedef VT ValueType;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
@@ -28,10 +31,10 @@ public:
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SVectorCenter_<DIM, VT, GRID, GHOST, ORDER> Self;
-    typedef std::shared_ptr<Field> spField;
+    typedef std::shared_ptr<Component> spComponent;
 
 protected:
-    std::array<spField, DIM> _arrs;
+    std::array<spComponent, DIM> _arrs;
 public:
     SVectorCenter_() {
         FOR_EACH_DIM{
@@ -40,17 +43,35 @@ public:
     }
 
     SVectorCenter_(
-            spField u,
-            spField v = nullptr,
-            spField w = nullptr){
-        spField a[] = {u,v,w};
+            spComponent u,
+            spComponent v = nullptr,
+            spComponent w = nullptr){
+        spComponent a[] = {u,v,w};
         FOR_EACH_DIM{
             ASSERT(a[d] != nullptr);
             _arrs[d] = a[d];
         }
     }
+    ValueType& operator()(Axes a, 
+                   St i, St j = 0, St k = 0) {
+        ASSERT(a < DIM);
+        return (*_arrs[a])(i, j, k);
+    }
+    const ValueType& operator()(Axes a, 
+                   St i, St j = 0, St k = 0) const{
+        ASSERT(a < DIM);
+        return (*_arrs[a])(i, j, k);
+    }
+    ValueType& operator()(Axes a, const Index& index){
+        ASSERT(a < DIM);
+        return (*_arrs[a])(index);
+    }
 
-    void set(Axes a, spField sps){
+    const ValueType& operator()(Axes a, const Index& index) const{
+        ASSERT(a < DIM);
+        return (*_arrs[a])(index);
+    }
+    void set(Axes a, spComponent sps){
         ASSERT(a < DIM);
         _arrs[a] = sps;
     }
@@ -67,11 +88,11 @@ public:
         return _arrs[_X_]->ghost();
     }
 
-    Field& operator[](St d){
+    Component& operator[](St d){
         return *(_arrs[d]);
     }
 
-    const Field& operator[](St d) const{
+    const Component& operator[](St d) const{
         return *(_arrs[d]);
     }
 

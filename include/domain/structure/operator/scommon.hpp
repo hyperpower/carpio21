@@ -90,8 +90,33 @@ FIELD IntVolume(const FIELD& field, SFieldCenterTag){
     }
     return res;
 }
+// typedef std::function<void(const Index&)> FunIndex;
+template<class FIELD>
+void _ForEach(FIELD& field, 
+              std::function<void(
+                typename FIELD::Self&,
+                const typename FIELD::Index&)> fun,
+                SFieldCenterTag, SGridTag, SGhostRegularTag, SOrderXYZTag){
+    for(auto& idx : field.order()){
+        fun(field, idx);
+    }
+}
+template<typename FIELD>
+void ForEach(FIELD& field, 
+             std::function<
+                void(typename FIELD::Self&,
+                const typename FIELD::Index&)> fun){
+    typedef typename FIELD::Index Index;
+    typedef typename FIELD::Grid::Tag  GridTag;
+    typedef typename FIELD::Ghost::Tag  GhostTag;
+    typedef typename FIELD::Order::Tag  OrderTag;
+    typedef typename FIELD::Tag FieldTag;
+    _ForEach(field, fun, FieldTag(), GridTag(), GhostTag(), OrderTag()); 
+    // std::cout << "For Each" << std::endl;
+
 }
 
 
 
+} // end namespace
 #endif

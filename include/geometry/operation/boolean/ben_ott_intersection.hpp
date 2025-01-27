@@ -26,7 +26,7 @@ namespace carpio {
             // sst << "front font \", 18\" textcolor rgb \"#00A4EF\" offset first " 
                 // << nv.x() * ratio << ", " << nv.y() * ratio; 
             // gnu.set_label(index, seg.get_name(), seg.pc().x(), seg.pc().y(),  sst.str());
-            auto a1 = ToGnuplotActorAsVector(seg);
+            auto a1 = ToGnuplotActorVector(seg);
             // a1.title("Segment " + seg.get_name());
             a1.style("with vector head filled size screen 0.03,15,135 lw 3 lc rgb \"#B5B5B5\"");
             gnu.add(a);
@@ -41,13 +41,13 @@ namespace carpio {
                           const std::string& color_code = "#00A4EF"){
     int i = 0;
     if(sl.size() == 0 ){
-        auto a = ToGnuplotActorAsVector(Segment_<double, 2>(0,0,1,1));
+        auto a = ToGnuplotActorVector(Segment_<double, 2>(0,0,1,1));
         a.title(t + " n=" + ToString(sl.size()));
         a.style("with vector head filled size screen 0.03,10,155 lw 2 lc rgb \"" + color_code +"\"");
         gnu.add(a);
     }else{
         for(auto seg : sl){
-            auto a1 = ToGnuplotActorAsVector(*seg);
+            auto a1 = ToGnuplotActorVector(*seg);
             if(i == 0){
                 a1.title(t + " n=" + ToString(sl.size()));
             }
@@ -61,7 +61,7 @@ namespace carpio {
     void PlotpSegment(Gnuplot& gnu, 
                       const SEG* seg, 
                       const std::string& color_code = "#00A4EF"){
-        auto a1 = ToGnuplotActorAsVector(*seg);
+        auto a1 = ToGnuplotActorVector(*seg);
         a1.style("with vector head filled size screen 0.03,15,145 lw 3 lc rgb \"" + color_code +"\"");
         gnu.add(a1);
     }
@@ -625,7 +625,7 @@ protected:
         gnu.unset_label();
         int index = 1;
         for(auto seg : tree){
-            auto a1 = ToGnuplotActorAsVector(*seg);
+            auto a1 = ToGnuplotActorVector(*seg);
             std::string color_code = "#EA8982" ;
             a1.style("with vector head filled size screen 0.03,5,80 lw 2 lc rgb \"" + color_code +"\"");
             gnu.add(a1);

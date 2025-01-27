@@ -523,9 +523,9 @@ public:
     //opertator====================================
     ref_Self operator+=(const value_type& a);
     ref_Self operator-=(const value_type& a);
-    ref_Self operator*=(const value_type& a);
+    ref_Self operator*=(const V&);
     ref_Self operator/=(const value_type& a);
-    ref_Self operator+=(const Self& a);
+    // ref_Self operator+=(const Self& a);
     template<class VT2>
     ref_Self operator+=(const ArrayListV_<VT2>& a){
         ASSERT(this->size() == a.size());
@@ -544,9 +544,14 @@ public:
 	    MultiplyEqual(this->size(), this->m_p, a.data());
         return *this;
     }
-    ref_Self operator-=(const Self& a);
-    ref_Self operator*=(const Self& a);
-    ref_Self operator/=(const Self& a);
+    template<class VT2>
+    ref_Self operator*=(const VT2& a){
+	    MultiplyEqual(this->size(), this->m_p, a);
+        return *this;
+    }
+    ref_Self operator-=(const Self&);
+    // ref_Self operator*=(const ArrayListV_<V>&);
+    ref_Self operator/=(const Self&);
 
         Self operator-() const;
         Self operator*(const Self &a);
@@ -634,7 +639,7 @@ void ArrayListV_<V>::reconstruct(size_type Len) {
     if (Len == 0 && this->m_Len == 0) {
         return;
     }
-    if (Len == 0 && NULL != this->m_p) {
+    if (Len == 0 && nullptr != this->m_p) {
         delete[] this->m_p;
         return;
     }
@@ -883,24 +888,24 @@ ArrayListV_<V>& ArrayListV_<V>::operator/=(const V &a) {
 	DivideEqual(this->size(), this->m_p, a);
     return *this;
 }
-template<typename V>
-ArrayListV_<V>& ArrayListV_<V>::operator+=(const ArrayListV_<V> &a) {
-	ASSERT(this->size() == a.size());
-	AddEqual(this->size(), this->m_p, a.m_p);
-    return *this;
-}
+// template<typename V>
+// ArrayListV_<V>& ArrayListV_<V>::operator+=(const ArrayListV_<V> &a) {
+// 	ASSERT(this->size() == a.size());
+// 	AddEqual(this->size(), this->m_p, a.m_p);
+//     return *this;
+// }
 template<typename V>
 ArrayListV_<V>& ArrayListV_<V>::operator-=(const ArrayListV_<V> &a) {
 	ASSERT(this->size() == a.size());
 	MinusEqual(this->size(), this->m_p, a.m_p);
     return *this;
 }
-template<typename V>
-ArrayListV_<V>& ArrayListV_<V>::operator*=(const ArrayListV_<V> &a) {
-	ASSERT(this->size() == a.size());
-	MultiplyEqual(this->size(), this->m_p, a.m_p);
-    return *this;
-}
+// template<typename V>
+// ArrayListV_<V>& ArrayListV_<V>::operator*=(const ArrayListV_<V> &a) {
+// 	ASSERT(this->size() == a.size());
+// 	MultiplyEqual(this->size(), this->m_p, a.m_p);
+//     return *this;
+// }
 template<typename V>
 ArrayListV_<V>& ArrayListV_<V>::operator/=(const ArrayListV_<V> &a) {
 	ASSERT(this->size() == a.size());

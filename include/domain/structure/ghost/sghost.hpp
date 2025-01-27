@@ -11,6 +11,7 @@ template<St DIM, class GRID>
 class SGhost_{
 public:
     static const St Dim = DIM;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
     
     typedef SIndex_<Dim> Index;
     typedef GRID         Grid;
@@ -47,6 +48,11 @@ public:
             const Index& index,
             const St&    a,
             const St&    o) const{
+        return false;
+    };
+    virtual bool is_boundary_face(
+            const Index& findex,
+            const St&    a) const{
         return false;
     };
     virtual bool is_cut(

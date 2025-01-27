@@ -3,6 +3,9 @@ import sys
 import time
 
 FILE_ORIGINAL = [
+    "dim1.h",
+    "dim2.h",
+    "dim3.h",
     "main.cpp",
     "CMakeLists.txt",
     # "plot.py",

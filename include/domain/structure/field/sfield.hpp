@@ -26,18 +26,19 @@ public:
     typedef typename GHOST::Tag GhostTag;
     typedef typename ORDER::Tag OrderTag;
     
+    typedef VT    ValueType;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
-    typedef VT    ValueType;
+    typedef std::shared_ptr<Grid>  spGrid;
+    typedef std::shared_ptr<Ghost> spGhost;
+    typedef std::shared_ptr<Order> spOrder;
     typedef FieldBase_<Dim, VT, GRID, GHOST, ORDER> Base;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
 
-
-    typedef std::shared_ptr<Grid>  spGrid;
-    typedef std::shared_ptr<Ghost> spGhost;
-    typedef std::shared_ptr<Order> spOrder;
+    typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef typename _DataInit::ValueTag ValueTag;
 
     typedef ArrayListV_<ValueType> Arr; 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
@@ -96,11 +97,11 @@ public:
     // ===========================================
     // arithmatic operator
     // ===========================================
-    // Self operator-() const{
-    //     Self res(*this);
-    //     res._arr = -(this->_arr);
-    //     return res;
-    // }
+    Self operator-() const{
+        Self res(*this);
+        res._arr = -(this->_arr);
+        return res;
+    }
 
     Self& operator+=(const Self& rhs){
         // actual addition of rhs to *this
@@ -115,13 +116,13 @@ public:
         return *this;
     }
 
-    Self& operator+=(const Vt& rhs){
+    Self& operator+=(const VT& rhs){
         _arr += rhs;
         return *this;
     }
 
     Self& operator-=(const Self& rhs) {
-        ASSERT(is_compatible(rhs));
+        ASSERT(this->is_compatible(rhs));
         _arr -= rhs._arr;
         return *this;
     }
@@ -131,7 +132,7 @@ public:
         _arr -= rhs.data();
         return *this;
     }
-    Self& operator-=(const Vt& rhs) {
+    Self& operator-=(const VT& rhs) {
         _arr -= rhs;
         return *this;
     }
@@ -152,20 +153,35 @@ public:
         _arr *= rhs.data();
         return *this;
     }
+
+    
     Self& operator/=(const Self& rhs) {
         ASSERT(this->is_compatible(rhs));
         _arr /= rhs._arr;
         return *this;
     }
 
-    Self& operator/=(const Vt& rhs) {
+    Self& operator/=(const VT& rhs) {
         _arr /= rhs;
         return *this;
+    }
+
+    Vt max() const {
+        return this->_arr.max();
+    }
+    Vt min() const {
+        return this->_arr.min();
     }
 
     SField_():Base(){}
 
     ~SField_(){}
+
+protected:
+    // template<class SELF, class OTHER>
+    // void _multiply_equal(SELF& self, const OTHER& other){
+    //     typedef 
+    // }
 };
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
@@ -219,30 +235,6 @@ inline SField_<DIM, VT, GRID, GHOST, ORDER> operator-(
 }
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SField_<DIM, VT, GRID, GHOST, ORDER> operator*(
-          SField_<DIM, VT, GRID, GHOST, ORDER> lhs, 
-    const SField_<DIM, VT, GRID, GHOST, ORDER>& rhs){
-    lhs *= rhs;
-      return lhs;
-}
-
-template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SField_<DIM, VT, GRID, GHOST, ORDER> operator*(
-        SField_<DIM, VT, GRID, GHOST, ORDER> lhs,
-        const Vt& rhs){
-    lhs *= rhs;
-    return lhs;
-}
-
-template<St DIM, class VT, class GRID, class GHOST, class ORDER>
-inline SField_<DIM, VT, GRID, GHOST, ORDER> operator*(
-        const Vt& lhs, 
-        SField_<DIM, VT, GRID, GHOST, ORDER> rhs){
-    rhs *= lhs;
-    return rhs;
-}
-
-template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 inline SField_<DIM, VT, GRID, GHOST, ORDER> operator/(
           SField_<DIM, VT, GRID, GHOST, ORDER> lhs, 
     const SField_<DIM, VT, GRID, GHOST, ORDER>& rhs){
@@ -273,7 +265,7 @@ inline SField_<DIM, VT, GRID, GHOST, ORDER> operator/(
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 SField_<DIM, VT, GRID, GHOST, ORDER> Square(
     const SField_<DIM, VT, GRID, GHOST, ORDER>& a){
-    auto res = a.new_compatible();
+    auto res = a.new_compatible_zero();
 
     for(auto& idx : res.order()){
         auto va = a(idx);
@@ -289,7 +281,7 @@ SField_<DIM, VT, GRID, GHOST, ORDER> SquareSum(
     const SField_<DIM, VT, GRID, GHOST, ORDER>& a, 
     const SField_<DIM, VT, GRID, GHOST, ORDER>& b){
     ASSERT(a.is_compatible(b));
-    auto res = a.new_compatible();
+    auto res = a.new_compatible_zero();
 
     for(auto& idx : res.order()){
         auto va = a(idx);
@@ -306,7 +298,7 @@ SField_<DIM, VT, GRID, GHOST, ORDER> SquareSum(
                        const SField_<DIM, VT, GRID, GHOST, ORDER>& c){
     ASSERT(a.is_compatible(b));
     ASSERT(a.is_compatible(c));
-    auto res = a.new_compatible();
+    auto res = a.new_compatible_zero();
 
     for(auto& idx : res.order()){
         auto va = a(idx);
@@ -319,7 +311,7 @@ SField_<DIM, VT, GRID, GHOST, ORDER> SquareSum(
 
 template<St DIM, class VT, class GRID, class GHOST, class ORDER>
 SField_<DIM, VT, GRID, GHOST, ORDER> Sqrt(const SField_<DIM, VT, GRID, GHOST, ORDER>& a){
-    auto res = a.new_compatible();
+    auto res = a.new_compatible_zero();
 
     for(auto& idx : res.order()){
         auto va = a(idx);

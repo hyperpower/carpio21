@@ -39,7 +39,56 @@ public:
     virtual ~OrderBase_(){};
 };
 
+template<St DIM, 
+         class VT,
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_{
+public:
+    static void InitAValue(){
+        std::cout << "Abstract" << std::endl;
+    }
+};
+
+template<St DIM, 
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_<DIM, Vt, GRID, GHOST, ORDER>{
+public:
+    typedef typename GRID::Index  Index;
+    typedef ArithmeticTag ValueTag;
+
+    static Vt InitAValue(const Index&){
+        return 0.0;
+    }
+    static Vt InitCoeOne(const Index&){
+        return 1.0;
+    }
+};
+
+template<St DIM, 
+         class GRID, 
+         class GHOST, 
+         class ORDER>
+class _DataInitial_<DIM, 
+                    LinearPolynomial_<Vt, typename GRID::Index>,
+                    GRID, GHOST, ORDER>{
+public:
+    typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
+    typedef LinearPolynomialTag ValueTag;
+    typedef typename GRID::Index  Index;
+    static Poly InitAValue(const Index& index){
+        return Poly();
+    }
+    static Vt InitCoeOne(const Index& index){
+        return Poly(index);
+    }
+};
+
 struct FieldBaseTag{};
+
 template<St DIM, 
          class VT, 
          class GRID, 
@@ -64,7 +113,9 @@ public:
     typedef const std::shared_ptr<Grid>  spcGrid;
     typedef const std::shared_ptr<Ghost> spcGhost;
     typedef const std::shared_ptr<Order> spcOrder;
-
+    
+    typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef typename _DataInit::ValueTag ValueTag;
 protected:
     spGrid  _spgrid;
     spGhost _spghost;
@@ -126,53 +177,28 @@ public:
     
 };
 
-#define DEF_FIELD_TAG(FIELD_TYPE)     \
-    typedef typename FIELD_TYPE::Tag      FieldTag; \
+#define EXPAND_FIELD_TAG(FIELD_TYPE)     \
+    typedef typename FIELD_TYPE::Tag      Tag; \
     typedef typename FIELD_TYPE::DimTag   DimTag; \
     typedef typename FIELD_TYPE::GridTag  GridTag; \
     typedef typename FIELD_TYPE::GhostTag GhostTag; \
     typedef typename FIELD_TYPE::OrderTag OrderTag; \
-    typedef typename FIELD_TYPE::DimTag   DimTag;
+    typedef typename FIELD_TYPE::DimTag   DimTag; \
+    typedef typename FIELD_TYPE::ValueTag ValueTag;
 
-template<St DIM, 
-         class VT,
-         class GRID, 
-         class GHOST, 
-         class ORDER>
-class _DataInitial_{
-public:
-    static void InitAValue(){
-        std::cout << "Abstract" << std::endl;
-    }
-};
+#define EXPAND_FIELD(FIELD_TYPE)     \
+    typedef typename FIELD_TYPE::Self  Field; \
+    typedef typename FIELD_TYPE::Index Index; \
+    typedef typename FIELD_TYPE::ValueType ValueType; \
+    typedef typename FIELD_TYPE::Grid  Grid; \
+    typedef typename FIELD_TYPE::Ghost Ghost; \
+    typedef typename FIELD_TYPE::Order Order; \
+    typedef typename FIELD_TYPE::spGrid  spGrid; \
+    typedef typename FIELD_TYPE::spGhost spGhost; \
+    typedef typename FIELD_TYPE::spOrder spOrder; 
 
-template<St DIM, 
-         class GRID, 
-         class GHOST, 
-         class ORDER>
-class _DataInitial_<DIM, Vt, GRID, GHOST, ORDER>{
-public:
-    typedef typename GRID::Index  Index;
 
-    static Vt InitAValue(const Index&){
-        return 0.0;
-    }
-};
 
-template<St DIM, 
-         class GRID, 
-         class GHOST, 
-         class ORDER>
-class _DataInitial_<DIM, 
-                    LinearPolynomial_<Vt, typename GRID::Index>,
-                    GRID, GHOST, ORDER>{
-public:
-    typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
-    typedef typename GRID::Index  Index;
-    static Poly InitAValue(const Index& index){
-        return Poly();
-    }
-};
 
 
 

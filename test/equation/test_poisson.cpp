@@ -5,15 +5,33 @@
 #include "domain/structure/io/splotly_actor.hpp"
 #include "gtest/gtest.h"
 
+#include "equation/poisson/laplace.hpp"
+#include "equation/poisson/poisson.hpp"
+#include "equation/equation.hpp"
+#include "equation/event/event.hpp"
+
 using namespace carpio;
 
 const std::string OUTPUTPATH = "./fig/";
 const int fig_width  = 800;
 const int fig_height = 600;
 
+const std::size_t dim = 2;
+typedef SGridUniform_<dim> Grid;
+typedef std::shared_ptr<Grid> spGrid;
 
-TEST(equation, explicit_run){
-    std::cout << "[  Laplace ] Test"<<std::endl;
+typedef SGhostRegular_<dim, Grid> Ghost;
+typedef std::shared_ptr<Ghost> spGhost;
+
+typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+typedef std::shared_ptr<Order> spOrder;
+
+typedef Point_<double,dim> Point;
+
+typedef SFieldCenter_<dim, double, Grid, Ghost, Order> Field;
+
+TEST(equation, DISABLED_explicit_run){
+    std::cout << "[  Poisson ] Test"<<std::endl;
     const int dim = 2;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;
     typedef Point_<double,dim> Point;
@@ -30,7 +48,6 @@ TEST(equation, explicit_run){
 
     typedef StructureDomain_<dim, Grid, Ghost, Order> Domain;
 
-    typedef Laplace_<Domain> Laplace;
     typedef Poisson_<Domain> Poisson;
 
     // Define the equation
@@ -55,8 +72,7 @@ TEST(equation, explicit_run){
     // Set solver
     equ.set_solver("Jacobi", 1000, 1e-4);
 
-    equ.set_space_scheme("finite_difference_2");
-
+    equ.set_space_scheme("finite_volume_2");
 
     // Add events
     typedef Event_<Domain> Event;
@@ -84,7 +100,7 @@ TEST(equation, explicit_run){
     egs.gnuplot().set_cbrange(0.0, 1.0);
     egs.gnuplot().set_palette_blue_red();
     egs.set_path("./fig/");
-    equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
+    // equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
 
     equ.run();
 
@@ -100,6 +116,88 @@ TEST(equation, explicit_run){
 	gnu.plot();
 
 
+}
+
+void PoissonSolver(int n, 
+                   std::list<double>& l1, 
+                   std::list<double>& l2, 
+                   std::list<double>& li,
+                   std::list<std::list<double> >& lr){
+    std::cout << "[  Poisson ] Solver"<<std::endl;
+    std::cout << "[   INFO   ] Dim = " << dim << std::endl;
+    std::cout << "[   INFO   ] n   = " << n << std::endl;
+    Point p(0,0,0);
+
+    spGrid  spgrid(new Grid(p, n, 1, 2));
+    spGhost spghost(new Ghost(spgrid));
+    spOrder sporder(new Order(spgrid, spghost));
+
+    typedef StructureDomain_<dim, Grid, Ghost, Order> Domain;
+    typedef Poisson_<Domain> Poisson;
+
+    // Define the equation
+    Poisson equ(spgrid, spghost, sporder);
+
+    // Set boundary condition
+	typedef std::shared_ptr<BoundaryIndex> spBI;
+	typedef BoundaryCondition BC;
+	typedef std::shared_ptr<BoundaryCondition> spBC;
+	spBI spbi(new BoundaryIndex());
+	spBC spbcp(new BoundaryConditionValue(BC::_BC3_, 0.0));
+	spbi->insert(0, spbcp);
+	spbi->insert(1, spbcp);
+	spbi->insert(2, spbcp);
+	spbi->insert(3, spbcp);
+	equ.set_boundary_index("phi", spbi);
+
+    // Set solver
+	equ.set_solver("Jacobi", 400, 1e-12);
+
+    // Set source
+    equ.set_source([](typename Domain::ValueType x,
+                      typename Domain::ValueType y,
+                      typename Domain::ValueType z){
+                        return  -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+                      });
+    // Add events
+	typedef Event_<Domain> Event;
+	typedef std::shared_ptr<Event>  spEvent;
+	spEvent spetime(new EventOutputTime_<Domain>(std::cout,
+		                                          -1, -1, 1, Event::START | Event::END));
+	equ.add_event("OutputTime", spetime);
+
+    equ.run();
+    
+    // PlotFieldAsContour("Poisson_SolutionContour" + ToString(n), equ.field("phi"));
+
+    //residual 
+    auto spsolver = equ.get_solver();
+    lr.push_back(spsolver->get_residual_array());
+
+    // error
+    auto exact = equ.field("phi").new_compatible_zero();
+    exact.assign([](typename Field::ValueType x,
+                    typename Field::ValueType y,
+                    typename Field::ValueType z,
+                double t){
+        return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
+    });
+    auto error = exact - equ.field("phi");
+    
+    // PlotFieldAsContour("Poisson_ErrorContour"+ ToString(n), error);
+
+    l1.push_back(Norm1(error));
+    l2.push_back(Norm2(error));
+    li.push_back(NormInf(error));
+}
+
+TEST(possion, periodic){
+    std::vector<int> vn = {10};
+    std::list<double> l1,l2,li;
+    std::list<std::list<double> > lr;
+    for(auto& n : vn){
+        PoissonSolver(n, l1, l2, li, lr);
+    }
 }
 
 TEST(equation, DISABLED_explicit_3d){

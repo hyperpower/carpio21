@@ -10,6 +10,13 @@
 namespace carpio{
 
 // template<class D> class EquationBase_;
+// struct EventFlag
+// {
+//     static const int START  = 0x10;
+//     static const int END    = 0x20;
+//     static const int BEFORE = 0x100;
+//     static const int AFTER  = 0x200;
+// };
 
 template<class D>
 class Event_ {
@@ -22,16 +29,19 @@ public:
     typedef D Domain;
     typedef EquationBase_<D> EquationBase;
     
-
-    static const int START  = 0x10;
-    static const int END    = 0x20;
-    static const int BEFORE = 0x100;
-    static const int AFTER  = 0x200;
+    static constexpr int START  = 0x10;
+    static constexpr int END    = 0x20;
+    static constexpr int BEFORE = 0x100;
+    static constexpr int AFTER  = 0x200;
 
 protected:
 
     int _flag;
     int _istart, _iend, _istep;
+
+    std::list<St>  _lstep;
+    std::list<Vt>  _lt;
+    std::list<int> _lfob;
 
 public:
     /**
@@ -46,11 +56,17 @@ public:
         _iend   = ie;
         _istep  = istep;
     }
-    
 
     virtual int execute(St step, Vt t, int fob, EquationBase& equ) {
+        this->record_execute_info(step, t, fob);
         std::cout << "Event : execute equ\n";
         return -1;
+    }
+
+    void record_execute_info(St step, Vt t, int fob){
+        this->_lstep.push_back(step);
+        this->_lt.push_back(t);
+        this->_lfob.push_back(fob);
     }
 
     virtual int flag() const {
@@ -108,7 +124,7 @@ public:
     }
 
     bool has_flag(int f) const {
-        return (_flag | f) == _flag ? true : false;
+        return (this->_flag | f) == this->_flag ? true : false;
     }
 
     virtual bool is_condition_event() const{
@@ -118,6 +134,16 @@ public:
     virtual void show() const{
         std::cout << "Event Base Show" << std::endl;
     }
+
+    const std::list<Vt>& get_list_time() const{
+        return this->_lt;
+    } 
+    const std::list<Vt>& get_list_step() const{
+        return this->_lstep;
+    } 
+    const std::list<Vt>& get_list_fob() const{
+        return this->_lfob;
+    } 
 };
 
 template<class D>

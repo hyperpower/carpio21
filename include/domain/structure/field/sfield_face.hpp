@@ -7,6 +7,10 @@ namespace carpio{
 
 struct SFieldFaceTag: public SFieldTag{};
 
+// ----x----|----x----|----x----|
+//    i-1        i        i+1       center index
+//          i        i+1       i+2  face   index
+
 template<St DIM, 
          class VT,
          class GRID, 
@@ -17,13 +21,13 @@ public:
     static const St Dim = DIM;
 
     typedef SFieldFaceTag Tag;
+    typedef SFieldFace_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef GRID  Grid;
     typedef GHOST Ghost;
     typedef ORDER Order;
     typedef VT    ValueType;
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Base;
-    typedef SFieldFace_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
 
     typedef std::shared_ptr<Grid>  spGrid;
@@ -33,6 +37,7 @@ public:
     typedef ArrayListV_<ValueType> Arr; 
 
     typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef typename _DataInit::ValueTag ValueTag;
 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
     typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;
@@ -84,13 +89,23 @@ public:
 
     ValueType& operator()(const Orientation& o, const Index& index) {
         auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
-        auto arr_idx = this->_sporder->get_order_face_idx(fidx, this->_axe);
+        auto arr_idx = this->_sporder->get_order_face_index(fidx, this->_axe);
         return this->_arr[arr_idx];
     }
 
     const ValueType& operator()(const Orientation& o, const Index& index) const {
         auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
-        auto arr_idx = this->_sporder->get_order_face_idx(fidx, this->_axe);
+        auto arr_idx = this->_sporder->get_order_face_index(fidx, this->_axe);
+        return this->_arr[arr_idx];
+    }
+    
+    ValueType& operator()(const Index& findex) {
+        auto arr_idx = this->_sporder->get_order_face_index(findex, this->_axe);
+        return this->_arr[arr_idx];
+    }
+
+    const ValueType& operator()(const Index& findex) const {
+        auto arr_idx = this->_sporder->get_order_face_index(findex, this->_axe);
         return this->_arr[arr_idx];
     }
 
@@ -188,7 +203,7 @@ public:
         }
     }
     // return a new scalar with compatible gird, ghost and order
-    Self new_compatible() const{
+    Self new_compatible_zero() const{
         Self res(this->_spgrid, this->_spghost, this->_sporder, this->_axe);
         return res;
     }
@@ -211,7 +226,7 @@ protected:
         // make data by order
         this->_arr.reconstruct(this->_sporder->size());
         for(auto& idx : (*(this->_sporder))){
-            auto arr_idx = this->_sporder->get_order_face_idx(idx, _axe);
+            auto arr_idx = this->_sporder->get_order_face_index(idx, _axe);
             this->_arr[arr_idx] = _DataInit::InitAValue(idx);
         }
     }

@@ -187,6 +187,10 @@ public:
         this->_set_cmd(this->_scmd, "lc", " rgb \"#B5B5B5\"");
         return *this;
     }
+    GnuplotActor& line_color_green(){
+        this->_set_cmd(this->_scmd, "lc", " rgb \"#81BC06ß\"");
+        return *this;
+    }
     GnuplotActor& line_color_pink(){
         this->_set_cmd(this->_scmd, "lc", " rgb \"#EA8982\"");
         return *this;
@@ -237,12 +241,13 @@ typedef std::shared_ptr<GnuplotActor> spGnuplotActor;
 
 class GnuplotActorGroup {
 public:
+    typedef GnuplotActor Actor;
     typedef std::shared_ptr<GnuplotActor> spActor;
-    typedef std::list<std::shared_ptr<GnuplotActor> > list_spActor;
-    typedef typename list_spActor::iterator  iterator;
-    typedef typename list_spActor::const_iterator  const_iterator;
+    typedef std::list<GnuplotActor> list_Actor;
+    typedef typename list_Actor::iterator  iterator;
+    typedef typename list_Actor::const_iterator  const_iterator;
 protected:
-    list_spActor _actors;
+    list_Actor _actors;
 public:
     GnuplotActorGroup(){
     }
@@ -259,6 +264,10 @@ public:
         this->_actors = other._actors;
         return *this;
     }
+
+    void push_back(const Actor& a){
+        this->_actors.push_back(a);
+    } 
 
     iterator begin(){
         return _actors.begin();
@@ -674,6 +683,18 @@ public:
         cmd(cmdstr.str());
         return *this;
     }
+    inline Gnuplot& set_label(
+            int tag,
+            const std::string & label,
+            const double& x, const double& y, const double& z,
+            const std::string &append = "") {
+        ASSERT(tag > 0);
+        std::ostringstream cmdstr;
+        cmdstr << "set label " << tag << " \"" << label << "\" at first " << x
+                << ", " << y << ", " << z << " " << append;
+        cmd(cmdstr.str());
+        return *this;
+    }
     inline Gnuplot& unset_label() {
         cmd("unset label");
         return *this;
@@ -952,12 +973,15 @@ public:
     /// turns on/off log scaling for the specified zaxis (logscale is set by default)
     Gnuplot& set_zlogscale(const double base = 10) {
         std::ostringstream cmdstr;
-
         cmdstr << "set logscale z " << base;
         cmd(cmdstr.str());
-
         return *this;
-
+    }
+    Gnuplot& set_xyplane(const double zvalue){
+        std::ostringstream cmdstr;
+        cmdstr << "set xyplane at " << zvalue;
+        cmd(cmdstr.str());
+        return *this;
     }
     /*
      *  plot
@@ -1204,7 +1228,7 @@ public:
     }
     Gnuplot& add(const GnuplotActorGroup& gag){
         for(auto& a : gag){
-            this->_actors.push_back(a);
+            this->_actors.push_back(std::make_shared<GnuplotActor>(a));
         }
         return *this;
     }
@@ -1305,8 +1329,8 @@ template<typename X,
     && IsContainer<X>::value,
     bool>::type = true>
 auto ToGnuplotActor(const X& x, 
-            const std::string &pcmd = "using 1:2 with lines title \"\"",
-            const std::string& scmd = ""){
+            const std::string &pcmd = "using 1:2 title \"\"",
+            const std::string& scmd = "with lines "){
     GnuplotActor actor;
     actor.command(pcmd);
     actor.style(scmd);
@@ -1322,6 +1346,25 @@ auto ToGnuplotActor(const X& x,
     return actor;
 }
 
+template<typename X, typename Y,
+    typename std::enable_if<
+       (! HasTag<X>::value)   //no tag
+    && (! HasTag<Y>::value)   //no tag
+    && std::is_arithmetic<X>::value
+    && std::is_arithmetic<Y>::value,
+    bool>::type = true>
+auto ToGnuplotActorLabel(
+        const X& x, const Y& y, const std::string& l, 
+        const std::string &pcmd = "using 1:2:3 title \"\" ",
+        const std::string& scmd = "with labels center textcolor lt -1"){
+    GnuplotActor actor;
+    actor.command(pcmd);
+    actor.style(scmd);
+    std::ostringstream sst;
+    sst << x << " " << y << " " << l;
+    actor.data().push_back(sst.str());
+    return actor;
+}
 
 }
 

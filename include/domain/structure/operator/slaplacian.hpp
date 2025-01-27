@@ -8,10 +8,10 @@
 #include "sapply_bc.hpp"
 
 namespace carpio{
+// deprecate all ------
 
 // -----------------------
 // Linear Poly 
-
 template<class FIELD, St DIM, class GRID, class GHOST, class ORDER>
 class IntLaplacianImplement_<
     FIELD, DIM, 
@@ -107,7 +107,7 @@ public:
     FIELD execute(const FIELD& phi, const BI& bi, const Vt& time = 0.0) const{
         // std::cout << "Laplace Vt " << std::endl;
         ApplyBC abc;
-        Field res        = phi.new_compatible();
+        Field res        = phi.new_compatible_zero();
         const Grid& grid = phi.grid();
         for (auto& idx : phi.order()) {
             std::array<Vt, DIM> arr;
@@ -119,8 +119,8 @@ public:
                 Index idxm = idx.m(d);
 
                 Vt dfdx_p, dfdx_m;
-                Vt phi_m = abc.value(phi, bi, idx, idxm, d, _M_, time);
-                Vt phi_p = abc.value(phi, bi, idx, idxp, d, _P_, time);
+                Vt phi_m = abc.value(phi, bi, idx, idxm, ToAxes(d), _M_, time);
+                Vt phi_p = abc.value(phi, bi, idx, idxp, ToAxes(d), _P_, time);
                 dfdx_m = (phi(idx) - phi_m)
                         / (grid.c_(d, idx) - grid.c_(d, idxm));
                 dfdx_p = (phi_p - phi(idx))
@@ -234,7 +234,7 @@ public:
     FIELD execute(const FIELD& phi, const BI& bi, const Vt& time = 0.0) const{
         // std::cout << "Laplace Vt " << std::endl;
         ApplyBC abc;
-        Field res        = phi.new_compatible();
+        Field res        = phi.new_compatible_zero();
         const Grid& grid = phi.grid();
         for (auto& idx : phi.order()) {
             std::array<Vt, DIM> arr;
@@ -381,23 +381,23 @@ public:
     }
 
 protected:
-    ValueType _L2OnD(const Index &idxc, 
-                     const FIELD &phi, 
-                     const BI &bi, 
-                     const Vt time = 0.0) const{
-        ApplyBC abc;
-        Index idxp = idxc.p(d);
-        Index idxm = idxc.m(d);
-        const Vt h = phi.grid().s();   // cell size
+    // ValueType _L2OnD(const Index &idxc, 
+    //                  const FIELD &phi, 
+    //                  const BI &bi, 
+    //                  const Vt time = 0.0) const{
+    //     ApplyBC abc;
+    //     Index idxp = idxc.p(d);
+    //     Index idxm = idxc.m(d);
+    //     const Vt h = phi.grid().s();   // cell size
 
-        Vt dfdx_p, dfdx_m;
-        Vt phi_m = abc.value(phi, bi, idx, idxm, d, _M_, time);
-        Vt phi_p = abc.value(phi, bi, idx, idxp, d, _P_, time);
+    //     Vt dfdx_p, dfdx_m;
+    //     Vt phi_m = abc.value(phi, bi, idx, idxm, d, _M_, time);
+    //     Vt phi_p = abc.value(phi, bi, idx, idxp, d, _P_, time);
 
-        dfdx_m = (phi(idx) - phi_m) / h;
-        dfdx_p = (phi_p - phi(idx)) / h;
-        return (dfdx_p - dfdx_m) / h;
-    }
+    //     dfdx_m = (phi(idx) - phi_m) / h;
+    //     dfdx_p = (phi_p - phi(idx)) / h;
+    //     return (dfdx_p - dfdx_m) / h;
+    // }
 };
 }
 

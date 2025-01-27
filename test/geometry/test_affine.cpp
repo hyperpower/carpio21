@@ -142,12 +142,12 @@ auto AddActorsTransformed(Gnuplot& gnu, const PointChain& box, const PointChain&
 
 auto AddAxes(Gnuplot& gnu){
     gnu.set_label(1, "x",  0.45, -0.08, "textcolor rgb \"#00A4EF\"");
-    auto actor_x = ToGnuplotActorAsVector(Seg2(Point2(0.0,0.0), Point2(0.5,0.0)));
+    auto actor_x = ToGnuplotActorVector(Seg2(Point2(0.0,0.0), Point2(0.5,0.0)));
     actor_x.style("with vectors lt 1 lw 3 lc rgb \"#00A4EF\"");
     gnu.add(actor_x);
 
     gnu.set_label(2, "y", -0.08, 0.45, "textcolor rgb \"#F25022\"");
-    auto actor_y = ToGnuplotActorAsVector(Seg2(Point2(0.0,0.0), Point2(0.0,0.5)));
+    auto actor_y = ToGnuplotActorVector(Seg2(Point2(0.0,0.0), Point2(0.0,0.5)));
     actor_y.style("with vectors lt 1 lw 3 lc rgb \"#F25022\"");
     gnu.add(actor_y);
 }

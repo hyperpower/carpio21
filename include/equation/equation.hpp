@@ -9,6 +9,7 @@
 #include "event/event.hpp"
 #include "event/output_time.hpp"
 #include "event/gnuplot_field.hpp"
+#include "event/error_norm.hpp"
 
 namespace carpio {
 

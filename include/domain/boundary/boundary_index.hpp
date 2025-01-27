@@ -11,9 +11,7 @@
 namespace carpio{
 
 class BoundaryIndex {
-
 public:
-
 	typedef BoundaryCondition BC;
 	typedef std::shared_ptr<BoundaryCondition> spBC;
 	typedef std::shared_ptr<const BoundaryCondition> spcBC;
@@ -78,7 +76,8 @@ public:
 		std::cout << "BI: ---->\n";
 		for (auto term : this->_BCmap) {
 			std::cout << "idx " <<term.first;
-			std::cout << " - type " << term.second->type() << "\n";
+			std::cout << " -> type = " << term.second->type();
+			std::cout << " -> value = " << term.second->value() << std::endl;
 		}
 		std::cout << "<--------\n";
 	}
