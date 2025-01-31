@@ -42,7 +42,7 @@ FIELD _UdotNablaFOU(const VECTORF& U, const FIELD& phi,
 
         for(auto& d : ArrAxes<Field::Dim>()) {
             arr[d] = _FOULocalOneAxe(idx, d, U, phi, bi, t,
-                                     ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
         }
 
         ValueType sum = 0;

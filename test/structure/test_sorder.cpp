@@ -1,16 +1,24 @@
 #include "gtest/gtest.h"
+#include "test_define.hpp"
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/ghost/regular.hpp"
 #include "domain/structure/order/xyz.hpp"
 #include "domain/structure/io/sgnuplot_actor.hpp"
 
+
+
 using namespace carpio;
 
-const std::string OUTPUTPATH = "./fig/";
+// const std::string OUTPUTPATH = "./fig/";
 
-const int fig_width  = 900;
-const int fig_height = 900;
+// const int fig_width  = 900;
+// const int fig_height = 900;
 
+TEST(order, a_test){
+    if(TestDir() == false){
+        std::abort();
+    }
+}
 TEST(order, initial){
 	typedef SGridUniform_<2> Grid;
 	typedef std::shared_ptr<Grid> spGrid;
@@ -60,7 +68,7 @@ TEST(order, plot_order){
 	// typedef SGnuplotActor_<2> GA;
 	Gnuplot gnu;
 	gnu.set_equal_aspect_ratio();
-    gnu.set_terminal_png(OUTPUTPATH + "GridOrder", fig_width, fig_height);
+    gnu.set_terminal_png(FIG_PATH + "GridOrder", fig_width, fig_height);
 	gnu.set_xrange(-0.2, 1.7);
 	gnu.set_yrange(-0.2, 1.7);
 	gnu.add(ToGnuplotActorWireFrame(*spgrid));

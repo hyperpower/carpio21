@@ -316,6 +316,14 @@ protected:
                     this->_sporder));
         }
     }
+    void new_field_face(const std::string& name, Axes a){
+        if(!(this->has_field_face(name))){
+            this->_fields[name] = spFieldFace(new FieldFace(
+                    this->_spgrid,
+                    this->_spghost,
+                    a));
+        }
+    }
 
     spFieldCenterExp new_field_exp_zero() const{
         return Domain::NewspFieldCenterExpZero(

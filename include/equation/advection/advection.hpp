@@ -42,8 +42,9 @@ template<class D>
 class Advection_: public EquationBase_<D>{
 public:
     typedef D Domain;
-    typedef Advection_<D>             Self;
+    typedef Advection_<D>           Self;
     typedef EquationBase_<D>        Base;
+    static const St Dim = D::Dim; 
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
     typedef typename Domain::Grid        Grid;
@@ -56,6 +57,10 @@ public:
     typedef typename Domain::spFieldCenter spFieldCenter;
     typedef typename Domain::FieldCenterExp     FieldCenterExp;
     typedef typename Domain::spFieldCenterExp spFieldCenterExp;
+    typedef typename Domain::VectorCenter       VectorCenter;
+    typedef typename Domain::spVectorCenter   spVectorCenter;
+    typedef typename Domain::VectorFace       VectorFace;
+    typedef typename Domain::spVectorFace   spVectorFace;
 
     typedef MatrixSCR_<Vt>    Mat;
     typedef ArrayListV_<Vt>   Arr;
@@ -65,16 +70,35 @@ public:
     typedef Jacobi_<Vt> Solver_Jacobi;
     typedef SOR_<Vt>    Solver_SOR;
     typedef CG_<Vt>     Solver_CG;
+protected:
+    VectorCenter _vc;
+    VectorFace   _vf;
 public:
     Advection_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
             this->new_field("phi");
     }
 
+    int run_one_step(St step, Vt time){};
 
+    int initialize(){}; 
 
+    int finalize(){}; 
 
+    int solve(){};
 
+protected:
+    void _new_uvw(){
+		std::vector<std::string> vname = {"u", "v", "w"};
+		for(St d = 0; d< Dim; ++d){
+			this->new_field(vname[d]);
+			_vc.set(ToAxes(d), this->_fields[vname[d]]);
+		}
+		for(St d = 0; d< Dim; ++d){
+			this->new_field_face(vname[d]);
+			_vf.set(ToAxes(d), this->_ffaces[vname[d]]);
+		}     
+	}
 
 };
 

@@ -4,8 +4,9 @@ set(This Equation)
 
 set(Sources
     # test_equation_base.cpp
-    test_poisson.cpp
+    # test_poisson.cpp
     # test_laplacian.cpp
+    test_advection.cpp
 )
 
 add_executable(${This} ${Sources})

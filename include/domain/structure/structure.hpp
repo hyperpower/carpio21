@@ -47,6 +47,7 @@ public:
     typedef SFieldCenter_<Dim, ValueType, Grid, Ghost, Order> FieldCenter;
     typedef SFieldFace_<Dim, ValueType, Grid, Ghost, Order> FieldFace;
     typedef SVectorCenter_<Dim, ValueType, Grid, Ghost, Order> VectorCenter;
+    typedef SVectorFace_<Dim, ValueType, Grid, Ghost, Order> VectorFace;
     typedef LinearPolynomial_<Vt, typename GRID::Index> Exp;
     typedef Exp    ExpType;
     typedef SFieldCenter_<Dim, Exp, Grid, Ghost, Order> FieldCenterExp;
@@ -57,8 +58,10 @@ public:
     typedef std::shared_ptr<Order> spOrder;
 
     typedef std::shared_ptr<FieldCenter>    spFieldCenter;
+    typedef std::shared_ptr<VectorCenter>   spVectorCenter;
     typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
     typedef std::shared_ptr<FieldFace>      spFieldFace;
+    typedef std::shared_ptr<VectorFace>     spVectorFace;
     typedef std::shared_ptr<FieldFaceExp>   spFieldFaceExp;
 
     typedef StructureDomain_<DIM, Grid, Ghost, Order> Self;

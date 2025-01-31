@@ -472,6 +472,13 @@ GnuplotActor _ToGnuplotActorVectors(const ANY& ff, Vt unit_length,
     return _ToGnuplotActorVectors(ff, unit_length, Tag(), DimTag());  
 }
 template<class ANY>
+GnuplotActor _ToGnuplotActorVectors(const ANY& fc, Vt unit_length, 
+        SFieldCenterTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorVectors(fc, unit_length, Tag(), DimTag());  
+}
+template<class ANY>
 auto _ToGnuplotActorVectors(const ANY& vector_face, Vt unit_length, 
         SVectorFaceTag){
     typedef typename ANY::Tag Tag;
@@ -481,24 +488,29 @@ auto _ToGnuplotActorVectors(const ANY& vector_face, Vt unit_length,
 template<class ANY>
 GnuplotActor _ToGnuplotActorVectors(const ANY& vc, Vt unit_length, 
         SVectorCenterTag, Dim1Tag){
+    return _ToGnuplotActorVectors(vc[_X_], unit_length, SFieldCenterTag(), Dim1Tag());
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorVectors(const ANY& fc, Vt unit_length, 
+        SFieldCenterTag, Dim1Tag){
     GnuplotActor actor;
     actor.command("using 1:2:3:4:5 title \"\" ");
     actor.style("with vectors lw 2 lc palette head filled");
     if (unit_length <= 0){
-        unit_length = vc[_X_].max() * 2.0;
+        unit_length = fc.max() * 2.0;
     }
-    auto gmin_size = vc.grid().min_size();
+    auto gmin_size = fc.grid().min_size();
 
-    for (auto &index : vc.order()){
-        auto x = vc.grid().c_(_X_, index);
+    for (auto &index : fc.order()){
+        auto x = fc.grid().c_(_X_, index);
         Vt   y = 0.0;
-        auto v = vc[_X_](index);
+        auto v = fc(index);
         auto dx = v / unit_length * gmin_size;
         Vt   dy = 0.0;
         
         actor.data().push_back(ToString(x, y, dx, dy, v, " "));
     }
-    return actor;
+    return actor;    
 }
 template<class ANY>
 GnuplotActor _ToGnuplotActorVectors(const ANY& vc, Vt unit_length, 
@@ -576,7 +588,7 @@ auto _ToGnuplotActorVectors(const ANY& vf, Vt unit_length,
    GnuplotActorGroup gag;
     for(auto& spface: vf){
         auto& field_face = *spface;
-        auto a = _ToGnuplotActorPointContour(field_face, SFieldFaceTag());
+        auto a = _ToGnuplotActorVectors(field_face, SFieldFaceTag());
         gag.push_back(a);
     }
     return gag;     

@@ -12,7 +12,6 @@
 
 namespace carpio{
 
-
 template<class CONTAINER>
 auto IntersectN2(const CONTAINER& con, SegmentTag){
     typedef typename CONTAINER::value_type Seg;

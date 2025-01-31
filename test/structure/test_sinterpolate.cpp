@@ -13,6 +13,11 @@
 
 using namespace carpio;
 
+TEST(s_interpolate, a_test){
+    if(TestDir() == false){
+        std::abort();
+    }
+}
 
 TEST(s_interpolate, dim2){
 
@@ -136,6 +141,8 @@ TEST(s_interpolate, dim1){
 	gnu.add(aloc);
 	auto ac = ToGnuplotActorPointContour(f);
     ac.title("value on x center");
+	auto avec = ToGnuplotActorVectors(f);
+    gnu.add(avec);
     gnu.add(ac);
 	gnu.plot();
 }
@@ -205,13 +212,7 @@ TEST(vector_center, dim2){
 	gnu.set_terminal_png(FIG_PATH + "SturctureVectorCenter", 
 	                    fig_width, fig_height);
 		
-	
 	auto aloc = ToGnuplotActorVectors(vc);
-	// // aloc.title("value on x face");
-	// // gnu.add(aloc);
-	// // auto alocy = ToGnuplotActorPointContour(fy);
-	// // alocy.title("value on y face");
-	// // alocy.point_type(9);
 	gnu.add(aloc);
 	gnu.plot();
 } 
