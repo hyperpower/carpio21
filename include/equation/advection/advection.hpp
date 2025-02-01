@@ -70,24 +70,66 @@ public:
     typedef Jacobi_<Vt> Solver_Jacobi;
     typedef SOR_<Vt>    Solver_SOR;
     typedef CG_<Vt>     Solver_CG;
+
+
 protected:
     VectorCenter _vc;
     VectorFace   _vf;
+
+    typedef void (Self::*FunOneStep)(St, Vt);
+	FunOneStep     _fun_one_step;
 public:
     Advection_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
             this->new_field("phi");
     }
 
-    int run_one_step(St step, Vt time){};
+    virtual std::string name() const{
+        return "EquationAdvection";
+    };
 
-    int initialize(){}; 
+    int run_one_step(St step, Vt time){
 
-    int finalize(){}; 
+    };
 
-    int solve(){};
+    int initialize(){
+        // solver ----------------------------
+        this->_configs["solver"] = this->_init_solver();
+        // time term -------------------------
+        // --- has time term -----------------
+        if(this->_time != nullptr){
+            // set default time scheme
+            if(!this->has_config("set_time_scheme")){
+                this->_configs["set_time_scheme"] = std::string("explicit");
+            }
+            auto& phi = *(this->_fields["phi"]);
+            this->_fields["inverse_volume"] = std::make_shared<FieldCenter>(phi.new_inverse_volume());
+            
+            auto name = any_cast<std::string>(this->_configs["set_time_scheme"]);   
+            if(name != "explicit"){
+                this->_configs["field_exp_coe_one"] = this->new_field_exp_coe_one();
+            }
+        // --- on time term -----------------
+        }else{ 
+            this->_configs["field_exp_coe_one"] = this->new_field_exp_coe_one();
+        }
+        // space scheme ---------------------
+        if(! this->has_config("space_scheme")){  // set default space scheme
+            this->set_space_scheme("finite_volume_2");  
+        }
+        return 0;
+    }; 
+
+    int finalize(){
+
+    }; 
+
+    int solve(){
+
+    };
 
 protected:
+    //new u v w on center and face
     void _new_uvw(){
 		std::vector<std::string> vname = {"u", "v", "w"};
 		for(St d = 0; d< Dim; ++d){
@@ -98,6 +140,25 @@ protected:
 			this->new_field_face(vname[d]);
 			_vf.set(ToAxes(d), this->_ffaces[vname[d]]);
 		}     
+	}
+
+    void _one_step_fou_explicit(St step, Vt t){
+        // UdotNabla_FOU FOU(this->_bis["phi"]);
+        VectorFace&   vf = this->_vf;
+        VectorCenter& vc = this->_vc;
+        FieldCenter& phi = this->field("phi");
+        auto         bis = this->get_boundary_index("phi");
+        auto          dt = this->_time->dt();
+        // auto           t = this->_time->current_time();
+
+        InterpolateCenterToFace(vc, vf,
+                this->get_boundary_index("u"),
+                this->get_boundary_index("v"),
+                this->get_boundary_index("w"));
+
+        for(St d = 0 ; d<Dim; d++){
+            phi = phi - UdotNabla(vf, phi, d, t) * dt;
+        }
 	}
 
 };
