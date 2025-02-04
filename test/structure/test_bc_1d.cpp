@@ -156,7 +156,7 @@ TEST(bc_on_dim1, type1){
     gnu.set_terminal_png(FIG_PATH + "SturctureFieldFace1d_BC1", 
                         fig_width, fig_height);
     
-    auto aloc = ToGnuplotActorPointContour(f);
+    auto aloc = ToGnuplotActorContourPoints(f);
     aloc.title("value on x ");
     gnu.add(aloc);
     
@@ -279,7 +279,7 @@ TEST(bc_on_dim1, type2){
     gnu.set_terminal_png(FIG_PATH + "SturctureFieldFace1d_BC2", 
                         fig_width, fig_height);
     
-    auto aloc = ToGnuplotActorPointContour(f);
+    auto aloc = ToGnuplotActorContourPoints(f);
     aloc.title("value on x ");
     gnu.add(aloc);
     
@@ -396,7 +396,7 @@ TEST(bc_on_dim1, type3){
     gnu.set_terminal_png(FIG_PATH + "SturctureFieldFace1d_BC3", 
                         fig_width, fig_height);
     
-    auto aloc = ToGnuplotActorPointContour(f);
+    auto aloc = ToGnuplotActorContourPoints(f);
     aloc.title("value on x ");
     gnu.add(aloc);
     

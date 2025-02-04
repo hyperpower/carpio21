@@ -225,6 +225,22 @@ GnuplotActor _ToGnuplotActorContourWireDim(const ANY& f, SFieldCenterTag, Dim2Ta
     }
     return actor;
 }
+template<class ANY>
+GnuplotActor _ToGnuplotActorContourWireDim(const ANY& f, SFieldCenterTag, Dim1Tag){
+    GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with lines lc palette");
+    for (St i = 0; i < f.grid().n(_X_); i++){
+        typename ANY::Grid::Index index(i);
+        auto pc = f.grid().c(index);
+        if (f.ghost().is_normal(index) == true){
+            actor.data().push_back(
+                ToString(pc(_X_), f(index), f(index), " "));
+        }
+    }
+    return actor;
+}
+
 
 template<class ANY>
 GnuplotActor _ToGnuplotActorContourWire(const ANY& a, SFieldCenterTag){
@@ -350,7 +366,7 @@ GnuplotActor  _ToGnuplotActorLabel(
 }
 
 template<class ANY>
-auto _ToGnuplotActorPointContour(
+auto _ToGnuplotActorContourPoints(
     const ANY& ff,
     SFieldFaceTag, Dim1Tag)
 {    
@@ -375,7 +391,7 @@ auto _ToGnuplotActorPointContour(
 }
 
 template<class ANY>
-auto _ToGnuplotActorPointContour(
+auto _ToGnuplotActorContourPoints(
     const ANY& fcenter,
     SFieldCenterTag, Dim1Tag){
     
@@ -391,7 +407,7 @@ auto _ToGnuplotActorPointContour(
     return aloc;
 }
 template<class ANY>
-auto _ToGnuplotActorPointContour(const ANY& field, 
+auto _ToGnuplotActorContourPoints(const ANY& field, 
         SFieldCenterTag, Dim2Tag){
     std::list<double> lx, ly, lv;
     for(auto& cidx : field.order()){
@@ -406,7 +422,7 @@ auto _ToGnuplotActorPointContour(const ANY& field,
 }
 
 template<class ANY>
-auto _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
+auto _ToGnuplotActorContourPoints(const ANY& ff, SFieldFaceTag, Dim2Tag){
     std::list<double> lx, ly, lv;
     auto a = ff.face_axe();
     for(auto& fidx : ff.order()){
@@ -428,34 +444,34 @@ auto _ToGnuplotActorPointContour(const ANY& ff, SFieldFaceTag, Dim2Tag){
     return aloc;
 }
 template<class ANY>
-GnuplotActorGroup _ToGnuplotActorPointContour(const ANY& vector_face, SVectorFaceTag, Dim2Tag){
+GnuplotActorGroup _ToGnuplotActorContourPoints(const ANY& vector_face, SVectorFaceTag, Dim2Tag){
     GnuplotActorGroup gag;
     for(auto& spface: vector_face){
         auto& field_face = *spface;
-        auto a = _ToGnuplotActorPointContour(field_face, SFieldFaceTag());
+        auto a = _ToGnuplotActorContourPoints(field_face, SFieldFaceTag());
         // a.show_command();
         gag.push_back(a);
     }
     return gag;    
 }
 template<class ANY>
-auto _ToGnuplotActorPointContour(const ANY& a, SFieldFaceTag){
+auto _ToGnuplotActorContourPoints(const ANY& a, SFieldFaceTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
+    return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
 }
 
 template<class ANY>
-auto _ToGnuplotActorPointContour(const ANY& a, SVectorFaceTag){
+auto _ToGnuplotActorContourPoints(const ANY& a, SVectorFaceTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
+    return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
 }    
 template<class ANY>
-GnuplotActor _ToGnuplotActorPointContour(const ANY& a, SFieldCenterTag){
+GnuplotActor _ToGnuplotActorContourPoints(const ANY& a, SFieldCenterTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorPointContour(a, Tag(), DimTag()); 
+    return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
 }
 template<class ANY>
 GnuplotActor _ToGnuplotActorVectors(const ANY& vector_center, Vt unit_length, 

@@ -83,17 +83,14 @@ public:
         }
     }
     
-    void set_phi(spFieldCenter spphi){
-        this->_fields["phi"] = spphi;
-    }
     void set_source(spFieldCenter spsource){
         this->_fields["source"] = spsource;
     }
 
-    void set_source(FunXYZT_Value fun){
-        auto& source = *(this->_fields["source"]);
-        source.assign(fun);
-    }
+    // void set_source(FunXYZT_Value fun){
+    //     auto& source = *(this->_fields["source"]);
+    //     source.assign(fun);
+    // }
     void set_source(FunXYZ_Value fun){
         auto& source = *(this->_fields["source"]);
         source.assign(fun);

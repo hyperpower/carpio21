@@ -373,4 +373,19 @@ class Runer:
             self._run_all()
 
 
-        # print(self._info)
+def make_gif(fn_prefix, gifname):
+    # make gif
+    print("making gif ...")
+    cmd = "{} {} {}".format(
+            "ffmpeg -i ./fig/{}_%03d.png".format(fn_prefix),
+            "-vf \"fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\"",
+            "-y -loop 0 ./fig/%s.gif" % gifname
+        )
+    os.system(cmd)
+    # os.system("ffmpeg -i ./fig/lb_%02d.png -vf \"fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 ./fig/%s.gif" % (fn_prefix, filename))
+
+    # delete files
+    # for file_name in os.listdir("./fig"):
+    #     if file_name.endswith('.png') and file_name.startswith("%s_" % fn_prefix):
+    #         # print("./fig/" + file_name)
+    #         os.remove("./fig/" + file_name)

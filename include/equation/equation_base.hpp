@@ -1,7 +1,7 @@
 #ifndef _EQUATION_BASE_HPP_
 #define _EQUATION_BASE_HPP_
 
-#include "type_define.hpp"
+#include "equation_define.hpp"
 #include "utility/any.hpp"
 #include "time_control.hpp"
 #include "stop_control.hpp"
@@ -29,7 +29,7 @@ public:
     typedef typename Domain::Order       Order;
     typedef typename Domain::spOrder     spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
-    typedef typename Domain::FieldCenter FieldFace;
+    typedef typename Domain::FieldFace   FieldFace;
     typedef typename Domain::FieldCenterExp FieldCenterExp;
 
     typedef EquationBase_<D> Self;
@@ -66,6 +66,8 @@ public:
     typedef SOR_<Vt>    Solver_SOR;
     typedef CG_<Vt>     Solver_CG;
 
+    typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
+    typedef std::function<Vt(Vt, Vt, Vt)> FunXYZ_Value;
 
 protected:
     spGrid  _spgrid; 
@@ -123,7 +125,7 @@ public:
             // events before calculation
             initialize();
             run_events(this->_time->current_step(), //
-                       this->_time->current_time(),    //
+                       this->_time->current_time(), //
                        Event::START);
             // loop
             while (!this->_time->is_end() && (!_stop->is_stop())) {
@@ -212,6 +214,13 @@ public:
         return false;
     }
     const FieldCenter& field(const std::string& key) const{
+        if(this->has_field(key)){
+            return *(this->_fields.at(key));
+        }else{
+            throw std::invalid_argument( key + "is not fields" );
+        }
+    }
+    FieldCenter& field(const std::string& key){
         if(this->has_field(key)){
             return *(this->_fields.at(key));
         }else{
@@ -307,7 +316,31 @@ public:
         this->_configs["space_scheme"] = name;
     }
     
-protected:
+    void set_field_center(const std::string& name, spFieldCenter spsource){
+        if(this->has_field(name)){
+            this->_fields[name] = spsource;
+        }else{
+            ASSERT_MSG(false, "Field Center : \t" + name + "Not Found"); 
+        }
+    }
+
+    void set_field_center(const std::string& name, FunXYZ_Value fun){
+        if(this->has_field(name)){
+            auto& fc = *(this->_fields[name]);
+            fc.assign(fun);
+        }else{
+            ASSERT_MSG(false, "Field Center : \t" + name + "Not Found"); 
+        }
+    }
+
+    void set_field_face(const std::string& name, FunXYZ_Value fun){
+        if(this->has_field_face(name)){
+            auto& fc = *(this->_ffaces[name]);
+            fc.assign(fun);
+        }else{
+            ASSERT_MSG(false, "Field Face : \t" + name + "Not Found"); 
+        }
+    }
     void new_field(const std::string& name){
         if(!(this->has_field(name))){
             this->_fields[name] = spFieldCenter(new FieldCenter(
@@ -318,13 +351,13 @@ protected:
     }
     void new_field_face(const std::string& name, Axes a){
         if(!(this->has_field_face(name))){
-            this->_fields[name] = spFieldFace(new FieldFace(
+            this->_ffaces[name] = spFieldFace(new FieldFace(
                     this->_spgrid,
                     this->_spghost,
                     a));
         }
     }
-
+protected:
     spFieldCenterExp new_field_exp_zero() const{
         return Domain::NewspFieldCenterExpZero(
             this->_spgrid,

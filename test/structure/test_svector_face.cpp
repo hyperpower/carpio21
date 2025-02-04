@@ -72,10 +72,10 @@ TEST(vector_face, dim2){
 	                    fig_width, fig_height);
 		
 	
-	auto aloc = ToGnuplotActorPointContour(vf);
+	auto aloc = ToGnuplotActorContourPoints(vf);
 	// aloc.title("value on x face");
 	// gnu.add(aloc);
-	// auto alocy = ToGnuplotActorPointContour(fy);
+	// auto alocy = ToGnuplotActorContourPoints(fy);
 	// alocy.title("value on y face");
 	// alocy.point_type(9);
 	gnu.add(aloc);

@@ -26,6 +26,8 @@
 #include "operator/slaplacian.hpp"
 #include "operator/sintegral_laplacian.hpp"
 #include "operator/sbuild_matrix.hpp"
+#include "operator/sinterpolate.hpp"
+#include "operator/su_dot_nabla.hpp"
 
 #include <memory>
 
@@ -65,7 +67,10 @@ public:
     typedef std::shared_ptr<FieldFaceExp>   spFieldFaceExp;
 
     typedef StructureDomain_<DIM, Grid, Ghost, Order> Self;
-
+    
+    typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
+    typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;
+    typedef std::function<ValueType(const Index&)>   FunIndex_Value;
 protected:
     // spGrid  _spgrid; 
     // spGhost _spghost; 

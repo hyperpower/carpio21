@@ -13,7 +13,7 @@
 #endif
 
 #define ASSERT(expr) assert(expr)
-#define ASSERT_MSG(expr, msg) assert((expr)&&(msg))
+// #define ASSERT_MSG(expr, msg) assert((expr)&&(msg))
 
 #define SHOULD_NOT_REACH assert((false)&&(" >! Should not reach"))
 #define CAST(type, p)           ((type)p)
@@ -64,6 +64,19 @@
                 && IsContainer<typename __T::value_type>::value   \
                 && std::is_arithmetic<typename __T::value_type::value_type>::value \
             >::value, bool>::type = true
+
+#   define ASSERT_MSG(Expr, Msg) \
+    __M_Assert(#Expr, Expr, __FILE__, __LINE__, Msg)
+
+inline void __M_Assert(const char* expr_str, bool expr, 
+            const char* file, int line, const std::string& msg){
+    if (!expr){
+        std::cerr << "Assert failed:\t" << msg << "\n"
+                  << "Expected:\t" << expr_str << "\n"
+                  << "Source:\t\t" << file << ", line " << line << "\n";
+        abort();
+    }
+}
 
 
 namespace carpio {
@@ -419,6 +432,10 @@ inline int LoopNext(const int& bgn, const int& end, const int& cur){
 inline int LoopPrev(const int& bgn, const int& end, const int& cur){
     return (cur == bgn) ? end : cur - 1;
 }
+
+
+
+
 
 }
 

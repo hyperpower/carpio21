@@ -15,7 +15,7 @@ namespace carpio{
 
 template<class VECTORF, class FIELD, class BI>
 FIELD UdotNabla(const VECTORF& vec, const FIELD& field, 
-                const BI& bi, Vt t, const std::string& m, 
+        const BI& bi, Vt t, const std::string& m, 
         SVectorFaceTag, SFieldCenterTag)
 {
     EXPAND_FIELD_TAG(FIELD);

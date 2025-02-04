@@ -71,7 +71,7 @@ TEST(s_interpolate, dim2){
     auto aloc = ToGnuplotActorVectors(fa);
     aloc.title("value on x face");
     gnu.add(aloc);
-    auto ac = ToGnuplotActorPointContour(a);
+    auto ac = ToGnuplotActorContourPoints(a);
     ac.title("value on x center");
     gnu.add(ac);
     gnu.plot();
@@ -136,10 +136,10 @@ TEST(s_interpolate, dim1){
 	gnu.set_terminal_png(FIG_PATH + "Iner_CenterToFace_1d", 
 	                    fig_width, fig_height);
 	
-	auto aloc = ToGnuplotActorPointContour(ff);
+	auto aloc = ToGnuplotActorContourPoints(ff);
 	aloc.title("value on x face");
 	gnu.add(aloc);
-	auto ac = ToGnuplotActorPointContour(f);
+	auto ac = ToGnuplotActorContourPoints(f);
     ac.title("value on x center");
 	auto avec = ToGnuplotActorVectors(f);
     gnu.add(avec);

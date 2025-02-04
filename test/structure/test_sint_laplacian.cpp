@@ -73,10 +73,10 @@ TEST(s_lap, dim2){
     gnu.set_terminal_png(OUTPUTPATH + "Int_Laplacian_2d", 
                         fig_width, fig_height);
     
-    auto aloc = ToGnuplotActorPointContour(res);
+    auto aloc = ToGnuplotActorContourPoints(res);
     aloc.title("value on x face");
     gnu.add(aloc);
-    auto ac = ToGnuplotActorPointContour(a);
+    auto ac = ToGnuplotActorContourPoints(a);
     ac.title("value on x center");
     gnu.add(ac);
     gnu.plot();

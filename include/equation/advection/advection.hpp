@@ -53,14 +53,16 @@ public:
     typedef typename Domain::spGhost   spGhost;
     typedef typename Domain::Order       Order;
     typedef typename Domain::spOrder   spOrder;
-    typedef typename Domain::FieldCenter     FieldCenter;
-    typedef typename Domain::spFieldCenter spFieldCenter;
+    typedef typename Domain::FieldCenter        FieldCenter;
+    typedef typename Domain::spFieldCenter    spFieldCenter;
     typedef typename Domain::FieldCenterExp     FieldCenterExp;
     typedef typename Domain::spFieldCenterExp spFieldCenterExp;
     typedef typename Domain::VectorCenter       VectorCenter;
     typedef typename Domain::spVectorCenter   spVectorCenter;
-    typedef typename Domain::VectorFace       VectorFace;
-    typedef typename Domain::spVectorFace   spVectorFace;
+    typedef typename Domain::VectorFace         VectorFace;
+    typedef typename Domain::spVectorFace     spVectorFace;
+    
+    typedef std::shared_ptr<BoundaryIndex> spBoundaryIndex;
 
     typedef MatrixSCR_<Vt>    Mat;
     typedef ArrayListV_<Vt>   Arr;
@@ -71,17 +73,20 @@ public:
     typedef SOR_<Vt>    Solver_SOR;
     typedef CG_<Vt>     Solver_CG;
 
+    typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
+    typedef std::function<Vt(Vt, Vt, Vt)> FunXYZ_Value;
 
 protected:
     VectorCenter _vc;
     VectorFace   _vf;
 
     typedef void (Self::*FunOneStep)(St, Vt);
-	FunOneStep     _fun_one_step;
+    FunOneStep     _fun_one_step;
 public:
     Advection_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
             this->new_field("phi");
+            this->_new_uvw();
     }
 
     virtual std::string name() const{
@@ -89,7 +94,8 @@ public:
     };
 
     int run_one_step(St step, Vt time){
-
+        _one_step_fou_explicit(step, time);
+        return 0;
     };
 
     int initialize(){
@@ -109,13 +115,13 @@ public:
             if(name != "explicit"){
                 this->_configs["field_exp_coe_one"] = this->new_field_exp_coe_one();
             }
-        // --- on time term -----------------
+        // --- no time term -----------------
         }else{ 
             this->_configs["field_exp_coe_one"] = this->new_field_exp_coe_one();
         }
         // space scheme ---------------------
         if(! this->has_config("space_scheme")){  // set default space scheme
-            this->set_space_scheme("finite_volume_2");  
+            this->set_space_scheme("fou");  
         }
         return 0;
     }; 
@@ -128,38 +134,72 @@ public:
 
     };
 
+    void set_boundary_index_phi(spBoundaryIndex spbi){
+        this->set_boundary_index("phi", spbi);
+    }
+
+    void set_boundary_index_velocity(Axes a, spBoundaryIndex spbi){
+        switch (a) {
+        case _X_: {
+            this->set_boundary_index("u", spbi);
+            break;
+        }
+        case _Y_: {
+            this->set_boundary_index("v", spbi);
+            break;
+        }
+        case _Z_: {
+            this->set_boundary_index("w", spbi);
+            break;
+        }
+        }
+    }
+
+    void set_phi(spFieldCenter spphi){
+        this->set_field_center("phi", spphi);
+    }
+
+    void set_phi(FunXYZ_Value fun){
+        this->set_field_center("phi", fun);
+    }
+
+    void set_center_velocity(const Axes& a, FunXYZ_Value fun){
+        auto nv = AxesToVelocityName(a);
+        this->set_field_center(nv, fun);
+    }
+
 protected:
     //new u v w on center and face
     void _new_uvw(){
-		std::vector<std::string> vname = {"u", "v", "w"};
-		for(St d = 0; d< Dim; ++d){
-			this->new_field(vname[d]);
-			_vc.set(ToAxes(d), this->_fields[vname[d]]);
-		}
-		for(St d = 0; d< Dim; ++d){
-			this->new_field_face(vname[d]);
-			_vf.set(ToAxes(d), this->_ffaces[vname[d]]);
-		}     
-	}
+        auto vaxes = ArrAxes<Dim>();
+        auto vname = ArrVelocityName<Dim>();
+        for(auto& a : vaxes){
+            this->new_field(vname[a]);
+            _vc.set(ToAxes(a), this->_fields[vname[a]]);
+        }
+        for(auto& a : vaxes){
+            this->new_field_face(vname[a], vaxes[a]);
+            _vf.set(ToAxes(a), this->_ffaces[vname[a]]);
+        }     
+    }
 
     void _one_step_fou_explicit(St step, Vt t){
         // UdotNabla_FOU FOU(this->_bis["phi"]);
         VectorFace&   vf = this->_vf;
         VectorCenter& vc = this->_vc;
-        FieldCenter& phi = this->field("phi");
-        auto         bis = this->get_boundary_index("phi");
+        FieldCenter& phi = *(this->_fields["phi"]);
+        auto&         bi = *(this->get_boundary_index("phi"));
         auto          dt = this->_time->dt();
         // auto           t = this->_time->current_time();
 
         InterpolateCenterToFace(vc, vf,
-                this->get_boundary_index("u"),
-                this->get_boundary_index("v"),
-                this->get_boundary_index("w"));
+                *(this->get_boundary_index("u")),
+                *(this->get_boundary_index("v")),
+                *(this->get_boundary_index("w")));
 
-        for(St d = 0 ; d<Dim; d++){
-            phi = phi - UdotNabla(vf, phi, d, t) * dt;
-        }
-	}
+        phi = phi - UdotNabla(vf, phi, bi, t) * dt;
+        
+    }
 
 };
 

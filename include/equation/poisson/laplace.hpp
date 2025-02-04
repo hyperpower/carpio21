@@ -38,6 +38,9 @@ public:
     typedef Jacobi_<Vt> Solver_Jacobi;
     typedef SOR_<Vt>    Solver_SOR;
     typedef CG_<Vt>     Solver_CG;
+    
+    typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
+    typedef std::function<Vt(Vt, Vt, Vt)> FunXYZ_Value;
 public:
     Laplace_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
@@ -105,7 +108,11 @@ public:
     }
 
     void set_phi(spFieldCenter spphi){
-        this->_fields["phi"] = spphi;
+        this->set_field_center("phi", spphi);
+    }
+
+    void set_phi(FunXYZ_Value fun){
+        this->set_field_center("phi", fun);
     }
 
 protected:

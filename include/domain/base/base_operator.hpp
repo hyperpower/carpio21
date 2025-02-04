@@ -126,10 +126,20 @@ auto InterpolateCenterToFace(const VECTOR& field,
     typedef typename VECTOR::Tag Tag; 
     return InterpolateCenterToFace(field, bix, biy, biz, Tag());
 }
+template<class VCENTER, class VFACE>
+void InterpolateCenterToFace(const VCENTER& vcenter, VFACE& vface,
+    const BoundaryIndex& bix, 
+    const BoundaryIndex& biy = BoundaryIndex(),
+    const BoundaryIndex& biz = BoundaryIndex()){
+    typedef typename VCENTER::Tag CenterTag; 
+    typedef typename VFACE::Tag   FaceTag; 
+    InterpolateCenterToFace(vcenter, vface, bix, biy, biz, 
+        CenterTag(), FaceTag());
+}
 // Advection ===============================
 template<class VECTORF, class FIELD, class BI>
 FIELD UdotNabla(const VECTORF& vec, const FIELD& field, const BI& bi, 
-                double time = 0.0, const std::string& method = ""){
+                Vt time = 0.0, const std::string& method = ""){
     typedef typename FIELD::Tag FieldTag; 
     typedef typename VECTORF::Tag VectorTag;
     return UdotNabla(vec, field, bi, time, method, VectorTag(), FieldTag());

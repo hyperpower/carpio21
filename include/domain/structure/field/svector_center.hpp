@@ -19,6 +19,13 @@ public:
     typedef SFieldCenter_<DIM, VT, GRID, GHOST, ORDER> Component;
     typedef SVectorCenterTag Tag;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
+    typedef typename GRID::Tag  GridTag;
+    typedef typename GHOST::Tag GhostTag;
+    typedef typename ORDER::Tag OrderTag;
+
+    typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef typename _DataInit::ValueTag ValueTag;
+
     typedef VT ValueType;
     typedef GRID  Grid;
     typedef GHOST Ghost;

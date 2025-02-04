@@ -1,5 +1,3 @@
-#include "gtest/gtest.h"
-#include "test_define.hpp"
 #include "domain/structure/field/sfield_face.hpp"
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/ghost/regular.hpp"
@@ -16,16 +14,13 @@
 #include "equation/equation.hpp"
 #include "equation/event/event.hpp"
 
+#include "example_define.hpp"
+
 using namespace carpio;
 
-TEST(s_interpolate, a_test){
-    if(TestDir() == false){
-        std::abort();
-    }
-}
 
-TEST(equ_advection, fou){
-    std::cout << "[Advection ] Test First order upwind"<<std::endl;
+int main(int argc, char** argv) {
+    std::cout << "[Advection ] One Step 1D"<<std::endl;
     const int dim = 1;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;
     typedef Point_<double,dim> Point;
@@ -45,7 +40,9 @@ TEST(equ_advection, fou){
     // Define the equation
     Advection equ(spgrid, spghost, sporder);
 
-    equ.set_time_term(100, 0.01);
+    Vt dt = 0.01;
+
+    equ.set_time_term(100, dt);
 
     typedef std::shared_ptr<BoundaryIndex> spBI;
     typedef BoundaryCondition BC;
@@ -74,13 +71,46 @@ TEST(equ_advection, fou){
 		                                          -1, -1, 1, Event::START | Event::AFTER | Event::END));
 	equ.add_event("OutputTime", spetime);
 
+   
+
+    // exact field
+    typedef EventSetFieldCenter_<Domain> EventSetFieldCenter;
+    equ.new_field("exact");
+    EventSetFieldCenter esfc("exact", 
+        [](Vt x, Vt y, Vt z, Vt t){
+            if(x < 0.5 + t){ // veo = 1.0
+                return 1.0;
+            }else{
+                return 0.0;
+            }
+        }, 
+        -1, -1, 1, Event::BEFORE);
+    equ.add_event("SetExact", std::make_shared<EventSetFieldCenter>(esfc));
+
+
+    // plot field
     typedef EventGnuplotField_<Domain> EventGnuplotField;
     EventGnuplotField::FunPlot fun = [](
                            Gnuplot& gnu,
                      const EventGnuplotField::FieldCenter& f,
                      St step, Vt t, int fob,
                      typename EventGnuplotField::EquationBase& pd){
-        gnu.add(ToGnuplotActorContourWire(f));
+
+        
+        auto af = ToGnuplotActorContourWire(f);
+        af.title("First Order Upwind");
+        af.line_width(2);
+        gnu.add(af);
+        // exact
+        auto aexact = ToGnuplotActorContourWire(pd.field("exact"));
+        aexact.title("Exact");
+        aexact.line_width(2);
+        aexact.line_color_black();
+        gnu.add(aexact);
+
+        // add label
+        gnu.set_label(10, "Step = " + ToString(step), 0.2, 1.3);
+        gnu.set_label(11, "Time = " + ToString(t, "%.2f"), 0.2, 1.2);
         gnu.plot();
         gnu.clear();
         return 1;
@@ -91,14 +121,17 @@ TEST(equ_advection, fou){
     // egs.set_figure_height(fig_height);
     egs.gnuplot().set_xrange(-0.0, 2.0);
     egs.gnuplot().set_yrange(-0.2, 1.4);
+    egs.gnuplot().set_xlabel("x");
+    egs.gnuplot().set_ylabel("Φ");
     // egs.gnuplot().set_zrange( 0.0, 1.1);
     // egs.gnuplot().set_equal_aspect_ratio();
     egs.gnuplot().set_cbrange(0.0, 1.0);
     egs.gnuplot().set_palette_blue_red();
-    egs.set_path(FIG_PATH + "ex_");
+    egs.set_path(FIG_PATH + "FOU_" );
+    egs.set_format_string("%s_%03d");
+
+    // egs.set_path("./fig/phi_");
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
 
-
     equ.run();
-
 }

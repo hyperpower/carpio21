@@ -69,7 +69,8 @@ void InterpolateCenterToFace(const VCENTER& vector_center, VFACE& vector_face,
         ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
 template<class VCENTER, class VFACE>
-void InterpolateCenterToFace(const VCENTER& vector_center, VFACE& vector_face,
+void InterpolateCenterToFace(
+        const VCENTER& vector_center, VFACE& vector_face,
         const BoundaryIndex& bix, const BoundaryIndex& biy, const BoundaryIndex& biz, 
         SVectorCenterTag, SVectorFaceTag){
     EXPAND_FIELD_TAG(VCENTER); 
@@ -204,7 +205,7 @@ void _SInterpolateCenterToFace(const VCENTER& vector_center, VFACE& vector_face,
     std::array<const BoundaryIndex*, 3> bis{&bix, &biy, &biz};
 
     for(auto& a : ArrAxes<VCENTER::Dim>()){
-        _SInterpolateCenterToFace(vector_center[a], vector_face[a], bis[a], 
+        _SInterpolateCenterToFace(vector_center[a], vector_face[a], *(bis[a]), 
             ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
     }
 }

@@ -29,7 +29,7 @@ protected:
     Vt    _cs;        // cell size
     Arr   _c[Dim];    // coordinate center
 public:
-    SGridUniform_(const Point&   minp,
+    SGridUniform_(const Point& minp,
                   const Index& n,
                   const Vt&    cellsize,
                   const St&    ghostlayer):
