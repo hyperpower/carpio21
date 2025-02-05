@@ -205,6 +205,11 @@ public:
             this->_configs["cn_omega"] = v;
         }
     }
+    
+    virtual void set_space_scheme(
+            const std::string& name){
+        this->_configs["space_scheme"] = name;
+    } 
 
     bool has_field(const std::string& key) const {
         auto it = this->_fields.find(key);
@@ -312,9 +317,6 @@ public:
         }
     }
 
-    void set_space_scheme(const std::string& name){
-        this->_configs["space_scheme"] = name;
-    }
     
     void set_field_center(const std::string& name, spFieldCenter spsource){
         if(this->has_field(name)){

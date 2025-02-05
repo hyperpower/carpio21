@@ -3,6 +3,7 @@
 
 #include "stddef.h"
 #include <assert.h>
+#include <iostream>
 #include <math.h>
 #include <string>
 #include <functional>  // for std::forward()

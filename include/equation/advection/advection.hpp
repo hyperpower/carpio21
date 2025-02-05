@@ -82,6 +82,7 @@ protected:
 
     typedef void (Self::*FunOneStep)(St, Vt);
     FunOneStep     _fun_one_step;
+
 public:
     Advection_(spGrid spg, spGhost spgh, spOrder spo):
         Base(spg, spgh, spo){
@@ -94,7 +95,11 @@ public:
     };
 
     int run_one_step(St step, Vt time){
-        _one_step_fou_explicit(step, time);
+        if(_has_tvd_scheme()){
+            _one_step_tvd_explicit(step, time);
+        }else{
+            _one_step_fou_explicit(step, time);
+        }
         return 0;
     };
 
@@ -169,6 +174,10 @@ public:
     }
 
 protected:
+    bool _has_tvd_scheme(){
+        auto name = any_cast<std::string>(this->_configs["space_scheme"]);
+	    return name != "" && name != "fou";
+	}
     //new u v w on center and face
     void _new_uvw(){
         auto vaxes = ArrAxes<Dim>();
@@ -190,14 +199,35 @@ protected:
         FieldCenter& phi = *(this->_fields["phi"]);
         auto&         bi = *(this->get_boundary_index("phi"));
         auto          dt = this->_time->dt();
-        // auto           t = this->_time->current_time();
+        auto name = any_cast<std::string>(this->_configs["space_scheme"]);
 
         InterpolateCenterToFace(vc, vf,
                 *(this->get_boundary_index("u")),
                 *(this->get_boundary_index("v")),
                 *(this->get_boundary_index("w")));
 
-        phi = phi - UdotNabla(vf, phi, bi, t) * dt;
+        phi = phi - UdotNabla(vf, phi, bi, t, name) * dt;
+        
+    }
+
+    void _one_step_tvd_explicit(St step, Vt t){
+        // UdotNabla_FOU FOU(this->_bis["phi"]);
+        VectorFace&   vf = this->_vf;
+        VectorCenter& vc = this->_vc;
+        FieldCenter& phi = *(this->_fields["phi"]);
+        auto&         bi = *(this->get_boundary_index("phi"));
+        auto          dt = this->_time->dt();
+        auto name = any_cast<std::string>(this->_configs["space_scheme"]);
+
+        InterpolateCenterToFace(vc, vf,
+                *(this->get_boundary_index("u")),
+                *(this->get_boundary_index("v")),
+                *(this->get_boundary_index("w")));
+
+        // half step FOU
+        Vt dth    = dt * 0.5;
+        auto phih = UdotNabla(vf, phi, bi, t) * (-dth) + phi;
+        phi       = UdotNabla(vf, phih, bi, t, name) * (-dt) + phi;
         
     }
 

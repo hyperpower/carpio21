@@ -47,6 +47,8 @@ TEST(equ_advection, fou){
 
     equ.set_time_term(100, 0.01);
 
+    equ.set_space_scheme("VanLeer");
+
     typedef std::shared_ptr<BoundaryIndex> spBI;
     typedef BoundaryCondition BC;
     spBI spbi(new BoundaryIndex());

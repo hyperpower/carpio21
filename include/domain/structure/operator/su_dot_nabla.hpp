@@ -10,6 +10,8 @@
 #include "domain/structure/ghost/regular.hpp"
 #include "domain/structure/order/xyz.hpp"
 
+#include "domain/structure/operator/su_dot_nabla_tvd.hpp"
+
 
 namespace carpio{
 
@@ -19,10 +21,14 @@ FIELD UdotNabla(const VECTORF& vec, const FIELD& field,
         SVectorFaceTag, SFieldCenterTag)
 {
     EXPAND_FIELD_TAG(FIELD);
+    auto* lim = Limiter::Get();
     // method choose
     if(m == "" || m == "fou"){
         return _UdotNablaFOU(vec, field, bi, t,
            ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+    }else if(lim->has_limiter(m)){
+        return _UdotNablaTVD(vec, field, bi, t, lim->get_limiter(m),
+           ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag()); 
     }else{
         return field;
     }
