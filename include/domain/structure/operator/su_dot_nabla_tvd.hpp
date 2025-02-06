@@ -18,8 +18,7 @@ inline Vt _RCD(Vt sC, Vt sD){
 }
 
 inline Vt _rCD(Vt vU, Vt vC, Vt vD, Vt sU, Vt sC, Vt sD){
-    Vt s = std::numeric_limits<Vt>::epsilon();
-    return (vC - vU) * (sD + sC) / (vD - vC + s) / (sC + sU);
+    return (vC - vU) * (sD + sC) / (vD - vC + 1e-16) / (sC + sU);
 }
 
 class Limiter
