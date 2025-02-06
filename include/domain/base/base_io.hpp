@@ -22,7 +22,7 @@ Strings Stringify(const ANY& a){
 
 template<class ANY>
 void OutputFile(const std::string& filename, const ANY& a){
-    TextFile file(filename,Stringify(a));
+    TextFile file(filename, Stringify(a));
     file.write();
 }
 

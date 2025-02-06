@@ -33,7 +33,7 @@ First Order Upwind
 
    First Order Upwind.
 
-.. figure:: fig/FOU_phi_100.png
+.. figure:: fig/FOU_phi-last.png
    :alt: the gate profile
    :align: center 
 

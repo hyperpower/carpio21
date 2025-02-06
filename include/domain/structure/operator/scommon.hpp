@@ -3,6 +3,7 @@
 
 #include "domain/base/base_operator.hpp"
 #include "domain/structure/structure_define.hpp"
+#include "domain/structure/field/sfield_center.hpp"
 #include "domain/boundary/boundary_index.hpp"
 
 #include "algebra/misc/linear_polynomial.hpp"

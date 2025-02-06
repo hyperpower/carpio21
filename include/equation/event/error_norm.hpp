@@ -22,7 +22,7 @@ public:
 
     typedef typename Domain::FieldCenter FieldCenter;
 protected:
-    FieldCenter _exact;
+    const FieldCenter* _exact;
     std::string _sn;   // field name to compare
 
     std::list<Vt> _l1;  // Norm1 
@@ -35,7 +35,7 @@ public:
      *
      *  default constructor is running event after each step
      */
-    EventErrorNorm_(const FieldCenter& exact, const std::string& fieldn, 
+    EventErrorNorm_(const FieldCenter* exact, const std::string& fieldn, 
                      int is    = -1,    int ie = -1,
                      int istep = 1,     int flag = Event::AFTER) :
                          _exact(exact), _sn(fieldn),
@@ -45,7 +45,8 @@ public:
     virtual int execute(St step, Vt t, int fob, EquationBase& equ) {
         this->record_execute_info(step, t, fob);
         if(equ.has_field(_sn)){
-            auto error = _exact - equ.field(_sn);
+            auto& exact = *_exact;
+            auto error = equ.field(_sn) - exact;
             auto n1 = Norm1(error);
             auto n2 = Norm2(error);
             auto ni = NormInf(error);

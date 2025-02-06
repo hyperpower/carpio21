@@ -138,7 +138,7 @@ public:
     const std::list<Vt>& get_list_time() const{
         return this->_lt;
     } 
-    const std::list<Vt>& get_list_step() const{
+    const std::list<St>& get_list_step() const{
         return this->_lstep;
     } 
     const std::list<Vt>& get_list_fob() const{

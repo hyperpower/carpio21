@@ -46,27 +46,27 @@ def plot_illustration_fig():
     """
     Data part
     """
-    arrx_start = [x_st, 0.5, 0.5, x_ed] 
-    arr_v      = [1.0,  1.0, 0.0, 0.0]
-    arrx_end   = [x_st, 1.5, 1.5, x_ed]    
+    arrx_start = [x_st, 0.25, 0.25, 0.75, 0.75, x_ed] 
+    arr_v      = [0.0,  0.0,  1.0,  1.0 , 0.0,  0.0]
+    arrx_end   = [x_st, 1.25, 1.25, 1.75, 1.75, x_ed]    
 
-    plt.plot(arrx_start, arr_v, linewidth=3.0)
     plt.plot(arrx_end  , arr_v, linewidth=2.0)
+    plt.plot(arrx_start, arr_v, linewidth=3.0)
 
     plt.text(0.25, 1.05, "Time = "+ "%.2f" % float(0.0))
     plt.text(1.25, 1.05, "Time = "+ "%.2f" % float(1.0))
 
     plt.annotate('Initial profile', 
-            xy=(0.5, 0.75), xytext=(0.75, 0.85),
+            xy=(0.26, 0.75), xytext=(0.55, 0.85),
             arrowprops = dict(facecolor='black', shrink = 0.05),
             )
     plt.annotate('Advected profile', 
-            xy=(1.5, 0.35), xytext=(0.55, 0.2),
+            xy=(1.75, 0.35), xytext=(0.9, 0.2),
             arrowprops = dict(facecolor='black', shrink = 0.05),
             )
     plt.arrow(0.4, 0.5, 0.2, 0.0, width=0.01, color = "k")
 
-    plt.text(0.52, 0.55, "u = 1.0")
+    plt.text(0.42, 0.55, "u = 1.0")
 
     # plt.legend(llg, scheme, loc= 'upper right')
 
@@ -79,9 +79,12 @@ def plot_illustration_fig():
 
 def main():
     plot_illustration_fig()
-    RT.make_gif("FOU_phi", "FOU_iter")
-    RT.rename_last_png("FOU_phi")
-    RT.delete_png_series("FOU_phi")
+    RT.make_gif("fou_phi", "fou_iter")
+    RT.make_gif("QUICK_phi", "QUICK_iter")
+    RT.rename_last_png("fou_phi")
+    RT.rename_last_png("QUICK_phi")
+    RT.delete_png_series("fou_phi")
+    RT.delete_png_series("QUICK_phi")
     
 
 if __name__ == '__main__':

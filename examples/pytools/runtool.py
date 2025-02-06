@@ -118,6 +118,8 @@ def parse_args():
                         action="store_true")
     parser.add_argument('--mpi', action='store_true',
                          help='run by mpi')
+    parser.add_argument('--html', action='store_true',
+                         help='open html')
     args=parser.parse_args()
     return args
 
@@ -365,12 +367,35 @@ class Runer:
             self.clean_doc()
             self.build_doc()
             self._info["document_wall_time"] = time.perf_counter() - t
-
+        if args.html:
+            print(" open document ===== ")
+            os.system("open ./doc/build/report.html")
+            record["html"] = True
+            
 
         if len(record) == 0:
             self.print_bar("run all")
             record["run_all"] = True
             self._run_all()
+
+def delete_png_series(fn_prefix):
+    # delete files
+    for file_name in os.listdir("./fig"):
+        if file_name.endswith('.png') and file_name.startswith("%s_" % fn_prefix):
+            # print("./fig/" + file_name)
+            os.remove("./fig/" + file_name)
+
+def rename_last_png(fn_prefix):
+    lf = []
+    for file_name in os.listdir("./fig"):
+        if file_name.endswith('.png') and file_name.startswith("%s_" % fn_prefix):
+            lf.append(file_name)
+    lf.sort()
+    print("The last fig = ", lf[-1])
+
+    cmd = "cp " + "./fig/" + lf[-1] + " ./fig/%s-last.png" % fn_prefix
+    print(cmd) 
+    os.system(cmd)
 
 
 def make_gif(fn_prefix, gifname):
