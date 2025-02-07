@@ -28,6 +28,7 @@
 #include "operator/sbuild_matrix.hpp"
 #include "operator/sinterpolate.hpp"
 #include "operator/su_dot_nabla.hpp"
+#include "operator/snorm.hpp"
 
 #include <memory>
 

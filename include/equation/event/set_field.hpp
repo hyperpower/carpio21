@@ -63,6 +63,9 @@ public:
         return "SetFieldCenter";
     }
     
+    virtual bool is_condition_event() const{
+        return false;
+    } 
 
     
 

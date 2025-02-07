@@ -106,6 +106,10 @@ public:
         return *(_spgnu);
     }
 
+    virtual bool is_condition_event() const{
+        return false;
+    }
+
 protected:
     void _set_terminal(
             const std::string& tn, // terminal name

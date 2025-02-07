@@ -153,7 +153,7 @@ TEST(equ_laplacian, explicit_step){
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
     // Add events Error Norm
     typename Domain::FieldCenter exact(spgrid, spghost, sporder);
-    typedef EventErrorNorm_<Domain> EventErrorNorm;
+    typedef EventNormExactFieldCenter_<Domain> EventErrorNorm;
     auto speen = std::make_shared<EventErrorNorm>(exact, "phi", -1, -1, 1, Event::AFTER);
     equ.add_event("ErrorPhi", speen);
 

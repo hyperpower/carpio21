@@ -40,48 +40,7 @@ public:
 
 };
 
-template<class FIELD,
-        typename std::enable_if<
-            std::is_base_of<typename FIELD::Ghost::Tag, SGhostRegularTag>::value, bool>::type = true>
-typename FIELD::ValueType Norm1(const FIELD& field, SFieldCenterTag){
-    Vt vol = 0.0;
-    Vt e   = 0.0;
-    auto& grid = field.grid();
-    for(auto& idx : field.order()){
-        Vt vi = grid.volume(idx);
-        vol += vi;
-        e += vi * std::abs(field(idx));
-    }
-    return e / vol;
-}
-template<class FIELD,
-        typename std::enable_if<
-            std::is_base_of<typename FIELD::Ghost::Tag, SGhostRegularTag>::value, bool>::type = true>
-typename FIELD::ValueType Norm2(const FIELD& field, SFieldCenterTag){
-    Vt vol = 0.0;
-    Vt e   = 0.0;
-    auto& grid = field.grid();
-    for(auto& idx : field.order()){
-        Vt vi = grid.volume(idx);
-        vol += vi;
-        Vt avalue = std::abs(field(idx));
-        e += vi * avalue * avalue;
-    }
-    return std::sqrt(e / vol);
-}
-template<class FIELD,
-        typename std::enable_if<
-            std::is_base_of<typename FIELD::Ghost::Tag, SGhostRegularTag>::value, bool>::type = true>
-typename FIELD::ValueType NormInf(const FIELD& field, SFieldCenterTag){
-    double m = 0.0;
-    for(auto& idx : field.order()){
-        Vt avalue = std::abs(field(idx));
-        if(avalue > m){
-            m = avalue;
-        }
-    }
-    return m;
-}
+
 template<class FIELD>
 FIELD IntVolume(const FIELD& field, SFieldCenterTag){
     FIELD res(field);

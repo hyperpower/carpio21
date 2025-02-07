@@ -159,7 +159,7 @@ void Iterative(const std::string& method, const Field& fe, double dt,
         equ.add_event("Gnuplotphi", std::make_shared<EventGnuplotField>(egs));
     }
     // Add events Error Norm
-    typedef EventErrorNorm_<Domain> EventErrorNorm;
+    typedef EventNormExactFieldCenter_<Domain> EventErrorNorm;
     auto speen = std::make_shared<EventErrorNorm>(fe, "phi", -1, -1, 1, Event::AFTER);
     equ.add_event("ErrorPhi", speen);
 

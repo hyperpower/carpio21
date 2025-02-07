@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <functional>
 #include "type_define.hpp"
 
 namespace carpio{
@@ -41,6 +42,8 @@ auto ArrAxes<3>(){
     return std::array<Axes, 3>{_X_, _Y_, _Z_};
 }
 
+typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
+typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;
 
 }
 

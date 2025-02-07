@@ -164,7 +164,7 @@ int run_a_scheme(const std::string& scheme){
     // egs.set_path("./fig/phi_");
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
 
-    typedef EventErrorNorm_<Domain> EventErrorNorm;
+    typedef EventNormExactFieldCenter_<Domain> EventErrorNorm;
     auto speen = std::make_shared<EventErrorNorm>(&(equ.field("exact")), "phi", -1, -1, 1, Event::AFTER);
     equ.add_event("ErrorPhi", speen);
 

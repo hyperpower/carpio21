@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "type_define.hpp"
+#include "domain/domain_define.hpp"
 #include "domain/boundary/boundary_index.hpp"
 #include "base_operator_impl.hpp"
 
@@ -57,31 +58,54 @@ FIELD L4Alter(const FIELD& field, BI bi, double t=0.0, const std::string& method
     imp.set(method);
     return imp.execute(field, bi, t); 
 }
-template<class FIELD>
-typename FIELD::ValueType Norm1(const FIELD& field,typename FIELD::Tag);
 
 template<class FIELD>
 typename FIELD::ValueType Norm1(const FIELD& field){
     typename FIELD::Tag t; 
-    return Norm1(field, t);
+    return _Norm1(field, t);
 }
 template<class FIELD>
-typename FIELD::ValueType Norm2(const FIELD& field,typename FIELD::Tag);
+typename FIELD::ValueType Norm1(const FIELD& field, FunXYZ_Value efun){
+    typename FIELD::Tag t; 
+    return _Norm1(field, efun, t);
+}
+template<class FIELD>
+typename FIELD::ValueType Norm1(const FIELD& field, FunXYZT_Value efun, Vt time){
+    typename FIELD::Tag tag;
+    return _Norm1(field, efun, time, tag);
+}
 
 template<class FIELD>
 typename FIELD::ValueType Norm2(const FIELD& field){
     typename FIELD::Tag t; 
-    return Norm2(field, t);
+    return _Norm2(field, t);
 }
 template<class FIELD>
-typename FIELD::ValueType NormInf(const FIELD& field,typename FIELD::Tag);
+typename FIELD::ValueType Norm2(const FIELD& field, FunXYZ_Value efun){
+    typename FIELD::Tag t; 
+    return _Norm2(field, efun, t);
+}
+template<class FIELD>
+typename FIELD::ValueType Norm2(const FIELD& field, FunXYZT_Value efun, Vt time){
+    typename FIELD::Tag tag; 
+    return _Norm2(field, efun, time, tag);
+}
 
 template<class FIELD>
 typename FIELD::ValueType NormInf(const FIELD& field){
     typename FIELD::Tag t; 
-    return NormInf(field, t);
+    return _NormInf(field, t);
 }
-
+template<class FIELD>
+typename FIELD::ValueType NormInf(const FIELD& field, FunXYZ_Value efun){
+    typename FIELD::Tag t; 
+    return _NormInf(field, efun, t);
+}
+template<class FIELD>
+typename FIELD::ValueType NormInf(const FIELD& field, FunXYZT_Value efun, Vt time){
+    typename FIELD::Tag tag; 
+    return _NormInf(field, efun, time, tag);
+}
 template<class FIELD>
 FIELD IntVolume(const FIELD& field,typename FIELD::Tag);
 

@@ -308,13 +308,15 @@ public:
         }
         return false;
     }
-
-    void add_event(const std::string& key, spEvent spe){
+    template<class SPE>
+    void add_event(const std::string& key, SPE spe){
         ASSERT(spe != nullptr);
         this->_events[key] = spe;
-        if(spe->is_condition_event()){
-            _stop->add_condition(std::dynamic_pointer_cast<EventCondition>(spe));
-        }
+        // std::cout << std::is_base_of<Condition_<D>, typeof(*spe)>::value << std::endl;
+        std::cout << spe->is_condition_event() << std::endl;
+        // if(spe->is_condition_event()){
+            // _stop->add_condition(spe);
+        // }
     }
 
     

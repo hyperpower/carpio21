@@ -2,6 +2,7 @@
 #define _STOP_CONTROL_HPP
 
 #include "type_define.hpp"
+// #include "equation/event/event.hpp"
 #include <map>
 #include <utility>
 #include <memory>
@@ -9,7 +10,7 @@
 
 namespace carpio {
 
-template<class D> class EventCondition_;
+template<class D> class Condition_;
 
 template<class D>
 class StopControl_ {
@@ -19,10 +20,10 @@ public:
     typedef StopControl_<D>* pSelf;
     typedef std::shared_ptr<Self> spStopManager;
 
-    typedef EventCondition_<D> EventCondition;
-    typedef std::shared_ptr<EventCondition> spEventCondition;
+    typedef Condition_<D> Condition;
+    typedef std::shared_ptr<Condition> spCondition;
 
-    typedef std::list<spEventCondition> Container;
+    typedef std::list<spCondition> Container;
 
 protected:
     Container _conditions;
@@ -59,7 +60,7 @@ public:
         }
     }
 
-    void add_condition(spEventCondition spec){
+    void add_condition(spCondition spec){
         _conditions.push_back(spec);
     }
 

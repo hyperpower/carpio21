@@ -83,7 +83,7 @@ def plot_illustration_fig():
     # plt.grid(True)
     ax.set_aspect('equal')
     plt.tight_layout()
-    plt.savefig(PATH_FIG + "/illustration.png")
+    plt.savefig("fig/illustration.png")
     plt.close()
     # plt.show()
 
@@ -91,11 +91,8 @@ def plot_illustration_fig():
 def main():
     plot_illustration_fig()
     RT.make_gif("fou_phi", "fou_iter")
-    # RT.make_gif("QUICK_phi", "QUICK_iter")
-    # RT.rename_last_png("fou_phi")
-    # RT.rename_last_png("QUICK_phi")
-    # RT.delete_png_series("fou_phi")
-    # RT.delete_png_series("QUICK_phi")
+    RT.rename_last_png("fou_phi")
+    RT.delete_png_series("fou_phi")
     
 
 if __name__ == '__main__':

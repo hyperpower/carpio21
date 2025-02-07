@@ -86,7 +86,9 @@ protected:
     std::string name() const {
         return "OutputTime";
     }
-
+    virtual bool is_condition_event() const{
+        return false;
+    }
 
 
 };

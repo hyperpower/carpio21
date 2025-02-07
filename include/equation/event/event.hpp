@@ -127,9 +127,7 @@ public:
         return (this->_flag | f) == this->_flag ? true : false;
     }
 
-    virtual bool is_condition_event() const{
-        return false;
-    }
+    virtual bool is_condition_event() const = 0;
 
     virtual void show() const{
         std::cout << "Event Base Show" << std::endl;
@@ -177,6 +175,28 @@ public:
     }
 };
 
+template<class D>
+class Condition_{
+protected:
+    bool _is_satisfied;
+public:
+    Condition_():
+        _is_satisfied(false)
+        {
+    }
+
+    virtual ~Condition_() {
+    }
+
+    virtual bool is_satisfied() const {
+        return _is_satisfied;
+    }
+
+    // virtual bool is_condition_event() const{
+    //     return true;
+    // }
+
+};
 
 }
 
