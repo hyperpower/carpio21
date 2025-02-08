@@ -164,7 +164,8 @@ int run_a_scheme(const std::string& scheme){
     // egs.gnuplot().set_zrange( 0.0, 1.1);
     egs.gnuplot().set_equal_aspect_ratio();
     egs.gnuplot().set_cbrange(0.0, 1.0);
-    egs.gnuplot().set_palette_blue_red();
+    egs.gnuplot().set_palette_red_blue_dark();
+    // egs.gnuplot().set_palette_red_grey();
     egs.set_path(FIG_PATH + scheme + "_" );
     egs.set_format_string("%s_%03d");
 

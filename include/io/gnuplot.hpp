@@ -868,6 +868,22 @@ public:
         return *this;
     }
 
+    Gnuplot& set_palette_red_blue_dark() {
+        std::ostringstream cmdstr;
+        cmdstr << "set palette defined ( 0 '#6B0624',\
+                      1 '#8C0823',\
+                      2 '#B7192B',\
+                      3 '#FEAB87',\
+                      4 '#FBD2BC',\
+                      5 '#C8E0EC',\
+                      6 '#6FAFD1',\
+                      7 '#327CB7',\
+                      8 '#124B88',\
+                      9 '#083061' )";
+        cmd(cmdstr.str());
+
+        return *this;
+    }
 
     Gnuplot& set_palette_blues() {
         std::ostringstream cmdstr;
