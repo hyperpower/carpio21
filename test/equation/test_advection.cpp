@@ -100,6 +100,19 @@ TEST(equ_advection, fou){
     egs.set_path(FIG_PATH + "ex_");
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
 
+    typedef EventConditonNormPrevious_<Domain> ECNormPrev;
+    typedef std::shared_ptr<ECNormPrev> spECNormPrev;
+    typedef std::shared_ptr<Event> spEvent;
+    typedef std::shared_ptr<Condition_<Domain> > spCondition;
+
+    ECNormPrev ec("phi", 1e-1, 1e-1, 1e-1);
+    spECNormPrev spec = std::make_shared<ECNormPrev>(ec);
+    spEvent spe = spec;
+    spCondition spc = spec;
+
+    equ.add_stop_condition("StopNormPrev", spec);
+    
+
 
     equ.run();
 

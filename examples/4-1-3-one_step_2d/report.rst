@@ -26,18 +26,18 @@ First Order Upwind
 -------------------
 Initial condition of the domain is :math:`\phi = 0.0`. The iteration stops when :math:`||\phi^{n+1} - \phi^{n}|| < 10^{-5}`. CFL number is 0.5.
 
-.. figure:: fig/fou_phi.gif
+.. figure:: fig/fou_iter.gif
    :alt: the gif
    :align: center 
 
    First Order Upwind.
 
-.. figure:: fig/fou_phi_last.png
+.. figure:: fig/fou_phi-last.png
    :align: center 
 
    First Order Upwind (Last Step).
 
-.. figure:: fig/norm.png
+.. figure:: fig/fou_norm.png
    :align: center 
 
    Normal of each step.

@@ -54,7 +54,7 @@ void plot_error_norm(const std::string& fn_prefix,
 int run_a_scheme(const std::string& scheme){
     std::cout << "[Advection ] One Step 2D"<<std::endl;
     const int dim = 2;
-    const St n   = 50;                           // number of cells
+    const St n   = 65;                           // number of cells
     const Vt CFL = 0.4;                          // CFL
     const Vt dt  = CFL / n;                      // delta time
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;
@@ -85,7 +85,14 @@ int run_a_scheme(const std::string& scheme){
     typedef BoundaryCondition BC;
     typedef std::shared_ptr<BoundaryCondition> spBC;
     spBI spbi(new BoundaryIndex());
-    spBC spbcxm(new BoundaryConditionValue(BC::_BC1_, 1.0));
+    BoundaryConditionFunXYZ::FunXYZ_Value fun = [](Vt x, Vt y, Vt z){
+        if(y >= 0.0 && y <= 0.3){
+            return 1.0;
+        }else{
+            return 0.0;
+        }
+    };
+    spBC spbcxm(new BoundaryConditionFunXYZ(BC::_BC1_, fun));
     spbi->insert(0, spbcxm);
     spBC spbcym(new BoundaryConditionValue(BC::_BC1_, 0.0));
     spbi->insert(2, spbcym);
@@ -125,8 +132,9 @@ int run_a_scheme(const std::string& scheme){
 
 
     // plot field
+    // if(scheme == "fou"){
     typedef EventGnuplotField_<Domain> EventGnuplotField;
-    EventGnuplotField::FunPlot fun = [&scheme](
+    EventGnuplotField::FunPlot fun_plot = [&scheme](
                            Gnuplot& gnu,
                      const EventGnuplotField::FieldCenter& f,
                      St step, Vt t, int fob,
@@ -145,7 +153,7 @@ int run_a_scheme(const std::string& scheme){
         gnu.clear();
         return 1;
     };
-    EventGnuplotField egs("phi", fun, -1, -1, 1, Event::AFTER );
+    EventGnuplotField egs("phi", fun_plot, -1, -1, 1, Event::AFTER );
     egs.set_figure_font("Fira Code");
     // egs.set_figure_width(fig_width);
     // egs.set_figure_height(fig_height);
@@ -160,8 +168,8 @@ int run_a_scheme(const std::string& scheme){
     egs.set_path(FIG_PATH + scheme + "_" );
     egs.set_format_string("%s_%03d");
 
-    // egs.set_path("./fig/phi_");
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
+    // }
 
     typedef EventNormExactFieldCenter_<Domain> EventErrorNorm;
     typedef std::shared_ptr<EventErrorNorm> spEventErrorNorm;
@@ -189,7 +197,7 @@ int run_a_scheme(const std::string& scheme){
 
 int main(int argc, char** argv) {
     std::vector<std::string> schemes = {
-        "fou",
+        "QUICK", "fou", "CDS"
     };
     for(auto& scheme : schemes){
         run_a_scheme(scheme);

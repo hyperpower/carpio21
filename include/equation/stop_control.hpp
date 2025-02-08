@@ -2,7 +2,7 @@
 #define _STOP_CONTROL_HPP
 
 #include "type_define.hpp"
-// #include "equation/event/event.hpp"
+#include "equation/event/event.hpp"
 #include <map>
 #include <utility>
 #include <memory>

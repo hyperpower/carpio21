@@ -135,7 +135,8 @@ public:
 };
 
 template<class D>
-class EventConditonNormPrevious_ : public EventNormExactFieldCenter_<D>, Condition_<D>{
+class EventConditonNormPrevious_ : 
+    public EventNormExactFieldCenter_<D>, public Condition_<D>{
 public:
     typedef D Domain;
     typedef Event_<D> Event;

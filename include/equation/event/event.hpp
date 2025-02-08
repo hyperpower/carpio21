@@ -9,7 +9,7 @@
 
 namespace carpio{
 
-// template<class D> class EquationBase_;
+template<class D> class EquationBase_;
 // struct EventFlag
 // {
 //     static const int START  = 0x10;
@@ -127,7 +127,7 @@ public:
         return (this->_flag | f) == this->_flag ? true : false;
     }
 
-    virtual bool is_condition_event() const = 0;
+    // virtual bool is_condition_event() const = 0;
 
     virtual void show() const{
         std::cout << "Event Base Show" << std::endl;
@@ -181,20 +181,11 @@ protected:
     bool _is_satisfied;
 public:
     Condition_():
-        _is_satisfied(false)
-        {
-    }
+        _is_satisfied(false){}
 
-    virtual ~Condition_() {
-    }
+    ~Condition_() {}
 
-    virtual bool is_satisfied() const {
-        return _is_satisfied;
-    }
-
-    // virtual bool is_condition_event() const{
-    //     return true;
-    // }
+    virtual bool is_satisfied() const = 0;
 
 };
 

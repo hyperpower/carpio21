@@ -37,8 +37,8 @@ public:
     typedef Event_<D>                      Event;
     typedef std::shared_ptr<Event>       spEvent;
 
-    typedef EventCondition_<D>                EventCondition;
-    typedef std::shared_ptr<EventCondition>spEventCondition;
+    typedef Condition_<D>                    Condition;
+    typedef std::shared_ptr<Condition> spCondition;
 
     typedef std::shared_ptr<FieldCenter>    spFieldCenter;
     typedef std::shared_ptr<FieldFace>      spFieldFace;
@@ -308,15 +308,19 @@ public:
         }
         return false;
     }
-    template<class SPE>
-    void add_event(const std::string& key, SPE spe){
+
+    void add_event(const std::string& key, spEvent spe){
         ASSERT(spe != nullptr);
-        this->_events[key] = spe;
-        // std::cout << std::is_base_of<Condition_<D>, typeof(*spe)>::value << std::endl;
-        std::cout << spe->is_condition_event() << std::endl;
-        // if(spe->is_condition_event()){
-            // _stop->add_condition(spe);
-        // }
+        auto result = this->_events.insert({key, spe}); 
+
+        if (!result.second) {
+            std::cerr << "Key already exists. Value: " << result.first->second << std::endl;
+        }
+    }
+    template<class SPE>
+    void add_stop_condition(const std::string& key, SPE spe){
+        this->add_event(key, spe);
+        _stop->add_condition(spe);
     }
 
     
