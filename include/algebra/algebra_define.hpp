@@ -21,130 +21,116 @@
 namespace carpio {
 
 inline int StepFun(Float x) {
-	return (x <= 0) ? 0 : 1;
+    return (x <= 0) ? 0 : 1;
 }
 
 inline int StepFun(int x) {
-	return (x <= 0) ? 0 : 1;
+    return (x <= 0) ? 0 : 1;
 }
 
 template<class TYPE>
 inline bool IsSameSign(const TYPE& x, const TYPE& y){
-	if(Sign(x) == Sign(y)){
-		return true;
-	}else{
-		return false;
-	}
+    if(Sign(x) == Sign(y)){
+        return true;
+    }else{
+        return false;
+    }
 }
 enum Range {
-	_oo_, _oc_, _co_, _cc_,
+    _oo_, _oc_, _co_, _cc_,
 };
 
-template<typename TYPE>
-inline bool IsInRange(TYPE down, TYPE value, TYPE up, Range range) {
-	switch (range) {
-	case _oo_:
-		return (down < value && value < up) ? true : false;
-	case _oc_:
-		return (down < value && value <= up) ? true : false;
-	case _co_:
-		return (down <= value && value < up) ? true : false;
-	case _cc_:
-		return (down <= value && value <= up) ? true : false;
-	}
-	return false;
-}
 
 // a number is prime or not
 inline bool IsPrime(St n) {
-	if (n == 1) {
-		return false;
-	}
-	if (n == 2 || n == 3) {
-		return true;
-	} else if ((n % 2 == 0) || (n % 3 == 0)) {
-		return false;
-	} else {
-		St p = 5;
-		St w = 2;
-		while (p * p <= n) {
-			if (n % p == 0) {
-				return false;
-			}
-			p += w;
-			w = 6 - w;
-		}
-		return true;
-	}
+    if (n == 1) {
+        return false;
+    }
+    if (n == 2 || n == 3) {
+        return true;
+    } else if ((n % 2 == 0) || (n % 3 == 0)) {
+        return false;
+    } else {
+        St p = 5;
+        St w = 2;
+        while (p * p <= n) {
+            if (n % p == 0) {
+                return false;
+            }
+            p += w;
+            w = 6 - w;
+        }
+        return true;
+    }
 }
 
 
 // this function return a^2+b^2
 template<typename TYPE>
 TYPE SquareSum(const TYPE &a, const TYPE &b){
-	return a * a + b * b;
+    return a * a + b * b;
 }
 
 // this function return (a + b)*(a + b)
 template<typename TYPE>
 TYPE SumSquare(const TYPE &a, const TYPE &b) {
-	return (a + b) * (a + b);
+    return (a + b) * (a + b);
 }
 
 // round to n digit of a
 // roundto(3.145,1)=3.1    roundto(3.145,2)=3.15
 inline long double RoundTo(long double a, int n) {
-	return std::round(a * std::pow(10.0, n)) / std::pow(10.0, n);
+    return std::round(a * std::pow(10.0, n)) / std::pow(10.0, n);
 }
 template<typename TYPE>
 inline int CountSignificanceDigit(TYPE a) {
-	for (int i = 0; i < 30; i++) {
-		if (RoundTo(a, i) == a) {
-			return i;
-		}
-	}
-	return -1;
+    for (int i = 0; i < 30; i++) {
+        if (RoundTo(a, i) == a) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 
 template<class TYPE>
 inline TYPE max(TYPE a, TYPE b, bool (*Comp_ge)(const TYPE&, const TYPE&)) {
-	return Comp_ge(a, b) ? a : b;
+    return Comp_ge(a, b) ? a : b;
 }
 
 template<class TYPE>
 inline TYPE max(TYPE a, TYPE b, TYPE c,
-		bool (*Comp_ge)(const TYPE&, const TYPE&)) {
-	TYPE tmp = Comp_ge(a, b) ? a : b;
-	return Comp_ge(tmp, c) ? tmp : c;
+        bool (*Comp_ge)(const TYPE&, const TYPE&)) {
+    TYPE tmp = Comp_ge(a, b) ? a : b;
+    return Comp_ge(tmp, c) ? tmp : c;
 }
 
 template<class TYPE>
 inline TYPE min(TYPE a, TYPE b, bool (*Comp_le)(const TYPE&, const TYPE&)) {
-	return Comp_le(a, b) ? a : b;
+    return Comp_le(a, b) ? a : b;
 }
 
 template<class TYPE>
 inline TYPE min(TYPE a, TYPE b, TYPE c,
-		bool (*Comp_le)(const TYPE&, const TYPE&)) {
-	TYPE tmp = Comp_le(a, b) ? a : b;
-	return Comp_le(tmp, c) ? tmp : c;
+        bool (*Comp_le)(const TYPE&, const TYPE&)) {
+    TYPE tmp = Comp_le(a, b) ? a : b;
+    return Comp_le(tmp, c) ? tmp : c;
 }
 
 template<class TYPE>
 inline TYPE mid(TYPE a, TYPE b, TYPE c,
-		bool (*Comp_ge)(const TYPE&, const TYPE&)) {
-	int idx = Comp_ge(a, b) ? 1 : 2;
-	if (idx == 1)
-		idx = Comp_ge(a, c) ? 1 : 3;
-	else
-		idx = Comp_ge(b, c) ? 2 : 3;
-	if (idx == 1)
-		return Comp_ge(b, c) ? b : c;
-	else if (idx == 2)
-		return Comp_ge(a, c) ? a : c;
-	else
-		return Comp_ge(a, b) ? a : b;
+        bool (*Comp_ge)(const TYPE&, const TYPE&)) {
+    int idx = Comp_ge(a, b) ? 1 : 2;
+    if (idx == 1)
+        idx = Comp_ge(a, c) ? 1 : 3;
+    else
+        idx = Comp_ge(b, c) ? 2 : 3;
+    if (idx == 1)
+        return Comp_ge(b, c) ? b : c;
+    else if (idx == 2)
+        return Comp_ge(a, c) ? a : c;
+    else
+        return Comp_ge(a, b) ? a : b;
 }
 
 // template<class TYPE>
@@ -190,12 +176,12 @@ inline TYPE mid(TYPE a, TYPE b, TYPE c,
 
 template<class TYPE>
 bool Comp_great(const TYPE& a, const TYPE& b) {
-	return a > b;
+    return a > b;
 }
 
 template<class TYPE>
 bool Comp_less(const TYPE& a, const TYPE& b) {
-	return a < b;
+    return a < b;
 }
 
 // template<class TYPE>
@@ -240,46 +226,46 @@ bool Comp_less(const TYPE& a, const TYPE& b) {
 // }
 template<class TYPE>
 inline void Swap(TYPE& a, TYPE& b) //
-		{
-	TYPE tmp = a;
-	a = b;
-	b = tmp;
+        {
+    TYPE tmp = a;
+    a = b;
+    b = tmp;
 }
 
 template<class TYPE>
 inline void SortIncr(TYPE& a, TYPE& b, TYPE& c) //
-		{
-	if (b < a) {
-		Swap(a, b);
-	}
-	if (c < a) {
-		Swap(a, c);
-	}
-	if (c < b) {
-		Swap(b, c);
-	}
+        {
+    if (b < a) {
+        Swap(a, b);
+    }
+    if (c < a) {
+        Swap(a, c);
+    }
+    if (c < b) {
+        Swap(b, c);
+    }
 }
 
 template<class TYPE>
 int _QuadraticDiscriminant(const TYPE& a, const TYPE& b, const TYPE& c,
-		Float& discri) {
-	discri = b * b - 4.0 * a * c;
-	if (discri == 0) {
-		return 1;
-	} else if (discri > 0) {
-		return 2;
-	} else {
-		return 0;
-	}
+        Float& discri) {
+    discri = b * b - 4.0 * a * c;
+    if (discri == 0) {
+        return 1;
+    } else if (discri > 0) {
+        return 2;
+    } else {
+        return 0;
+    }
 }
 
 // n!
 inline double Factorial(St n) {
-	double r = 1;
-	for (St i = n; i > 0; i--) {
-		r *= i;
-	}
-	return r;
+    double r = 1;
+    for (St i = n; i > 0; i--) {
+        r *= i;
+    }
+    return r;
 }
 
 

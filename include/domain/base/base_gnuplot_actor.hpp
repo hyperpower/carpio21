@@ -39,6 +39,11 @@ GnuplotActor ToGnuplotActorContourWire(const ANY& a){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorContourWire(a, Tag()); 
 }
+template<class ANY>
+GnuplotActor ToGnuplotActorSection(const ANY& f, Axes a, Vt v){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorSection(f, a, v, Tag()); 
+}
 // a      : any objects
 // config : configure string
 template<class ANY>

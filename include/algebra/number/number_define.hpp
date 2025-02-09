@@ -67,6 +67,41 @@ template<class T, typename = std::enable_if_t<
 inline bool IsGreaterEqual(const T& x, const T& y){  // x < y
     return !IsLess(x, y);
 }
+template<typename T>
+inline std::enable_if_t<std::is_floating_point<T>::value, bool> 
+IsInRange(const T& down, const T& value, const T& up, Range range) {
+    auto maxXYOne = std::max( { T(1.0), std::fabs(down) , std::fabs(up), std::fabs(value) } );
+    auto e = std::numeric_limits<T>::epsilon()*maxXYOne;
+    auto vmd = value - down;
+    auto umv = up - value;
+    switch (range) {
+    case _oo_:
+        return ((vmd >  e) && (umv >  e)) ? true : false;
+    case _oc_:
+        return ((vmd >  e) && (umv > -e)) ? true : false;
+    case _co_:
+        return ((vmd > -e) && (umv >  e)) ? true : false;
+    case _cc_:
+        return ((vmd > -e) && (umv > -e)) ? true : false;
+    }
+    return false;
+}
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, bool> 
+IsInRange(const T& down, const T& value, const T& up, Range range) {
+    switch (range) {
+    case _oo_:
+        return ((down < value) && (value < up)) ? true : false;
+    case _oc_:
+        return ((down < value) && (value <= up)) ? true : false;
+    case _co_:
+        return ((down <= value) && (value < up)) ? true : false;
+    case _cc_:
+        return ((down <= value) && (value <= up)) ? true : false;
+    }
+    return false;
+}
+
 //implements ULP method
 //use this when you are only concerned about floating point precision issue
 //for example, if you want to see if a is 1.0 by checking if its within

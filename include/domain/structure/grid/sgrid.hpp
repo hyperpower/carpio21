@@ -73,6 +73,7 @@ public:
     virtual Point f (St, int, const Index&) const {return Point();}
     virtual Point f (St, int, Idx, Idx j = 0, Idx k = 0) const {return Point();}
     virtual Vt  f_(St, int, Idx) const {return 0;}
+    virtual Vt  f_(St, int, const Index&) const {return 0;}
     // face area
     virtual Vt  fa(St, int, const Index&) const {return 0;}
 

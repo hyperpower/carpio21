@@ -9,6 +9,8 @@ import operator
 import multiprocessing
 from multiprocessing import Pool
 PATH_CASES    = os.path.abspath(os.path.join(__file__, "../.."))
+PATH_THIS     = os.path.abspath(os.path.join(__file__, "../"))
+PATH_FIG      = os.path.abspath(os.path.join(PATH_THIS, "fig"))
 PATH_PYTOOLS  = os.path.abspath(os.path.join(PATH_CASES, "pytools"))
 
 plt.style.use(os.path.join(PATH_PYTOOLS, "web.mplstyle"))
@@ -77,7 +79,7 @@ def plot_illustration_fig():
     plt.text( 0.42, 0.34, "v = 1.0")
     plt.arrow(0.5,  0.1, 0.2, 0.2, width=0.01, color = "r")
 
-    plt.text( 0.5, 0.75, r'$\phi=1.0$')
+    plt.text( 0.35, 0.6, r'$\phi=\sin^2(\frac{10}{3} \pi y)$')
     plt.text( 0.6, 0.45, r'$\phi=0.0$')
     plt.text( 0.1, 0.75, r'$\phi=0.0$')
 
@@ -94,14 +96,14 @@ def plot_illustration_fig():
     # plt.grid(True)
     ax.set_aspect('equal')
     plt.tight_layout()
-    plt.savefig("./fig/illustration.png")
+    plt.savefig(PATH_FIG + "/illustration.png")
     plt.close()
     # plt.show()
 
 
 def main():
     plot_illustration_fig()
-    scheme = ["fou", "QUICK", "CDS"]
+    scheme = ["fou", "GPR0", "GPR12", "GPR13"]
     for s in scheme:
         prefix = s + "_phi"
         RT.make_gif(prefix, s + "_iter")

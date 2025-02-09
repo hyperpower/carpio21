@@ -5,6 +5,8 @@
 
 #include "domain/base/base_gnuplot_actor.hpp"
 #include "domain/structure/grid/sgrid.hpp"
+#include "domain/structure/ghost/sghost.hpp"
+#include "domain/structure/order/sorder.hpp"
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/field/sfield_center.hpp"
 #include "domain/structure/field/sfield_face.hpp"
@@ -609,6 +611,35 @@ auto _ToGnuplotActorVectors(const ANY& vf, Vt unit_length,
     }
     return gag;     
 }
+
+template<class ANY>
+GnuplotActor _ToGnuplotActorSection(const ANY& f, Axes a, Vt v, 
+    SFieldCenterTag){
+    EXPAND_FIELD_TAG(ANY);
+    return _SFieldCenterToGASection(f, a, v, 
+        ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+}
+
+template<class ANY>
+GnuplotActor _SFieldCenterToGASection(const ANY& f, Axes a, Vt v, 
+    ArithmeticTag, SGridTag, SGhostTag, SOrderTag, Dim2Tag){
+    // 2D Field Center
+    GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with points lw 2 lc palette");
+    auto& grid = f.grid();
+    for (auto &index : f.order()){
+        Vt fpm = grid.f_(a, _M_, index);
+        Vt fpp = grid.f_(a, _P_, index);
+        if (IsInRange(fpm, v, fpp, _co_)) {
+            Vt cor = grid.c_((a == _X_) ? _Y_ : _X_, index);
+            Vt val = f(index);
+            actor.data().push_back(ToString(cor, val, val," "));
+        }
+    }
+    return actor;
+}
+
 }
 
 #endif

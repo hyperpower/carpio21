@@ -16,6 +16,8 @@
 
 #include "example_define.hpp"
 
+#include <cmath>
+
 using namespace carpio;
 
 void plot_error_norm(const std::string& fn_prefix, 
@@ -89,7 +91,8 @@ int run_a_scheme(const std::string& scheme, std::list<GnuplotActor>& list_a){
     spBI spbi(new BoundaryIndex());
     BoundaryConditionFunXYZ::FunXYZ_Value fun = [](Vt x, Vt y, Vt z){
         if(y >= 0.0 && y <= 0.3){
-            return 1.0;
+            Vt s = std::sin(10.0 / 3.0 * M_PI * y);
+            return s * s;
         }else{
             return 0.0;
         }
@@ -124,7 +127,8 @@ int run_a_scheme(const std::string& scheme, std::list<GnuplotActor>& list_a){
     EventSetFieldCenter esfc("exact", 
         [](Vt x, Vt y, Vt z, Vt t){
             if(y > x && y < x + 0.3){
-                return 1.0;
+                Vt s = std::sin(10.0 / 3.0 * M_PI * y);
+                return s * s;
             }else{
                 return 0.0;
             }
@@ -230,8 +234,7 @@ int run_a_scheme(const std::string& scheme, std::list<GnuplotActor>& list_a){
 int main(int argc, char** argv) {
     std::vector<std::string> schemes = {
         "fou",
-        "QUICK", 
-        "CDS"
+        "GPR0", "GPR12", "GPR13"
     };
     std::list<GnuplotActor> la;
     for(auto& scheme : schemes){
@@ -240,7 +243,7 @@ int main(int argc, char** argv) {
     Gnuplot gun;
     gun.set_terminal_png("./fig/section_compare");
 
-    gun.set_xrange(0.0, 1.0);
+    gun.set_xrange(0.5, 1.0);
     gun.set_yrange(-0.2, 1.2);
     gun.set_xlabel("y");
     gun.set_ylabel("value"); 

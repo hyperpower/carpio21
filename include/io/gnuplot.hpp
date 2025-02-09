@@ -148,6 +148,11 @@ public:
         return *this;
     }
 
+    GnuplotActor& with_lines(){
+        this->_set_cmd(this->_scmd, "with", "lines");
+        return *this;
+    }
+
     GnuplotActor& point_size(const int& size){
         this->_set_cmd(this->_scmd, "pointsize", ToString(size));
         return *this;
@@ -1245,6 +1250,15 @@ public:
     Gnuplot& add(const GnuplotActorGroup& gag){
         for(auto& a : gag){
             this->_actors.push_back(std::make_shared<GnuplotActor>(a));
+        }
+        return *this;
+    }
+    template<class C>
+    std::enable_if_t<IsContainer<C>::value 
+        && std::is_same_v<typename C::value_type, GnuplotActor>, Gnuplot&> 
+    add(const C& c){
+        for(auto& a : c){
+            this->add(a);
         }
         return *this;
     }

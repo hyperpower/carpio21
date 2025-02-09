@@ -236,7 +236,9 @@ public:
         }
         return pc;
     }
-
+    Vt f_(St dim, int ori, const Index& index) const {
+        return f_(dim, ori, index[dim]);
+    }
     Vt f_(St dim, int fb, Idx idx) const {
         Vt halfs = hs_(dim, idx);
         Vt cen = c_(dim, idx);

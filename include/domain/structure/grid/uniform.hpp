@@ -212,7 +212,7 @@ public:
     }
 
     Point f(St dim, int fb, Idx i, Idx j = 0, Idx k = 0) const {
-        Point pc   = c(i, j, k);
+        Point pc = c(i, j, k);
         Vt halfs = _cs * 0.5;
         if (fb == _P_) { //right face
             pc[dim] += halfs;
@@ -222,6 +222,10 @@ public:
             SHOULD_NOT_REACH;
         }
         return pc;
+    }
+
+    Vt f_(St dim, int ori, const Index& index) const {
+        return f_(dim, ori, index[dim]);
     }
 
     Vt f_(St dim, int ori, Idx idx) const {
