@@ -830,7 +830,7 @@ public:
 
         return *this;
     }
-    Gnuplot& set_palette_blue_red() {
+    Gnuplot& set_palette_red_blue() {
         std::ostringstream cmdstr;
         cmdstr
                 << "set palette defined(\

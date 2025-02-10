@@ -60,8 +60,8 @@ public:
     virtual int boundary_id(
                 const Index& indexc,
                 const Index& indexg,
-                const St& axe,
-                const St& ori) const{
+                const Axes& axe,
+                const Orientation& ori) const{
         int baseid  = Base::boundary_id(indexc, indexg, axe, ori);
         auto bindex = Base::boundary_index(indexc, indexg, axe, ori);
         auto p      = this->_grid->f(axe, ori, bindex);

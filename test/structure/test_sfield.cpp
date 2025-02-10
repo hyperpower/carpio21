@@ -282,7 +282,7 @@ TEST(field, coutour){
     gnu.set_yrange(-0.0, 1.0);
     gnu.set_zrange(-1.0, 1.0);
     gnu.set_equal_aspect_ratio();
-    gnu.set_palette_blue_red();
+    gnu.set_palette_red_blue();
     gnu.set_ticslevel(0.1);
     gnu.set_view(55, 25 ,1.2 ,1.0);
     gnu.add(ToGnuplotActorContourWire(a));

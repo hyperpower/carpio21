@@ -96,7 +96,7 @@ TEST(equation, equation_base){
 // 	gnu.set_ylabel("y");
 // 	gnu.set_xlabel("x");
 // 	gnu.set_equal_aspect_ratio();
-// 	gnu.set_palette_blue_red();
+// 	gnu.set_palette_red_blue();
 // 	gnu.add(ToGnuplotActorContour(equ.field("phi")));
 //     gnu.set_terminal_png(OUTPUTPATH + "SolutionContour", fig_width, fig_height);
 // 	gnu.plot();
@@ -160,7 +160,7 @@ TEST(equation, equation_base){
 // 	gnu.set_ylabel("y");
 // 	gnu.set_xlabel("x");
 // 	gnu.set_equal_aspect_ratio();
-// 	gnu.set_palette_blue_red();
+// 	gnu.set_palette_red_blue();
 // 	gnu.add(ToGnuplotActorContour(equ.field("phi")));
 //     gnu.set_terminal_png(OUTPUTPATH + "Poisson_SolutionContour", fig_width, fig_height);
 // 	gnu.plot();

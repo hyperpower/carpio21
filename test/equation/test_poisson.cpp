@@ -98,7 +98,7 @@ TEST(equation, DISABLED_explicit_run){
     egs.gnuplot().set_yrange(-0.1, 1.1);
     egs.gnuplot().set_equal_aspect_ratio();
     egs.gnuplot().set_cbrange(0.0, 1.0);
-    egs.gnuplot().set_palette_blue_red();
+    egs.gnuplot().set_palette_red_blue();
     egs.set_path("./fig/");
     // equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
 
@@ -110,7 +110,7 @@ TEST(equation, DISABLED_explicit_run){
 	gnu.set_ylabel("y");
 	gnu.set_xlabel("x");
 	gnu.set_equal_aspect_ratio();
-	gnu.set_palette_blue_red();
+	gnu.set_palette_red_blue();
 	gnu.add(ToGnuplotActorContour(equ.field("phi")));
     gnu.set_terminal_png(OUTPUTPATH + "phi", fig_width, fig_height);
 	gnu.plot();

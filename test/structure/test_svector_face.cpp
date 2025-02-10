@@ -61,7 +61,7 @@ TEST(vector_face, dim2){
 	gnu.set_ylabel("Y");
 	gnu.set_equal_aspect_ratio();
 	gnu.set_key_spacing(1.5);
-	gnu.set_palette_blue_red();
+	gnu.set_palette_red_blue();
 	
 	auto agrid = ToGnuplotActorWireFrame(*spgrid);
 	agrid.title("Grid");

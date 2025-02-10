@@ -73,7 +73,7 @@ TEST(equ_laplacian, solve){
     // gnu.set_ylabel("y");
     // gnu.set_xlabel("x");
     gnu.set_equal_aspect_ratio();
-    gnu.set_palette_blue_red();
+    gnu.set_palette_red_blue();
     gnu.add(ToGnuplotActorContourWire(equ.field("phi")));
     gnu.set_terminal_png(FIG_PATH + "Solved_Phi", fig_width, fig_height);
     gnu.splot();
@@ -148,7 +148,7 @@ TEST(equ_laplacian, explicit_step){
     egs.gnuplot().set_zrange( 0.0, 1.1);
     egs.gnuplot().set_equal_aspect_ratio();
     egs.gnuplot().set_cbrange(0.0, 1.0);
-    egs.gnuplot().set_palette_blue_red();
+    egs.gnuplot().set_palette_red_blue();
     egs.set_path(FIG_PATH + "ex_");
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
     // Add events Error Norm
@@ -169,7 +169,7 @@ TEST(equ_laplacian, explicit_step){
     // gnu.set_ylabel("y");
     // gnu.set_xlabel("x");
     // gnu.set_equal_aspect_ratio();
-    // gnu.set_palette_blue_red();
+    // gnu.set_palette_red_blue();
     // gnu.add(ToGnuplotActorContour(equ.field("phi")));
     // gnu.set_terminal_png(FIG_PATH + "phi", fig_width, fig_height);
     // gnu.plot();
@@ -243,7 +243,7 @@ TEST(equ_laplacian, implicit_step){
     egs.gnuplot().set_zrange( 0.0, 1.1);
     egs.gnuplot().set_equal_aspect_ratio();
     egs.gnuplot().set_cbrange(0.0, 1.0);
-    egs.gnuplot().set_palette_blue_red();
+    egs.gnuplot().set_palette_red_blue();
     egs.set_path(FIG_PATH + "im_");
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
 
@@ -255,7 +255,7 @@ TEST(equ_laplacian, implicit_step){
     // gnu.set_ylabel("y");
     // gnu.set_xlabel("x");
     // gnu.set_equal_aspect_ratio();
-    // gnu.set_palette_blue_red();
+    // gnu.set_palette_red_blue();
     // gnu.add(ToGnuplotActorContour(equ.field("phi")));
     // gnu.set_terminal_png(FIG_PATH + "phi", fig_width, fig_height);
     // gnu.plot();
