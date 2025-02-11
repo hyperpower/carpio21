@@ -255,7 +255,7 @@ GnuplotActor _ToGnuplotActorContourWire(const ANY& a, SFieldCenterTag){
 template<class ANY>
 GnuplotActor  _ToGnuplotActorLabel(const ANY& order, 
                                 const std::string& config, 
-                                SOrderXYZTag){
+                                SOrderTag){
     GnuplotActor actor;
     actor.command("using 1:2:3 title \"\" ");
     actor.style("with labels center textcolor lt 2");

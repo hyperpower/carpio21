@@ -33,7 +33,7 @@ void PlotFieldAsContour(const std::string& ffn, const Field& f){
 	gnu.set_ylabel("y");
 	gnu.set_xlabel("x");
 	gnu.set_equal_aspect_ratio();
-	gnu.set_palette_blue_red();
+	gnu.set_palette_red_blue();
 	gnu.add(ToGnuplotActorContour(f));
     gnu.set_terminal_png(FIG_PATH + ffn, fig_width, fig_height);
 	gnu.plot();
@@ -95,7 +95,6 @@ void PlotError(const std::string& ffn,
 	gnu.set_ylabel("Norm");
 	gnu.set_xlabel("1/n");
     gnu.set_yformat("10^{%L}");
-	// gnu.set_equal_aspect_ratio();
 	// gnu.set_palette_blue_red();
     std::list<double> lh;
     for(auto& n:ln){
@@ -126,7 +125,6 @@ void PlotError(const std::string& ffn,
 
     auto liref = Reference(2, ln, li);
     auto air = ToGnuplotActor(lh, liref);
-    // a2r.title("2 Order");
     air.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
 
     gnu.add(a1r);
@@ -135,8 +133,7 @@ void PlotError(const std::string& ffn,
 
     gnu.set_terminal_png(FIG_PATH + ffn, fig_width, fig_height);
     gnu.set_key("top left");
-    // gnu.test();
-	gnu.plot();
+    gnu.plot();
 }
 
 void ExactSolution(){
