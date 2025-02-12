@@ -54,17 +54,17 @@ public:
     virtual ~Laplace_(){};
 
     virtual int run_one_step(St step, Vt time){
-        auto name = any_cast<std::string>(this->_configs["set_time_scheme"]);
-        if(name == "explicit"){
+        auto tscheme = any_cast<std::string>(this->_configs["set_time_scheme"]);
+        if(tscheme == "explicit"){
             _one_step_explicit(step, time);
-        }else if(name == "implicit"){
+        }else if(tscheme == "implicit"){
             _one_step_implicit(step, time);
-        }else if(name == "CN"){
+        }else if(tscheme == "CN"){
             _one_step_cn(step, time);
-        }else if(name == "CNgeneral"){
+        }else if(tscheme == "CNgeneral"){
             _one_step_cng(step, time);
         }else{
-            std::cout <<" >! Unknown time scheme " << name << std::endl;
+            std::cout <<" >! Unknown time scheme " << tscheme << std::endl;
             SHOULD_NOT_REACH;
         }
         return -1;
@@ -95,9 +95,32 @@ public:
 
     virtual int finalize(){
         return 0;
-    }; 
+    };
 
     virtual int solve(){
+        auto sscheme = any_cast<std::string>(
+            this->_configs["space_scheme"]);
+        if(sscheme == "finite_volume_2"){
+            return solve_fv2();
+        }else if(sscheme == "finite_difference_2"){
+            return solve_fd2();
+        }else{
+            std::cerr << "Wrong space sscheme " << sscheme << std::endl;
+            return 1;
+        }
+    } 
+
+    virtual int solve_fd2(){
+        FieldCenter&    phi  = *(this->_fields["phi"]);
+        auto expf = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
+        auto bis      = this->get_boundary_index("phi");
+
+        auto res = DifferenialLaplacian((*expf), (*bis));
+
+        return this->_build_mat_and_solve(res, phi);
+    }    
+
+    virtual int solve_fv2(){
         FieldCenter&    phi  = *(this->_fields["phi"]);
         auto expf = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
         auto bis      = this->get_boundary_index("phi");

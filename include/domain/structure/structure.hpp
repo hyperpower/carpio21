@@ -24,7 +24,8 @@
 #include "io/s_stringify.hpp"
 
 #include "operator/slaplacian.hpp"
-#include "operator/sintegral_laplacian.hpp"
+#include "operator/slaplacian_integral.hpp"
+#include "operator/slaplacian_differential.hpp"
 #include "operator/sbuild_matrix.hpp"
 #include "operator/sinterpolate.hpp"
 #include "operator/su_dot_nabla.hpp"

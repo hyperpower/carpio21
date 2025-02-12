@@ -55,6 +55,31 @@ void plot_error_norm(const std::string& fn_prefix,
     gnu.plot();
 }
 
+template<class EQU>
+inline void plot_section_compare(const std::string& scheme, const EQU& equ){
+    Gnuplot gun_section;
+    gun_section.set_terminal_png("./fig/" + scheme +"_section");
+
+    gun_section.set_xrange(0.0, 40.0);
+    gun_section.set_yrange(-0.1, 1.1);
+    gun_section.set_xlabel("y");
+    gun_section.set_ylabel("value");
+
+    auto a_exact = ToGnuplotActorSection(equ.field("exact"), _Y_, 40.0);
+    a_exact.title("Exact");
+    a_exact.with_lines();
+    a_exact.line_color_black();
+    gun_section.add(a_exact);
+
+    auto a_section = ToGnuplotActorSection(equ.field("phi"), _Y_, 40.0);
+    a_section.title(scheme);
+    a_section.point_type(7);
+    gun_section.add(a_section);
+    gun_section.set_palette_red_blue();
+    gun_section.set_key("top left");
+    gun_section.plot();
+}
+
 
 int run_a_scheme(const std::string& scheme){
     std::cout << "[Advection ] Rotational square"<<std::endl;
@@ -158,12 +183,12 @@ int run_a_scheme(const std::string& scheme){
         
         auto af = ToGnuplotActorContourWire(f);
         // af.title(scheme);
-        af.line_width(2);
+        af.line_width(1);
         gnu.add(af);
 
         // add label
-        gnu.set_label(10, "Step = " + ToString(step), 5, 10, 5);
-        gnu.set_label(11, "Time = " + ToString(t, "%.2f"), 5, 10, 4.5);
+        gnu.set_label(10, "Step = " + ToString(step), 5, 10, 3);
+        gnu.set_label(11, "Time = " + ToString(t, "%.2f"), 5, 10, 2.5);
         gnu.splot();
         gnu.clear();
         return 1;
@@ -176,14 +201,14 @@ int run_a_scheme(const std::string& scheme){
     egs.gnuplot().set_yrange(0, 80);
     egs.gnuplot().set_zrange(0, 1.1);
     egs.gnuplot().set_view(20,25,1.1,1.0);
-    egs.gnuplot().set_ticslevel(0.);
+    egs.gnuplot().set_ticslevel(0.1);
     egs.gnuplot().set_xlabel("x");
     egs.gnuplot().set_ylabel("y");
     // egs.gnuplot().set_zrange( 0.0, 1.1);
     // egs.gnuplot().set_equal_aspect_ratio();
-    egs.gnuplot().set_cbrange(0.0, 1.0);
-    // egs.gnuplot().set_palette_red_blue_dark();
-    egs.gnuplot().set_palette_red_blue();
+    egs.gnuplot().set_cbrange(-0.2, 1.2);
+    egs.gnuplot().set_palette_red_blue_dark();
+    // egs.gnuplot().set_palette_red_blue();
     egs.set_path(FIG_PATH + scheme + "_" );
     egs.set_format_string("%s_%03d");
 
@@ -194,27 +219,7 @@ int run_a_scheme(const std::string& scheme){
     equ.run();
 
     // Plot last section
-    Gnuplot gun_section;
-    gun_section.set_terminal_png("./fig/" + scheme +"_section");
-
-    gun_section.set_xrange(0.0, 1.0);
-    gun_section.set_yrange(-0.1, 1.1);
-    gun_section.set_xlabel("y");
-    gun_section.set_ylabel("value");
-
-    auto a_exact = ToGnuplotActorSection(equ.field("exact"), _Y_, 1e-3);
-    a_exact.title("Exact");
-    a_exact.with_lines();
-    a_exact.line_color_black();
-    gun_section.add(a_exact);
-
-    auto a_section = ToGnuplotActorSection(equ.field("phi"), _Y_, 1e-3);
-    a_section.title(scheme);
-    a_section.point_type(7);
-    gun_section.add(a_section);
-    gun_section.set_palette_red_blue();
-    gun_section.set_key("top left");
-    gun_section.plot();
+    plot_section_compare(scheme, equ); 
 }
 
 

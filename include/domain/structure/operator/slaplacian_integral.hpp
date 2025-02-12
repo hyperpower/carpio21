@@ -1,5 +1,5 @@
-#ifndef _SINTEGRAL_LAPLACIAN_HPP
-#define _SINTEGRAL_LAPLACIAN_HPP
+#ifndef _S_LAPLACIAN_INTEGRAL_HPP
+#define _S_LAPLACIAN_INTEGRAL_HPP
 
 #include "domain/base/base_operator.hpp"
 #include "domain/structure/field/sfield.hpp"

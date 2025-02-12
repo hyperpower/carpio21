@@ -30,7 +30,11 @@ FIELD IntegralLaplacian(const FIELD& field, const BI& bi, double t=0.0){
     typename FIELD::Tag field_tag; 
     return IntegralLaplacian(field, bi, t, field_tag);
 }
-
+template<class FIELD, class BI>
+FIELD DifferenialLaplacian(const FIELD& field, const BI& bi, double t=0.0){
+    typename FIELD::Tag field_tag; 
+    return DifferenialLaplacian(field, bi, t, field_tag);
+}
 // Laplacian Finite Difference Method
 template<class FIELD, class BI>
 FIELD Laplacian(const FIELD& field, BI bi, double t=0.0){

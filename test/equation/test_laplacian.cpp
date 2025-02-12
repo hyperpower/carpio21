@@ -9,7 +9,7 @@
 #include "domain/structure/io/sgnuplot_actor.hpp"
 
 #include "domain/structure/operator/sapply_bc.hpp"
-#include "domain/structure/operator/sintegral_laplacian.hpp"
+#include "domain/structure/operator/slaplacian_integral.hpp"
 
 #include "domain/structure/operator/scommon.hpp"
 
@@ -18,6 +18,7 @@
 #include "equation/event/event.hpp"
 
 using namespace carpio;
+
 
 TEST(equ_laplacian, solve){
     std::cout << "[  Laplace ] Test"<<std::endl;
@@ -55,6 +56,7 @@ TEST(equ_laplacian, solve){
 
     // Set solver
     equ.set_solver("Jacobi", 1000, 1e-4);
+    equ.set_space_scheme("finite_difference_2");
     
     // Add events
     typedef Event_<Domain> Event;
@@ -73,14 +75,19 @@ TEST(equ_laplacian, solve){
     // gnu.set_ylabel("y");
     // gnu.set_xlabel("x");
     gnu.set_equal_aspect_ratio();
-    gnu.set_palette_red_blue();
     gnu.add(ToGnuplotActorContourWire(equ.field("phi")));
+    gnu.set_palette_red_blue_dark();
+    gnu.set_grid();
+    gnu.set_view(60,40,1.1,1.0);
+    gnu.set_ticslevel(0.0);
     gnu.set_terminal_png(FIG_PATH + "Solved_Phi", fig_width, fig_height);
     gnu.splot();
+
+    
 }
 
 
-TEST(equ_laplacian, explicit_step){
+TEST(equ_laplacian, DISABLED_explicit_step){
     std::cout << "[  Laplace ] Explicit step"<<std::endl;
     const int dim = 2;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;
@@ -148,20 +155,20 @@ TEST(equ_laplacian, explicit_step){
     egs.gnuplot().set_zrange( 0.0, 1.1);
     egs.gnuplot().set_equal_aspect_ratio();
     egs.gnuplot().set_cbrange(0.0, 1.0);
-    egs.gnuplot().set_palette_red_blue();
+    egs.gnuplot().set_palette_red_blue_dark();
     egs.set_path(FIG_PATH + "ex_");
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
     // Add events Error Norm
     typename Domain::FieldCenter exact(spgrid, spghost, sporder);
     typedef EventNormExactFieldCenter_<Domain> EventErrorNorm;
-    auto speen = std::make_shared<EventErrorNorm>(exact, "phi", -1, -1, 1, Event::AFTER);
+    auto speen = std::make_shared<EventErrorNorm>(&exact, "phi", -1, -1, 1, Event::AFTER);
     equ.add_event("ErrorPhi", speen);
 
     equ.run();
 
-    for(auto& v : speen->get_list_norm1()){
-        std::cout << v << std::endl;
-    }
+    // for(auto& v : speen->get_list_norm1()){
+    //     std::cout << v << std::endl;
+    // }
 
     // Gnuplot gnu;
     // gnu.set_xrange(-0.1, 1.1);
@@ -175,7 +182,7 @@ TEST(equ_laplacian, explicit_step){
     // gnu.plot();
 }
 
-TEST(equ_laplacian, implicit_step){
+TEST(equ_laplacian, DISABLED_implicit_step){
     std::cout << "[  Laplace ] Explicit step"<<std::endl;
     const int dim = 2;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;

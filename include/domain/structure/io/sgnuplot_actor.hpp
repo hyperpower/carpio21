@@ -209,7 +209,8 @@ GnuplotActor _ToGnuplotActorContour(const ANY& a, SFieldCenterTag){
     return _ToGnuplotActorContourDim(a, Tag(), DimTag()); 
 }
 template<class ANY>
-GnuplotActor _ToGnuplotActorContourWireDim(const ANY& f, SFieldCenterTag, Dim2Tag){
+GnuplotActor _ToGnuplotActorContourWireDim(const ANY& f, 
+    SFieldCenterTag, Dim2Tag){
     GnuplotActor actor;
     actor.command("using 1:2:3 title \"\" ");
     actor.style("with line lc palette");
@@ -228,7 +229,8 @@ GnuplotActor _ToGnuplotActorContourWireDim(const ANY& f, SFieldCenterTag, Dim2Ta
     return actor;
 }
 template<class ANY>
-GnuplotActor _ToGnuplotActorContourWireDim(const ANY& f, SFieldCenterTag, Dim1Tag){
+GnuplotActor _ToGnuplotActorContourWireDim(
+        const ANY& f, SFieldCenterTag, Dim1Tag){
     GnuplotActor actor;
     actor.command("using 1:2:3 title \"\" ");
     actor.style("with lines lc palette");

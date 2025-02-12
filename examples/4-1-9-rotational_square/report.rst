@@ -1,33 +1,61 @@
 Problem Description
 ===================
 
-The domain is a unit square :math:`x \in [-1.0, 1.0], y \in [0.0, 1.0]`. The boudary conditions are
+The domain is a square :math:`x \in [0, 80], y \in [0, 80]`. The boudary conditions are
 
 .. math::
-   \phi = 1 &, \quad \text{if} \quad y = 0.0 \quad \text{and} \quad y = [-0.8, -0.6] \quad \text{or} \quad y = [-0.4, -0.2]\\
-   \frac{d \phi}{d x} = 0 &, \quad \text{if} \quad x = 0 \quad \text{and} \quad x = 1\\
-   \frac{d \phi}{d y} = 0 &, \quad \text{if} \quad y = 0.0 \quad \text{and} \quad x = [0.0, 1.0]\\
-   \frac{d \phi}{d y} = 0 &, \quad \text{if} \quad y = 1.0 \\
+   \frac{d \phi}{d x} = 0 
 
-The velocity is :math:`\mathbf{u}=(y, -x)`. 
+The velocity is 
+
+.. math::
+   u = -(y - 40)\frac{2 \pi}{360} 
+
+
+.. math::
+   v = (x - 40)\frac{2 \pi}{360} 
+
+Initial condition of the domain is
+
+.. math::
+   \phi = 1, \quad \text{if} \in [16, 24], \quad y \in [44, 36]
+
+.. math::
+   \phi = 0, \quad \text{elsewhere}
 
 .. figure:: fig/illustration.png
-   :alt: two gates
+   :alt: rotational_square
    :align: center 
 
    Illustration of the problem.
 
+It t = 360, the square will rotate back.
+
 Results
 ===================
 
-Scheme Comparsion
--------------------
-Initial condition of the domain is :math:`\phi = 0.0`. The iteration stops when 3 norms are all less than :math:`10^{-5}`. CFL number is 0.4. 
+First Order Upwind
+--------------------
+The movement of the profile is shown as follows.
 
-The final profile at outlet section (x = [0.0, 1.0] and y = 0.0) is shown as follows.
-
-.. figure:: fig/compare_section.png
-   :alt: rotate ou
+.. figure:: fig/fou_phi.gif
+   :alt: FOU gif
    :align: center 
 
-   Comparsion of schemes.
+   Convection of the square.
+
+Final Profile Comparsion
+--------------------------
+The final profile should equal to initial profile. But, different scheme will have different results.
+
+.. figure:: fig/compare_section_x.png
+   :alt: rotate x
+   :align: center 
+
+   Comparsion of schemes (x=20).
+
+.. figure:: fig/compare_section_y.png
+   :alt: rotate x
+   :align: center 
+
+   Comparsion of schemes (y=40).
