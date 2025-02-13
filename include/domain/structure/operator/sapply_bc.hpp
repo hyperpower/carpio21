@@ -6,6 +6,10 @@
 #include "domain/boundary/boundary_index.hpp"
 #include "domain/base/base_operator.hpp"
 
+#include "domain/structure/ghost/sghost.hpp"
+#include "domain/structure/grid/sgrid.hpp"
+#include "domain/structure/order/sorder.hpp"
+
 namespace carpio{
 // BC Implement 
 template<class FIELD, St DIM, 
@@ -649,29 +653,44 @@ void _ApplyBoundaryValue(
     FIELD&               field,
     const BoundaryIndex& bi,
     const Vt&            time, 
+    SGridTag , SGhostTag , SOrderTag , DimTag )
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    EXPAND_FIELD(FIELD);
+    typedef typename FIELD::ValueType Exp;
+
+    auto& ghost = field.ghost();
+    for(auto& idx : field.order()){
+        _ApplyBoundaryValueLocal(field, idx, bi, time,
+           GridTag(), GhostTag(), OrderTag(), DimTag());
+    }
+}
+template<class FIELD>
+void _ApplyBoundaryValueLocal(
+    FIELD&               field,
+    const typename FIELD::Index&  idx,
+    const BoundaryIndex& bi,
+    const Vt&            time, 
     SGridTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
     typedef typename FIELD::ValueType Exp;
 
     auto& ghost = field.ghost();
-    for(auto& idx : field.order()){
-        auto& exp = field(idx);
-        Exp res(exp.value());
-        for(auto& term : exp){
-            auto& idxg = term.first;
-            if(ghost.is_ghost(idxg)){
-                auto axe  = GetDeltaAxe(idx, idxg);
-                auto ori  = GetDeltaOrient(idx, idxg);
-                auto v    = Value(field, bi, idx, idxg, axe, ori, time);
-                res += v * term.second;
-            }else{
-                res.insert(term.second, term.first);
-            }
+    auto& exp = field(idx);
+    for(auto iter = exp.begin(); iter != exp.end();){
+        auto& idxg = iter->first;
+        auto& coe  = iter->second;
+        if(ghost.is_ghost(idxg)){
+            auto axe  = GetDeltaAxe(idx, idxg);
+            auto ori  = GetDeltaOrienOnAxes(idx, idxg, axe);
+            auto v    = Value(field, bi, idx, idxg, axe, ori, time);
+            exp += v * coe;
+            iter = exp.erase(iter);
+        } else {
+            ++iter; 
         }
-        field(idx) = res;
     }
-
 }
 } // namespace carpio
 

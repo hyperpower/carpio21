@@ -6,7 +6,6 @@
 #include "domain/structure/io/sgnuplot_actor.hpp"
 
 #include "domain/structure/operator/sapply_bc.hpp"
-#include "domain/structure/operator/sintegral_laplacian.hpp"
 
 #include "domain/structure/operator/scommon.hpp"
 
@@ -158,10 +157,11 @@ int run_a_scheme(const std::string& scheme){
     equ.new_field("exact");
     EventSetFieldCenter esfc("exact", 
         [](Vt x, Vt y, Vt z, Vt t){
-            if(((x * x + y * y) > (0.6 * 0.6)
-                 && (x * x + y * y) < (0.8 * 0.8))
-                || ((x * x + y * y) < (0.4 * 0.4)
-                 && (x * x + y * y) > (0.2 * 0.2)) ){
+            Vt xc = 20;
+            Vt yc = 40;
+            Vt l  = 8;
+            if(   IsInRange(xc-l, x, xc+l, _cc_) 
+            && IsInRange(yc-l, y, yc+l, _cc_)){
                 return 1.0;
             }else{
                 return 0.0;
@@ -199,9 +199,9 @@ int run_a_scheme(const std::string& scheme){
     // egs.set_figure_height(fig_height);
     egs.gnuplot().set_xrange(0, 80);
     egs.gnuplot().set_yrange(0, 80);
-    egs.gnuplot().set_zrange(0, 1.1);
-    egs.gnuplot().set_view(20,25,1.1,1.0);
-    egs.gnuplot().set_ticslevel(0.1);
+    egs.gnuplot().set_zrange(-0.2, 1.1);
+    egs.gnuplot().set_view(25,25,1.1,1.0);
+    egs.gnuplot().set_ticslevel(0.0);
     egs.gnuplot().set_xlabel("x");
     egs.gnuplot().set_ylabel("y");
     // egs.gnuplot().set_zrange( 0.0, 1.1);
@@ -214,7 +214,6 @@ int run_a_scheme(const std::string& scheme){
 
     equ.add_event("GnuplotPhi", std::make_shared<EventGnuplotField>(egs));
     // }
-
 
     equ.run();
 

@@ -266,24 +266,15 @@ Orientation GetDeltaOrient(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     }
     return _C_;
 }
-// deprecate -->
-// template<St DIM>
-// SIndex_<DIM> CellIndexToFaceIndex(const SIndex_<DIM>& cidx, 
-//                                  const Axes& a, 
-//                                  const Orientation& o) {
-//     auto res(cidx);
-//     res[a] += (o == _P_)? 1 : 0;
-//     return res;
-// }
-// template<St DIM>
-// SIndex_<DIM> FaceIndexToCellIndex(const SIndex_<DIM>& fidx, 
-//                                  const Axes& a, 
-//                                  const Orientation& o) {
-//     auto res(fidx);
-//     res[a] -= (o == _P_)? 1 : 0;
-//     return res;
-// }
-// <--- deprecate
+template<St DIM>
+Orientation GetDeltaOrienOnAxes(
+    const SIndex_<DIM>& c, const SIndex_<DIM>& g, const Axes& a) {
+    if(g[a] > c[a])
+        return _P_;
+    else if(g[a] < c[a])
+        return _M_;
+    return _C_;
+}
 
 
 
