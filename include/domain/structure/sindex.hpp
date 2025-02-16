@@ -43,58 +43,58 @@ public:
     }
 
     // plus 1
-    Self p(St dim) {
+    // Self p(St dim, St step = 1) {
+    //     Self res(*this);
+    //     if (dim == 0) {
+    //         res[0] += step;
+    //     }else if (dim == 1) {
+    //         res[1] += step;
+    //     }else { // dim == 2
+    //         res[2] += step;
+    //     }
+    //     return res;
+    // }
+    Self p(St dim, unsigned int step = 1) const {
         Self res(*this);
         if (dim == 0) {
-            res[0] += 1;
-        }else if (dim == 1) {
-            res[1] += 1;
-        }else { // dim == 2
-            res[2] += 1;
+            res[0] += step;
+        }
+        if (dim == 1) {
+            res[1] += step;
+        }
+        if (dim == 2) {
+            res[2] += step;
         }
         return res;
     }
-    Self p(St dim) const {
+    // Self m(St dim) {
+    //     Self res(*this);
+    //     if (dim == 0) {
+    //         res[0] -= 1;
+    //     }
+    //     if (dim == 1) {
+    //         res[1] -= 1;
+    //     }
+    //     if (dim == 2) {
+    //         res[2] -= 1;
+    //     }
+    //     return res;
+    // }
+    Self m(St dim, unsigned int step = 1) const {
         Self res(*this);
         if (dim == 0) {
-            res[0] += 1;
+            res[0] -= step;
         }
         if (dim == 1) {
-            res[1] += 1;
+            res[1] -= step;
         }
         if (dim == 2) {
-            res[2] += 1;
-        }
-        return res;
-    }
-    Self m(St dim) {
-        Self res(*this);
-        if (dim == 0) {
-            res[0] -= 1;
-        }
-        if (dim == 1) {
-            res[1] -= 1;
-        }
-        if (dim == 2) {
-            res[2] -= 1;
-        }
-        return res;
-    }
-    Self m(St dim) const {
-        Self res(*this);
-        if (dim == 0) {
-            res[0] -= 1;
-        }
-        if (dim == 1) {
-            res[1] -= 1;
-        }
-        if (dim == 2) {
-            res[2] -= 1;
+            res[2] -= step;
         }
         return res;
     }
     // high level shift
-    Self shift(St dim, St ori) {
+    Self shift(St dim, const Orientation& ori) const{
         // dim 0 1 2
         //     x y z
         // ori 0 1 2
@@ -106,20 +106,33 @@ public:
             return this->p(dim);
         }
     }
-    Self shift(St dim, St ori) const {
+    Self shift(St dim, int step) const{
         // dim 0 1 2
         //     x y z
         // ori 0 1 2
         //     m p c
-        ASSERT(ori == 0 || ori == 1 || ori == 2);
-        if (ori == 0) {
-            return this->m(dim);
-        } else if (ori == 1) {
-            return this->p(dim);
-        } else {
+        if (step < 0) {
+            return this->m(dim, std::abs(step));
+        } else if (step > 0){
+            return this->p(dim, std::abs(step));
+        }else{
             return (*this);
         }
     }
+    // Self shift(St dim, St ori) const {
+    //     // dim 0 1 2
+    //     //     x y z
+    //     // ori 0 1 2
+    //     //     m p c
+    //     ASSERT(ori == 0 || ori == 1 || ori == 2);
+    //     if (ori == 0) {
+    //         return this->m(dim);
+    //     } else if (ori == 1) {
+    //         return this->p(dim);
+    //     } else {
+    //         return (*this);
+    //     }
+    // }
 
     int value(St i) const {
         if (i < Dim) {
@@ -245,10 +258,41 @@ SIndex_<DIM> GetDeltaIndex(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     return res;
 }
 template<St DIM>
+bool OnSameAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
+    auto d = GetDeltaIndex(c, g);
+    short count = 0;
+    for(int i = 0; i < DIM; ++i){
+        if(d[i] != 0){
+            count++;
+        }
+    }
+    return count <= 1;
+} 
+template<St DIM>
+bool OnSameAxe(const SIndex_<DIM>& delta_idx) {
+    short count = 0;
+    for(short i = 0; i < DIM; ++i){
+        if(delta_idx[i] != 0){
+            count++;
+        }
+    }
+    return count <= 1;
+} 
+template<St DIM>
 Axes GetDeltaAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     auto d = GetDeltaIndex(c, g);
     for(int i = 0; i < DIM; ++i){
         if(d[i] != 0){
+            return ToAxes(i);
+        }
+    }
+    SHOULD_NOT_REACH;
+    return _X_;
+}
+template<St DIM>
+Axes GetDeltaAxe(const SIndex_<DIM>& didx) {
+    for(int i = 0; i < DIM; ++i){
+        if(didx[i] != 0){
             return ToAxes(i);
         }
     }
@@ -267,7 +311,17 @@ Orientation GetDeltaOrient(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     return _C_;
 }
 template<St DIM>
-Orientation GetDeltaOrienOnAxes(
+Orientation GetDeltaOrientOnSameAxe(const SIndex_<DIM>& delta_idx) {
+    for(int i = 0; i < DIM; ++i){
+        if(delta_idx[i] > 0)
+            return _P_;
+        else if(delta_idx[i] < 0)
+            return _M_;
+    }
+    return _C_;
+}
+template<St DIM>
+Orientation GetDeltaOrientOnAxe(
     const SIndex_<DIM>& c, const SIndex_<DIM>& g, const Axes& a) {
     if(g[a] > c[a])
         return _P_;

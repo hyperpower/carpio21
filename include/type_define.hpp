@@ -152,6 +152,17 @@ struct AxesTagTraits_<1> {using Type = YTag;};
 template<>
 struct AxesTagTraits_<2> {using Type = ZTag;};
 
+inline Axes Next(const Axes& a){
+    switch (a) {
+    case _X_:
+        return _Y_;
+    case _Y_:
+        return _Z_;
+    case _Z_:
+        return _X_;
+    }
+    return _X_;
+}
 
 inline Axes ToAxes(const St& i) {
     ASSERT(i >= 0 && i < 3);

@@ -46,7 +46,7 @@ template<St DIM,
          class ORDER>
 class _DataInitial_{
 public:
-    static void InitAValue(){
+    static void InitZero(){
         std::cout << "Abstract" << std::endl;
     }
 };
@@ -60,7 +60,7 @@ public:
     typedef typename GRID::Index  Index;
     typedef ArithmeticTag ValueTag;
 
-    static Vt InitAValue(const Index&){
+    static Vt InitZero(const Index&){
         return 0.0;
     }
     static Vt InitCoeOne(const Index&){
@@ -79,7 +79,7 @@ public:
     typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
     typedef LinearPolynomialTag ValueTag;
     typedef typename GRID::Index  Index;
-    static Poly InitAValue(const Index& index){
+    static Poly InitZero(const Index& index){
         return Poly();
     }
     static Vt InitCoeOne(const Index& index){

@@ -26,6 +26,7 @@
 #include "operator/slaplacian.hpp"
 #include "operator/slaplacian_integral.hpp"
 #include "operator/slaplacian_differential.hpp"
+#include "operator/slaplacian_HOC4.hpp"
 #include "operator/sbuild_matrix.hpp"
 #include "operator/sinterpolate.hpp"
 #include "operator/su_dot_nabla.hpp"

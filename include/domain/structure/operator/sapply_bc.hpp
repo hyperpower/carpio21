@@ -8,7 +8,10 @@
 
 #include "domain/structure/ghost/sghost.hpp"
 #include "domain/structure/grid/sgrid.hpp"
+#include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/order/sorder.hpp"
+#include "domain/structure/sindex.hpp"
+
 
 namespace carpio{
 // BC Implement 
@@ -661,6 +664,8 @@ void _ApplyBoundaryValue(
 
     auto& ghost = field.ghost();
     for(auto& idx : field.order()){
+        // std::cout << "idx --> " << idx << std::endl;
+    // auto idx = Index(0,0);
         _ApplyBoundaryValueLocal(field, idx, bi, time,
            GridTag(), GhostTag(), OrderTag(), DimTag());
     }
@@ -683,13 +688,114 @@ void _ApplyBoundaryValueLocal(
         auto& coe  = iter->second;
         if(ghost.is_ghost(idxg)){
             auto axe  = GetDeltaAxe(idx, idxg);
-            auto ori  = GetDeltaOrienOnAxes(idx, idxg, axe);
+            auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe);
             auto v    = Value(field, bi, idx, idxg, axe, ori, time);
             exp += v * coe;
             iter = exp.erase(iter);
         } else {
             ++iter; 
         }
+    }
+}
+template<class FIELD>
+void _ApplyBoundaryValueLocal(
+    FIELD&               field,
+    const typename FIELD::Index&  idx,
+    const BoundaryIndex& bi,
+    const Vt&            time, 
+    SGridUniformTag, SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD);
+    typedef typename FIELD::ValueType Exp;
+    // if(Index(0,0) == idx){
+    //     std::cout << "ABC Unifrom Local = " << idx << std::endl;
+    // }
+
+    auto& ghost = field.ghost();
+    auto& exp = field(idx);
+    for(auto iter = exp.begin(); iter != exp.end();){
+        auto& idxg = iter->first;
+        auto& coe  = iter->second;
+        if(ghost.is_ghost(idxg)){
+            auto v = _FindBoundaryValueInExp(field, idx, idxg, bi, time,
+                GridTag(), GhostTag(), OrderTag(), DimTag());
+
+            // if(Index(0,0) == idx){
+            //     std::cout << " v                = " << v << std::endl;
+            // }
+            exp += v * coe;
+            iter = exp.erase(iter);
+        } else {
+            ++iter; 
+        }
+    }
+    // std::cout << "applied exp = " << exp << std::endl;
+}
+template<class FIELD, class CIDX, class CVALUE>
+auto _AverageValueByDistance(FIELD&  field,
+        const typename FIELD::Index&  idx,
+        const CIDX&    arridxg,
+        const CVALUE&  arrv){
+    EXPAND_FIELD(FIELD);
+    
+    ValueType sum;
+    Vt sum_dis;
+
+    auto& grid = field.grid();
+    auto iteridxg = arridxg.begin();
+    auto iterv   = arrv.begin();
+    for(;iteridxg != arridxg.end();){
+        auto cc  = grid.c(idx);
+        auto cg  = grid.c(*iteridxg);
+        auto dis = Distance(cc, cg);
+        sum += (*iterv) * dis;
+        sum_dis += dis;                
+        iteridxg++;
+        iterv++;
+    }
+    return sum / sum_dis;
+}
+template<class FIELD>
+auto _FindBoundaryValueInExp(
+    FIELD&               field,
+    const typename FIELD::Index&  idx,
+    const typename FIELD::Index&  idxg,
+    const BoundaryIndex& bi,
+    const Vt&            time, 
+    SGridUniformTag, SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD);
+
+    typedef typename FIELD::ValueType Exp;
+
+    auto& ghost = field.ghost();
+
+    auto didx = GetDeltaIndex(idx, idxg);
+    if(OnSameAxe(didx)){
+        auto axe  = GetDeltaAxe(didx);
+        auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        return Value(field, bi, idx, idxg, axe, ori, time);
+    }else{
+        std::array<ValueType, FIELD::Dim> arrexp;
+        arrexp.fill(Exp(0));
+        std::array<Index, FIELD::Dim> arridx;
+        arridx.fill(idx);
+        for(auto d : ArrAxes<FIELD::Dim>()){
+            if(didx[d] != 0 ){
+                auto idxng = idxg.shift(d, -(Sign(didx[d])));
+                if(! (ghost.is_ghost(idxng))){
+                    auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
+                    return Value(field, bi, idxng, idxg, d, ori, time); 
+                }else{
+                    arridx[d] = idxng;
+                    arrexp[d] = _FindBoundaryValueInExp(field, idx, idxng, bi, time,
+                        GridTag(), GhostTag(), OrderTag(), DimTag());
+                }
+            }
+        }
+        return _AverageValueByDistance(field, idx, arridx, arrexp); 
     }
 }
 } // namespace carpio

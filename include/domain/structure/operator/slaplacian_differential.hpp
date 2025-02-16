@@ -23,12 +23,57 @@ FIELD DifferenialLaplacian(
 }
 
 template<class FIELD>
+auto _CDSOneAxe(
+        const FIELD& phi, 
+        const typename FIELD::Index& idx, Axes& a,
+        const BoundaryIndex& bi, double t, 
+        ArithmeticTag, SGridTag, SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD(FIELD);
+
+    const Grid& grid = phi.grid();
+
+    Index idxp = idx.p(a);
+    Index idxm = idx.m(a);
+
+    Vt dfdx_p, dfdx_m;
+    Vt phi_m = Value(phi, bi, idx, idxm, a, _M_, t);
+    Vt phi_p = Value(phi, bi, idx, idxp, a, _P_, t);
+    dfdx_m = (phi(idx) - phi_m)
+            / (grid.c_(a, idx) - grid.c_(a, idxm));
+    dfdx_p = (phi_p - phi(idx))
+            / (grid.c_(a, idxp) - grid.c_(a, idx));
+    return (dfdx_p - dfdx_m ) / grid.s_(a, idx);
+}
+template<class FIELD>
+auto _CDSOneAxe(
+        const FIELD& phi, 
+        const typename FIELD::Index& idx, Axes& a,
+        const BoundaryIndex& bi, double t, 
+        ArithmeticTag, SGridUniformTag, SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD(FIELD);
+
+    const Grid& grid = phi.grid();
+
+    Index idxp = idx.p(a);
+    Index idxm = idx.m(a);
+
+    Vt dfdx_p, dfdx_m;
+    Vt phi_m = Value(phi, bi, idx, idxm, a, _M_, t);
+    Vt phi_p = Value(phi, bi, idx, idxp, a, _P_, t);
+    Vt s = grid.s_(a, idx);
+    return (phi_p - 2.0 * phi(idx) - phi_m) / (s * s);
+}
+
+template<class FIELD>
 FIELD _DifferentialLaplacianCenter(
         const FIELD& phi, const BoundaryIndex& bi, double t, 
         ArithmeticTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
     EXPAND_FIELD(FIELD);
+
 
     Field res        = phi.new_compatible_zero();
     const Grid& grid = phi.grid();
@@ -37,17 +82,8 @@ FIELD _DifferentialLaplacianCenter(
         arr.fill(0.0);
 
         for(auto& a : ArrAxes<Field::Dim>()){
-            Index idxp = idx.p(a);
-            Index idxm = idx.m(a);
-
-            Vt dfdx_p, dfdx_m;
-            Vt phi_m = Value(phi, bi, idx, idxm, a, _M_, t);
-            Vt phi_p = Value(phi, bi, idx, idxp, a, _P_, t);
-            dfdx_m = (phi(idx) - phi_m)
-                    / (grid.c_(a, idx) - grid.c_(a, idxm));
-            dfdx_p = (phi_p - phi(idx))
-                    / (grid.c_(a, idxp) - grid.c_(a, idx));
-            arr[a] = (dfdx_p - dfdx_m ) / grid.s_(a, idx);
+            arr[a] = _CDSOneAxe(phi, idx, a, bi, t,
+               ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
         }
 
         Vt sum = 0;
@@ -56,9 +92,61 @@ FIELD _DifferentialLaplacianCenter(
         }
         res(idx) = sum;
     }
-
     return res;
+}
+template<class FIELD>
+auto _CDSOneAxe(
+        const FIELD& field, 
+        const typename FIELD::Index& idx, Axes& a, double t, 
+        LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD); 
+    typedef ValueType Exp;
 
+    const Grid& grid = field.grid();
+    const Ghost& ghost = field.ghost();
+
+    // std::cout << "_CDSOneAxe : idx = " << idx << std::endl; 
+
+    Index idxp = idx.p(a);
+    Index idxm = idx.m(a);
+    // std::cout << "           : idxp = " << idxp << std::endl; 
+    // std::cout << "           : idxm = " << idxm << std::endl; 
+
+    Exp phi_m(idxm), phi_p(idxp), phi(idx);
+    if(!ghost.is_ghost(idx)){
+        phi = field(idx);
+    }
+    auto dfdx_m = (phi - phi_m)
+            / (grid.c_(a, idx) - grid.c_(a, idxm));
+    auto dfdx_p = (phi_p - phi)
+            / (grid.c_(a, idxp) - grid.c_(a, idx));
+    return (dfdx_p - dfdx_m ) / grid.s_(a, idx);
+}
+
+template<class FIELD>
+auto _CDSOneAxe(
+        const FIELD& field, 
+        const typename FIELD::Index& idx, Axes& a, double t, 
+        LinearPolynomialTag, SGridUniformTag, SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD); 
+    typedef ValueType Exp;
+
+    const Grid& grid = field.grid();
+    const Ghost& ghost = field.ghost();
+
+
+    Index idxp = idx.p(a);
+    Index idxm = idx.m(a);
+
+    Exp phi_m(idxm), phi_p(idxp), phi(idx);
+    if(!ghost.is_ghost(idx)){
+        phi = field(idx);
+    }
+    return (phi_p - phi * 2.0 + phi_m) / (grid.dc() * grid.s());
 }
 
 template<class FIELD>
@@ -67,22 +155,15 @@ FIELD _DifferentialLaplacianCenter( // No BoundaryIndex
         LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD); 
     typedef ValueType Exp;
     Field res = field.new_compatible_zero();
     const auto& grid = res.grid();
     for (auto& idx : res.order()) {
         std::array<Exp, Field::Dim> arr;
         for(auto& d : ArrAxes<Field::Dim>()){
-            Index idxp = idx.p(d);
-            Index idxm = idx.m(d);
-            Exp phi_m(idxm), phi_p(idxp);
-            Exp phi = field(idx);
-            auto dfdx_m = (phi - phi_m)
-                        / (grid.c_(d, idx ) - grid.c_(d, idxm));
-            auto dfdx_p = (phi_p - phi) 
-                        / (grid.c_(d, idxp) - grid.c_(d, idx ));
-
-            arr[d] = (dfdx_p - dfdx_m) / grid.s_(d, idx);
+            arr[d] = _CDSOneAxe(field, idx, d, t,
+               ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag()); 
         }
         for(auto& d : ArrAxes<Field::Dim>()){
             res(idx) += arr[d];

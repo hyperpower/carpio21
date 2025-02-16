@@ -122,12 +122,12 @@ Strings _StringifyCell(const ANY& grid, const INDEX& index, SGridTag, Dim2Tag){
     for (short o = 0; o < ANY::NumVertex; ++o){
         auto p = grid.v(order[o], index);
         res.push_back(ToString(p.value(_X_),
-                               p.value(_Y_),
+                               p.value(_Y_), 0.0,
                                " "));
     }
     auto p = grid.v(0, index);
     res.push_back(ToString(p.value(_X_),
-                           p.value(_Y_),
+                           p.value(_Y_), 0.0,
                            " "));
     return res;
 }

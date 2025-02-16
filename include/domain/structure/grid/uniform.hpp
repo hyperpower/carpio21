@@ -160,6 +160,17 @@ public:
         }
     }
 
+    inline Vt dc() const{
+        return _cs;
+    }
+
+    virtual Vt dc_(const St& dim, const Idx& idx,   const Orientation& o)   const {
+        return _cs;
+    }
+    virtual Vt dc_(const St& dim, const Index& idx, const Orientation& o)   const {
+        return _cs;
+    }
+
     St size_cell() const {
         St res = 1;
         for (St d = 0; d < Dim; ++d) {

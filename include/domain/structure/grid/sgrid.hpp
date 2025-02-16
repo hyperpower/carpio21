@@ -62,6 +62,12 @@ public:
     virtual Vt cy(Idx i, Idx j = 0, Idx k = 0) const {return 0;}
     virtual Vt cz(Idx i, Idx j = 0, Idx k = 0) const {return 0;}
 
+    // distance between center ==================================
+    virtual Vt dc_(const St& dim, const Idx& idx,   const Orientation& o)   const {return 0;}
+    virtual Vt dc_(const St& dim, const Index& idx, const Orientation& o)   const {return 0;}
+
+
+    // size ==================================
     virtual St size_cell()  const  {return 0;}
     virtual St size_vertex() const  {return 0;}
     virtual St size_face()   const  {return 0;}

@@ -181,9 +181,11 @@ GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SGhostTag){
 }
 template<class ANY>
 GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SFieldCenterTag){
+    // Todo: not ok for masked grid, need upgrade.
     auto& grid = a.grid();
     return _ToGnuplotActorWireFrame(grid, SGridTag()); 
 }
+
 template<class ANY>
 GnuplotActor _ToGnuplotActorContourDim(const ANY& f, SFieldCenterTag, Dim2Tag){
     GnuplotActor actor;

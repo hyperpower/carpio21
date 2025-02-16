@@ -18,7 +18,14 @@
 #include "equation/event/event.hpp"
 
 using namespace carpio;
+#include "test_define.hpp"
 
+
+TEST(equ_laplacian, a_test){
+    if(TestDir() == false){
+        std::abort();
+    }
+}
 
 TEST(equ_laplacian, solve){
     std::cout << "[  Laplace ] Test"<<std::endl;
@@ -56,6 +63,7 @@ TEST(equ_laplacian, solve){
 
     // Set solver
     equ.set_solver("Jacobi", 1000, 1e-4);
+    // equ.set_space_scheme("HOC4");
     equ.set_space_scheme("finite_difference_2");
     
     // Add events

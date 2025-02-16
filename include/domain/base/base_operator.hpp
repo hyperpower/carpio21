@@ -35,6 +35,11 @@ FIELD DifferenialLaplacian(const FIELD& field, const BI& bi, double t=0.0){
     typename FIELD::Tag field_tag; 
     return DifferenialLaplacian(field, bi, t, field_tag);
 }
+template<class FIELD, class BI>
+FIELD DifferenialLaplacianHOC4(const FIELD& field, const BI& bi, double t=0.0){
+    typename FIELD::Tag field_tag; 
+    return DifferenialLaplacianHOC4(field, bi, t, field_tag);
+}
 // Laplacian Finite Difference Method
 template<class FIELD, class BI>
 FIELD Laplacian(const FIELD& field, BI bi, double t=0.0){
@@ -48,7 +53,7 @@ FIELD Laplacian(const FIELD& field, BI bi, double t=0.0){
                         > imp;
     return imp.execute(field, bi, t); 
 }
-// Laplacian Finite Difference Method
+// Laplacian Finite Difference Method << deprecate 
 template<class FIELD, class BI>
 FIELD L4Alter(const FIELD& field, BI bi, double t=0.0, const std::string& method = ""){
     // std::cout << "IntLaplacian field with bi" << std::endl;

@@ -227,7 +227,7 @@ protected:
         this->_arr.reconstruct(this->_sporder->size());
         for(auto& idx : (*(this->_sporder))){
             auto arr_idx = this->_sporder->get_order_face_index(idx, _axe);
-            this->_arr[arr_idx] = _DataInit::InitAValue(idx);
+            this->_arr[arr_idx] = _DataInit::InitZero(idx);
         }
     }
 };

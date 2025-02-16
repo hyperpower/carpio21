@@ -75,7 +75,9 @@ public:
         this->_arr = std::move(other._arr);
         return *this;
     }
-    
+    // ===========================================
+    // operator()   get value
+    // =========================================== 
     ValueType&      operator()(St i, St j = 0, St k = 0){
         return this->_arr[this->_sporder->get_order(i,j,k)];
     }
@@ -220,7 +222,7 @@ protected:
         // make data by order
         this->_arr.reconstruct(this->_sporder->size());
         for(auto& idx : this->order()){
-            this->operator()(idx) = _DataInit::InitAValue(idx);
+            this->operator()(idx) = _DataInit::InitZero(idx);
         }
     }
     void _initial_arr(FunIndex_Value fun){
