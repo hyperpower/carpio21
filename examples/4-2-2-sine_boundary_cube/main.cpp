@@ -73,6 +73,7 @@ void PlotResidual(const std::string& ffn,
 	// gnu.set_yrange(-0.1, 1.1);
 	gnu.set_ylabel("Residual");
 	gnu.set_xlabel("Number of iteration");
+    gnu.set_yformat("10^{%L}");
 	// gnu.set_equal_aspect_ratio();
 	// gnu.set_palette_blue_red();
     auto itern = ln.begin();
@@ -104,6 +105,7 @@ std::list<double> Reference(int order,
     return res;
 }
 void PlotError(const std::string& ffn,
+               const int order,
                const std::vector<int>& ln,
                const std::list<double> & l1,
                const std::list<double> & l2,
@@ -135,17 +137,17 @@ void PlotError(const std::string& ffn,
     gnu.add(a2);
     gnu.add(ai);
 
-    auto l1ref = Reference(2, ln, l1);
+    auto l1ref = Reference(order, ln, l1);
     auto a1r = ToGnuplotActor(lh, l1ref);
     // a1r.title("2 Order");
     a1r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
 
-    auto l2ref = Reference(2, ln, l2);
+    auto l2ref = Reference(order, ln, l2);
     auto a2r = ToGnuplotActor(lh, l2ref);
-    a2r.title("2 Order Reference");
+    a2r.title(ToString(order) + " Order Reference");
     a2r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
 
-    auto liref = Reference(2, ln, li);
+    auto liref = Reference(order, ln, li);
     auto air = ToGnuplotActor(lh, liref);
     // a2r.title("2 Order");
     air.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
@@ -184,12 +186,12 @@ void ExactSolution(){
     PlotFieldAsVolume("exact", a);
 }
 
-void LaplaceSolver(int n, 
+void LaplaceSolver(const std::string& scheme, int n, 
                    std::list<double>& l1, 
                    std::list<double>& l2, 
                    std::list<double>& li,
                    std::list<std::list<double> >& lr){
-    std::cout << "[  Poisson ] Solver"<<std::endl;
+    std::cout << "[  Laplace ] Solver"<<std::endl;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;
     std::cout << "[   INFO   ] n   = " << n << std::endl;
     Point p(0.,0.,0.);
@@ -232,6 +234,7 @@ void LaplaceSolver(int n,
 
     // // Set solver
 	equ.set_solver("Jacobi", 20000, 1e-7);
+    equ.set_space_scheme(scheme);
 
     // Set source
     // equ.set_source([](typename Domain::ValueType x,
@@ -268,6 +271,7 @@ void LaplaceSolver(int n,
     l2.push_back(Norm2(error));
     li.push_back(NormInf(error));
 }
+
 Vt cal_order(Vt e2n, Vt en){
     return std::log2(en / e2n);
 }
@@ -313,18 +317,27 @@ void OutputError(
 
 }
 
-int main(int argc, char** argv) {
-    ExactSolution();
+void AScheme(const std::string& scheme){
     std::vector<int> vn = {8, 16, 32};
     std::list<double> l1,l2,li;
     std::list<std::list<double> > lr;
     for(auto& n : vn){
-        LaplaceSolver(n, l1, l2, li, lr);
+        LaplaceSolver(scheme, n, l1, l2, li, lr);
     }
     // // output to a file
-    OutputError("error_table.txt",vn, l1, l2, li);
+    OutputError(scheme + "_error_table.txt",vn, l1, l2, li);
 
     // // plot residual
-    PlotResidual("residual", vn, lr);
-    PlotError("error", vn, l1, l2, li);
+    PlotResidual(scheme + "_residual", vn, lr);
+    if(scheme == "HOC4"){
+        PlotError(scheme + "_error", 3, vn, l1, l2, li);
+    }else{
+        PlotError(scheme + "_error", 2, vn, l1, l2, li);
+    }
+}
+
+int main(int argc, char** argv) {
+    ExactSolution();
+    AScheme("finite_volume_2");
+    AScheme("HOC4");
 }

@@ -37,21 +37,38 @@ Second Order Finite Volume Method
 ==================================
 
 
-.. figure:: fig/residual.png
+.. figure:: fig/finite_volume_2_residual.png
    :align: center 
 
    Solver residual on each mesh.
 
 .. csv-table:: Error Norm in different mesh resolutions.
-   :file: fig/error_table.txt
+   :file: fig/finite_volume_2_error_table.txt
    :header-rows: 1
 
-.. figure:: fig/error.png
+.. figure:: fig/finite_volume_2_error.png
    :align: center 
 
    Error Norm in different mesh resolutions.
    
 
+4th-Order High Order Compact (HOC4) Scheme
+=============================================
+
+
+.. figure:: fig/HOC4_residual.png
+   :align: center 
+
+   Solver residual on each mesh. (HOC4)
+
+.. csv-table:: Error Norm in different mesh resolutions. (HOC4)
+   :file: fig/HOC4_error_table.txt
+   :header-rows: 1
+
+.. figure:: fig/HOC4_error.png
+   :align: center 
+
+   Error Norm in different mesh resolutions. (HOC4)
 
 Reference
 ===================
