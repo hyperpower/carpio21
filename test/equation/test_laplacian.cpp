@@ -35,7 +35,7 @@ TEST(equ_laplacian, solve){
     Point p(0,0,0);
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegular_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p,10, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
@@ -103,7 +103,7 @@ TEST(equ_laplacian, DISABLED_explicit_step){
     Point p(0,0,0);
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegular_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost,CenterTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p,10, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
@@ -198,7 +198,7 @@ TEST(equ_laplacian, DISABLED_implicit_step){
     Point p(0,0,0);
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegular_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost,CenterTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p,10, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));

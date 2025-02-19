@@ -13,8 +13,13 @@ namespace carpio{
 
 struct SOrderXYZTag:  public SOrderTag{};
 
-template<St DIM,class GRID, class GHOST>
-class SOrderXYZ_ : public SOrder_<DIM, GRID, GHOST>{
+template<St DIM, class GRID, class GHOST, class LOCTAG>
+class SOrderXYZ_ : public SOrder_<DIM, GRID, GHOST, LOCTAG>{
+};
+
+
+template<St DIM, class GRID, class GHOST>
+class SOrderXYZ_ <DIM, GRID, GHOST, CenterTag>: public SOrder_<DIM, GRID, GHOST, CenterTag>{
 public:
     static const St Dim = DIM;
     typedef SIndex_<DIM> Index;

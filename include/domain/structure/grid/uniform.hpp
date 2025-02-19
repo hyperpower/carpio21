@@ -47,7 +47,7 @@ public:
     }
 
     SGridUniform_(
-            const Point& minp,
+            const Point& minp, 
             const Idx& nx,
             const Vt&  length_on_x,
             const St&  ghostlayer) :

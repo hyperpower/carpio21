@@ -374,7 +374,7 @@ typename FIELD::ValueType GetGhostCenterExp(
         const Vt&              time = 0.0){
     switch (bc.type()){
     case BoundaryCondition::_BC1_:
-        return GetGhostCenterExpType1_3(fc,bc, idxc, idxg, axe, ori, time);
+        return GetGhostCenterExpType1(fc,bc, idxc, idxg, axe, ori, time);
         break;
     case BoundaryCondition::_BC2_:
         return GetGhostCenterExpType2(fc,bc, idxc, idxg, axe, ori, time);
@@ -613,7 +613,7 @@ typename FIELD::ValueType GetGhostCenterExpType3(
 }
 
 template<class FIELD>
-typename FIELD::ValueType _ValueCenter(
+typename FIELD::ValueType _ValueGhostCenter(
     const FIELD& field,
     const BoundaryIndex& bi,
     const typename FIELD::Index& idxc,
@@ -637,7 +637,7 @@ typename FIELD::ValueType _ValueCenter(
     }
 }
 template<class FIELD>
-typename FIELD::ValueType _ValueCenter(
+typename FIELD::ValueType _ValueGhostCenter(
     const FIELD& field,
     const BoundaryIndex& bi,
     const typename FIELD::Index& idxc,
@@ -672,7 +672,7 @@ typename FIELD::ValueType Value(
     SFieldCenterTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
-    return _ValueCenter(field, bi, idxc, idxg, axe, ori, time,
+    return _ValueGhostCenter(field, bi, idxc, idxg, axe, ori, time,
         ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
 

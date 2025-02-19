@@ -29,7 +29,7 @@ public:
     virtual ~GhostBase_(){};
 };
 struct OrderBaseTag{};
-template<St DIM>
+template<St DIM, class LOCTAG>
 class OrderBase_{
 public:
     static const St Dim = DIM;

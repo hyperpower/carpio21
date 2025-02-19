@@ -8,8 +8,8 @@ namespace carpio{
 
 struct SOrderTag:  public StructureTag, OrderBaseTag{};
 
-template<St DIM, class GRID, class GHOST>
-class SOrder_:public OrderBase_<DIM>{
+template<St DIM, class GRID, class GHOST, class LOCTAG>
+class SOrder_:public OrderBase_<DIM, LOCTAG>{
 public:
     static const St Dim = DIM;
     typedef GRID  Grid;

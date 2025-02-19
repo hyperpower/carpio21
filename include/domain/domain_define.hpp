@@ -24,6 +24,15 @@ struct DomainTag{};
 struct StructureTag: public DomainTag{};
 struct OctreeTag:    public DomainTag{};
 
+struct LocationTag{};
+
+struct CenterTag: public LocationTag{};
+struct FaceTag:   public LocationTag{};
+struct VertexTag: public LocationTag{};
+
+
+
+
 template<St DIM>
 auto ArrAxes(){
     SHOULD_NOT_REACH;
