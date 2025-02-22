@@ -22,8 +22,15 @@ public:
     typedef std::vector<Index> OrderVector;
     typedef typename OrderVector::iterator iterator;
     typedef typename OrderVector::const_iterator const_iterator;
+protected:
+    spGrid  _grid;
+    spGhost _ghost;
 
+public:
     SOrder_(){}
+
+    SOrder_(spGrid spgrid, 
+            spGhost spghost): _grid(spgrid) , _ghost(spghost){}
 
     virtual ~SOrder_(){}
 
@@ -39,17 +46,17 @@ public:
 
     virtual St get_order(const Index&) const{return 0;}
 
-    // virtual const Grid& grid() const {
-    //     return Grid();
-    // }
-    // virtual const Ghost& ghost() const {
-    //     return Ghost();
-    // }
-    virtual spGrid spgrid() const{
-        return nullptr;
+    const Grid& grid() const {
+        return (*_grid);
     }
-    virtual spGhost spghost() const{
-        return nullptr;
+    const Ghost& ghost() const {
+        return (*_ghost);
+    }
+    spGrid spgrid() const {
+        return _grid;
+    }
+    spGhost spghost() const {
+        return _ghost;
     }
 
     // ----------------------------------------------

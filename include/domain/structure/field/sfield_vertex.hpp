@@ -204,20 +204,6 @@ public:
         Self res(this->_spgrid, this->_spghost, this->_sporder, this->_axe);
         return res;
     }
-    Self new_inverse_volume() const{
-        Self res(this->_spgrid, this->_spghost, this->_sporder);
-        for(auto& idx : (*this->_sporder)){
-            res(idx) = 1.0 / res.grid().volume(idx);
-        }
-        return res;
-    }
-    Self new_volume() const{
-        Self res(this->_spgrid, this->_spghost, this->_sporder);
-        for(auto& idx : (*this->_sporder)){
-            res(idx) = res.grid().volume(idx);
-        }
-        return res;
-    }
 protected:
     void _initial_arr(){
         // make data by order

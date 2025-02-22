@@ -39,15 +39,15 @@ auto ArrAxes(){
     return std::array<Axes, 1>{_X_};
 }
 template<>
-auto ArrAxes<1>(){
+constexpr auto ArrAxes<1>(){
     return std::array<Axes, 1>{_X_};
 }
 template<>
-auto ArrAxes<2>(){
+constexpr auto ArrAxes<2>(){
     return std::array<Axes, 2>{_X_, _Y_};
 }
 template<>
-auto ArrAxes<3>(){
+constexpr auto ArrAxes<3>(){
     return std::array<Axes, 3>{_X_, _Y_, _Z_};
 }
 

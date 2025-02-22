@@ -290,7 +290,10 @@ public:
     Point v(Idx order, Index index) const{
         return v(order, index.i(), index.j(), index.k());
     }
-
+    
+    Point v(Index index) const{  //default version
+        return v(7, index.i(), index.j(), index.k());
+    }
 
     Point v(Idx i,     short oi,
             Idx j = 0, short oj = 0,

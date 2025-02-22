@@ -78,6 +78,9 @@ public:
     virtual St size_face_normal(const Axes& a) const{
         return 0;
     }
+    virtual St size_vertex_normal() const{ //not include boundary vertex
+        return 0;
+    }
     virtual St size_not_ghost() const{
         return 0;
     }

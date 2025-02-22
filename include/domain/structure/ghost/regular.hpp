@@ -87,17 +87,27 @@ public:
     virtual bool is_boundary(
                 const Index& index,
                 const St& a,
-                const St& o) const{
+                const Orientation& o) const{
         ASSERT(a < DIM);
         Idx idx = index.value(a);
         if(o == _M_){
             return idx == 0;
         }else if(o == _P_){
-            return idx == (_grid->n().value(a) - 1);
+            return idx == (_grid->n(a) - 1);
         }else{
             SHOULD_NOT_REACH;
             return false;
         }
+    }
+    virtual bool is_boundary(
+                const Index& index,
+                const Orientation& o) const{
+        for(auto& a : ArrAxes<DIM>()){
+            if(is_boundary(index, a, o)){
+                return true;
+            }
+        }
+        return false;
     }
     virtual bool is_boundary_face(
             const Index& findex,
@@ -115,6 +125,9 @@ public:
         return !(is_ghost(index));
     }
 
+    virtual bool is_normal_vertex(const Index& vidx) const{
+        return (!is_ghost(vidx)) && (!is_boundary(vidx, _P_));
+    }
 
     virtual int boundary_id(
                 const Index& indexc,
@@ -149,7 +162,13 @@ public:
         }
         return idxb;
     }
-
+    virtual St size_vertex_normal() const{
+        St res = 1;
+        for(auto& a : ArrAxes<DIM>()){
+            res *= _grid->n(a) - 1;
+        }
+        return res;
+    }
     virtual St size_cell_normal() const{
         return _grid->size_cell();
     }

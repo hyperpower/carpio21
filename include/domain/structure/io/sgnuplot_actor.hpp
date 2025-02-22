@@ -255,11 +255,17 @@ GnuplotActor _ToGnuplotActorContourWire(const ANY& a, SFieldCenterTag){
     return _ToGnuplotActorContourWireDim(a, Tag(), DimTag()); 
 }
 
-
 template<class ANY>
 GnuplotActor  _ToGnuplotActorLabel(const ANY& order, 
                                 const std::string& config, 
                                 SOrderTag){
+    typedef typename ANY::LocationTag LocTag;
+    return _ToGnuplotActorLabel(order, config, SOrderTag(), LocTag());
+}
+template<class ANY>
+GnuplotActor  _ToGnuplotActorLabel(const ANY& order, 
+                                const std::string& config, 
+                                SOrderTag, CenterTag){
     GnuplotActor actor;
     actor.command("using 1:2:3 title \"\" ");
     actor.style("with labels center textcolor lt 2");
@@ -284,7 +290,39 @@ GnuplotActor  _ToGnuplotActorLabel(const ANY& order,
     grid.for_each(fun);
     return actor;
 }
-
+template<class ANY>
+GnuplotActor  _ToGnuplotActorLabel(const ANY& order, 
+                                const std::string& config, 
+                                SOrderTag, VertexTag){
+   GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with labels center textcolor lt 2");
+    
+    auto &grid  = order.grid();
+    auto &ghost = order.ghost();
+    typedef typename ANY::Index Index;
+    auto fun = [&grid, &ghost, &actor, &order, &config](const Index &idx)
+    {
+        if(ghost.is_normal_vertex(idx)){
+            auto vp = grid.v(idx);
+            auto s  = grid.s_(idx, _X_);
+            auto o  = order.get_order(idx);
+            std::string text = "";
+            if (config == "index"){
+                text =  ToString(idx);
+            }else if(config == "order"){
+                text =  ToString(o);
+            }else{
+                text =  ToString(idx);
+            }
+            actor.data().push_back(
+                        ToString(vp(_X_) + s * 0.1, vp(_Y_) + s * 0.1," ") + " \"" + text + "\"");
+        }
+        
+    };
+    grid.for_each(fun);
+    return actor; 
+}
 template<class ANY>
 GnuplotActor  _ToGnuplotActorLabel(
     const ANY& ff, const std::string& config, 

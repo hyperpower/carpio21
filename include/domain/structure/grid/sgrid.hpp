@@ -89,9 +89,9 @@ public:
     virtual Point v(Idx order, Idx i, Idx j = 0, Idx k = 0) const {return Point();}
     virtual Point v(Idx order, Index index) const{return Point();}
 
-    virtual Point v(Idx i,     short oi,
-                  Idx j = 0, short oj = 0,
-                  Idx k = 0, short ok = 0) const {return Point();}
+    virtual Point v(Idx i,   short oi,
+                    Idx j = 0, short oj = 0,
+                    Idx k = 0, short ok = 0) const {return Point();}
 
     // Point is in the range
     virtual inline bool is_in_on(Point p) {return false;}
