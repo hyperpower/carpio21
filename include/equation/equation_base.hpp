@@ -22,15 +22,17 @@ public:
     typedef D Domain;
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
-    typedef typename Domain::Grid         Grid;
+    typedef typename Domain::Grid          Grid;
     typedef typename Domain::spGrid      spGrid;
-    typedef typename Domain::Ghost       Ghost;
+    typedef typename Domain::Ghost         Ghost;
     typedef typename Domain::spGhost     spGhost;
-    typedef typename Domain::Order       Order;
+    typedef typename Domain::Order         Order;
     typedef typename Domain::spOrder     spOrder;
     typedef typename Domain::FieldCenter FieldCenter;
     typedef typename Domain::FieldFace   FieldFace;
+    typedef typename Domain::FieldVertex FieldVertex;
     typedef typename Domain::FieldCenterExp FieldCenterExp;
+    typedef typename Domain::FieldVertexExp FieldVertexExp;
 
     typedef EquationBase_<D> Self;
 
@@ -45,8 +47,8 @@ public:
     typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
     typedef std::shared_ptr<BoundaryIndex> spBoundaryIndex;
 
-    typedef std::map<std::string, Any>             Configures;
     typedef std::map<std::string, spFieldCenter>   Fields;
+    typedef std::map<std::string, Any>             Configures;
     typedef std::map<std::string, spFieldFace>     FieldFaces;
     typedef std::map<std::string, spBoundaryIndex> BIs;
     typedef std::map<std::string, spEvent>         Events;

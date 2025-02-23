@@ -17,13 +17,24 @@ namespace carpio{
 // O-----> x
 ///
 //z
+#if __cplusplus >= 201703L
+inline static const std::array<std::array<short, 2>, 3> _BID = 
+{{
+     { 0, 1 }, 
+     { 2, 3 }, 
+     { 4, 5 } 
+}};
+#else
+    #error "C++17 or later is required"
+#endif
 
-struct SGhostRegularTag:  public SGhostTag, GhostBaseTag{};
+struct SGhostRegularTag:  public SGhostTag{};
 
 template<St DIM, class GRID>
 class SGhostRegular_ : public SGhost_<DIM, GRID>{
 public:
-    typedef SIndex_<DIM> Index;
+    typedef SGhost_<DIM, GRID> Base;
+    typedef SIndex_<Base::Dim> Index;
     typedef typename DimTagTraits_<DIM>::Type DimTag;
     typedef GRID Grid;
     typedef std::shared_ptr<Grid> spGrid;
@@ -60,29 +71,45 @@ public:
         return _grid->ghost_layer();
     }
 
-    virtual bool is_ghost(const Index& index) const{
+    virtual bool 
+    is_ghost(const Index& cindex) const{
         for (St d = 0; d < DIM; ++d) {
-            Idx res = index.value(d);
+            Idx res = cindex.value(d);
             if (res < 0) {
                 return true;
-            } else if (res >= this->_grid->n().value(d)) {
+            } else if (res >= this->_grid->n(d)) {
                 return true;
             }
         }
         return false;
     };
-
-    virtual bool is_ghost(const Axes& a, const Index& index) const{
+    
+    virtual bool 
+    is_ghost(
+        const Index& vindex,
+        VertexTag) const
+    {
         for (St d = 0; d < DIM; ++d) {
-            Idx res = index.value(d);
-            if (res < 0) {
+            Idx res = vindex.value(d);
+            if (res <= 0) {
                 return true;
-            } else if (res >= this->_grid->n().value(d)) {
+            } else if (res >= this->_grid->n(d)) {
                 return true;
             }
         }
         return false;
     };
+    // virtual bool is_ghost(const Axes& a, const Index& index) const{
+    //     for (St d = 0; d < DIM; ++d) {
+    //         Idx res = index.value(d);
+    //         if (res < 0) {
+    //             return true;
+    //         } else if (res >= this->_grid->n().value(d)) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // };
 
     virtual bool is_boundary(
                 const Index& index,
@@ -109,6 +136,26 @@ public:
         }
         return false;
     }
+
+    virtual bool 
+    is_boundary_vertex(const Index& vindex) const{
+        for(auto& a : ArrAxes<DIM>()){
+            if(is_boundary_vertex(vindex, a)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    virtual bool 
+    is_boundary_vertex(
+        const Index& vindex, 
+        const Axes& a) const
+    {
+        ASSERT(a < DIM);
+        Idx idx = vindex.value(a);
+        return (idx == 0) || (idx == _grid->n().value(a)); 
+    }
     virtual bool is_boundary_face(
             const Index& findex,
             const St&    a) const{
@@ -129,20 +176,45 @@ public:
         return (!is_ghost(vidx)) && (!is_boundary(vidx, _P_));
     }
 
-    virtual int boundary_id(
-                const Index& indexc,
-                const Index& indexg,
-                const St& axe,
-                const St& ori) const{
+    virtual int 
+    boundary_id(
+        const Index& indexc,
+        const Index& indexg,
+        const St& axe,
+        const St& ori) const
+    {
         // get seg idx in BCID
-        St ABI[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
+        // St ABI[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
         Index n = this->_grid->n();
-        for (St d = 0; d < DIM; ++d) {
-            Idx res = indexg.value(d);
+        for (auto& a : ArrAxes<Base::Dim>()) {
+            Idx res = indexg.value(a);
             if (res < 0) {
-                return ABI[d][0];
-            } else if (res >= n.value(d)) {
-                return ABI[d][1];
+                return _BID[a][0];
+            } else if (res >= n.value(a)) {
+                return _BID[a][1];
+            }
+        }
+        SHOULD_NOT_REACH;
+        return 0;
+    };
+
+    virtual int 
+    boundary_id(
+        const Index& indexc,
+        const Index& indexg,
+        const St& axe,
+        const St& ori, 
+        VertexTag) const
+    {
+        // get seg idx in BCID
+        // St ABI[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
+        Index n = this->_grid->n();
+        for (auto& a : ArrAxes<Base::Dim>()) {
+            Idx res = indexg[a];
+            if (res <= 0) {
+                return _BID[a][0];
+            } else if (res >= n[a] - 1) {
+                return _BID[a][1];
             }
         }
         SHOULD_NOT_REACH;

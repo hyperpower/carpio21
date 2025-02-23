@@ -1,5 +1,5 @@
-#ifndef _SAPPLY_BC_HPP
-#define _SAPPLY_BC_HPP
+#ifndef _SAPPLY_BC_VERTEX_HPP
+#define _SAPPLY_BC_VERTEX_HPP
 
 #include "scommon.hpp"
 #include "algebra/algebra.hpp"
@@ -17,23 +17,31 @@ void ApplyBoundaryValue(
     FIELD&               field,
     const BoundaryIndex& bi,
     const Vt&            time, 
-    SFieldCenterTag, LinearPolynomialTag)
-{
-    EXPAND_FIELD_TAG(FIELD); 
-    _ApplyBoundaryValue(field, bi, time,
-        FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-}
-template<class FIELD>
-void ApplyBoundaryValue(
-    FIELD&               field,
-    const BoundaryIndex& bi,
-    const Vt&            time, 
     SFieldVertexTag, LinearPolynomialTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
     _ApplyBoundaryValue(field, bi, time,
         FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
+
+template<class FIELD>
+void _ApplyBoundaryValue(
+    FIELD&               field,
+    const BoundaryIndex& bi,
+    const Vt&            time, 
+    SFieldTag, SGridTag , SGhostTag , SOrderTag , DimTag )
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    EXPAND_FIELD(FIELD);
+    typedef typename FIELD::ValueType Exp;
+
+    auto& ghost = field.ghost();
+    for(auto& idx : field.order()){
+        _ApplyBoundaryValueLocal(field, idx, bi, time,
+           FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+    }
+}
+
 template<class FIELD>
 typename FIELD::ValueType Value(
     const FIELD&         field,
@@ -43,14 +51,14 @@ typename FIELD::ValueType Value(
     const Axes&            axe,
     const Orientation&     ori,
     const Vt&              time, 
-    SFieldCenterTag)
+    SFieldVertexTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
-    return _ValueGhostCenter(field, bi, idxc, idxg, axe, ori, time,
+    return _ValueBoundaryVertex(field, bi, idxc, idxg, axe, ori, time,
         ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
 template<class FIELD>
-typename FIELD::ValueType GetGhostCenterValue(
+typename FIELD::ValueType GetBoundaryVertexValue(
         const FIELD&             fc,
         const BoundaryCondition& bc,
         const typename FIELD::Index& idxc,
@@ -60,13 +68,13 @@ typename FIELD::ValueType GetGhostCenterValue(
         const Vt&              time = 0.0){
     switch (bc.type()){
     case BoundaryCondition::_BC1_:
-        return GetGhostCenterValueType1(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexValueType1(fc,bc, idxc, idxg, axe, ori, time);
         break;
     case BoundaryCondition::_BC2_:
-        return GetGhostCenterValueType2(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexValueType2(fc,bc, idxc, idxg, axe, ori, time);
         break;
     case BoundaryCondition::_BC3_:
-        return GetGhostCenterValueType3(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexValueType3(fc,bc, idxc, idxg, axe, ori, time);
         break;
     default:
         return 0.0;
@@ -74,7 +82,7 @@ typename FIELD::ValueType GetGhostCenterValue(
     }
 }
 template<class FIELD>
-typename FIELD::ValueType GetGhostCenterExp(
+typename FIELD::ValueType GetBoundaryVertexExp(
         const FIELD&             fc,
         const BoundaryCondition& bc,
         const typename FIELD::Index& idxc,
@@ -84,13 +92,13 @@ typename FIELD::ValueType GetGhostCenterExp(
         const Vt&              time = 0.0){
     switch (bc.type()){
     case BoundaryCondition::_BC1_:
-        return GetGhostCenterExpType1(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexExpType1(fc,bc, idxc, idxg, axe, ori, time);
         break;
     case BoundaryCondition::_BC2_:
-        return GetGhostCenterExpType2(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexExpType2(fc,bc, idxc, idxg, axe, ori, time);
         break;
     case BoundaryCondition::_BC3_:
-        return GetGhostCenterExpType3(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexExpType3(fc,bc, idxc, idxg, axe, ori, time);
         break;
     default:
         return 0.0;
@@ -98,7 +106,7 @@ typename FIELD::ValueType GetGhostCenterExp(
     }
 }
 template<class FIELD>
-typename FIELD::ValueType GetGhostCenterValueType1(
+typename FIELD::ValueType GetBoundaryVertexValueType1(
         const FIELD&             field,
         const BoundaryCondition& bc,
         const typename FIELD::Index& idxc,
@@ -108,14 +116,16 @@ typename FIELD::ValueType GetGhostCenterValueType1(
         const Vt&              time = 0.0){
         // boundary condition must be type 1
         // walk back
+        auto& grid  = field.grid();
+        auto& ghost = field.ghost();
         auto oori = Opposite(Orientation(ori));  // opposite oritation
         auto idxb = idxg.shift(axe, oori);
         //    int  step  = 0;
-        while(field.ghost().is_ghost(idxb)){ // find nearest normal cell
+        while(ghost.is_ghost(idxb)){ // find nearest normal cell
             Shift(idxb, axe, oori);
         //    step++;
         }
-        auto fp = field.grid().f(axe, ori, idxb);   // face point
+        auto fp = grid.f(axe, ori, idxb);   // face point
         // auto idxsym = idxb;
         // for(int i = 0; i < step; ++i){
         //    Shift(idxsym, axe, oori);
@@ -135,7 +145,7 @@ typename FIELD::ValueType GetGhostCenterValueType1(
         return vx + (vbc - vx) * (dx + dg) / dx;
 }
 template<class FIELD>
-typename FIELD::ValueType GetGhostCenterValueType2(
+typename FIELD::ValueType GetBoundaryVertexValueType2(
         const FIELD&             field,
         const BoundaryCondition& bc,
         const typename FIELD::Index& idxc,
@@ -172,7 +182,7 @@ typename FIELD::ValueType GetGhostCenterValueType2(
     return vx - vbc * (dx + dg);
 }
 template<class FIELD>
-typename FIELD::ValueType GetGhostCenterValueType3(
+typename FIELD::ValueType GetBoundaryVertexValueType3(
         const FIELD&             fc,
         const BoundaryCondition& bc,
         const typename FIELD::Index& idxc,
@@ -232,7 +242,7 @@ typename FIELD::ValueType GetGhostCenterExpType1_3(
         return res;
 }
 template<class FIELD>
-typename FIELD::ValueType GetGhostCenterExpType1(
+typename FIELD::ValueType GetBoundaryVertexExpType1(
         const FIELD&             field,
         const BoundaryCondition& bc,
         const typename FIELD::Index& idxc,
@@ -244,28 +254,33 @@ typename FIELD::ValueType GetGhostCenterExpType1(
         typedef typename FIELD::ValueType Exp;
         // boundary condition must be type 1
         // walk back
+        auto& ghost = field.ghost(); 
+        auto& grid  = field.grid(); 
         auto oori = Opposite(Orientation(ori));  // opposite oritation
-        auto idxb = idxg.shift(axe, oori);
-        while(field.ghost().is_ghost(idxb)){ // find nearest normal cell
-            Shift(idxb, axe, oori);
+        auto idxi = idxg.shift(axe, oori);
+        while(ghost.is_ghost(idxi, VertexTag())){   // find nearest normal cell
+            Shift(idxi, axe, oori);
         }
-        auto fp = field.grid().f(axe, ori, idxb);   // face point
-        ASSERT(field.ghost().is_normal(idxb));
-        //  idxb   face  ghost
-        // ---x-----|-----g-----
+        auto idxb = idxi.shift(axe, ori);
+        auto pb = grid.v(idxb);
+        
+        Vt vbc = bc.value(pb.value(_X_), pb.value(_Y_), pb.value(_Z_), time);
+        return Exp(vbc);
+        //  idxi   idxb  ghost
+        // ---x-----x-----g-----
         //    +--dx-+--dg-+
         // equation:
         //  vg - vx     vbc - vx
         // --------- = ----------  ==> vg - vx = (vbc - vx) * (dx + dg) / dx;
         //  dx + dg        dx          vg = vx + (vbc - vx) * (dx + dg) / dx;
-        Vt dx  = std::abs(field.grid().c_(axe, idxb) - fp[axe]);
-        Vt dg  = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
-        Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-        Exp expx(idxb);
-        return expx + (vbc - expx) * (dx + dg) / dx;
+        // Vt dx  = std::abs(field.grid().c_(axe, idxi) - fp[axe]);
+        // Vt dg  = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
+        // Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
+        // Exp expx(idxi);
+        // return expx + (vbc - expx) * (dx + dg) / dx;
 }
 template<class FIELD>
-typename FIELD::ValueType GetGhostCenterExpType2(
+typename FIELD::ValueType GetBoundaryVertexExpType2(
         const FIELD&             field,
         const BoundaryCondition& bc,
         const typename FIELD::Index& idxc,
@@ -299,7 +314,7 @@ typename FIELD::ValueType GetGhostCenterExpType2(
     return expx - vbc * (dx + dg);
 }
 template<class FIELD>
-typename FIELD::ValueType GetGhostCenterExpType3(
+typename FIELD::ValueType GetBoundaryVertexExpType3(
         const FIELD&             fc,
         const BoundaryCondition& bc,
         const typename FIELD::Index& idxc,
@@ -323,7 +338,7 @@ typename FIELD::ValueType GetGhostCenterExpType3(
 }
 
 template<class FIELD>
-typename FIELD::ValueType _ValueGhostCenter(
+typename FIELD::ValueType _ValueBoundaryVertex(
     const FIELD& field,
     const BoundaryIndex& bi,
     const typename FIELD::Index& idxc,
@@ -341,13 +356,13 @@ typename FIELD::ValueType _ValueGhostCenter(
     if(ghost.is_ghost(idxg)){
         auto bid  = ghost.boundary_id(idxc, idxg, axe, ori);
         auto spbc = bi.find(bid);
-        return GetGhostCenterValue(field, *spbc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexValue(field, *spbc, idxc, idxg, axe, ori, time);
     }else{
         return field(idxg);
     }
 }
 template<class FIELD>
-typename FIELD::ValueType _ValueGhostCenter(
+typename FIELD::ValueType _ValueBoundaryVertex(
     const FIELD& field,
     const BoundaryIndex& bi,
     const typename FIELD::Index& idxc,
@@ -362,33 +377,17 @@ typename FIELD::ValueType _ValueGhostCenter(
 
     auto& ghost = field.ghost();
 
-    if(ghost.is_ghost(idxg)){
-        auto bid  = ghost.boundary_id(idxc, idxg, axe, ori);
+    if(ghost.is_ghost(idxg, VertexTag())){
+        auto bid  = ghost.boundary_id(idxc, idxg, axe, ori, VertexTag());
         auto spbc = bi.find(bid);
-        return GetGhostCenterExp(field, *spbc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexExp(field, *spbc, idxc, idxg, axe, ori, time);
     }else{
         return field(idxg);
     }
 }
 
 
-template<class FIELD>
-void _ApplyBoundaryValue(
-    FIELD&               field,
-    const BoundaryIndex& bi,
-    const Vt&            time, 
-    SFieldTag, SGridTag , SGhostTag , SOrderTag , DimTag )
-{
-    EXPAND_FIELD_TAG(FIELD); 
-    EXPAND_FIELD(FIELD);
-    typedef typename FIELD::ValueType Exp;
 
-    auto& ghost = field.ghost();
-    for(auto& idx : field.order()){
-        _ApplyBoundaryValueLocal(field, idx, bi, time,
-           FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-    }
-}
 template<class FIELD>
 void _ApplyBoundaryValueLocal(
     FIELD&               field,
@@ -510,6 +509,7 @@ auto _FindBoundaryValueInExp(
         return _AverageValueByDistance(field, idx, arridx, arrexp); 
     }
 }
+
 } // namespace carpio
 
 

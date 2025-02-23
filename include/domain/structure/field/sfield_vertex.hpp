@@ -41,19 +41,19 @@ public:
 protected:
 
 public:
-    SFieldVertex_(spGrid spg, spGhost spgh):{
-        this->_spgrid  = spg;
-        this->_spghost = spgh; 
+    SFieldVertex_(spGrid spg, spGhost spgh){
+        this->_spgrid = spg;
+        this->_spghost = spgh;
         // Initall a default order_xyz
-        this->_sporder = spOrder(new Order(spg, spgh, af));
+        this->_sporder = spOrder(new Order(spg, spgh));
         _initial_arr();
     }
     SFieldVertex_(spGrid spg, spGhost spgh, spOrder spo, Axes axe)
         :Base(spg, spgh, spo){
         _initial_arr();
     }
-    SFieldVertex_(const Self&  other): Base(other),_axe(other._axe){}
-    SFieldVertex_(      Self&& other): Base(std::move(other)), _axe(std::move(other._axe)){}
+    SFieldVertex_(const Self&  other): Base(other){}
+    SFieldVertex_(      Self&& other): Base(std::move(other)){}
     SFieldVertex_(const Base&  b) :Base(b) {}
     SFieldVertex_(      Base&& b) :Base(std::move(b)) {}
 
@@ -105,11 +105,6 @@ public:
         auto arr_idx = this->_sporder->get_order_face_index(findex, this->_axe);
         return this->_arr[arr_idx];
     }
-
-    Axes face_axe() const{
-        return _axe;
-    }
-
     
     // ===========================================
     // arithmatic operator

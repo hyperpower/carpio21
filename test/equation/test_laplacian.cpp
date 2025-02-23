@@ -95,7 +95,7 @@ TEST(equ_laplacian, solve){
 }
 
 
-TEST(equ_laplacian, DISABLED_explicit_step){
+TEST(equ_laplacian, explicit_step){
     std::cout << "[  Laplace ] Explicit step"<<std::endl;
     const int dim = 2;
     std::cout << "[   INFO   ] Dim = " << dim << std::endl;
@@ -132,9 +132,9 @@ TEST(equ_laplacian, DISABLED_explicit_step){
 
     // Set solver
     equ.set_solver("Jacobi", 1000, 1e-4);
-
     // Set time term
-    equ.set_time_term(50, 2e-3);
+    // equ.set_time_term(50, 2e-3);
+    equ.set_time_term(5, 2e-3);
     
     // Add events
     typedef Event_<Domain> Event;
@@ -198,7 +198,7 @@ TEST(equ_laplacian, DISABLED_implicit_step){
     Point p(0,0,0);
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegular_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost,CenterTag> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p,10, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));

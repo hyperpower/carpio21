@@ -2,10 +2,11 @@
 #define S_GHOST_HPP
 
 #include "domain/domain_define.hpp"
+#include "domain/base/base_field.hpp"
 
 namespace carpio{
 
-struct SGhostTag:  public StructureTag{};
+struct SGhostTag:  public StructureTag, public GhostBaseTag{};
 
 template<St DIM, class GRID>
 class SGhost_{

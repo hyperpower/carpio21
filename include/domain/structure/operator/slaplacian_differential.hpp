@@ -4,6 +4,7 @@
 #include "domain/base/base_operator.hpp"
 #include "domain/structure/field/sfield.hpp"
 #include "domain/structure/field/sfield_center.hpp"
+#include "domain/structure/field/sfield_vertex.hpp"
 #include "domain/structure/operator/sapply_bc.hpp"
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/ghost/regular.hpp"
@@ -11,6 +12,18 @@
 
 namespace carpio{
 
+// DifferenialLaplacian
+// 1 FieldCenter
+// 2 FieldVertex
+// -> _DifferentialLaplacianCenter
+//    1 Exp with bi 
+//    2 Exp without bi
+//    3 Value with bi
+//   -> _CDSOneAxe
+//      1 Value 
+//      2 Value UniformGrid
+//      3 Exp
+//      4 Exp UniformGrid 
 
 template<class FIELD, class BI>
 FIELD DifferenialLaplacian(
@@ -21,6 +34,16 @@ FIELD DifferenialLaplacian(
     return _DifferentialLaplacianCenter(field, bi, t, 
            ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
+template<class FIELD, class BI>
+FIELD DifferenialLaplacian(
+        const FIELD& field, const BI& bi, double t, 
+        SFieldVertexTag)
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    return _DifferentialLaplacianVertex(field, bi, t, 
+           ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+}
+
 
 template<class FIELD>
 auto _CDSOneAxe(
@@ -66,34 +89,7 @@ auto _CDSOneAxe(
     return (phi_p - 2.0 * phi(idx) - phi_m) / (s * s);
 }
 
-template<class FIELD>
-FIELD _DifferentialLaplacianCenter(
-        const FIELD& phi, const BoundaryIndex& bi, double t, 
-        ArithmeticTag, SGridTag, SGhostTag, SOrderTag, DimTag)
-{
-    EXPAND_FIELD_TAG(FIELD); 
-    EXPAND_FIELD(FIELD);
 
-
-    Field res        = phi.new_compatible_zero();
-    const Grid& grid = phi.grid();
-    for (auto& idx : phi.order()) {
-        std::array<Vt, Field::Dim> arr;
-        arr.fill(0.0);
-
-        for(auto& a : ArrAxes<Field::Dim>()){
-            arr[a] = _CDSOneAxe(phi, idx, a, bi, t,
-               ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-        }
-
-        Vt sum = 0;
-        for(auto& a : ArrAxes<Field::Dim>()){
-            sum += arr[a];
-        }
-        res(idx) = sum;
-    }
-    return res;
-}
 template<class FIELD>
 auto _CDSOneAxe(
         const FIELD& field, 
@@ -104,7 +100,7 @@ auto _CDSOneAxe(
     EXPAND_FIELD_TAG(FIELD); 
     typedef ValueType Exp;
 
-    const Grid& grid = field.grid();
+    const Grid& grid   = field.grid();
     const Ghost& ghost = field.ghost();
 
     // std::cout << "_CDSOneAxe : idx = " << idx << std::endl; 
@@ -150,6 +146,35 @@ auto _CDSOneAxe(
 }
 
 template<class FIELD>
+FIELD _DifferentialLaplacianCenter(
+        const FIELD& phi, const BoundaryIndex& bi, double t, 
+        ArithmeticTag, SGridTag, SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    EXPAND_FIELD(FIELD);
+
+
+    Field res        = phi.new_compatible_zero();
+    const Grid& grid = phi.grid();
+    for (auto& idx : phi.order()) {
+        std::array<Vt, Field::Dim> arr;
+        arr.fill(0.0);
+
+        for(auto& a : ArrAxes<Field::Dim>()){
+            arr[a] = _CDSOneAxe(phi, idx, a, bi, t,
+               ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+        }
+
+        Vt sum = 0;
+        for(auto& a : ArrAxes<Field::Dim>()){
+            sum += arr[a];
+        }
+        res(idx) = sum;
+    }
+    return res;
+}
+
+template<class FIELD>
 FIELD _DifferentialLaplacianCenter( // No BoundaryIndex
         const FIELD& field, double t, 
         LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
@@ -185,6 +210,18 @@ FIELD _DifferentialLaplacianCenter(
     return res;
 }
 
+template<class FIELD>
+FIELD _DifferentialLaplacianVertex(
+        const FIELD& phi, const BoundaryIndex& bi, double t, 
+        LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    auto res = _DifferentialLaplacianVertex(phi, t, 
+                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
+    ApplyBoundaryValue(res,bi,t);
+
+    return res;
+}
 
 
 
