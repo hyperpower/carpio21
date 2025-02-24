@@ -10,6 +10,7 @@
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/field/sfield_center.hpp"
 #include "domain/structure/field/sfield_face.hpp"
+#include "domain/structure/field/sfield_vertex.hpp"
 #include "domain/structure/field/svector_center.hpp"
 #include "domain/structure/field/svector_face.hpp"
 #include "io/gnuplot.hpp"
@@ -466,6 +467,21 @@ auto _ToGnuplotActorContourPoints(const ANY& field,
 }
 
 template<class ANY>
+auto _ToGnuplotActorContourPoints(const ANY& field, 
+        SFieldVertexTag, Dim2Tag){
+    std::list<double> lx, ly, lv;
+    for(auto& cidx : field.order()){
+        auto p = field.grid().v(cidx);
+        lx.push_back(p.value(_X_));
+        ly.push_back(p.value(_Y_));
+        lv.push_back(field(cidx));
+    }
+    auto aloc = ToGnuplotActor(lx, ly, lv);
+    aloc.style("with points ps 2 pointtype 7 lc palette");
+    return aloc;
+}
+
+template<class ANY>
 auto _ToGnuplotActorContourPoints(const ANY& ff, SFieldFaceTag, Dim2Tag){
     std::list<double> lx, ly, lv;
     auto a = ff.face_axe();
@@ -513,6 +529,12 @@ auto _ToGnuplotActorContourPoints(const ANY& a, SVectorFaceTag){
 }    
 template<class ANY>
 GnuplotActor _ToGnuplotActorContourPoints(const ANY& a, SFieldCenterTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorContourPoints(const ANY& a, SFieldVertexTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
     return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 

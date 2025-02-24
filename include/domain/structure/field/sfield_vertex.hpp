@@ -38,8 +38,7 @@ public:
 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
     typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;
-protected:
-
+    typedef std::function<ValueType(const Index&)>   FunIndex_Value;
 public:
     SFieldVertex_(spGrid spg, spGhost spgh){
         this->_spgrid = spg;
@@ -48,9 +47,13 @@ public:
         this->_sporder = spOrder(new Order(spg, spgh));
         _initial_arr();
     }
-    SFieldVertex_(spGrid spg, spGhost spgh, spOrder spo, Axes axe)
+    SFieldVertex_(spGrid spg, spGhost spgh, spOrder spo)
         :Base(spg, spgh, spo){
         _initial_arr();
+    }
+    SFieldVertex_(spGrid spg, spGhost spgh, spOrder spo, FunIndex_Value init_fun)
+        :Base(spg, spgh, spo){
+        _initial_arr(init_fun);
     }
     SFieldVertex_(const Self&  other): Base(other){}
     SFieldVertex_(      Self&& other): Base(std::move(other)){}
@@ -74,35 +77,23 @@ public:
         return *this;
     }
     
-    ValueType&      operator()(const Orientation& o, St i, St j = 0, St k = 0){
+    ValueType&      operator()(St i, St j = 0, St k = 0){
         Index fidx(i,j,k);
-        return this->operator()(o, fidx);
+        return this->operator()(fidx);
     }
 
-    const ValueType& operator()(const Orientation& o, St i, St j = 0, St k = 0) const{
+    const ValueType& operator()(St i, St j = 0, St k = 0) const{
         Index fidx(i,j,k);
-        return this->operator()(o, fidx);
-    }
-
-    ValueType& operator()(const Orientation& o, const Index& index) {
-        auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
-        auto arr_idx = this->_sporder->get_order_face_index(fidx, this->_axe);
-        return this->_arr[arr_idx];
-    }
-
-    const ValueType& operator()(const Orientation& o, const Index& index) const {
-        auto fidx    = this->_spgrid->cell_index_to_face_index(index, o, this->_axe);
-        auto arr_idx = this->_sporder->get_order_face_index(fidx, this->_axe);
-        return this->_arr[arr_idx];
+        return this->operator()(fidx);
     }
     
     ValueType& operator()(const Index& findex) {
-        auto arr_idx = this->_sporder->get_order_face_index(findex, this->_axe);
+        auto arr_idx = this->_sporder->get_order(findex);
         return this->_arr[arr_idx];
     }
 
     const ValueType& operator()(const Index& findex) const {
-        auto arr_idx = this->_sporder->get_order_face_index(findex, this->_axe);
+        auto arr_idx = this->_sporder->get_order(findex);
         return this->_arr[arr_idx];
     }
     
@@ -196,7 +187,7 @@ public:
     }
     // return a new scalar with compatible gird, ghost and order
     Self new_compatible_zero() const{
-        Self res(this->_spgrid, this->_spghost, this->_sporder, this->_axe);
+        Self res(this->_spgrid, this->_spghost, this->_sporder);
         return res;
     }
 protected:
@@ -204,8 +195,15 @@ protected:
         // make data by order
         this->_arr.reconstruct(this->_sporder->size());
         for(auto& idx : (*(this->_sporder))){
-            auto arr_idx = this->_sporder->get_order_face_index(idx);
+            auto arr_idx = this->_sporder->get_order(idx);
             this->_arr[arr_idx] = _DataInit::InitZero(idx);
+        }
+    }
+    void _initial_arr(FunIndex_Value fun){
+        // make data by order
+        this->_arr.reconstruct(this->_sporder->size());
+        for(auto& idx : this->order()){
+            this->operator()(idx) = fun(idx);
         }
     }
 };

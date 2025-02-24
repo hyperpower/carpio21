@@ -5,15 +5,13 @@
 #include "algebra/algebra.hpp"
 #include "domain/boundary/boundary_index.hpp"
 
-
-
 namespace carpio{
 
 template<class FIELD>
 void _BuildMatrix(const FIELD& expf, 
                   MatrixSCR_<Vt>& mat, ArrayListV_<Vt>& b,
                   SFieldCenterTag, LinearPolynomialTag){
-    auto &grid = expf.grid();
+    auto &grid  = expf.grid();
     auto &order = expf.order();
     St n = order.size();
 
@@ -36,8 +34,8 @@ void _BuildMatrix(const FIELD& expf,
     mat.row_ptr(0) = 0;
     for (auto &index : order){
         auto &exp = expf(index);
-        St row = order.get_order(index);
-        St nr = exp.size();
+        St row    = order.get_order(index);
+        St nr     = exp.size();
         mat.row_ptr(row + 1) = mat.row_ptr(row) + nr;
         // Inner Loop ---------------------
         St ii = mat.row_ptr(row);
@@ -51,7 +49,13 @@ void _BuildMatrix(const FIELD& expf,
     }
 }
 
-
+template<class FIELD>
+void _BuildMatrix(const FIELD& expf, 
+                  MatrixSCR_<Vt>& mat, ArrayListV_<Vt>& b,
+                  SFieldVertexTag, LinearPolynomialTag){
+    //Vertex and Center build mat function is same
+    _BuildMatrix(expf, mat, b, SFieldCenterTag(), LinearPolynomialTag()); 
+}
 
 }
 

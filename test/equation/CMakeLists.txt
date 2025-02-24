@@ -5,7 +5,8 @@ set(This Equation)
 set(Sources
     # test_equation_base.cpp
     # test_poisson.cpp
-    test_laplacian.cpp
+    # test_laplacian.cpp
+    test_laplacian_vertex.cpp
     # test_advection.cpp
 )
 

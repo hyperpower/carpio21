@@ -29,7 +29,7 @@ void _ApplyBoundaryValue(
     FIELD&               field,
     const BoundaryIndex& bi,
     const Vt&            time, 
-    SFieldTag, SGridTag , SGhostTag , SOrderTag , DimTag )
+    SFieldVertexTag, SGridTag , SGhostTag , SOrderTag , DimTag )
 {
     EXPAND_FIELD_TAG(FIELD); 
     EXPAND_FIELD(FIELD);
@@ -204,43 +204,7 @@ typename FIELD::ValueType GetBoundaryVertexValueType3(
     return fc(idxp);
 }
 
-template<class FIELD>
-typename FIELD::ValueType GetGhostCenterExpType1_3(
-        const FIELD&             field,
-        const BoundaryCondition& bc,
-        const typename FIELD::Index& idxc,
-        const typename FIELD::Index& idxg,
-        const Axes&            axe,
-        const Orientation&     ori,
-        const Vt&              time = 0.0)
-{        
-        typedef typename FIELD::ValueType Exp;
-        auto& grid = field.grid();
-        // boundary condition must be type 1
-        // walk back
-        auto oori = Opposite(Orientation(ori));  // opposite oritation
-        auto idx0 = idxg.shift(axe, oori);
-        while(field.ghost().is_ghost(idx0)){     // find nearest normal cell i
-            Shift(idx0, axe, oori);
-        }
-        auto idx1 = idx0.shift(axe, oori);     // inner cell i+1
-        auto idx2 = idx1.shift(axe, oori);     // inner cell i+1
-        auto fp = field.grid().f(axe, ori, idx0);   // face point
-        ASSERT(field.ghost().is_normal(idx0));
-        // lagrange
-        Exp res(0);
-        auto xb  = fp[axe];
-        auto x0  = grid.c_(axe, idx0);
-        auto x1  = grid.c_(axe, idx1);
-        auto x2  = grid.c_(axe, idx2);
-        auto xg  = grid.c_(axe, idxg);
-        Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-        res += (xg - x0) * (xg - x1) * (xg - x2)/ (xb - x0) / (xb - x1) / (xb - x2) * vbc;
-        res.insert((xg - xb) * (xg - x1) * (xg - x2) / (x0 - xb) / (x0 - x1) / (x0 - x2), idx0);
-        res.insert((xg - x0) * (xg - xb) * (xg - x2) / (x1 - x0) / (x1 - xb) / (x1 - x2), idx1);
-        res.insert((xg - x0) * (xg - xb) * (xg - x1) / (x2 - x0) / (x2 - xb) / (x2 - x1), idx2);
-        return res;
-}
+
 template<class FIELD>
 typename FIELD::ValueType GetBoundaryVertexExpType1(
         const FIELD&             field,
@@ -266,19 +230,8 @@ typename FIELD::ValueType GetBoundaryVertexExpType1(
         
         Vt vbc = bc.value(pb.value(_X_), pb.value(_Y_), pb.value(_Z_), time);
         return Exp(vbc);
-        //  idxi   idxb  ghost
-        // ---x-----x-----g-----
-        //    +--dx-+--dg-+
-        // equation:
-        //  vg - vx     vbc - vx
-        // --------- = ----------  ==> vg - vx = (vbc - vx) * (dx + dg) / dx;
-        //  dx + dg        dx          vg = vx + (vbc - vx) * (dx + dg) / dx;
-        // Vt dx  = std::abs(field.grid().c_(axe, idxi) - fp[axe]);
-        // Vt dg  = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
-        // Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-        // Exp expx(idxi);
-        // return expx + (vbc - expx) * (dx + dg) / dx;
 }
+
 template<class FIELD>
 typename FIELD::ValueType GetBoundaryVertexExpType2(
         const FIELD&             field,
@@ -394,7 +347,7 @@ void _ApplyBoundaryValueLocal(
     const typename FIELD::Index&  idx,
     const BoundaryIndex& bi,
     const Vt&            time, 
-    SFieldCenterTag, SGridTag, SGhostTag, SOrderTag, DimTag)
+    SFieldVertexTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
     typedef typename FIELD::ValueType Exp;
@@ -421,7 +374,7 @@ void _ApplyBoundaryValueLocal(
     const typename FIELD::Index&  idx,
     const BoundaryIndex& bi,
     const Vt&            time, 
-    SFieldCenterTag, SGridUniformTag, SGhostTag, SOrderTag, DimTag)
+    SFieldVertexTag, SGridUniformTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
     EXPAND_FIELD_TAG(FIELD);
@@ -432,10 +385,13 @@ void _ApplyBoundaryValueLocal(
     for(auto iter = exp.begin(); iter != exp.end();){
         auto& idxg = iter->first;
         auto& coe  = iter->second;
-        if(ghost.is_ghost(idxg)){
-            auto v = _FindBoundaryValueInExp(field, idx, idxg, bi, time,
+        if(ghost.is_ghost(idxg, VertexTag())){
+            auto v = _FindBoundaryVertexValueInExp(field, idx, idxg, bi, time,
                 GridTag(), GhostTag(), OrderTag(), DimTag());
-
+            // auto didx = GetDeltaIndex(idx, idxg);
+            // auto axe  = GetDeltaAxe(didx);
+            // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+            // auto v    = Value(field, bi, idx, idxg, axe, ori, time);
             exp += v * coe;
             iter = exp.erase(iter);
         } else {
@@ -444,7 +400,7 @@ void _ApplyBoundaryValueLocal(
     }
 }
 template<class FIELD, class CIDX, class CVALUE>
-auto _AverageValueByDistance(FIELD&  field,
+auto _AverageVertxValueByDistance(FIELD&  field,
         const typename FIELD::Index&  idx,
         const CIDX&    arridxg,
         const CVALUE&  arrv){
@@ -457,8 +413,8 @@ auto _AverageValueByDistance(FIELD&  field,
     auto iteridxg = arridxg.begin();
     auto iterv   = arrv.begin();
     for(;iteridxg != arridxg.end();){
-        auto cc  = grid.c(idx);
-        auto cg  = grid.c(*iteridxg);
+        auto cc  = grid.v(idx);
+        auto cg  = grid.v(*iteridxg);
         auto dis = Distance(cc, cg);
         sum += (*iterv) * dis;
         sum_dis += dis;                
@@ -468,7 +424,7 @@ auto _AverageValueByDistance(FIELD&  field,
     return sum / sum_dis;
 }
 template<class FIELD>
-auto _FindBoundaryValueInExp(
+auto _FindBoundaryVertexValueInExp(
     FIELD&               field,
     const typename FIELD::Index&  idx,
     const typename FIELD::Index&  idxg,
@@ -496,17 +452,17 @@ auto _FindBoundaryValueInExp(
         for(auto d : ArrAxes<FIELD::Dim>()){
             if(didx[d] != 0 ){
                 auto idxng = idxg.shift(d, -(Sign(didx[d])));
-                if(! (ghost.is_ghost(idxng))){
+                if(! (ghost.is_ghost(idxng, VertexTag()))){
                     auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
                     return Value(field, bi, idxng, idxg, d, ori, time); 
                 }else{
                     arridx[d] = idxng;
-                    arrexp[d] = _FindBoundaryValueInExp(field, idx, idxng, bi, time,
+                    arrexp[d] = _FindBoundaryVertexValueInExp(field, idx, idxng, bi, time,
                         GridTag(), GhostTag(), OrderTag(), DimTag());
                 }
             }
         }
-        return _AverageValueByDistance(field, idx, arridx, arrexp); 
+        return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
     }
 }
 

@@ -91,9 +91,9 @@ public:
     {
         for (St d = 0; d < DIM; ++d) {
             Idx res = vindex.value(d);
-            if (res <= 0) {
+            if (res < 0) {
                 return true;
-            } else if (res >= this->_grid->n(d)) {
+            } else if (res >= this->_grid->n(d) - 1) {
                 return true;
             }
         }

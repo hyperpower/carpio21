@@ -23,17 +23,17 @@ void ApplyBoundaryValue(
     _ApplyBoundaryValue(field, bi, time,
         FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
-template<class FIELD>
-void ApplyBoundaryValue(
-    FIELD&               field,
-    const BoundaryIndex& bi,
-    const Vt&            time, 
-    SFieldVertexTag, LinearPolynomialTag)
-{
-    EXPAND_FIELD_TAG(FIELD); 
-    _ApplyBoundaryValue(field, bi, time,
-        FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-}
+// template<class FIELD>
+// void ApplyBoundaryValue(
+//     FIELD&               field,
+//     const BoundaryIndex& bi,
+//     const Vt&            time, 
+//     SFieldVertexTag, LinearPolynomialTag)
+// {
+//     EXPAND_FIELD_TAG(FIELD); 
+//     _ApplyBoundaryValue(field, bi, time,
+//         FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+// }
 template<class FIELD>
 typename FIELD::ValueType Value(
     const FIELD&         field,
@@ -377,7 +377,7 @@ void _ApplyBoundaryValue(
     FIELD&               field,
     const BoundaryIndex& bi,
     const Vt&            time, 
-    SFieldTag, SGridTag , SGhostTag , SOrderTag , DimTag )
+    SFieldCenterTag, SGridTag , SGhostTag , SOrderTag , DimTag )
 {
     EXPAND_FIELD_TAG(FIELD); 
     EXPAND_FIELD(FIELD);
@@ -445,7 +445,7 @@ void _ApplyBoundaryValueLocal(
     }
 }
 template<class FIELD, class CIDX, class CVALUE>
-auto _AverageValueByDistance(FIELD&  field,
+auto _AverageCenterValueByDistance(FIELD&  field,
         const typename FIELD::Index&  idx,
         const CIDX&    arridxg,
         const CVALUE&  arrv){
@@ -507,7 +507,7 @@ auto _FindBoundaryValueInExp(
                 }
             }
         }
-        return _AverageValueByDistance(field, idx, arridx, arrexp); 
+        return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
     }
 }
 } // namespace carpio

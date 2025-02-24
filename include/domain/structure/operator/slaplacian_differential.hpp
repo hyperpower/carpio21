@@ -5,7 +5,7 @@
 #include "domain/structure/field/sfield.hpp"
 #include "domain/structure/field/sfield_center.hpp"
 #include "domain/structure/field/sfield_vertex.hpp"
-#include "domain/structure/operator/sapply_bc.hpp"
+#include "domain/structure/operator/sapply_bc_vertex.hpp"
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/ghost/regular.hpp"
 #include "domain/structure/order/xyz.hpp"
@@ -15,7 +15,7 @@ namespace carpio{
 // DifferenialLaplacian
 // 1 FieldCenter
 // 2 FieldVertex
-// -> _DifferentialLaplacianCenter
+// -> _DifferentialLaplacianCDS
 //    1 Exp with bi 
 //    2 Exp without bi
 //    3 Value with bi
@@ -26,24 +26,25 @@ namespace carpio{
 //      4 Exp UniformGrid 
 
 template<class FIELD, class BI>
-FIELD DifferenialLaplacian(
-        const FIELD& field, const BI& bi, double t, 
+FIELD DifferenialLaplacian(const FIELD& field, const BI& bi, double t, 
         SFieldCenterTag)
 {
-    EXPAND_FIELD_TAG(FIELD); 
-    return _DifferentialLaplacianCenter(field, bi, t, 
-           ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+    return _DifferenialLaplacian(field, bi, t);
 }
 template<class FIELD, class BI>
-FIELD DifferenialLaplacian(
-        const FIELD& field, const BI& bi, double t, 
+FIELD DifferenialLaplacian(const FIELD& field, const BI& bi, double t, 
         SFieldVertexTag)
 {
-    EXPAND_FIELD_TAG(FIELD); 
-    return _DifferentialLaplacianVertex(field, bi, t, 
-           ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+    return _DifferenialLaplacian(field, bi, t);
 }
 
+template<class FIELD, class BI>
+FIELD _DifferenialLaplacian(const FIELD& field, const BI& bi, double t)
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    return _DifferentialLaplacianCDS(field, bi, t, 
+           ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+}
 
 template<class FIELD>
 auto _CDSOneAxe(
@@ -146,7 +147,7 @@ auto _CDSOneAxe(
 }
 
 template<class FIELD>
-FIELD _DifferentialLaplacianCenter(
+FIELD _DifferentialLaplacianCDS(
         const FIELD& phi, const BoundaryIndex& bi, double t, 
         ArithmeticTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
@@ -175,7 +176,7 @@ FIELD _DifferentialLaplacianCenter(
 }
 
 template<class FIELD>
-FIELD _DifferentialLaplacianCenter( // No BoundaryIndex
+FIELD _DifferentialLaplacianCDS( // No BoundaryIndex
         const FIELD& field, double t, 
         LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
@@ -198,25 +199,12 @@ FIELD _DifferentialLaplacianCenter( // No BoundaryIndex
 }
 
 template<class FIELD>
-FIELD _DifferentialLaplacianCenter(
+FIELD _DifferentialLaplacianCDS(
         const FIELD& phi, const BoundaryIndex& bi, double t, 
         LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
-    auto res = _DifferentialLaplacianCenter(phi, t, 
-                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
-    ApplyBoundaryValue(res,bi,t);
-
-    return res;
-}
-
-template<class FIELD>
-FIELD _DifferentialLaplacianVertex(
-        const FIELD& phi, const BoundaryIndex& bi, double t, 
-        LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
-{
-    EXPAND_FIELD_TAG(FIELD); 
-    auto res = _DifferentialLaplacianVertex(phi, t, 
+    auto res = _DifferentialLaplacianCDS(phi, t, 
                 ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
     ApplyBoundaryValue(res,bi,t);
 

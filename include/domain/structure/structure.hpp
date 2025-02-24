@@ -68,6 +68,7 @@ public:
     typedef std::shared_ptr<Order> spOrder;
 
     typedef std::shared_ptr<FieldCenter>    spFieldCenter;
+    typedef std::shared_ptr<FieldVertex>    spFieldVertex;
     typedef std::shared_ptr<VectorCenter>   spVectorCenter;
     typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
     typedef std::shared_ptr<FieldVertexExp> spFieldVertexExp;
@@ -101,6 +102,19 @@ public:
         return spFieldCenterExp(new FieldCenterExp(spgrid, spghost, sporder, fun));
     }
 
+    static spFieldCenterExp NewspFieldExpCoeOne(
+        spGrid spgrid, spGhost spghost, spOrder sporder, CenterTag
+    ){
+        return NewspFieldCenterExpCoeOne(spgrid, spghost, sporder);
+    } 
+    static spFieldVertexExp NewspFieldExpCoeOne(
+        spGrid spgrid, spGhost spghost, spOrder sporder, VertexTag
+    ){
+        auto fun =[](const Index& idx){
+            return Exp(idx);
+        };
+        return spFieldVertexExp(new FieldVertexExp(spgrid, spghost, sporder, fun));
+    }
 };
 
 }

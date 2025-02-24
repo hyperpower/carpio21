@@ -34,6 +34,7 @@ public:
     typedef typename Domain::FieldCenterExp FieldCenterExp;
     typedef typename Domain::FieldVertexExp FieldVertexExp;
 
+
     typedef EquationBase_<D> Self;
 
     typedef Event_<D>                      Event;
@@ -42,12 +43,21 @@ public:
     typedef Condition_<D>                    Condition;
     typedef std::shared_ptr<Condition> spCondition;
 
+    typedef std::conditional<std::is_same_v<
+                typename Domain::LocationTag, CenterTag>, 
+                FieldCenter, FieldVertex>::type FieldMain;
+    typedef std::shared_ptr<FieldMain> spFieldMain; 
+    typedef std::conditional<std::is_same_v<
+                typename Domain::LocationTag, CenterTag>, 
+                FieldCenterExp, FieldVertexExp>::type FieldMainExp;
+    typedef std::shared_ptr<FieldMainExp> spFieldMainExp; 
+
     typedef std::shared_ptr<FieldCenter>    spFieldCenter;
     typedef std::shared_ptr<FieldFace>      spFieldFace;
     typedef std::shared_ptr<FieldCenterExp> spFieldCenterExp;
     typedef std::shared_ptr<BoundaryIndex> spBoundaryIndex;
 
-    typedef std::map<std::string, spFieldCenter>   Fields;
+    typedef std::map<std::string, spFieldMain> Fields;
     typedef std::map<std::string, Any>             Configures;
     typedef std::map<std::string, spFieldFace>     FieldFaces;
     typedef std::map<std::string, spBoundaryIndex> BIs;
@@ -220,14 +230,14 @@ public:
         }
         return false;
     }
-    const FieldCenter& field(const std::string& key) const{
+    const FieldMain& field(const std::string& key) const{
         if(this->has_field(key)){
             return *(this->_fields.at(key));
         }else{
             throw std::invalid_argument( key + "is not fields" );
         }
     }
-    FieldCenter& field(const std::string& key){
+    FieldMain& field(const std::string& key){
         if(this->has_field(key)){
             return *(this->_fields.at(key));
         }else{
@@ -353,7 +363,7 @@ public:
     }
     void new_field(const std::string& name){
         if(!(this->has_field(name))){
-            this->_fields[name] = spFieldCenter(new FieldCenter(
+            this->_fields[name] = spFieldMain(new FieldMain(
                     this->_spgrid,
                     this->_spghost,
                     this->_sporder));
@@ -375,11 +385,14 @@ protected:
             this->_sporder 
         );
     }
-    spFieldCenterExp new_field_exp_coe_one() const{
-        return Domain::NewspFieldCenterExpCoeOne(
-                    this->_spgrid, this->_spghost, this->_sporder);
+    // spFieldCenterExp new_field_exp_coe_one() const{
+    //     return Domain::NewspFieldCenterExpCoeOne(
+    //                 this->_spgrid, this->_spghost, this->_sporder);
+    // }
+    spFieldMainExp new_field_exp_coe_one() const{
+        return Domain::NewspFieldExpCoeOne(
+                    this->_spgrid, this->_spghost, this->_sporder, typename Domain::LocationTag());
     }
-
     template<class Container>
     void new_fields(const Container& list){
         auto isstring = std::is_same<typename Container::value_type,
@@ -414,7 +427,7 @@ protected:
         return spsolver;
     }
 
-    virtual int _build_mat_and_solve(const FieldCenterExp& fexp, FieldCenter& fres){
+    virtual int _build_mat_and_solve(const FieldMainExp& fexp, FieldMain& fres){
         auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
         Mat a;  Arr b;
         BuildMatrix(fexp, a, b);

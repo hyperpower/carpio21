@@ -9,21 +9,6 @@
 
 namespace carpio{
 
-//deprecate -->
-// template<class FIELD, class BI>
-// FIELD IntLaplacian(const FIELD& field, BI bi, double t=0.0){
-//     // std::cout << "IntLaplacian field with bi" << std::endl;
-//     IntLaplacianImplement_<FIELD,   FIELD::Dim,
-//                         typename FIELD::ValueType,
-//                         typename FIELD::Grid, 
-//                         typename FIELD::Ghost,
-//                         typename FIELD::Order,
-//                         typename FIELD::Tag
-//                         > imp;
-//     return imp.execute(field, bi, t); 
-// }
-// <--- deprecate
-
 
 template<class FIELD, class BI>
 FIELD IntegralLaplacian(const FIELD& field, const BI& bi, double t=0.0){
@@ -181,7 +166,7 @@ FIELD UdotNabla(const VECTORF& vec, const FIELD& field, const BI& bi,
 // BoundaryValue ===========================
 template<class FIELD>
 void ApplyBoundaryValue(
-     FIELD& field,
+    FIELD& field,
     const BoundaryIndex& bi,
     const Vt&            time = 0.0)
 {
