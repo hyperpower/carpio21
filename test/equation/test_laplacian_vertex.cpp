@@ -62,7 +62,7 @@ TEST(equ_laplacian_vertex, solve){
     equ.set_boundary_index("phi", spbi);
 
     // Set solver
-    equ.set_solver("Jacobi", 1000, 1e-4);
+    equ.set_solver("Jacobi", 10000, 1e-7);
     // equ.set_space_scheme("HOC4");
     equ.set_space_scheme("finite_difference_2");
     
@@ -83,14 +83,16 @@ TEST(equ_laplacian_vertex, solve){
     // gnu.set_ylabel("y");
     // gnu.set_xlabel("x");
     gnu.set_equal_aspect_ratio();
-    gnu.add(ToGnuplotActorWireFrame(*spgrid));
-    gnu.add(ToGnuplotActorContourPoints(equ.field("phi")));
+    // gnu.add(ToGnuplotActorWireFrame(*spgrid));
+    gnu.add(ToGnuplotActorContourWire(equ.field("phi"), *spbi));
+    gnu.add(ToGnuplotActorContourPoints(equ.field("phi"), *spbi));
     gnu.set_palette_red_blue_dark();
     gnu.set_grid();
-    // gnu.set_view(60,40,1.1,1.0);
-    // gnu.set_ticslevel(0.0);
+    gnu.set_view(60.0,40.0,1.1,1.0);
+    gnu.set_ticslevel(0.0);
     gnu.set_terminal_png(FIG_PATH + "Solved_Phi_Ver", fig_width, fig_height);
     gnu.plot();
+
 
     
 }

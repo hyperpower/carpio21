@@ -13,8 +13,8 @@
 namespace carpio{
 
 // DifferenialLaplacian
-// 1 FieldCenter
-// 2 FieldVertex
+// 1 FieldCenter 
+// 2 FieldVertex 
 // -> _DifferentialLaplacianCDS
 //    1 Exp with bi 
 //    2 Exp without bi

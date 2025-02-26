@@ -16,6 +16,8 @@
 #include "io/gnuplot.hpp"
 #include "s_stringify.hpp"
 
+#include "sgnuplot_actor_contour_wire.hpp"
+
 namespace carpio{
 
 // ToGnuplotActorXXX(ANY)
@@ -210,50 +212,6 @@ GnuplotActor _ToGnuplotActorContour(const ANY& a, SFieldCenterTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
     return _ToGnuplotActorContourDim(a, Tag(), DimTag()); 
-}
-template<class ANY>
-GnuplotActor _ToGnuplotActorContourWireDim(const ANY& f, 
-    SFieldCenterTag, Dim2Tag){
-    GnuplotActor actor;
-    actor.command("using 1:2:3 title \"\" ");
-    actor.style("with line lc palette");
-    for (St i = 0; i < f.grid().n(_X_); i++){
-        for (St j = 0; j < f.grid().n(_Y_); j++){
-            typename ANY::Grid::Index index(i, j);
-            auto pc = f.grid().c(index);
-            if (f.ghost().is_normal(index) == true){
-                actor.data().push_back(
-                    ToString(pc(_X_), pc(_Y_),
-                             f(index), f(index), " "));
-            }
-        }
-        actor.data().push_back("");
-    }
-    return actor;
-}
-template<class ANY>
-GnuplotActor _ToGnuplotActorContourWireDim(
-        const ANY& f, SFieldCenterTag, Dim1Tag){
-    GnuplotActor actor;
-    actor.command("using 1:2:3 title \"\" ");
-    actor.style("with lines lc palette");
-    for (St i = 0; i < f.grid().n(_X_); i++){
-        typename ANY::Grid::Index index(i);
-        auto pc = f.grid().c(index);
-        if (f.ghost().is_normal(index) == true){
-            actor.data().push_back(
-                ToString(pc(_X_), f(index), f(index), " "));
-        }
-    }
-    return actor;
-}
-
-
-template<class ANY>
-GnuplotActor _ToGnuplotActorContourWire(const ANY& a, SFieldCenterTag){
-    typedef typename ANY::Tag Tag;
-    typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorContourWireDim(a, Tag(), DimTag()); 
 }
 
 template<class ANY>
@@ -470,17 +428,40 @@ template<class ANY>
 auto _ToGnuplotActorContourPoints(const ANY& field, 
         SFieldVertexTag, Dim2Tag){
     std::list<double> lx, ly, lv;
-    for(auto& cidx : field.order()){
-        auto p = field.grid().v(cidx);
+    for(auto& idx : field.order()){
+        auto p = field.grid().v(idx);
         lx.push_back(p.value(_X_));
         ly.push_back(p.value(_Y_));
-        lv.push_back(field(cidx));
+        lv.push_back(field(idx));
     }
     auto aloc = ToGnuplotActor(lx, ly, lv);
     aloc.style("with points ps 2 pointtype 7 lc palette");
     return aloc;
 }
 
+template<class ANY>
+auto _ToGnuplotActorContourPoints(const ANY& field, const BoundaryIndex& bi, 
+        SFieldVertexTag, Dim2Tag){
+    std::list<double> lx, ly, lv;
+    for(auto& idx : field.order()){
+        auto p = field.grid().v(idx);
+        lx.push_back(p.value(_X_));
+        ly.push_back(p.value(_Y_));
+        lv.push_back(field(idx));
+        for (auto& idxg : CrossListIndex(idx)){
+            if(field.ghost().is_ghost_vertex(idxg)){
+                auto pg = field.grid().v(idxg);
+                auto pv = FindBoundaryValue(field, bi, idx, idxg, 0.0);
+                lx.push_back(pg.value(_X_));
+                ly.push_back(pg.value(_Y_));
+                lv.push_back(pv);
+            }
+        }
+    }
+    auto aloc = ToGnuplotActor(lx, ly, lv);
+    aloc.style("with points ps 2 pointtype 7 lc palette");
+    return aloc;
+}
 template<class ANY>
 auto _ToGnuplotActorContourPoints(const ANY& ff, SFieldFaceTag, Dim2Tag){
     std::list<double> lx, ly, lv;
@@ -538,6 +519,13 @@ GnuplotActor _ToGnuplotActorContourPoints(const ANY& a, SFieldVertexTag){
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
     return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
+}
+template<class ANY>
+GnuplotActor _ToGnuplotActorContourPoints(const ANY& a, const BoundaryIndex& bi,
+    SFieldVertexTag){
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    return _ToGnuplotActorContourPoints(a, bi, Tag(), DimTag()); 
 }
 template<class ANY>
 GnuplotActor _ToGnuplotActorVectors(const ANY& vector_center, Vt unit_length, 

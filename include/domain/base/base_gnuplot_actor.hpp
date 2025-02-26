@@ -7,21 +7,19 @@
 #include "domain/domain_define.hpp"
 #include "io/gnuplot.hpp"
 
+#include "domain/boundary/boundary_index.hpp"
+
 namespace carpio{
 
-
-// template<class ANY>
-// GnuplotActor _ToGnuplotActorLines(const ANY& a, const DomainTag& tag){};
-
-// template<class ANY>
-// GnuplotActor ToGnuplotActorLines(const ANY& a){
-//     typedef typename ANY::Tag Tag;
-//     return _ToGnuplotActorLines(a, Tag()); 
-// }
 template<class ANY>
 auto ToGnuplotActorContourPoints(const ANY& a){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorContourPoints(a, Tag()); 
+}
+template<class ANY>
+auto ToGnuplotActorContourPoints(const ANY& a, const BoundaryIndex& bi){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorContourPoints(a, bi, Tag()); 
 }
 template<class ANY>
 GnuplotActor ToGnuplotActorWireFrame(const ANY& a){
@@ -38,6 +36,11 @@ template<class ANY>
 GnuplotActor ToGnuplotActorContourWire(const ANY& a){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorContourWire(a, Tag()); 
+}
+template<class ANY, class BI>
+GnuplotActor ToGnuplotActorContourWire(const ANY& a, const BI& bi){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorContourWire(a, bi, Tag()); 
 }
 template<class ANY>
 GnuplotActor ToGnuplotActorSection(const ANY& f, Axes a, Vt v){

@@ -3,6 +3,7 @@
 
 
 #include <array>
+#include <list>
 #include "domain/domain_define.hpp"
 
 namespace carpio{
@@ -330,6 +331,16 @@ Orientation GetDeltaOrientOnAxe(
     return _C_;
 }
 
+template<St DIM>
+auto CrossListIndex(const SIndex_<DIM>& idx){
+    typedef const SIndex_<DIM> Index;
+    std::list<Index> res;
+    for(auto& d : ArrAxes<DIM>()){
+        res.push_back(idx.m(d));
+        res.push_back(idx.p(d));
+    }
+    return res;
+}
 
 
 }

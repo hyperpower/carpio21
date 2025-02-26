@@ -99,17 +99,11 @@ public:
         }
         return false;
     };
-    // virtual bool is_ghost(const Axes& a, const Index& index) const{
-    //     for (St d = 0; d < DIM; ++d) {
-    //         Idx res = index.value(d);
-    //         if (res < 0) {
-    //             return true;
-    //         } else if (res >= this->_grid->n().value(d)) {
-    //             return true;
-    //         }
-    //     }
-    //     return false;
-    // };
+    virtual bool 
+    is_ghost_vertex(const Index& vindex) const
+    {
+        return is_ghost(vindex, VertexTag());
+    };
 
     virtual bool is_boundary(
                 const Index& index,
@@ -153,8 +147,15 @@ public:
         const Axes& a) const
     {
         ASSERT(a < DIM);
-        Idx idx = vindex.value(a);
-        return (idx == 0) || (idx == _grid->n().value(a)); 
+        Index m = vindex.m(a);
+        if(is_ghost_vertex(m)){
+            return true;
+        }
+        Index p = vindex.p(a);
+        if(is_ghost_vertex(p)){
+            return true;
+        }
+        return false; 
     }
     virtual bool is_boundary_face(
             const Index& findex,
@@ -173,49 +174,44 @@ public:
     }
 
     virtual bool is_normal_vertex(const Index& vidx) const{
-        return (!is_ghost(vidx)) && (!is_boundary(vidx, _P_));
+        return (!is_ghost(vidx, VertexTag()));
     }
 
     virtual int 
     boundary_id(
         const Index& indexc,
         const Index& indexg,
-        const St& axe,
+        const St& a,
         const St& ori) const
     {
         // get seg idx in BCID
         // St ABI[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
         Index n = this->_grid->n();
-        for (auto& a : ArrAxes<Base::Dim>()) {
-            Idx res = indexg.value(a);
-            if (res < 0) {
-                return _BID[a][0];
-            } else if (res >= n.value(a)) {
-                return _BID[a][1];
-            }
+        Idx res = indexg.value(a);
+        if (res < 0) {
+            return _BID[a][0];
+        } else if (res >= n.value(a)) {
+            return _BID[a][1];
         }
         SHOULD_NOT_REACH;
         return 0;
     };
 
     virtual int 
-    boundary_id(
+    boundary_id_vertex(
         const Index& indexc,
         const Index& indexg,
-        const St& axe,
-        const St& ori, 
-        VertexTag) const
+        const St& a,
+        const St& ori) const
     {
         // get seg idx in BCID
         // St ABI[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
         Index n = this->_grid->n();
-        for (auto& a : ArrAxes<Base::Dim>()) {
-            Idx res = indexg[a];
-            if (res <= 0) {
-                return _BID[a][0];
-            } else if (res >= n[a] - 1) {
-                return _BID[a][1];
-            }
+        Idx res = indexg[a];
+        if (res <= 0) {
+            return _BID[a][0];
+        } else if (res >= n[a] - 1) {
+            return _BID[a][1];
         }
         SHOULD_NOT_REACH;
         return 0;

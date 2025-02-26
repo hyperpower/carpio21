@@ -113,36 +113,21 @@ typename FIELD::ValueType GetBoundaryVertexValueType1(
         const typename FIELD::Index& idxg,
         const Axes&            axe,
         const Orientation&     ori,
-        const Vt&              time = 0.0){
+        const Vt&              time = 0.0)
+{
         // boundary condition must be type 1
         // walk back
-        auto& grid  = field.grid();
-        auto& ghost = field.ghost();
+        auto& ghost = field.ghost(); 
+        auto& grid  = field.grid(); 
         auto oori = Opposite(Orientation(ori));  // opposite oritation
-        auto idxb = idxg.shift(axe, oori);
-        //    int  step  = 0;
-        while(ghost.is_ghost(idxb)){ // find nearest normal cell
-            Shift(idxb, axe, oori);
-        //    step++;
+        auto idxi = idxg.shift(axe, oori);
+        while(ghost.is_ghost(idxi, VertexTag())){   // find nearest normal cell
+            Shift(idxi, axe, oori);
         }
-        auto fp = grid.f(axe, ori, idxb);   // face point
-        // auto idxsym = idxb;
-        // for(int i = 0; i < step; ++i){
-        //    Shift(idxsym, axe, oori);
-        // }
-        ASSERT(field.ghost().is_normal(idxb));
-        //  idxb   face  ghost
-        // ---x-----|-----g-----
-        //    +--dx-+--dg-+
-        // equation:
-        //  vg - vx     vbc - vx
-        // --------- = ----------  ==> vg - vx = (vbc - vx) * (dx + dg) / dx;
-        //  dx + dg        dx          vg = vx + (vbc - vx) * (dx + dg) / dx;
-        Vt dx  = std::abs(field.grid().c_(axe, idxb) - fp[axe]);
-        Vt dg  = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
-        Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-        Vt vx  = field(idxb);
-        return vx + (vbc - vx) * (dx + dg) / dx;
+        auto idxb = idxi.shift(axe, ori);
+        auto pb = grid.v(idxb);
+        
+        return bc.value(pb.value(_X_), pb.value(_Y_), pb.value(_Z_), time);
 }
 template<class FIELD>
 typename FIELD::ValueType GetBoundaryVertexValueType2(
@@ -306,8 +291,8 @@ typename FIELD::ValueType _ValueBoundaryVertex(
 
     auto& ghost = field.ghost();
 
-    if(ghost.is_ghost(idxg)){
-        auto bid  = ghost.boundary_id(idxc, idxg, axe, ori);
+    if(ghost.is_ghost_vertex(idxg)){
+        auto bid  = ghost.boundary_id_vertex(idxc, idxg, axe, ori);
         auto spbc = bi.find(bid);
         return GetBoundaryVertexValue(field, *spbc, idxc, idxg, axe, ori, time);
     }else{
@@ -330,8 +315,8 @@ typename FIELD::ValueType _ValueBoundaryVertex(
 
     auto& ghost = field.ghost();
 
-    if(ghost.is_ghost(idxg, VertexTag())){
-        auto bid  = ghost.boundary_id(idxc, idxg, axe, ori, VertexTag());
+    if(ghost.is_ghost_vertex(idxg)){
+        auto bid  = ghost.boundary_id_vertex(idxc, idxg, axe, ori);
         auto spbc = bi.find(bid);
         return GetBoundaryVertexExp(field, *spbc, idxc, idxg, axe, ori, time);
     }else{
@@ -423,6 +408,7 @@ auto _AverageVertxValueByDistance(FIELD&  field,
     }
     return sum / sum_dis;
 }
+
 template<class FIELD>
 auto _FindBoundaryVertexValueInExp(
     FIELD&               field,
@@ -464,6 +450,61 @@ auto _FindBoundaryVertexValueInExp(
         }
         return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
     }
+}
+template<class FIELD>
+auto _SFindBoundaryValue(
+    FIELD&               field,
+    const BoundaryIndex& bi,
+    const typename FIELD::Index&  idx,
+    const typename FIELD::Index&  idxg,
+    const Vt&            time, 
+    SFieldVertexTag, SGridUniformTag , SGhostTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD);
+
+    typedef typename FIELD::ValueType Exp;
+
+    auto& ghost = field.ghost();
+
+    auto didx = GetDeltaIndex(idx, idxg);
+    if(OnSameAxe(didx)){
+        auto axe  = GetDeltaAxe(didx);
+        auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        return Value(field, bi, idx, idxg, axe, ori, time);
+    }else{
+        std::array<ValueType, FIELD::Dim> arrexp;
+        arrexp.fill(Exp(0));
+        std::array<Index, FIELD::Dim> arridx;
+        arridx.fill(idx);
+        for(auto d : ArrAxes<FIELD::Dim>()){
+            if(didx[d] != 0 ){
+                auto idxng = idxg.shift(d, -(Sign(didx[d])));
+                if(! (ghost.is_ghost_vertex(idxng))){
+                    auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
+                    return Value(field, bi, idxng, idxg, d, ori, time); 
+                }else{
+                    arridx[d] = idxng;
+                    arrexp[d] = _SFindBoundaryValue(field, bi, idx, idxng, time,
+                        FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+                }
+            }
+        }
+        return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
+    }
+}
+template<class FIELD>
+auto FindBoundaryValue(
+    FIELD&               field,
+    const BoundaryIndex& bi,
+    const typename FIELD::Index&  idx,
+    const typename FIELD::Index&  idxg,
+    const Vt&            time, 
+    SFieldVertexTag)
+{
+    EXPAND_FIELD_TAG(FIELD);
+    return _SFindBoundaryValue(field, bi, idx, idxg, time,
+        FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
 
 } // namespace carpio

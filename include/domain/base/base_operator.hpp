@@ -188,6 +188,17 @@ typename FIELD::ValueType Value(
     typedef typename FIELD::Tag Tag; 
     return Value(field, bi, idxc, idxg, axe, ori, time, Tag());
 }
+template<class FIELD>
+typename FIELD::ValueType FindBoundaryValue(
+    const FIELD& field,
+    const BoundaryIndex& bi,
+    const typename FIELD::Index& idxc,
+    const typename FIELD::Index& idxg,
+    const Vt&              time = 0.0)
+{
+    typedef typename FIELD::Tag Tag; 
+    return FindBoundaryValue(field, bi, idxc, idxg, time, Tag());
+}
 // BuildMatrix =============================
 template<class FIELD, class MAT, class ARR>
 int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){
