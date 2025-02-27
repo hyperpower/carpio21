@@ -18,7 +18,7 @@ typedef std::shared_ptr<Grid> spGrid;
 typedef SGhostRegular_<dim, Grid> Ghost;
 typedef std::shared_ptr<Ghost> spGhost;
 
-typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 typedef std::shared_ptr<Order> spOrder;
 
 typedef SFieldCenter_<dim, double, Grid, Ghost, Order> Field;
@@ -72,7 +72,7 @@ auto SolvedSolution(int meshn){
     gnu.set_ylabel("y");
     gnu.set_xlabel("x");
     gnu.set_equal_aspect_ratio();
-    gnu.set_palette_blue_red();
+    gnu.set_palette_red_blue();
     gnu.add(ToGnuplotActorContour(equ.field("phi")));
     gnu.set_terminal_png(FIG_PATH + "Solved_Phi", 
                         fig_width, fig_height, "Fira Code");
@@ -160,9 +160,8 @@ void Iterative(const std::string& method, const Field& fe, double dt,
     }
     // Add events Error Norm
     typedef EventNormExactFieldCenter_<Domain> EventErrorNorm;
-    auto speen = std::make_shared<EventErrorNorm>(fe, "phi", -1, -1, 1, Event::AFTER);
+    auto speen = std::make_shared<EventErrorNorm>(&fe, "phi", -1, -1, 1, Event::AFTER);
     equ.add_event("ErrorPhi", speen);
-
     equ.run();
     lt  = speen->get_list_time();
     ln1 = speen->get_list_norm1();

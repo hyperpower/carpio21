@@ -43,11 +43,11 @@ public:
     typedef Condition_<D>                    Condition;
     typedef std::shared_ptr<Condition> spCondition;
 
-    typedef std::conditional<std::is_same_v<
+    typedef typename std::conditional<std::is_same_v<
                 typename Domain::LocationTag, CenterTag>, 
                 FieldCenter, FieldVertex>::type FieldMain;
     typedef std::shared_ptr<FieldMain> spFieldMain; 
-    typedef std::conditional<std::is_same_v<
+    typedef typename std::conditional<std::is_same_v<
                 typename Domain::LocationTag, CenterTag>, 
                 FieldCenterExp, FieldVertexExp>::type FieldMainExp;
     typedef std::shared_ptr<FieldMainExp> spFieldMainExp; 

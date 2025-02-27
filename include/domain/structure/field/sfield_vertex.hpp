@@ -158,31 +158,19 @@ public:
         Base::assign(other);
     }
     void assign(FunXYZT_Value fun, Vt t = 0.0){
-        for(auto& fidx : (*this->_sporder)){
-            auto cidx = this->_spgrid->face_index_to_cell_index(fidx, this->_axe);
-            auto cp = this->_spgrid->c(cidx);
-            auto fp = this->_spgrid->f(this->_axe, _M_, cidx);
-            auto value = fun(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), t);
-            this->operator ()(_M_, cidx) = value;
-            if(this->_spgrid->is_last(cidx, this->_axe)){
-                auto fp = this->_spgrid->f(this->_axe, _P_, cidx);
-                auto value = fun(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), t);
-                this->operator ()(_P_, cidx) = value;
-            }
+        auto& grid = this->grid();
+        for(auto& idx : (*this->_sporder)){
+            auto p = grid.v(idx);
+            auto value = fun(p.value(_X_), p.value(_Y_), p.value(_Z_), t);
+            this->operator ()(idx) = value;
         }
     }
     void assign(FunXYZ_Value fun){
-        for(auto& fidx : (*this->_sporder)){
-            auto cidx = this->_spgrid->face_index_to_cell_index(fidx, this->_axe);
-            auto cp = this->_spgrid->c(cidx);
-            auto fp = this->_spgrid->f(this->_axe, _M_, cidx);
-            auto value = fun(fp.value(_X_), fp.value(_Y_), fp.value(_Z_));
-            this->operator ()(_M_, cidx) = value;
-            if(this->_spgrid->is_last(cidx, this->_axe)){
-                auto fp = this->_spgrid->f(this->_axe, _P_, cidx);
-                auto value = fun(fp.value(_X_), fp.value(_Y_), fp.value(_Z_));
-                this->operator ()(_P_, cidx) = value;
-            }
+        auto& grid = this->grid();
+        for(auto& idx : (*this->_sporder)){
+            auto p = grid.v(idx);
+            auto value = fun(p.value(_X_), p.value(_Y_), p.value(_Z_));
+            this->operator ()(idx) = value;
         }
     }
     // return a new scalar with compatible gird, ghost and order

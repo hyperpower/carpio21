@@ -84,7 +84,7 @@ TEST(equ_laplacian_vertex, solve){
     // gnu.set_xlabel("x");
     gnu.set_equal_aspect_ratio();
     // gnu.add(ToGnuplotActorWireFrame(*spgrid));
-    gnu.add(ToGnuplotActorContourWire(equ.field("phi"), *spbi));
+    gnu.add(ToGnuplotActorContourWire(equ.field("phi")));
     gnu.add(ToGnuplotActorContourPoints(equ.field("phi"), *spbi));
     gnu.set_palette_red_blue_dark();
     gnu.set_grid();

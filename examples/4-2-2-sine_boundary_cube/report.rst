@@ -51,6 +51,22 @@ Second Order Finite Volume Method
 
    Error Norm in different mesh resolutions.
    
+Second Order Finite Difference Method
+==================================
+
+.. figure:: fig/finite_difference_2_residual.png
+   :align: center 
+
+   Solver residual on each mesh.
+
+.. csv-table:: Error Norm in different mesh resolutions.
+   :file: fig/finite_difference_2_error_table.txt
+   :header-rows: 1
+
+.. figure:: fig/finite_difference_2_error.png
+   :align: center 
+
+   Error Norm in different mesh resolutions.
 
 4th-Order High Order Compact (HOC4) Scheme
 =============================================
