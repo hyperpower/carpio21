@@ -6,6 +6,7 @@
 #include "domain/structure/structure.hpp"
 #include "equation/equation.hpp"
 #include "example_define.hpp"
+#include "convergence_analysis.hpp"
 
 
 using namespace carpio;
@@ -17,7 +18,7 @@ typedef std::shared_ptr<Grid> spGrid;
 typedef SGhostRegular_<dim, Grid> Ghost;
 typedef std::shared_ptr<Ghost> spGhost;
 
-typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 typedef std::shared_ptr<Order> spOrder;
 
 typedef Point_<double,dim> Point;
@@ -39,33 +40,7 @@ void PlotFieldAsContour(const std::string& ffn, const Field& f){
 	gnu.plot();
 }
 
-void PlotResidual(const std::string& ffn, 
-                  const std::vector<int>& ln,
-                  const std::list<std::list<double> >& lr){
-    const int fig_width  = 800;
-    const int fig_height = 600;
-    Gnuplot gnu;
-    gnu.set_ylogscale();
-	// gnu.set_xrange(-0.1, 1.1);
-	// gnu.set_yrange(-0.1, 1.1);
-	gnu.set_ylabel("Residual");
-	gnu.set_xlabel("Number of iteration");
-	// gnu.set_equal_aspect_ratio();
-	// gnu.set_palette_blue_red();
-    auto itern = ln.begin();
-    auto iterr = lr.begin();
-    for(;itern != ln.end();){
-        std::cout << iterr->size() << std::endl; 
-        auto a = ToGnuplotActor(*iterr);
-        a.title("Mesh n = " + ToString(*itern));
-        a.style("with lines lw 2");
-	    gnu.add(a);
-        itern++;
-        iterr++;
-    }
-    gnu.set_terminal_png(FIG_PATH + ffn, fig_width, fig_height);
-	gnu.plot();
-}
+
 std::list<double> Reference(int order,
                const std::vector<int>& ln,
                const std::list<double>& l1){
@@ -81,60 +56,7 @@ std::list<double> Reference(int order,
     }
     return res;
 }
-void PlotError(const std::string& ffn,
-               const std::vector<int>& ln,
-               const std::list<double> & l1,
-               const std::list<double> & l2,
-               const std::list<double> & li
-               ){
-    const int fig_width  = 800;
-    const int fig_height = 600;
-    Gnuplot gnu;
-    gnu.set_xlogscale();
-    gnu.set_ylogscale();
-	gnu.set_ylabel("Norm");
-	gnu.set_xlabel("1/n");
-    gnu.set_yformat("10^{%L}");
-	// gnu.set_palette_blue_red();
-    std::list<double> lh;
-    for(auto& n:ln){
-        lh.push_back(1.0/n);
-    }
-    auto a1 = ToGnuplotActor(lh, l1);
-    a1.title("L1-Norm");
-    a1.style("with linespoints lw 2 pt 7");
-    auto a2 = ToGnuplotActor(lh, l2);
-    a2.title("L2-Norm");
-    a2.style("with linespoints lw 2 pt 7");
-    auto ai = ToGnuplotActor(lh, li);
-    ai.title("Linf-Norm");
-    ai.style("with linespoints lw 2 pt 7");
-    gnu.add(a1);
-    gnu.add(a2);
-    gnu.add(ai);
 
-    auto l1ref = Reference(2, ln, l1);
-    auto a1r = ToGnuplotActor(lh, l1ref);
-    // a1r.title("2 Order");
-    a1r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
-
-    auto l2ref = Reference(2, ln, l2);
-    auto a2r = ToGnuplotActor(lh, l2ref);
-    a2r.title("2 Order Reference");
-    a2r.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
-
-    auto liref = Reference(2, ln, li);
-    auto air = ToGnuplotActor(lh, liref);
-    air.style("with lines lw 1 lc rgb \"#0C0D0E\" dt 2");
-
-    gnu.add(a1r);
-    gnu.add(a2r);
-    gnu.add(air);
-
-    gnu.set_terminal_png(FIG_PATH + ffn, fig_width, fig_height);
-    gnu.set_key("top left");
-    gnu.plot();
-}
 
 void ExactSolution(){
     Point_<Vt, dim> pmin(0, 0, 0);
@@ -231,10 +153,6 @@ void PoissonSolver(int n,
     li.push_back(NormInf(error));
 }
 
-Vt cal_order(Vt e2n, Vt en){
-    return std::log2(en / e2n);
-}
-
 int main(int argc, char** argv) {
     ExactSolution();
     std::vector<int> vn = {10, 20, 40, 80, 160};
@@ -244,43 +162,12 @@ int main(int argc, char** argv) {
         PoissonSolver(n, l1, l2, li, lr);
     }
     // output to a file
-    std::ofstream fout("./fig/error_table.txt",std::ios::out);
 
-    tfm::format(fout, "n,L1-Norm, O-L1, L2-Norm, O-L2, Linf-Norm, O-Linf\n");
-    int count = 0;
-    auto itervn = vn.begin();
-    auto iterl1 = l1.begin();
-    auto iterl2 = l2.begin();
-    auto iterli = li.begin();
-    for(;itervn != vn.end();){
-        tfm::format(std::cout,
-                    "n: %8d N1: %10.5e N2: %10.5e Ni: %10.5e\n",
-                    *itervn, *iterl1, *iterl2, *iterli);
-        if(count > 0){
-            auto pl1 = std::prev(iterl1);
-            auto pl2 = std::prev(iterl2);
-            auto pli = std::prev(iterli);
-            tfm::format(fout,
-                    "%8d, %10.3e, %10.2f, %10.3e, %10.2f, %10.3e, %10.2f\n",
-                    *itervn, *iterl1, cal_order(*iterl1, *pl1),
-                             *iterl2, cal_order(*iterl2, *pl2), 
-                             *iterli, cal_order(*iterli, *pli));
-        }else{
-            tfm::format(fout,
-                    "%8d, %10.3e, %10s, %10.3e, %10s, %10.3e, %10s\n",
-                    *itervn, *iterl1, " ",  *iterl2," ",  *iterli, " ");
-        }
-        itervn++;
-        iterl1++;
-        iterl2++;
-        iterli++;
-        count++;
-    }
-    fout.close();
+    OutputError(FIG_PATH + "error_table.txt",vn, l1, l2, li);
 
     // plot residual
-    PlotResidual("residual", vn, lr);
-    PlotError("error", vn, l1, l2, li);
+    PlotResidual( FIG_PATH + "residual", vn, lr);
+    PlotError(FIG_PATH + "error", 2, vn, l1, l2, li);
 
     return 0;
 }

@@ -48,9 +48,9 @@ public:
 
     SGridUniform_(
             const Point& minp, 
-            const Idx& nx,
-            const Vt&  length_on_x,
-            const St&  ghostlayer) :
+            const Idx&   nx,
+            const Vt&    length_on_x,
+            const St&    ghostlayer) :
             _min(minp), _gl(ghostlayer) {
         _cs = length_on_x / nx;
         for (St i = 0; i < Dim; ++i) {
@@ -65,7 +65,26 @@ public:
             }
         }
     }
-
+    // SGridUniform_(
+    //         const Point& minp, 
+    //         const Idx&   np,    //number of points
+    //         const Vt&    length_on_x,
+    //         const St&    ghostlayer,
+    //         VertexTag) :
+    //         _min(minp), _gl(ghostlayer-1) {
+    //     _cs = length_on_x / np;
+    //     for (St i = 0; i < Dim; ++i) {
+    //         _n[i]  = np;
+    //         _ng[i] = _n[i] + 2 * _gl;
+    //     }
+    //     for (St d = 0; d < Dim; ++d) {
+    //         _c[d].reconstruct(_ng[d]);
+    //         Vt orignal = _min[d] + _cs * (0.5 - _gl);
+    //         for (typename Arr::size_type ii = 0; ii < _c[d].size(); ++ii) {
+    //             _c[d][ii] = orignal + ii * _cs;
+    //         }
+    //     }
+    // }
     Idx ghost_layer() const{
         return _gl;
     }

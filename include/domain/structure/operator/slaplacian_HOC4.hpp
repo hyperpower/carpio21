@@ -9,7 +9,7 @@ namespace carpio{
 template<class FIELD, class BI>
 FIELD DifferenialLaplacianHOC4(
         const FIELD& field, const BI& bi, double t, 
-        SFieldCenterTag)
+        SFieldVertexTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
     return _DifferentialLaplacianHOC4(field, bi, t, 
@@ -56,11 +56,9 @@ FIELD _DifferentialLaplacianHOC4( // No BoundaryIndex
 
     for (auto& idx : res.order()) {
         std::array<Exp, Field::Dim> arr;
-        // std::cout << "idx = " << idx << std::endl;
         for(auto& d : ArrAxes<Field::Dim>()){
             arr[d] = _CDSOneAxe(field, idx, d, t,
                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());  
-            
             // if(idx == Index(1,1)){
             //     std::cout << "d = " << ToString(d) << std::endl;
             //     std::cout << _CDSOneAxe(field, idx, d, t,
@@ -77,6 +75,8 @@ FIELD _DifferentialLaplacianHOC4( // No BoundaryIndex
             // }
 
         }
+        
+
         for(auto& d : ArrAxes<Field::Dim>()){
             res(idx) += arr[d];
         }
@@ -92,7 +92,10 @@ FIELD _DifferentialLaplacianHOC4(
     EXPAND_FIELD_TAG(FIELD); 
     auto res = _DifferentialLaplacianHOC4(phi, t, 
                 ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
+    std::cout << res(0,8) << std::endl;
     ApplyBoundaryValue(res,bi,t);
+    std::cout << res(0,8) << std::endl;
+    std::cout << phi.grid().v(-1,-1) << std::endl;
 
     return res;
 }

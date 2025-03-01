@@ -112,7 +112,7 @@ auto _CDSOneAxe(
     // std::cout << "           : idxm = " << idxm << std::endl; 
 
     Exp phi_m(idxm), phi_p(idxp), phi(idx);
-    if(!ghost.is_ghost(idx)){
+    if(!ghost.is_ghost_vertex(idx)){
         phi = field(idx);
     }
     auto dfdx_m = (phi - phi_m)
@@ -140,7 +140,7 @@ auto _CDSOneAxe(
     Index idxm = idx.m(a);
 
     Exp phi_m(idxm), phi_p(idxp), phi(idx);
-    if(!ghost.is_ghost(idx)){
+    if(!ghost.is_ghost_vertex(idx)){
         phi = field(idx);
     }
     return (phi_p - phi * 2.0 + phi_m) / (grid.dc() * grid.s());

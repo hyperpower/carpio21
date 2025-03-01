@@ -14,7 +14,7 @@ This test problem has a doubly periodic boundary condition. Exact solution is,
 .. math::
    \phi = \text{sin}(2 \pi x) \text{sin}(2 \pi y)
 
-This test is in [Barad2005]_.
+This test is in [Barad2005]_ Problem 1.
 
 .. figure:: fig/ExactSolutionContour.png
    :alt: Fig of Exact Solution

@@ -6,7 +6,6 @@
 #include "domain/structure/io/sgnuplot_actor.hpp"
 
 #include "domain/structure/operator/sapply_bc.hpp"
-#include "domain/structure/operator/sintegral_laplacian.hpp"
 
 #include "domain/structure/operator/scommon.hpp"
 
@@ -15,7 +14,7 @@
 #include "equation/event/event.hpp"
 
 #include "example_define.hpp"
-
+#include "convergence_analysis.hpp"
 #include <cmath>
 
 using namespace carpio;
@@ -66,7 +65,7 @@ int run_a_scheme(const std::string& scheme, std::list<GnuplotActor>& list_a){
     Point p(0,0,0);
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegular_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p, 
                                         {n,  n},      // num on each direction
@@ -198,7 +197,8 @@ int run_a_scheme(const std::string& scheme, std::list<GnuplotActor>& list_a){
     auto ln2 = speen->get_list_norm2();
     auto lni = speen->get_list_norminf();
 
-    plot_error_norm(scheme, lt, ln1, ln2, lni);
+    std::string ffn = "./fig/" + scheme + "_norm";
+    PlotNormWithStep(ffn, lt, ln1, ln2, lni);
 
     // Plot last section
     Gnuplot gun_section;

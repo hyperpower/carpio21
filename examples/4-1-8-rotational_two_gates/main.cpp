@@ -6,7 +6,6 @@
 #include "domain/structure/io/sgnuplot_actor.hpp"
 
 #include "domain/structure/operator/sapply_bc.hpp"
-#include "domain/structure/operator/sintegral_laplacian.hpp"
 
 #include "domain/structure/operator/scommon.hpp"
 
@@ -15,45 +14,11 @@
 #include "equation/event/event.hpp"
 
 #include "example_define.hpp"
-
+#include "convergence_analysis.hpp"
 #include <cmath>
 
 using namespace carpio;
 
-void plot_error_norm(const std::string& fn_prefix, 
-                     const std::list<St>& ls,
-                     const std::list<Vt>& ln1,
-                     const std::list<Vt>& ln2,
-                     const std::list<Vt>& lni
-){
-    Gnuplot gnu;
-    auto an1 = ToGnuplotActor(ls, ln1);
-    an1.title("Norm1");
-    an1.style("with lines ");  
-    an1.line_width(2);
-    gnu.add(an1);
-    auto an2 = ToGnuplotActor(ls, ln2);
-    an2.title("Norm2");
-    an2.style("with lines ");  
-    an2.line_width(2);
-    gnu.add(an2);
-        
-    auto ani = ToGnuplotActor(ls, lni);
-    ani.title("Norm inf");
-    ani.style("with lines ");  
-    ani.line_width(2);
-    gnu.add(ani);
-
-    gnu.set_xlabel("Step");
-    gnu.set_ylabel("Error Norm");
-    gnu.set_ylogscale();
-    gnu.set_yformat("10^{%L}");
-
-    gnu.set_terminal_png("./fig/" + fn_prefix + "_norm", 
-	                    fig_width, fig_height);
-
-    gnu.plot();
-}
 
 
 int run_a_scheme(const std::string& scheme, std::list<GnuplotActor>& list_a){
@@ -67,7 +32,7 @@ int run_a_scheme(const std::string& scheme, std::list<GnuplotActor>& list_a){
     typedef Point_<double,dim> Point;
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegularSubdivision_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 
     Point p(-1.0,0.0);
     std::shared_ptr<Grid>  spgrid(new Grid(p, 
@@ -210,7 +175,8 @@ int run_a_scheme(const std::string& scheme, std::list<GnuplotActor>& list_a){
     auto ln2 = spec->get_list_norm2();
     auto lni = spec->get_list_norminf();
 
-    plot_error_norm(scheme, lt, ln1, ln2, lni);
+    std::string ffn = "./fig/" + scheme + "_norm";
+    PlotNormWithStep(ffn, lt, ln1, ln2, lni);
 
     // Plot last section
     Gnuplot gun_section;

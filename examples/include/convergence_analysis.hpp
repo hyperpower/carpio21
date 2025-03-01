@@ -15,13 +15,15 @@ void PlotResidual(const std::string& ffn,
                   const VVN& llr){
     Gnuplot gnu;
     gnu.set_ylogscale();
+    gnu.set_xlogscale();
 	// gnu.set_xrange(-0.1, 1.1);
 	// gnu.set_yrange(-0.1, 1.1);
 	gnu.set_ylabel("Residual");
 	gnu.set_xlabel("Number of iteration");
     gnu.set_yformat("10^{%L}");
+    gnu.set_xformat("{%.0e}");
 	// gnu.set_equal_aspect_ratio();
-	// gnu.set_palette_blue_red();
+	// gnu.set_palette_red_blue();
     auto itern = ln.begin();
     auto iterr = llr.begin();
     for(;itern != ln.end();){
@@ -54,7 +56,7 @@ std::list<double> ConvergenceOrderReference(int order,
 
 void PlotError(const std::string& ffn,
                const int order,
-               const std::vector<int>& ln,
+               const std::vector<int>&   ln,
                const std::list<double> & l1,
                const std::list<double> & l2,
                const std::list<double> & li
@@ -102,7 +104,7 @@ void PlotError(const std::string& ffn,
     gnu.add(a2r);
     gnu.add(air);
 
-    gnu.set_terminal_png(ffn, fig_width, fig_height);
+    gnu.set_terminal_png(ffn, fig_width, fig_height, "Fira Code", 16);
     gnu.set_key("top left");
 	gnu.plot();
 }
@@ -152,5 +154,37 @@ void OutputError(
     fout.close();
 }
 
+void PlotNormWithStep(const std::string& ffn, 
+                    const std::list<St>& ls,
+                    const std::list<Vt>& ln1,
+                    const std::list<Vt>& ln2,
+                    const std::list<Vt>& lni
+){
+    Gnuplot gnu;
+    auto an1 = ToGnuplotActor(ls, ln1);
+    an1.title("Norm1");
+    an1.style("with lines ");  
+    an1.line_width(2);
+    gnu.add(an1);
+    auto an2 = ToGnuplotActor(ls, ln2);
+    an2.title("Norm2");
+    an2.style("with lines ");  
+    an2.line_width(2);
+    gnu.add(an2);
+        
+    auto ani = ToGnuplotActor(ls, lni);
+    ani.title("Norm inf");
+    ani.style("with lines ");  
+    ani.line_width(2);
+    gnu.add(ani);
+
+    gnu.set_xlabel("Step");
+    gnu.set_ylabel("Error Norm");
+
+    gnu.set_terminal_png(ffn, 
+	                    fig_width, fig_height, "Fira Code", 16);
+
+    gnu.plot();
+}
 
 #endif 

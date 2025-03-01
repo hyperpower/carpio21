@@ -38,6 +38,11 @@ TEST(equ_laplacian_vertex, solve){
     typedef SOrderXYZ_<dim, Grid, Ghost, VertexTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p,10, 1, 2));
+    std::cout << "n = " << spgrid->n() << std::endl;
+    std::cout << "N = " << spgrid->N() << std::endl;
+    std::cout << "v = " << Order::Index(-1, -1) << spgrid->v(Order::Index(-1,-1)) << std::endl;
+    std::cout << "v = " << Order::Index(9, 9) << spgrid->v(Order::Index(9,9)) << std::endl;
+    std::cout << "c = " << spgrid->c(Order::Index(0,0)) << std::endl;
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
     std::shared_ptr<Order> sporder(new Order(spgrid, spghost));
 
@@ -63,8 +68,8 @@ TEST(equ_laplacian_vertex, solve){
 
     // Set solver
     equ.set_solver("Jacobi", 10000, 1e-7);
-    // equ.set_space_scheme("HOC4");
-    equ.set_space_scheme("finite_difference_2");
+    equ.set_space_scheme("HOC4");
+    // equ.set_space_scheme("finite_difference_2");
     
     // Add events
     typedef Event_<Domain> Event;

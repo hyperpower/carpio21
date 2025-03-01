@@ -6,7 +6,6 @@
 #include "domain/structure/io/sgnuplot_actor.hpp"
 
 #include "domain/structure/operator/sapply_bc.hpp"
-#include "domain/structure/operator/sintegral_laplacian.hpp"
 
 #include "domain/structure/operator/scommon.hpp"
 
@@ -27,7 +26,7 @@ int main(int argc, char** argv) {
     Point p(0,0,0);
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegular_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p, 100, 2.0, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
@@ -126,7 +125,7 @@ int main(int argc, char** argv) {
     // egs.gnuplot().set_zrange( 0.0, 1.1);
     // egs.gnuplot().set_equal_aspect_ratio();
     egs.gnuplot().set_cbrange(0.0, 1.0);
-    egs.gnuplot().set_palette_blue_red();
+    egs.gnuplot().set_palette_red_blue();
     egs.set_path(FIG_PATH + "FOU_" );
     egs.set_format_string("%s_%03d");
 

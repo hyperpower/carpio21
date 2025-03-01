@@ -24,7 +24,7 @@
 // #include "io/splotly_actor.hpp"
 #include "io/s_stringify.hpp"
 
-#include "operator/slaplacian.hpp"
+// #include "operator/slaplacian.hpp"
 #include "operator/slaplacian_integral.hpp"
 #include "operator/slaplacian_differential.hpp"
 #include "operator/slaplacian_HOC4.hpp"

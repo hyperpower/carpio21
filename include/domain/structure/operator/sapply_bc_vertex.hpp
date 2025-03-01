@@ -207,7 +207,7 @@ typename FIELD::ValueType GetBoundaryVertexExpType1(
         auto& grid  = field.grid(); 
         auto oori = Opposite(Orientation(ori));  // opposite oritation
         auto idxi = idxg.shift(axe, oori);
-        while(ghost.is_ghost(idxi, VertexTag())){   // find nearest normal cell
+        while(ghost.is_ghost_vertex(idxi)){   // find nearest normal cell
             Shift(idxi, axe, oori);
         }
         auto idxb = idxi.shift(axe, ori);

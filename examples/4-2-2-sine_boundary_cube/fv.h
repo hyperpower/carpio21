@@ -140,16 +140,10 @@ void LaplaceSolver(const std::string& scheme, int n,
 	spbi->insert(5, spbc_zero);
 	equ.set_boundary_index("phi", spbi);
 
-    // // Set solver
+    // Set solver
 	equ.set_solver("Jacobi", 20000, 1e-7);
     equ.set_space_scheme(scheme);
-
-    // Set source
-    // equ.set_source([](typename Domain::ValueType x,
-    //                   typename Domain::ValueType y,
-    //                   typename Domain::ValueType z){
-    //                     return  -3.0 * _PI_ * _PI_ * std::sin(_PI_*x)*std::sin(_PI_*y)*std::sin(_PI_*z);
-    //                   });
+   
     // Add events
 	typedef Event_<Domain> Event;
 	typedef std::shared_ptr<Event>  spEvent;
