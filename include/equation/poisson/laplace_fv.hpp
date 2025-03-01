@@ -19,7 +19,7 @@ template<class D>
 class LaplaceImpl_<D, CenterTag>: public EquationBase_<D>{
 public:
     typedef D Domain;
-    typedef LaplaceImpl_<D, CenterTag>             Self;
+    typedef LaplaceImpl_<D, CenterTag> Self;
     typedef EquationBase_<D>        Base;
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
@@ -106,23 +106,21 @@ public:
             this->_configs["space_scheme"]);
         if(sscheme == "finite_volume_2"){
             return solve_fv2();
-        }else if(sscheme == "finite_difference_2"){
-            return solve_fd2();
         }else{
             std::cerr << "Wrong space sscheme " << sscheme << std::endl;
             return 1;
         }
     } 
 
-    virtual int solve_fd2(){
-        FieldCenter&    phi  = *(this->_fields["phi"]);
-        auto expf = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
-        auto bis      = this->get_boundary_index("phi");
+    // virtual int solve_fd2(){
+    //     FieldCenter&    phi  = *(this->_fields["phi"]);
+    //     auto expf = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
+    //     auto bis      = this->get_boundary_index("phi");
 
-        auto res = DifferenialLaplacian((*expf), (*bis));
+    //     auto res = DifferenialLaplacian((*expf), (*bis));
 
-        return this->_build_mat_and_solve(res, phi);
-    }    
+    //     return this->_build_mat_and_solve(res, phi);
+    // }    
 
     virtual int solve_fv2(){
         FieldCenter&    phi  = *(this->_fields["phi"]);
@@ -134,15 +132,6 @@ public:
         return this->_build_mat_and_solve(res, phi);
     }
 
-    // virtual int solve_hoc4(){
-    //     FieldCenter&    phi  = *(this->_fields["phi"]);
-    //     auto expf = any_cast<spFieldCenterExp>(this->_configs["field_exp_coe_one"]);
-    //     auto bis      = this->get_boundary_index("phi");
-
-    //     auto res = DifferenialLaplacianHOC4((*expf), (*bis));
-
-    //     return this->_build_mat_and_solve(res, phi);
-    // }    
     void set_phi(spFieldCenter spphi){
         this->set_field_center("phi", spphi);
     }

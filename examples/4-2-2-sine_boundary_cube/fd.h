@@ -30,8 +30,6 @@ typedef Point_<double,dim> Point;
 
 typedef SFieldVertex_<dim, double, Grid, Ghost, Order> Field;
 
-const std::string OUTPUTPATH = "./fig/";
-
 
 void LaplaceSolver(const std::string& scheme, int n, 
                    std::list<double>& l1, 
@@ -80,7 +78,7 @@ void LaplaceSolver(const std::string& scheme, int n,
 	equ.set_boundary_index("phi", spbi);
 
     // // Set solver
-	equ.set_solver("Jacobi", 20000, 1e-7);
+	equ.set_solver("Jacobi", 20000, 1e-12);
     equ.set_space_scheme(scheme);
 
     
@@ -102,7 +100,7 @@ void LaplaceSolver(const std::string& scheme, int n,
     exact.assign([](typename Field::ValueType x,
                     typename Field::ValueType y,
                     typename Field::ValueType z,
-                double t){
+                    double t){
         return (std::sin( _PI_ * y) * std::sin( _PI_ * z) / std::sinh( _PI_ * std::sqrt(2.0)))
             * (2 * std::sinh( _PI_ * x * std::sqrt(2.0) )
             +  std::sinh( _PI_ * (1 - x) * std::sqrt(2.0) ));
@@ -116,21 +114,22 @@ void LaplaceSolver(const std::string& scheme, int n,
 
 
 void AScheme(const std::string& scheme){
-    std::vector<int> vn = {8, 16, 32};
+    std::vector<int> vn = {4, 8, 16, 32};
+    // std::vector<int> vn = {8 };
     std::list<double> l1,l2,li;
     std::list<std::list<double> > lr;
     for(auto& n : vn){
         LaplaceSolver(scheme, n, l1, l2, li, lr);
     }
     // // output to a file
-    OutputError(OUTPUTPATH +"/"+ scheme + "_error_table.txt",vn, l1, l2, li);
+    OutputError(FIG_PATH +"/"+ scheme + "_error_table.txt",vn, l1, l2, li);
 
     // // plot residual
-    PlotResidual(OUTPUTPATH +"/"+ scheme + "_residual", vn, lr);
+    PlotResidual(FIG_PATH +"/"+ scheme + "_residual", vn, lr);
     if(scheme == "HOC4"){
-        PlotError(OUTPUTPATH +"/"+ scheme + "_error", 4, vn, l1, l2, li);
+        PlotError(FIG_PATH +"/"+ scheme + "_error", 4, vn, l1, l2, li);
     }else{
-        PlotError(OUTPUTPATH +"/"+ scheme + "_error", 2, vn, l1, l2, li);
+        PlotError(FIG_PATH +"/"+ scheme + "_error", 2, vn, l1, l2, li);
     }
 }
 

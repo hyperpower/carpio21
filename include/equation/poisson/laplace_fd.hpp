@@ -18,7 +18,7 @@ template<class D>
 class LaplaceImpl_<D, VertexTag>: public EquationBase_<D>{
 public:
     typedef D Domain;
-    typedef LaplaceImpl_<D, VertexTag>             Self;
+    typedef LaplaceImpl_<D, VertexTag>  Self;
     typedef EquationBase_<D>        Base;
     typedef typename Domain::ValueType   Vt;
     typedef typename Domain::Index       Index;
@@ -130,7 +130,7 @@ public:
     virtual int solve_hoc4(){
         FieldVertex&    phi  = *(this->_fields["phi"]);
         auto expf = any_cast<spFieldVertexExp>(this->_configs["field_exp_coe_one"]);
-        auto bis      = this->get_boundary_index("phi");
+        auto bis  = this->get_boundary_index("phi");
 
         auto res = DifferenialLaplacianHOC4((*expf), (*bis));
 

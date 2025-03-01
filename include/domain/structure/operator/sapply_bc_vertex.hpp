@@ -176,16 +176,18 @@ typename FIELD::ValueType GetBoundaryVertexValueType3(
         const Orientation&     ori,
         const Vt&            time = 0.0){
     // only works for regular ghost
-    auto &grid = fc.grid();
-    auto n = grid.n(axe);
+    auto& grid = fc.grid();
+    auto  n = grid.n(axe);
     auto ig = idxg[axe];
     typename FIELD::Index idxp(idxg);
-    if (ig >= n){
-        idxp[axe] = ig % n;
+    auto nn = n - 1;
+    // std::cout << "idxg " << idxg << std::endl;
+    if (ig >= nn){
+        idxp[axe] = ig % nn;
+    }else if (ig < 0){
+        idxp[axe] = nn - std::abs(ig) % nn;
     }
-    else if (ig < 0){
-        idxp[axe] = n - std::abs(ig) % n;
-    }
+    // std::cout << "idxp " << idxp << std::endl;
     return fc(idxp);
 }
 
@@ -263,15 +265,21 @@ typename FIELD::ValueType GetBoundaryVertexExpType3(
 {
     typedef typename FIELD::ValueType Exp;
     // only works for regular ghost
+    // std::cout << "here" << std::endl;
     auto& grid = fc.grid();
-    auto  n = grid.n(axe);
-    auto ig = idxg[axe];
     typename FIELD::Index idxp(idxg);
-    if (ig >= n){
-        idxp[axe] = ig % n;
-    }else if (ig < 0){
-        idxp[axe] = n - std::abs(ig) % n;
+    for(auto& a : ArrAxes<FIELD::Dim>()){
+        auto  n = grid.n(a);
+        auto ig = idxg[a];
+        auto nn = n - 1;
+        // std::cout << "idxg " << idxg << std::endl;
+        if (ig >= nn){
+            idxp[a] = ig % nn;
+        }else if (ig < 0){
+            idxp[a] = nn - std::abs(ig) % nn;
+        }
     }
+    // std::cout << "idxp " << idxp << std::endl;
     return Exp(idxp);
 }
 
@@ -426,6 +434,12 @@ auto _FindBoundaryVertexValueInExp(
     auto& ghost = field.ghost();
 
     auto didx = GetDeltaIndex(idx, idxg);
+
+    // if(ghost.is_ghost_vertex(idxg)){
+    //     auto bid  = ghost.boundary_id_vertex(idx, idxg, axe, ori);
+    //     auto spbc = bi.find(bid);
+    //     isbc3 = (spbc->type() == BoundaryCondition::_BC3_);
+    // }
     if(OnSameAxe(didx)){
         auto axe  = GetDeltaAxe(didx);
         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 

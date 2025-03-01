@@ -88,9 +88,8 @@ typename FIELD::ValueType _SNorm1Center(const FIELD& field, FunXYZT_Value fun, V
 template<class FIELD>
 typename FIELD::ValueType _SNorm1Vertex(const FIELD& error_field,
     ArithmeticTag, SGridTag, SGhostTag, SOrderTag, DimTag){
-    Vt count = 0.0;
-    Vt e     = 0.0;
-    auto& grid = error_field.grid();
+    double count = 0.0;
+    double e     = 0.0;
     for(auto& idx : error_field.order()){
         count += 1.0;
         e += std::abs(error_field(idx));

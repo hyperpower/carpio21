@@ -151,7 +151,36 @@ The simple Second Order FVM is applied on this problem.
    :align: center 
 
    Error Norm in different mesh resolutions.
-   
+
+
+Second Order Finite Difference Method
+======================================
+
+Vertex field used in present problem. Since the boundary condition of present 
+problem is doubly periodic boundary. The vertex should not locate on the boundary.
+An imaging periodic boundary is set, see :numref:`fd_c10`.
+
+.. _fd_c10:
+.. figure:: fig/PoissonFD_SolutionContour10.png
+   :align: center 
+
+   Solution on field vertex.
+
+
+.. figure:: fig/fd_residual.png
+   :align: center 
+
+   Solver residual on each mesh.
+
+.. csv-table:: Error Norm in different mesh resolutions.
+   :file: fig/fd_error_table.txt
+   :header-rows: 1
+
+.. figure:: fig/fd_error.png
+   :align: center 
+
+   Error Norm in different mesh resolutions.
+
 
 
 Reference

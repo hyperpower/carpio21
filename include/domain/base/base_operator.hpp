@@ -20,6 +20,12 @@ FIELD DifferenialLaplacian(const FIELD& field, const BI& bi, double t=0.0){
     typename FIELD::Tag field_tag; 
     return DifferenialLaplacian(field, bi, t, field_tag);
 }
+template<class FIELD>
+auto CoeH2_12(const FIELD& field){
+    typename FIELD::Tag field_tag; 
+    return CoeH2_12(field, field_tag);
+}
+
 template<class FIELD, class BI>
 FIELD DifferenialLaplacianHOC4(const FIELD& field, const BI& bi, double t=0.0){
     typename FIELD::Tag field_tag; 

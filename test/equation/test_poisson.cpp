@@ -23,7 +23,7 @@ typedef std::shared_ptr<Grid> spGrid;
 typedef SGhostRegular_<dim, Grid> Ghost;
 typedef std::shared_ptr<Ghost> spGhost;
 
-typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 typedef std::shared_ptr<Order> spOrder;
 
 typedef Point_<double,dim> Point;
@@ -38,7 +38,7 @@ TEST(equation, DISABLED_explicit_run){
     Point p(0,0,0);
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegular_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p,10, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));
@@ -151,7 +151,7 @@ void PoissonSolver(int n,
 	equ.set_boundary_index("phi", spbi);
 
     // Set solver
-	equ.set_solver("Jacobi", 400, 1e-12);
+	equ.set_solver("Jacobi", 400, 1e-10);
 
     // Set source
     equ.set_source([](typename Domain::ValueType x,
@@ -208,7 +208,7 @@ TEST(equation, DISABLED_explicit_3d){
     Point p(0,0,0);
     typedef SGridUniform_<dim> Grid;
     typedef SGhostRegular_<dim, Grid> Ghost;
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
 
     std::shared_ptr<Grid>  spgrid(new Grid(p,20, 1, 2));
     std::shared_ptr<Ghost> spghost(new Ghost(spgrid));

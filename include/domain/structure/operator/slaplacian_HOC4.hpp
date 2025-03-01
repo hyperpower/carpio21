@@ -12,9 +12,30 @@ FIELD DifferenialLaplacianHOC4(
         SFieldVertexTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
+    // std::cout << "DifferenialLaplacianHOC4" << std::endl;
     return _DifferentialLaplacianHOC4(field, bi, t, 
            ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
+
+template<class FIELD>
+double CoeH2_12(
+        const FIELD& field,
+        SFieldVertexTag)
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    return _CoeH2_12(field, GridTag());
+}
+template<class FIELD>
+double _CoeH2_12(
+        const FIELD& field,
+        SGridUniformTag)
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    auto& grid = field.grid();
+    return grid.dc() * grid.dc() / 12.0;
+}
+
+
 template<class FIELD>
 auto _CDSTwoAxes(
         const FIELD& field, 
@@ -89,13 +110,17 @@ FIELD _DifferentialLaplacianHOC4(
         const FIELD& phi, const BoundaryIndex& bi, double t, 
         LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
-    EXPAND_FIELD_TAG(FIELD); 
+    EXPAND_FIELD_TAG(FIELD);
+    EXPAND_FIELD(FIELD) 
     auto res = _DifferentialLaplacianHOC4(phi, t, 
                 ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
-    std::cout << res(0,8) << std::endl;
+    // std::cout << res(0,8) << std::endl;
     ApplyBoundaryValue(res,bi,t);
-    std::cout << res(0,8) << std::endl;
-    std::cout << phi.grid().v(-1,-1) << std::endl;
+    // std::cout << res(0,8) << std::endl;
+    // Index idx(0,0, 0);
+    // std::cout << idx  << phi.grid().v(idx) << std::endl;
+    // Index idxm(-1,-1, -1);
+    // std::cout << idxm << phi.grid().v(idxm) << std::endl;
 
     return res;
 }

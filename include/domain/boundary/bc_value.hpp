@@ -28,7 +28,12 @@ public:
 	BoundaryConditionValue(int type, Vt v) : Base(),
 		_type(type), _value(v) {
 	}
-
+	/*
+	 * this constructor should not used to BC2
+	 */
+	BoundaryConditionValue(int type) : Base(),
+		_type(type), _value(0.0) {
+	}
 	// get
 	int type() const {
 		return _type;

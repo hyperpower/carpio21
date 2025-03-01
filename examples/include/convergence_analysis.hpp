@@ -105,7 +105,7 @@ void PlotError(const std::string& ffn,
     gnu.add(air);
 
     gnu.set_terminal_png(ffn, fig_width, fig_height, "Fira Code", 16);
-    gnu.set_key("top left");
+    gnu.set_key("bottom right");
 	gnu.plot();
 }
 

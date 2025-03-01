@@ -27,7 +27,7 @@ TEST(s_lap, dim2){
     typedef SGhostRegular_<2, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<2, double, Grid, Ghost, Order> Field;
@@ -92,7 +92,7 @@ TEST(s_lap, HOC4_op){
     typedef SGhostRegular_<2, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<2, double, Grid, Ghost, Order> Field;

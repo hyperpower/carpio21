@@ -27,7 +27,7 @@ TEST(s_interpolate, dim2){
     typedef SGhostRegular_<2, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<2, double, Grid, Ghost, Order> Field;
@@ -84,7 +84,7 @@ TEST(s_interpolate, dim1){
     typedef SGhostRegular_<1, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<1, Grid, Ghost> Order;
+    typedef SOrderXYZ_<1, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<1, double, Grid, Ghost, Order> Field;
@@ -154,7 +154,7 @@ TEST(vector_center, dim2){
 	typedef SGhostRegular_<2, Grid> Ghost;
 	typedef std::shared_ptr<Ghost> spGhost;
 
-	typedef SOrderXYZ_<2, Grid, Ghost> Order;
+	typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
 	typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldFace_<2, double, Grid, Ghost, Order> FieldFace;

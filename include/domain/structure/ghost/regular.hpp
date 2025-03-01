@@ -107,9 +107,8 @@ public:
 
     virtual bool is_boundary(
                 const Index& index,
-                const St& a,
+                const Axes& a,
                 const Orientation& o) const{
-        ASSERT(a < DIM);
         Idx idx = index.value(a);
         if(o == _M_){
             return idx == 0;
@@ -146,7 +145,6 @@ public:
         const Index& vindex, 
         const Axes& a) const
     {
-        ASSERT(a < DIM);
         Index m = vindex.m(a);
         if(is_ghost_vertex(m)){
             return true;
@@ -193,6 +191,7 @@ public:
         } else if (res >= n.value(a)) {
             return _BID[a][1];
         }
+        
         SHOULD_NOT_REACH;
         return 0;
     };
@@ -213,6 +212,10 @@ public:
         } else if (res >= n[a] - 1) {
             return _BID[a][1];
         }
+        std::cout << "idx c = "<<indexc << std::endl;
+        std::cout << "idx g = "<<indexg << std::endl;
+        std::cout << "axe   = "<<ToString(a) << std::endl;
+        std::cout << " o    = "<<ToString(ori) << std::endl;
         SHOULD_NOT_REACH;
         return 0;
     };
