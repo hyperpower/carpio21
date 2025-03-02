@@ -52,6 +52,17 @@ public:
 		return _num;
 	}
 
+	Coe min_coe() const{
+		auto it = std::min_element(std::begin(*this), std::end(*this),
+                           [](const auto& l, const auto& r) { return l.second < r.second; });
+		return it->second;
+	}
+	Coe min_abs_coe() const{
+		auto it = std::min_element(std::begin(*this), std::end(*this),
+                           [](const auto& l, const auto& r) { return std::abs(l.second) < std::abs(r.second); });
+		return it->second;
+	}
+
 	Self& operator=(const Self& other){
 		this->Base::operator =(other);
 		_num = other._num;

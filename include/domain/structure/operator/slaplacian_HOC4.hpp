@@ -12,11 +12,19 @@ FIELD DifferenialLaplacianHOC4(
         SFieldVertexTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
-    // std::cout << "DifferenialLaplacianHOC4" << std::endl;
+    std::cout << "DifferenialLaplacianHOC4" << std::endl;
     return _DifferentialLaplacianHOC4(field, bi, t, 
            ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
-
+template<class FIELD >
+FIELD DifferenialLaplacianHOC4(
+        const FIELD& field, 
+        SFieldVertexTag)
+{
+    EXPAND_FIELD_TAG(FIELD); 
+    return _DifferentialLaplacianHOC4(field, 
+           ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+}
 template<class FIELD>
 double CoeH2_12(
         const FIELD& field,
@@ -39,7 +47,7 @@ double _CoeH2_12(
 template<class FIELD>
 auto _CDSTwoAxes(
         const FIELD& field, 
-        const typename FIELD::Index& idx, Axes& a, double t, 
+        const typename FIELD::Index& idx, Axes& a, 
         LinearPolynomialTag, SGridUniformTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
@@ -52,11 +60,11 @@ auto _CDSTwoAxes(
     }
 
     const auto& grid = field.grid();
-    auto dnac = _CDSOneAxe(field, idx, na, t,
+    auto dnac = _CDSOneAxe(field, idx, na, 
                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-    auto dnap = _CDSOneAxe(field, idx.p(a), na, t,
+    auto dnap = _CDSOneAxe(field, idx.p(a), na, 
                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-    auto dnam = _CDSOneAxe(field, idx.m(a), na, t,
+    auto dnam = _CDSOneAxe(field, idx.m(a), na, 
                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 
     return (dnap - dnac * 2.0 + dnam) / (grid.dc() * grid.s());
@@ -64,7 +72,7 @@ auto _CDSTwoAxes(
 
 template<class FIELD>
 FIELD _DifferentialLaplacianHOC4( // No BoundaryIndex
-        const FIELD& field, double t, 
+        const FIELD& field, 
         LinearPolynomialTag, SGridUniformTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
@@ -72,13 +80,15 @@ FIELD _DifferentialLaplacianHOC4( // No BoundaryIndex
     typedef ValueType Exp;
     Field res = field.new_compatible_zero();
     const auto& grid = res.grid();
+    
+    std::cout << "_DifferenialLaplacianHOC4 No bi" << std::endl;
 
     Vt coe_h2_6 = grid.dc() * grid.dc() / 6.0;
 
     for (auto& idx : res.order()) {
         std::array<Exp, Field::Dim> arr;
         for(auto& d : ArrAxes<Field::Dim>()){
-            arr[d] = _CDSOneAxe(field, idx, d, t,
+            arr[d] = _CDSOneAxe(field, idx, d,
                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());  
             // if(idx == Index(1,1)){
             //     std::cout << "d = " << ToString(d) << std::endl;
@@ -86,7 +96,7 @@ FIELD _DifferentialLaplacianHOC4( // No BoundaryIndex
             //    ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag()) << std::endl;
             // }
 
-            arr[d] += _CDSTwoAxes(field, idx, d, t,
+            arr[d] += _CDSTwoAxes(field, idx, d,
                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag()) * coe_h2_6;
             // std::cout << arr[d] << std::endl;
             // if(idx == Index(1,1)){
@@ -112,7 +122,7 @@ FIELD _DifferentialLaplacianHOC4(
 {
     EXPAND_FIELD_TAG(FIELD);
     EXPAND_FIELD(FIELD) 
-    auto res = _DifferentialLaplacianHOC4(phi, t, 
+    auto res = _DifferentialLaplacianHOC4(phi, 
                 ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
     // std::cout << res(0,8) << std::endl;
     ApplyBoundaryValue(res,bi,t);

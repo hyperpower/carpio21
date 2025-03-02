@@ -20,6 +20,7 @@ void ApplyBoundaryValue(
     SFieldVertexTag, LinearPolynomialTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
+    std::cout <<"ApplyBoundaryValue" << std::endl;
     _ApplyBoundaryValue(field, bi, time,
         FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
@@ -333,7 +334,6 @@ typename FIELD::ValueType _ValueBoundaryVertex(
 }
 
 
-
 template<class FIELD>
 void _ApplyBoundaryValueLocal(
     FIELD&               field,
@@ -372,6 +372,7 @@ void _ApplyBoundaryValueLocal(
     EXPAND_FIELD(FIELD);
     EXPAND_FIELD_TAG(FIELD);
     typedef typename FIELD::ValueType Exp;
+
 
     auto& ghost = field.ghost();
     auto& exp = field(idx);
@@ -445,6 +446,10 @@ auto _FindBoundaryVertexValueInExp(
         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         return Value(field, bi, idx, idxg, axe, ori, time);
     }else{
+        // auto axe  = GetDeltaAxe(didx);
+        // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        // return Value(field, bi, idx, idxg, axe, ori, time);
+
         std::array<ValueType, FIELD::Dim> arrexp;
         arrexp.fill(Exp(0));
         std::array<Index, FIELD::Dim> arridx;
@@ -487,6 +492,10 @@ auto _SFindBoundaryValue(
         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         return Value(field, bi, idx, idxg, axe, ori, time);
     }else{
+        // std::cout << "here" << std::endl;
+        // auto axe  = GetDeltaAxe(didx);
+        // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        // return Value(field, bi, idx, idxg, axe, ori, time);
         std::array<ValueType, FIELD::Dim> arrexp;
         arrexp.fill(Exp(0));
         std::array<Index, FIELD::Dim> arridx;

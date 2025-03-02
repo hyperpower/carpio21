@@ -3,6 +3,9 @@
 
 #include <string>
 
+#include "geometry/objects/basic/box.hpp"
+#include "geometry/affine.hpp"
+
 #include "domain/base/base_gnuplot_actor.hpp"
 #include "domain/structure/grid/sgrid.hpp"
 #include "domain/structure/ghost/sghost.hpp"
@@ -17,6 +20,8 @@
 #include "s_stringify.hpp"
 
 #include "sgnuplot_actor_contour_wire.hpp"
+#include "sgnuplot_actor_wire_frame.hpp"
+#include "sgnuplot_actor_contour_points.hpp"
 
 namespace carpio{
 
@@ -49,144 +54,11 @@ namespace carpio{
 //       : FC    : 1    : vari_color
 //       : FF    : 1    : vari_color
 //       : VC    : 1    : vari_color
-
 template<class ANY>
-GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& grid, SGridTag, Dim1Tag){
-    GnuplotActor actor; 
-    actor.command( "using 1:2 title \"\" ");
-    actor.style( "with line lc -1");
-    Vt tik = 0.1;
-
-    Vt xs=0.0, xe=0.0;
-    for (St i = 0; i < grid.n(_X_); i++){
-        typename ANY::Index index(i);
-        auto p = grid.f(_X_, _M_, index);
-        actor.data().push_back(
-            ToString(p.value(_X_), -0.0,  " "));
-        actor.data().push_back(
-            ToString(p.value(_X_), tik, " "));
-        actor.data().push_back("");
-        if (i == 0){
-            xs = p.value(_X_);
-        }
-    }
-    typename ANY::Index index(grid.n(_X_) - 1);
-    auto p = grid.f(_X_, _P_, index);
-    actor.data().push_back(
-        ToString(p.value(_X_), -0.0, " "));
-    actor.data().push_back(
-        ToString(p.value(_X_), tik, " "));
-    actor.data().push_back("");
-    xe = p.value(_X_);
-
-    actor.data().push_back(ToString(xs, 0.0, " "));
-    actor.data().push_back(ToString(xe, 0.0, " "));
-
-    // boundary
-    actor.data().push_back(ToString(xs, 0.0, " "));
-    actor.data().push_back(ToString(xs, 2.0 * tik, " "));
-    actor.data().push_back("");
-
-    actor.data().push_back(ToString(xe, 0.0, " "));
-    actor.data().push_back(ToString(xe, 2.0 * tik, " "));
-    actor.data().push_back("");
-
-    return actor;
-}
-template<class ANY>
-GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& ghost, SGhostTag, Dim1Tag){
-    GnuplotActor actor; 
-    actor.command( "using 1:2 title \"\" ");
-    actor.style( "with line");
-    Vt tik = 0.1;
-
-    auto& grid = ghost.grid();
-    auto gl    = ghost.ghost_layer();
-
-    Vt xs=0.0, xe=0.0;
-    for (int i = -gl; i <= 0; i++){
-        typename ANY::Index index(i);
-        auto p = grid.f(_X_, _M_, index);
-        actor.data().push_back(
-            ToString(p.value(_X_), -0.0,  " "));
-        actor.data().push_back(
-            ToString(p.value(_X_), tik, " "));
-        actor.data().push_back("");
-        if(i == -gl){
-            xs = p.value(_X_);
-        }
-        if(i == 0){
-            xe = p.value(_X_);
-        }
-    }
-    actor.data().push_back(
-        ToString(xs, 0.0,  " "));
-    actor.data().push_back(
-        ToString(xe, 0.0, " "));
-    actor.data().push_back("");
-    
-    for (int i = grid.n(_X_) - 1; i < grid.n(_X_) + gl; i++){
-        typename ANY::Index index(i);
-        auto p = grid.f(_X_, _P_, index);
-        actor.data().push_back(
-            ToString(p.value(_X_), -0.0,  " "));
-        actor.data().push_back(
-            ToString(p.value(_X_), tik, " "));
-        actor.data().push_back("");
-        if(i == grid.n(_X_) - 1){
-            xs = p.value(_X_);
-        }
-        if(i == grid.n(_X_) + gl -1 ){
-            xe = p.value(_X_);
-        }
-    }
-    actor.data().push_back(
-        ToString(xs, 0.0,  " "));
-    actor.data().push_back(
-        ToString(xe, 0.0, " "));
-    actor.data().push_back("");
-    return actor;
-}
-template<class ANY>
-GnuplotActor _ToGnuplotActorWireFrameDim(const ANY& grid, SGridTag, Dim2Tag){
-    GnuplotActor actor;
-    actor.command("using 1:2 title \"\" ");
-    actor.style("with line lc 0");
-
-    for (St j = 0; j < grid.n(_Y_); j++) {
-        for (St i = 0; i < grid.n(_X_); i++) {
-            typename ANY::Index index(i, j);
-                
-            actor.data().splice(actor.data().end(), 
-                        _StringifyCell(grid, index, SGridTag(), Dim2Tag()));
-
-            actor.data().push_back("");
-        }
-    }
-    return actor;
-}
-
-template<class ANY>
-GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SGridTag){
-    typedef typename ANY::Tag Tag;
-    typedef typename ANY::DimTag DimTag;
-    Tag t;
-    DimTag dt;
-    return _ToGnuplotActorWireFrameDim(a, t, dt); 
-}
-template<class ANY>
-GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SGhostTag){
-    typedef typename ANY::Tag Tag;
-    typedef typename ANY::DimTag DimTag;
-    Tag t;
-    DimTag dt;
-    return _ToGnuplotActorWireFrameDim(a, t, dt); 
-}
-template<class ANY>
-GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, SFieldCenterTag){
-    // Todo: not ok for masked grid, need upgrade.
-    auto& grid = a.grid();
-    return _ToGnuplotActorWireFrame(grid, SGridTag()); 
+auto _ApproximateRange(const ANY& a, const typename ANY::Index& idx, 
+    SFieldVertexTag){
+    EXPAND_FIELD_TAG(ANY);
+    return _SApproximateRange(a, idx, FieldTag(), ValueTag()); 
 }
 
 template<class ANY>
@@ -369,164 +241,52 @@ GnuplotActor  _ToGnuplotActorLabel(
 }
 
 template<class ANY>
-auto _ToGnuplotActorContourPoints(
-    const ANY& ff,
-    SFieldFaceTag, Dim1Tag)
-{    
-    std::list<double> lx, ly, lv;
-    for(auto& fidx : ff.order()){
-        auto cidx = ff.grid().face_index_to_cell_index(fidx, ff.face_axe());
-        auto p = ff.grid().f(ff.face_axe(), _M_, cidx);
-        lx.push_back(p.value(_X_));
-        ly.push_back(ff(_M_, cidx));
-        lv.push_back(ff(_M_, cidx));
+auto _ToGnuplotActorLabel(const ANY& a, const typename ANY::Index& idx, 
+    const std::string& config, SFieldVertexTag){
+    EXPAND_FIELD_TAG(ANY);
+    return _SToGnuplotActorLabel(a, idx, config, FieldTag(), ValueTag()); 
+}
+template<class ANY>
+auto _SToGnuplotActorLabel(const ANY& field, const typename ANY::Index& idx, 
+    const std::string& config, SFieldVertexTag, LinearPolynomialTag){
+    EXPAND_FIELD_TAG(ANY);
 
-        if(ff.grid().is_last(cidx, ff.face_axe())){
-            p = ff.grid().f(ff.face_axe(), _P_, cidx);
-            lx.push_back(p.value(_X_));
-            ly.push_back(ff(_P_, cidx));
-            lv.push_back(ff(_P_, cidx));
+    GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with labels boxed center textcolor lt -1");
+
+    auto& grid = field.grid();
+    auto pc    = grid.v(idx);
+    auto pmin  = pc;
+    auto pmax  = pc;
+    auto& exp  = field(idx);
+    auto amin  = exp.min_abs_coe();
+    for(auto iter = exp.begin(); iter != exp.end(); iter++){
+        auto& idxg = iter->first;
+        auto& coe  = iter->second;
+        auto pg    = grid.v(idxg);
+        if(config == "norm_value"){
+            actor.data().push_back(
+                ToString( pg[_X_], 
+                          pg[_Y_] + 0.2 * grid.s(), 
+                          "\"" + ToString(coe / amin ) + "\"" , " ")); 
+        }         
+        if(config == "value"){
+            actor.data().push_back(
+                ToString( pg[_X_], 
+                          pg[_Y_] + 0.2 * grid.s(), 
+                          "\"" + ToString(coe) + "\"" , " ")); 
         }
+        if(config == "index"){
+            actor.data().push_back(
+                ToString( pg[_X_], 
+                          pg[_Y_] - 0.2 * grid.s(), 
+                          "\"" + ToString(idxg) + "\"" , " ")); 
+        }       
     }
-    auto aloc = ToGnuplotActor(lx, ly, lv);
-    aloc.style("with points ps 2 pointtype 13 lc palette");
-    return aloc;
+    return actor; 
 }
 
-template<class ANY>
-auto _ToGnuplotActorContourPoints(
-    const ANY& fcenter,
-    SFieldCenterTag, Dim1Tag){
-    
-    std::list<double> lx, ly, lv;
-    for(auto& cidx : fcenter.order()){
-        auto p = fcenter.grid().c(cidx);
-        lx.push_back(p.value(_X_));
-        ly.push_back(fcenter(cidx));
-        lv.push_back(fcenter(cidx));
-    }
-    auto aloc = ToGnuplotActor(lx, ly, lv);
-    aloc.style("with points ps 2 pointtype 7 lc palette");
-    return aloc;
-}
-template<class ANY>
-auto _ToGnuplotActorContourPoints(const ANY& field, 
-        SFieldCenterTag, Dim2Tag){
-    std::list<double> lx, ly, lv;
-    for(auto& cidx : field.order()){
-        auto p = field.grid().c(cidx);
-        lx.push_back(p.value(_X_));
-        ly.push_back(p.value(_Y_));
-        lv.push_back(field(cidx));
-    }
-    auto aloc = ToGnuplotActor(lx, ly, lv);
-    aloc.style("with points ps 2 pointtype 7 lc palette");
-    return aloc;
-}
-
-template<class ANY>
-auto _ToGnuplotActorContourPoints(const ANY& field, 
-        SFieldVertexTag, Dim2Tag){
-    std::list<double> lx, ly, lv;
-    for(auto& idx : field.order()){
-        auto p = field.grid().v(idx);
-        lx.push_back(p.value(_X_));
-        ly.push_back(p.value(_Y_));
-        lv.push_back(field(idx));
-    }
-    auto aloc = ToGnuplotActor(lx, ly, lv);
-    aloc.style("with points ps 2 pointtype 7 lc palette");
-    return aloc;
-}
-
-template<class ANY>
-auto _ToGnuplotActorContourPoints(const ANY& field, const BoundaryIndex& bi, 
-        SFieldVertexTag, Dim2Tag){
-    std::list<double> lx, ly, lv;
-    for(auto& idx : field.order()){
-        auto p = field.grid().v(idx);
-        lx.push_back(p.value(_X_));
-        ly.push_back(p.value(_Y_));
-        lv.push_back(field(idx));
-        for (auto& idxg : CrossListIndex(idx)){
-            if(field.ghost().is_ghost_vertex(idxg)){
-                auto pg = field.grid().v(idxg);
-                auto pv = FindBoundaryValue(field, bi, idx, idxg, 0.0);
-                lx.push_back(pg.value(_X_));
-                ly.push_back(pg.value(_Y_));
-                lv.push_back(pv);
-            }
-        }
-    }
-    auto aloc = ToGnuplotActor(lx, ly, lv);
-    aloc.style("with points ps 2 pointtype 7 lc palette");
-    return aloc;
-}
-template<class ANY>
-auto _ToGnuplotActorContourPoints(const ANY& ff, SFieldFaceTag, Dim2Tag){
-    std::list<double> lx, ly, lv;
-    auto a = ff.face_axe();
-    for(auto& fidx : ff.order()){
-        auto cidx = ff.grid().face_index_to_cell_index(fidx, a);
-        auto p = ff.grid().f(a, _M_, cidx);
-        lx.push_back(p.value(_X_));
-        ly.push_back(p.value(_Y_));
-        lv.push_back(ff(_M_, cidx));
-
-        if(ff.grid().is_last(cidx, a)){
-            p = ff.grid().f(a, _P_, cidx);
-            lx.push_back(p.value(_X_));
-            ly.push_back(p.value(_Y_));
-            lv.push_back(ff(_P_, cidx));
-        }
-    }
-    auto aloc = ToGnuplotActor(lx, ly, lv);
-    aloc.style("with points ps 2 pointtype 13 lc palette");
-    return aloc;
-}
-template<class ANY>
-GnuplotActorGroup _ToGnuplotActorContourPoints(const ANY& vector_face, SVectorFaceTag, Dim2Tag){
-    GnuplotActorGroup gag;
-    for(auto& spface: vector_face){
-        auto& field_face = *spface;
-        auto a = _ToGnuplotActorContourPoints(field_face, SFieldFaceTag());
-        // a.show_command();
-        gag.push_back(a);
-    }
-    return gag;    
-}
-template<class ANY>
-auto _ToGnuplotActorContourPoints(const ANY& a, SFieldFaceTag){
-    typedef typename ANY::Tag Tag;
-    typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
-}
-
-template<class ANY>
-auto _ToGnuplotActorContourPoints(const ANY& a, SVectorFaceTag){
-    typedef typename ANY::Tag Tag;
-    typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
-}    
-template<class ANY>
-GnuplotActor _ToGnuplotActorContourPoints(const ANY& a, SFieldCenterTag){
-    typedef typename ANY::Tag Tag;
-    typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
-}
-template<class ANY>
-GnuplotActor _ToGnuplotActorContourPoints(const ANY& a, SFieldVertexTag){
-    typedef typename ANY::Tag Tag;
-    typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorContourPoints(a, Tag(), DimTag()); 
-}
-template<class ANY>
-GnuplotActor _ToGnuplotActorContourPoints(const ANY& a, const BoundaryIndex& bi,
-    SFieldVertexTag){
-    typedef typename ANY::Tag Tag;
-    typedef typename ANY::DimTag DimTag;
-    return _ToGnuplotActorContourPoints(a, bi, Tag(), DimTag()); 
-}
 template<class ANY>
 GnuplotActor _ToGnuplotActorVectors(const ANY& vector_center, Vt unit_length, 
         SVectorCenterTag){
@@ -691,6 +451,27 @@ GnuplotActor _SFieldCenterToGASection(const ANY& f, Axes a, Vt v,
     }
     return actor;
 }
+template<class ANY>
+auto _SApproximateRange(const ANY& field, 
+    const typename ANY::Index& idx, 
+    SFieldVertexTag, LinearPolynomialTag){
+    EXPAND_FIELD_TAG(ANY);
+    auto& grid = field.grid();
+    auto pc    = grid.v(idx);
+    auto pmin = pc;
+    auto pmax = pc;
+    auto& exp  = field(idx);
+    for(auto iter = exp.begin(); iter != exp.end(); iter++){
+        auto& idxg = iter->first;
+        auto& coe  = iter->second;
+        auto pg = grid.v(idxg);
+        pmin = Min(pmin, pg); 
+        pmax = Max(pmax, pg); 
+    }
+    Box_<Vt, ANY::Dim> res(pmin, pmax);
+    return res; 
+}
+
 
 }
 

@@ -381,6 +381,7 @@ protected:
         //set terminal type
         // cmd("set output");
         cmd("set terminal " + this->terminal_std + " enhanced font 'Helvetica,12'");
+        cmd("set style textbox opaque noborder");
 
         return;
     }

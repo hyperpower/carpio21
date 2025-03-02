@@ -232,7 +232,15 @@ public:
 		this->_min.transfer(dx, dy, dz);
 		this->_max.transfer(dx, dy, dz);
 	}
-
+	template<typename T>
+	void scale(const T& r) {
+		auto pc = this->center();
+		auto d  = this->d();
+		for (St i = 0; i < Dim; i++) {
+			_max[i] = pc[i] + d[i] * r * 0.5;
+			_min[i] = pc[i] - d[i] * r * 0.5;
+		}	
+	}
 };
 
 template<typename TYPE, St DIM>

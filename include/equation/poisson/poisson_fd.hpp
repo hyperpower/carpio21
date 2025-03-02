@@ -110,11 +110,30 @@ protected:
 
     int _solve_hoc4(){
         FieldVertex& phi  = *(this->_fields["phi"]);
-        auto expf     = any_cast<spFieldVertexExp>(this->_configs["field_exp_coe_one"]);
-        auto& bis      = *(this->get_boundary_index("phi"));
+        auto& expf    = *(any_cast<spFieldVertexExp>(this->_configs["field_exp_coe_one"]));
+        auto& bis     = *(this->get_boundary_index("phi"));
         auto& fsource = *(this->_fields["source"]);
 
-        auto res = DifferenialLaplacianHOC4((*expf), bis) 
+        std::cout << "solve hoc4" << std::endl;
+        Gnuplot gnu;
+        auto fout = DifferenialLaplacianHOC4(expf); 
+        auto idx  = Index(8,6); 
+        auto r = ApproximateRange(fout, idx);
+        r.scale(2.5);
+        gnu.set_xrange(r.min(_X_), r.max(_X_));
+        gnu.set_yrange(r.min(_Y_), r.max(_Y_));
+        gnu.add(ToGnuplotActorWireFrame(phi.grid()));
+        gnu.add(ToGnuplotActorWireFrame(fout, idx));
+        gnu.add(ToGnuplotActorContourPoints(fout, idx));
+        gnu.add(ToGnuplotActorLabel(fout, idx, "norm_value"));
+        gnu.add(ToGnuplotActorLabel(fout, idx, "index"));
+        gnu.set_palette_red_blue_dark();
+        gnu.set_equal_aspect_ratio();
+        
+        gnu.set_terminal_png("./fig/local_exp");
+        gnu.plot();
+
+        auto res = DifferenialLaplacianHOC4(expf, bis) 
             - fsource
             - DifferenialLaplacian(fsource, bis) * CoeH2_12(fsource);
 

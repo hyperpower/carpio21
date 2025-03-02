@@ -211,7 +211,7 @@ public:
             return _BID[a][0];
         } else if (res >= n[a] - 1) {
             return _BID[a][1];
-        }
+        } 
         std::cout << "idx c = "<<indexc << std::endl;
         std::cout << "idx g = "<<indexg << std::endl;
         std::cout << "axe   = "<<ToString(a) << std::endl;

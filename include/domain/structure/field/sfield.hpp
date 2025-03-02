@@ -8,7 +8,6 @@
 namespace carpio{
 
 
-
 struct SFieldTag: public StructureTag, public FieldBaseTag{};
 
 template<St DIM, 

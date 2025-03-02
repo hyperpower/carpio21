@@ -71,8 +71,7 @@ auto _CDSOneAxe(
 }
 template<class FIELD>
 auto _CDSOneAxe(
-        const FIELD& phi, 
-        const typename FIELD::Index& idx, Axes& a,
+        const FIELD& phi, const typename FIELD::Index& idx, Axes& a,
         const BoundaryIndex& bi, double t, 
         ArithmeticTag, SGridUniformTag, SGhostTag, SOrderTag, DimTag)
 {
@@ -93,8 +92,7 @@ auto _CDSOneAxe(
 
 template<class FIELD>
 auto _CDSOneAxe(
-        const FIELD& field, 
-        const typename FIELD::Index& idx, Axes& a, double t, 
+        const FIELD& field, const typename FIELD::Index& idx, Axes& a, 
         LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
@@ -125,7 +123,7 @@ auto _CDSOneAxe(
 template<class FIELD>
 auto _CDSOneAxe(
         const FIELD& field, 
-        const typename FIELD::Index& idx, Axes& a, double t, 
+        const typename FIELD::Index& idx, Axes& a,
         LinearPolynomialTag, SGridUniformTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
@@ -177,7 +175,7 @@ FIELD _DifferentialLaplacianCDS(
 
 template<class FIELD>
 FIELD _DifferentialLaplacianCDS( // No BoundaryIndex
-        const FIELD& field, double t, 
+        const FIELD& field, 
         LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
@@ -188,7 +186,7 @@ FIELD _DifferentialLaplacianCDS( // No BoundaryIndex
     for (auto& idx : res.order()) {
         std::array<Exp, Field::Dim> arr;
         for(auto& d : ArrAxes<Field::Dim>()){
-            arr[d] = _CDSOneAxe(field, idx, d, t,
+            arr[d] = _CDSOneAxe(field, idx, d,
                ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag()); 
         }
         for(auto& d : ArrAxes<Field::Dim>()){
@@ -204,7 +202,7 @@ FIELD _DifferentialLaplacianCDS(
         LinearPolynomialTag, SGridTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
-    auto res = _DifferentialLaplacianCDS(phi, t, 
+    auto res = _DifferentialLaplacianCDS(phi,
                 ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
     ApplyBoundaryValue(res,bi,t);
 

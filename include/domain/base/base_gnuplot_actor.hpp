@@ -10,11 +10,20 @@
 #include "domain/boundary/boundary_index.hpp"
 
 namespace carpio{
-
+template<class ANY, class ANY2>
+auto ApproximateRange(const ANY& a, const ANY2& a2){
+    typedef typename ANY::Tag Tag;
+    return _ApproximateRange(a, a2, Tag()); 
+}
 template<class ANY>
 auto ToGnuplotActorContourPoints(const ANY& a){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorContourPoints(a, Tag()); 
+}
+template<class ANY, class ANY2>
+auto ToGnuplotActorContourPoints(const ANY& a, const ANY2& a2){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorContourPoints(a, a2, Tag()); 
 }
 template<class ANY>
 auto ToGnuplotActorContourPoints(const ANY& a, const BoundaryIndex& bi){
@@ -26,7 +35,11 @@ GnuplotActor ToGnuplotActorWireFrame(const ANY& a){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorWireFrame(a, Tag()); 
 }
-
+template<class ANY, class ANY2>
+GnuplotActor ToGnuplotActorWireFrame(const ANY& a, const ANY2& a2){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorWireFrame(a, a2, Tag()); 
+}
 template<class ANY>
 GnuplotActor ToGnuplotActorContour(const ANY& a){
     typedef typename ANY::Tag Tag;
@@ -53,6 +66,11 @@ template<class ANY>
 GnuplotActor ToGnuplotActorLabel(const ANY& a, const std::string& config = ""){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorLabel(a, config, Tag()); 
+}
+template<class ANY, class ANY2>
+auto ToGnuplotActorLabel(const ANY& a, const ANY2& a2, const std::string& config = ""){
+    typedef typename ANY::Tag Tag;
+    return _ToGnuplotActorLabel(a, a2, config, Tag()); 
 }
 template<class ANY>
 auto ToGnuplotActorVectors(const ANY& a, Vt unit_length = -1.0){

@@ -7,6 +7,7 @@
 #include "stop_control.hpp"
 // #include "equation/event/event.hpp"
 #include "domain/boundary/boundary_index.hpp"
+#include "domain/domain.hpp"
 #include <memory>
 #include <map>
 
