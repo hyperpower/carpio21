@@ -429,11 +429,12 @@ protected:
     }
 
     virtual int _build_mat_and_solve(const FieldMainExp& fexp, FieldMain& fres){
-        auto spsolver = any_cast<spSolver>(this->_configs["solver"]);
-        Mat a;  Arr b;
+        auto& solver = *(any_cast<spSolver>(this->_configs["solver"]));
+        Mat a;  
+        Arr b;
         BuildMatrix(fexp, a, b);
         Arr x = fres.to_array();
-        this->_configs["solver_return_code"] = spsolver->solve(a, x, b);
+        this->_configs["solver_return_code"] = solver.solve(a, x, b);
         fres.assign(x);
         return any_cast<int>(this->_configs["solver_return_code"]);
     }

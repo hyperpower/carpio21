@@ -86,7 +86,7 @@ auto _CDSOneAxe(
     Vt phi_m = Value(phi, bi, idx, idxm, a, _M_, t);
     Vt phi_p = Value(phi, bi, idx, idxp, a, _P_, t);
     Vt s = grid.s_(a, idx);
-    return (phi_p - 2.0 * phi(idx) - phi_m) / (s * s);
+    return (phi_p - 2.0 * phi(idx) + phi_m) / (s * s);
 }
 
 
@@ -132,7 +132,6 @@ auto _CDSOneAxe(
 
     const Grid& grid = field.grid();
     const Ghost& ghost = field.ghost();
-
 
     Index idxp = idx.p(a);
     Index idxm = idx.m(a);

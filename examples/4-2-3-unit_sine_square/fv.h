@@ -74,8 +74,9 @@ void PoissonSolver(const std::string& scheme, int n,
                    std::list<double>& li,
                    std::list<std::list<double> >& lr){
     std::cout << "[  Poisson ] Solver"<<std::endl;
-    std::cout << "[   INFO   ] Dim = " << dim << std::endl;
-    std::cout << "[   INFO   ] n   = " << n << std::endl;
+    std::cout << "[   INFO   ] Dim    = " << dim << std::endl;
+    std::cout << "[   INFO   ] n      = " << n << std::endl;
+    std::cout << "[   INFO   ] Scheme = " << scheme << std::endl;
     Point p(0,0,0);
 
     spGrid  spgrid(new Grid(p, n, 1, 2));

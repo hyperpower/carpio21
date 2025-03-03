@@ -20,7 +20,6 @@ void ApplyBoundaryValue(
     SFieldVertexTag, LinearPolynomialTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
-    std::cout <<"ApplyBoundaryValue" << std::endl;
     _ApplyBoundaryValue(field, bi, time,
         FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
@@ -35,6 +34,7 @@ void _ApplyBoundaryValue(
     EXPAND_FIELD_TAG(FIELD); 
     EXPAND_FIELD(FIELD);
     typedef typename FIELD::ValueType Exp;
+
 
     auto& ghost = field.ghost();
     for(auto& idx : field.order()){
@@ -376,12 +376,15 @@ void _ApplyBoundaryValueLocal(
 
     auto& ghost = field.ghost();
     auto& exp = field(idx);
+    
     for(auto iter = exp.begin(); iter != exp.end();){
         auto& idxg = iter->first;
         auto& coe  = iter->second;
         if(ghost.is_ghost(idxg, VertexTag())){
+            
             auto v = _FindBoundaryVertexValueInExp(field, idx, idxg, bi, time,
                 GridTag(), GhostTag(), OrderTag(), DimTag());
+        
             // auto didx = GetDeltaIndex(idx, idxg);
             // auto axe  = GetDeltaAxe(didx);
             // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
@@ -436,6 +439,8 @@ auto _FindBoundaryVertexValueInExp(
 
     auto didx = GetDeltaIndex(idx, idxg);
 
+    
+
     // if(ghost.is_ghost_vertex(idxg)){
     //     auto bid  = ghost.boundary_id_vertex(idx, idxg, axe, ori);
     //     auto spbc = bi.find(bid);
@@ -446,11 +451,12 @@ auto _FindBoundaryVertexValueInExp(
         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         return Value(field, bi, idx, idxg, axe, ori, time);
     }else{
+        
         // auto axe  = GetDeltaAxe(didx);
         // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         // return Value(field, bi, idx, idxg, axe, ori, time);
 
-        std::array<ValueType, FIELD::Dim> arrexp;
+        std::array<Exp, FIELD::Dim> arrexp;
         arrexp.fill(Exp(0));
         std::array<Index, FIELD::Dim> arridx;
         arridx.fill(idx);
@@ -467,6 +473,8 @@ auto _FindBoundaryVertexValueInExp(
                 }
             }
         }
+
+        
         return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
     }
 }

@@ -12,7 +12,6 @@ FIELD DifferenialLaplacianHOC4(
         SFieldVertexTag)
 {
     EXPAND_FIELD_TAG(FIELD); 
-    std::cout << "DifferenialLaplacianHOC4" << std::endl;
     return _DifferentialLaplacianHOC4(field, bi, t, 
            ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
@@ -81,8 +80,6 @@ FIELD _DifferentialLaplacianHOC4( // No BoundaryIndex
     Field res = field.new_compatible_zero();
     const auto& grid = res.grid();
     
-    std::cout << "_DifferenialLaplacianHOC4 No bi" << std::endl;
-
     Vt coe_h2_6 = grid.dc() * grid.dc() / 6.0;
 
     for (auto& idx : res.order()) {
@@ -124,7 +121,6 @@ FIELD _DifferentialLaplacianHOC4(
     EXPAND_FIELD(FIELD) 
     auto res = _DifferentialLaplacianHOC4(phi, 
                 ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag() );
-    // std::cout << res(0,8) << std::endl;
     ApplyBoundaryValue(res,bi,t);
     // std::cout << res(0,8) << std::endl;
     // Index idx(0,0, 0);

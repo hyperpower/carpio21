@@ -444,25 +444,27 @@ void _ApplyBoundaryValueLocal(
         }
     }
 }
+
 template<class FIELD, class CIDX, class CVALUE>
-auto _AverageCenterValueByDistance(FIELD&  field,
+auto _AverageCenterValueByDistance(const FIELD&  field,
         const typename FIELD::Index&  idx,
         const CIDX&    arridxg,
         const CVALUE&  arrv){
     EXPAND_FIELD(FIELD);
     
-    ValueType sum;
-    Vt sum_dis;
+    ValueType sum(0);
+    Vt sum_dis = 0;
 
-    auto& grid = field.grid();
+    auto& grid    = field.grid();
     auto iteridxg = arridxg.begin();
-    auto iterv   = arrv.begin();
+    auto iterv    = arrv.begin();
     for(;iteridxg != arridxg.end();){
         auto cc  = grid.c(idx);
         auto cg  = grid.c(*iteridxg);
         auto dis = Distance(cc, cg);
         sum += (*iterv) * dis;
         sum_dis += dis;                
+        
         iteridxg++;
         iterv++;
     }

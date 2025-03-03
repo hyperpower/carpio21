@@ -24,6 +24,7 @@ typedef std::shared_ptr<Order> spOrder;
 typedef Point_<double,dim> Point;
 
 typedef SFieldVertex_<dim, double, Grid, Ghost, Order> Field;
+typedef typename Field::Index Index;
 
 void PlotFieldAsContour(const std::string& ffn, const Field& f){
     const int fig_width  = 800;
@@ -101,6 +102,7 @@ void PoissonSolver(int n,
     
     PlotFieldAsContour("Poisson_SolutionContour" + ToString(n), equ.field("phi"));
 
+    std::cout << "a phi " << equ.field("phi")(Index(0,0))<< std::endl;
     //residual 
     auto spsolver = equ.get_solver();
     lr.push_back(spsolver->get_residual_array());
@@ -110,7 +112,7 @@ void PoissonSolver(int n,
     exact.assign([](typename Field::ValueType x,
                     typename Field::ValueType y,
                     typename Field::ValueType z){
-        return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
+        return std::sin(2.0 * _PI_ * x) * std::sin(2.0 * _PI_ * y);
     });
     auto error = exact - equ.field("phi");
     

@@ -17,7 +17,7 @@ using namespace carpio;
 
 namespace fd{
 
-const std::size_t dim = 2;
+const  std::size_t dim = 2;
 typedef SGridUniform_<dim> Grid;
 typedef std::shared_ptr<Grid> spGrid;
 
@@ -30,6 +30,7 @@ typedef std::shared_ptr<Order> spOrder;
 typedef Point_<double,dim> Point;
 
 typedef SFieldVertex_<dim, double, Grid, Ghost, Order> Field;
+typedef typename Field::Index Index;
 
 void PlotFieldAsContour(const std::string& ffn, const Field& f){
     const int fig_width  = 800;
@@ -103,7 +104,7 @@ void PoissonSolver(const std::string& scheme, int n,
     equ.set_source([](typename Domain::ValueType x,
                       typename Domain::ValueType y,
                       typename Domain::ValueType z){
-        return  -8.0 * _PI_ * _PI_ * std::sin(2.0* _PI_ *x)*std::sin(2.0*_PI_*y);
+        return  -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
     });
     // Add events
 	typedef Event_<Domain> Event;
@@ -114,13 +115,15 @@ void PoissonSolver(const std::string& scheme, int n,
 
     equ.run();
     
-    if( n == 10){
+    if( n == 10 && scheme == "finite_difference_2"){
         PlotFieldAsContour("PoissonFD_SolutionContour" + ToString(n), equ.field("phi"));
     }
 
     //residual 
     auto spsolver = equ.get_solver();
     lr.push_back(spsolver->get_residual_array());
+    
+    std::cout << "a phi " << equ.field("phi")(Index(0,0))<< std::endl;
 
     // error
     auto exact = equ.field("phi").new_compatible_zero();
@@ -132,10 +135,29 @@ void PoissonSolver(const std::string& scheme, int n,
     auto error = exact - equ.field("phi");
     
     // PlotFieldAsContour("PoissonFD_ErrorContour"+ ToString(n), error);
+    auto n1 = Norm1(error);
+    auto n2 = Norm2(error);
+    auto ni = NormInf(error);
 
-    l1.push_back(Norm1(error));
-    l2.push_back(Norm2(error));
-    li.push_back(NormInf(error));
+    std::cout << "Norm 1   = " << Norm1(error) << std::endl;
+    std::cout << "Norm 2   = " << Norm2(error) << std::endl;
+    std::cout << "Norm inf = " << NormInf(error) << std::endl;
+
+    l1.push_back(n1);
+    l2.push_back(n2);
+    li.push_back(ni);
+}
+
+std::string ShortName(const std::string& scheme){
+    std::string nshort;
+    if(scheme == "finite_difference_2"){
+        nshort = "fd2";
+    }else if(scheme == "HOC4"){
+        nshort = "hoc4";
+    }else{
+        nshort = "fd2";
+    }
+    return nshort;
 }
 
 int AScheme(const std::string& scheme){
@@ -146,12 +168,14 @@ int AScheme(const std::string& scheme){
         PoissonSolver(scheme, n, l1, l2, li, lr);
     }
     // output to a file
+    std::string nshort = ShortName(scheme);
+   
 
-    OutputError(FIG_PATH + "fd_error_table.txt",vn, l1, l2, li);
+    OutputError(FIG_PATH + nshort +"_error_table.txt",vn, l1, l2, li);
 
     // plot residual
-    PlotResidual(FIG_PATH + "fd_residual", vn, lr);
-    PlotError(FIG_PATH + "fd_error", 2, vn, l1, l2, li);
+    PlotResidual(FIG_PATH+ nshort + "_residual", vn, lr);
+    PlotError(FIG_PATH+ nshort + "_error", 2, vn, l1, l2, li);
 
     return 0;
 }

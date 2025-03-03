@@ -48,7 +48,7 @@ public:
 	LinearPolynomial_(const Self& other) : Base(other), _num(other._num) {
 	}
 
-	Coe value() const{
+	auto value() const{
 		return _num;
 	}
 

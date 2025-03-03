@@ -167,20 +167,19 @@ An imaging periodic boundary is set, see :numref:`fd_c10`.
    Solution on field vertex.
 
 
-.. figure:: fig/fd_residual.png
+.. figure:: fig/fd2_residual.png
    :align: center 
 
    Solver residual on each mesh.
 
 .. csv-table:: Error Norm in different mesh resolutions.
-   :file: fig/fd_error_table.txt
+   :file: fig/fd2_error_table.txt
    :header-rows: 1
 
-.. figure:: fig/fd_error.png
+.. figure:: fig/fd2_error.png
    :align: center 
 
    Error Norm in different mesh resolutions.
-
 
 
 Reference
