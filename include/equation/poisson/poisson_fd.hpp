@@ -96,6 +96,21 @@ public:
         auto& source = *(this->_fields["source"]);
         source.assign(fun);
     }
+    void set_analytical_d2x_source(FunXYZ_Value fun){
+        if(!(this->has_field("d2x_source"))){
+            this->new_field("d2x_source");
+        }
+        auto& source = *(this->_fields["d2x_source"]);
+        source.assign(fun);
+    }
+    void set_analytical_d2y_source(FunXYZ_Value fun){
+        if(!(this->has_field("d2y_source"))){
+            this->new_field("d2y_source");
+        }
+        auto& source = *(this->_fields["d2y_source"]);
+        source.assign(fun);
+    }
+
 protected:
     int _solve_finite_difference_2(){
         FieldVertex& phi  = *(this->_fields["phi"]);
@@ -140,9 +155,13 @@ protected:
         
         // gnu.set_terminal_png("./fig/local_exp");
         // gnu.plot();
+        auto& d2x = *(this->_fields["d2x_source"]);
+        auto& d2y = *(this->_fields["d2y_source"]);
 
-        auto res = DifferenialLaplacianHOC4(expf, bis) - fsource
-            - DifferenialLaplacian(fsource, bis) * CoeH2_12(fsource);
+        auto res = DifferenialLaplacianHOC4(expf, bis) 
+                   -  fsource
+                   - DifferenialLaplacian(fsource, bis) * CoeH2_12(fsource);
+                //    - (d2x + d2y) * CoeH2_12(fsource);
         
 
         return this->_build_mat_and_solve(res, phi);

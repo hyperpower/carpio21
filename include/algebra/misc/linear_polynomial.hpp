@@ -35,7 +35,7 @@ protected:
 	COE    _num;
 	IsZero _is_zero;
 public:
-	LinearPolynomial_() : Base(), _num(0) {
+	LinearPolynomial_() : Base(), _num(0.0) {
 	}
 
 	LinearPolynomial_(const COE& c): Base(), _num(c){

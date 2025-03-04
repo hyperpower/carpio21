@@ -439,8 +439,6 @@ auto _FindBoundaryVertexValueInExp(
 
     auto didx = GetDeltaIndex(idx, idxg);
 
-    
-
     // if(ghost.is_ghost_vertex(idxg)){
     //     auto bid  = ghost.boundary_id_vertex(idx, idxg, axe, ori);
     //     auto spbc = bi.find(bid);
@@ -451,7 +449,6 @@ auto _FindBoundaryVertexValueInExp(
         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         return Value(field, bi, idx, idxg, axe, ori, time);
     }else{
-        
         // auto axe  = GetDeltaAxe(didx);
         // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         // return Value(field, bi, idx, idxg, axe, ori, time);
@@ -473,8 +470,6 @@ auto _FindBoundaryVertexValueInExp(
                 }
             }
         }
-
-        
         return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
     }
 }

@@ -82,7 +82,7 @@ void PoissonSolver(int n,
 	equ.set_boundary_index("phi", spbi);
 
     // Set solver
-	equ.set_solver("Jacobi", 4000, 1e-10);
+	equ.set_solver("CG", 20000, 1e-6, 1.0);
     equ.set_space_scheme("HOC4");
 
     // Set source
@@ -91,6 +91,18 @@ void PoissonSolver(int n,
                       typename Domain::ValueType z){
         return  -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
     });
+    equ.set_analytical_d2x_source([](
+        typename Domain::ValueType x,
+        typename Domain::ValueType y,
+        typename Domain::ValueType z){
+            return  8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+        });
+    equ.set_analytical_d2y_source([](
+        typename Domain::ValueType x,
+        typename Domain::ValueType y,
+        typename Domain::ValueType z){
+            return  8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+        });
     // Add events
 	typedef Event_<Domain> Event;
 	typedef std::shared_ptr<Event>  spEvent;
@@ -106,6 +118,7 @@ void PoissonSolver(int n,
     //residual 
     auto spsolver = equ.get_solver();
     lr.push_back(spsolver->get_residual_array());
+    std::cout << "Number of Iter : " << spsolver->num_iter() << std::endl;
 
     // error
     auto exact = equ.field("phi").new_compatible_zero();

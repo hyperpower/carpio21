@@ -97,7 +97,8 @@ void PoissonSolver(const std::string& scheme, int n,
 	equ.set_boundary_index("phi", spbi);
 
     // Set solver
-	equ.set_solver("Jacobi", 20000, 1e-10);
+	// equ.set_solver("Jacobi", 20000, 1e-10);
+    equ.set_solver("SOR", 20000, 1e-10, 1.0);
     equ.set_space_scheme(scheme);
 
     // Set source
@@ -106,6 +107,18 @@ void PoissonSolver(const std::string& scheme, int n,
                       typename Domain::ValueType z){
         return  -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
     });
+    equ.set_analytical_d2x_source([](
+        typename Domain::ValueType x,
+        typename Domain::ValueType y,
+        typename Domain::ValueType z){
+            return  8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+        });
+    equ.set_analytical_d2y_source([](
+        typename Domain::ValueType x,
+        typename Domain::ValueType y,
+        typename Domain::ValueType z){
+            return  8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+        });
     // Add events
 	typedef Event_<Domain> Event;
 	typedef std::shared_ptr<Event>  spEvent;
@@ -161,7 +174,7 @@ std::string ShortName(const std::string& scheme){
 }
 
 int AScheme(const std::string& scheme){
-    std::vector<int> vn = {10, 20, 40, 80};
+    std::vector<int> vn = {20, 40, 80, 160};
     std::list<double> l1,l2,li;
     std::list<std::list<double> > lr;
     for(auto& n : vn){
@@ -175,8 +188,11 @@ int AScheme(const std::string& scheme){
 
     // plot residual
     PlotResidual(FIG_PATH+ nshort + "_residual", vn, lr);
-    PlotError(FIG_PATH+ nshort + "_error", 2, vn, l1, l2, li);
-
+    if(nshort == "hoc4"){
+        PlotError(FIG_PATH+ nshort + "_error", 4, vn, l1, l2, li);
+    }else{
+        PlotError(FIG_PATH+ nshort + "_error", 2, vn, l1, l2, li);
+    }
     return 0;
 }
 

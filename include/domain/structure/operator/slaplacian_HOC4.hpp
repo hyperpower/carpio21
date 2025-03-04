@@ -94,7 +94,8 @@ FIELD _DifferentialLaplacianHOC4( // No BoundaryIndex
             // }
 
             arr[d] += _CDSTwoAxes(field, idx, d,
-               ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag()) * coe_h2_6;
+               ValueTag(), GridTag(), GhostTag(), OrderTag(), DimTag())
+                * coe_h2_6;
             // std::cout << arr[d] << std::endl;
             // if(idx == Index(1,1)){
             //     std::cout << "Two Axes d = " << ToString(d) << std::endl;
