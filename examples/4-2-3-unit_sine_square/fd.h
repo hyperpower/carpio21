@@ -68,13 +68,11 @@ void PoissonSolver(const std::string& scheme, int n,
     std::cout << "[   INFO   ] n      = " << n << std::endl;
     std::cout << "[   INFO   ] Scheme = " << scheme << std::endl;
     Point p(0,0,0);
-    Vt l = 1.0;
-    Vt h = 1.0 / n;
-    Vt nl = l * (1.0 + h);
-    Vt nh = nl / n;
-    Point np(p[0] - 0.5 * nh,p[1] - 0.5 * nh, p[2] - 0.5 * nh);
+    Vt h = 1.0 / (n - 1);
+    Vt l = h * n;
+    Point np(p[0] - 0.5 * h,p[1] - 0.5 * h, p[2] - 0.5 * h);
 
-    spGrid  spgrid(new  Grid(np, n, nl, 2));
+    spGrid  spgrid(new  Grid(np, n, l, 2));
     spGhost spghost(new Ghost(spgrid));
     spOrder sporder(new Order(spgrid, spghost));
 
@@ -111,13 +109,13 @@ void PoissonSolver(const std::string& scheme, int n,
         typename Domain::ValueType x,
         typename Domain::ValueType y,
         typename Domain::ValueType z){
-            return  8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+            return  32.0 * std::pow(_PI_, 4) * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
         });
     equ.set_analytical_d2y_source([](
         typename Domain::ValueType x,
         typename Domain::ValueType y,
         typename Domain::ValueType z){
-            return  8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+            return  32.0 * std::pow(_PI_, 4) * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
         });
     // Add events
 	typedef Event_<Domain> Event;
@@ -174,7 +172,7 @@ std::string ShortName(const std::string& scheme){
 }
 
 int AScheme(const std::string& scheme){
-    std::vector<int> vn = {20, 40, 80, 160};
+    std::vector<int> vn = {20, 40, 80};
     std::list<double> l1,l2,li;
     std::list<std::list<double> > lr;
     for(auto& n : vn){

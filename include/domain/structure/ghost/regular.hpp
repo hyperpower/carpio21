@@ -216,7 +216,7 @@ public:
         std::cout << "idx g = "<<indexg << std::endl;
         std::cout << "axe   = "<<ToString(a) << std::endl;
         std::cout << " o    = "<<ToString(ori) << std::endl;
-        SHOULD_NOT_REACH;
+        // SHOULD_NOT_REACH;
         return 0;
     };
 

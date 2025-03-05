@@ -78,7 +78,7 @@ void LaplaceSolver(const std::string& scheme, int n,
 	equ.set_boundary_index("phi", spbi);
 
     // // Set solver
-	equ.set_solver("Jacobi", 20000, 1e-12);
+	equ.set_solver("SOR", 20000, 1e-12);
     equ.set_space_scheme(scheme);
 
     

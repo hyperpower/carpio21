@@ -495,28 +495,28 @@ auto _SFindBoundaryValue(
         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         return Value(field, bi, idx, idxg, axe, ori, time);
     }else{
-        // std::cout << "here" << std::endl;
-        // auto axe  = GetDeltaAxe(didx);
-        // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
-        // return Value(field, bi, idx, idxg, axe, ori, time);
-        std::array<ValueType, FIELD::Dim> arrexp;
-        arrexp.fill(Exp(0));
-        std::array<Index, FIELD::Dim> arridx;
-        arridx.fill(idx);
-        for(auto d : ArrAxes<FIELD::Dim>()){
-            if(didx[d] != 0 ){
-                auto idxng = idxg.shift(d, -(Sign(didx[d])));
-                if(! (ghost.is_ghost_vertex(idxng))){
-                    auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
-                    return Value(field, bi, idxng, idxg, d, ori, time); 
-                }else{
-                    arridx[d] = idxng;
-                    arrexp[d] = _SFindBoundaryValue(field, bi, idx, idxng, time,
-                        FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-                }
-            }
-        }
-        return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
+        std::cout << "here" << std::endl;
+        auto axe  = GetDeltaAxe(didx);
+        auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        return Value(field, bi, idx, idxg, axe, ori, time);
+        // std::array<ValueType, FIELD::Dim> arrexp;
+        // arrexp.fill(Exp(0));
+        // std::array<Index, FIELD::Dim> arridx;
+        // arridx.fill(idx);
+        // for(auto d : ArrAxes<FIELD::Dim>()){
+        //     if(didx[d] != 0 ){
+        //         auto idxng = idxg.shift(d, -(Sign(didx[d])));
+        //         if(! (ghost.is_ghost_vertex(idxng))){
+        //             auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
+        //             return Value(field, bi, idxng, idxg, d, ori, time); 
+        //         }else{
+        //             arridx[d] = idxng;
+        //             arrexp[d] = _SFindBoundaryValue(field, bi, idx, idxng, time,
+        //                 FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+        //         }
+        //     }
+        // }
+        // return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
     }
 }
 template<class FIELD>

@@ -128,40 +128,45 @@ protected:
         auto& expf    = *(any_cast<spFieldVertexExp>(this->_configs["field_exp_coe_one"]));
         auto& bis     = *(this->get_boundary_index("phi"));
         auto& fsource = *(this->_fields["source"]);
-
-        // std::cout << "solve hoc4" << std::endl;
-        // Gnuplot gnu;
-        // auto fout = DifferenialLaplacianHOC4(expf, bis); 
-        auto idx  = Index(8,8); 
-        // auto r = ApproximateRange(fout, idx);
-        // r.scale(2.5);
-        // gnu.set_xlabel("x");
-        // gnu.set_ylabel("y");
-        // gnu.set_label_with_box(10, "Index C = " + ToString(idx), 
-        //     r.max(_X_) - 0.4 * r.get_d(_X_), 
-        //     r.max(_Y_) - 0.1 * r.get_d(_Y_) );
-        // gnu.set_label_with_box(12, "Num     = " + ToString(fout(idx).value()), 
-        //     r.max(_X_) - 0.4 * r.get_d(_X_), 
-        //     r.max(_Y_) - 0.2 * r.get_d(_Y_) );
-        // gnu.set_xrange(r.min(_X_), r.max(_X_));
-        // gnu.set_yrange(r.min(_Y_), r.max(_Y_));
-        // gnu.add(ToGnuplotActorWireFrame(phi.grid()));
-        // gnu.add(ToGnuplotActorWireFrame(fout, idx));
-        // gnu.add(ToGnuplotActorContourPoints(fout, idx));
-        // gnu.add(ToGnuplotActorLabel(fout, idx, "norm_value"));
-        // gnu.add(ToGnuplotActorLabel(fout, idx, "index"));
-        // gnu.set_palette_red_blue_dark();
-        // gnu.set_equal_aspect_ratio();
-        
-        // gnu.set_terminal_png("./fig/local_exp");
-        // gnu.plot();
         auto& d2x = *(this->_fields["d2x_source"]);
         auto& d2y = *(this->_fields["d2y_source"]);
 
         auto res = DifferenialLaplacianHOC4(expf, bis) 
                    -  fsource
-                   - DifferenialLaplacian(fsource, bis) * CoeH2_12(fsource);
-                //    - (d2x + d2y) * CoeH2_12(fsource);
+                //    - DifferenialLaplacian(fsource, bis) * CoeH2_12(fsource);
+                   - (d2x + d2y) * CoeH2_12(fsource);
+
+        std::cout << "solve hoc4" << std::endl;
+        Gnuplot gnu;
+        auto fout = DifferenialLaplacianHOC4(expf, bis); 
+        auto ff   = -fsource - (d2x + d2y) * CoeH2_12(fsource); 
+        auto idx  = Index(2,2); 
+        std::cout << "f side = " << ff(idx) << std::endl;
+        auto r = ApproximateRange(res, idx);
+        r.scale(2.5);
+        gnu.set_xlabel("x");
+        gnu.set_ylabel("y");
+        gnu.set_label_with_box(10, "Index C = " + ToString(idx), 
+            r.max(_X_) - 0.4 * r.get_d(_X_), 
+            r.max(_Y_) - 0.1 * r.get_d(_Y_) );
+        gnu.set_label_with_box(12, "Num     = " + ToString(res(idx).value()), 
+            r.max(_X_) - 0.4 * r.get_d(_X_), 
+            r.max(_Y_) - 0.2 * r.get_d(_Y_) );
+        gnu.set_xrange(r.min(_X_), r.max(_X_));
+        gnu.set_yrange(r.min(_Y_), r.max(_Y_));
+        gnu.add(ToGnuplotActorWireFrame(phi.grid()));
+        gnu.add(ToGnuplotActorWireFrame(res, idx));
+        gnu.add(ToGnuplotActorContourPoints(res, idx));
+        gnu.add(ToGnuplotActorLabel(res, idx, "value"));
+        gnu.add(ToGnuplotActorLabel(res, idx, "index"));
+        gnu.set_palette_red_blue_dark();
+        gnu.set_equal_aspect_ratio();
+        
+        gnu.set_terminal_png("./fig/local_exp");
+        gnu.plot();
+
+
+        
         
 
         return this->_build_mat_and_solve(res, phi);

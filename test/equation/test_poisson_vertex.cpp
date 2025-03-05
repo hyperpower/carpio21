@@ -53,15 +53,14 @@ void PoissonSolver(int n,
     std::cout << "[   INFO   ] n   = " << n << std::endl;
     
     Point p(0,0,0);
-    Vt l = 1.0;
-    Vt h = 1.0 / n;
-    Vt nl = l * (1.0 + h);
-    Vt nh = nl / n;
-    Point np(p[0] - 0.5 * nh,p[1] - 0.5 * nh, p[2] - 0.5 * nh);
+    Vt h = 1.0 / (n - 1);
+    Vt l = h * n;
+    Point np(p[0] - 0.5 * h,p[1] - 0.5 * h, p[2] - 0.5 * h);
 
-    spGrid  spgrid(new Grid(np, n, nl, 2));
+    spGrid  spgrid(new Grid(np, n, l, 2));
     spGhost spghost(new Ghost(spgrid));
     spOrder sporder(new Order(spgrid, spghost));
+    std::cout << "[   INFO   ] h   = " << spgrid->dc() << std::endl;
 
     typedef StructureDomain_<dim, Grid, Ghost, Order> Domain;
     typedef Poisson_<Domain> Poisson;
@@ -82,26 +81,26 @@ void PoissonSolver(int n,
 	equ.set_boundary_index("phi", spbi);
 
     // Set solver
-	equ.set_solver("CG", 20000, 1e-6, 1.0);
+	equ.set_solver("SOR", 20000, 1e-6, 1.0);
     equ.set_space_scheme("HOC4");
 
     // Set source
     equ.set_source([](typename Domain::ValueType x,
                       typename Domain::ValueType y,
                       typename Domain::ValueType z){
-        return  -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+        return  - 8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
     });
     equ.set_analytical_d2x_source([](
         typename Domain::ValueType x,
         typename Domain::ValueType y,
         typename Domain::ValueType z){
-            return  8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+            return   32.0 * std::pow(_PI_,4.0) * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
         });
     equ.set_analytical_d2y_source([](
         typename Domain::ValueType x,
         typename Domain::ValueType y,
         typename Domain::ValueType z){
-            return  8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+            return   32.0 * std::pow(_PI_,4.0) * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
         });
     // Add events
 	typedef Event_<Domain> Event;
@@ -111,6 +110,9 @@ void PoissonSolver(int n,
 	equ.add_event("OutputTime", spetime);
 
     equ.run();
+
+    auto& phi = equ.field("phi");
+    std::cout << "[   INFO   ] phi(0,0) = " << phi(0,0) << std::endl;
     
     PlotFieldAsContour("Poisson_SolutionContour" + ToString(n), equ.field("phi"));
 
@@ -140,7 +142,7 @@ void PoissonSolver(int n,
 }
 
 TEST(possion, solver){
-    std::vector<int> vn = {10};
+    std::vector<int> vn = {11};
     std::list<double> l1,l2,li;
     std::list<std::list<double> > lr;
     for(auto& n : vn){
