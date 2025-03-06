@@ -161,7 +161,7 @@ problem is doubly periodic boundary. The vertex should not locate on the boundar
 An imaging periodic boundary is set, see :numref:`fd_c10`.
 
 .. _fd_c10:
-.. figure:: fig/PoissonFD_SolutionContour10.png
+.. figure:: fig/Solution_fd2_10.png
    :align: center 
 
    Solution on field vertex.
@@ -172,7 +172,7 @@ An imaging periodic boundary is set, see :numref:`fd_c10`.
 
    Solver residual on each mesh.
 
-.. csv-table:: Error Norm in different mesh resolutions.
+.. csv-table:: Error Norm in different mesh resolutions. (FD2)
    :file: fig/fd2_error_table.txt
    :header-rows: 1
 
@@ -180,6 +180,26 @@ An imaging periodic boundary is set, see :numref:`fd_c10`.
    :align: center 
 
    Error Norm in different mesh resolutions.
+
+
+4th Order Compact (HOC) Scheme
+================================
+
+.. figure:: fig/hoc4_residual.png
+   :align: center 
+
+   Solver residual on each mesh.
+
+.. csv-table:: Error Norm in different mesh resolutions. (HOC4)
+   :file: fig/hoc4_error_table.txt
+   :header-rows: 1
+
+.. figure:: fig/hoc4_error.png
+   :align: center 
+
+   Error Norm in different mesh resolutions.
+
+
 
 
 Reference

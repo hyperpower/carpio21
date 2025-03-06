@@ -2,6 +2,7 @@
 #define _CONVERGENCE_ANALYSIS_HPP_
 
 #include <string>
+#include <numeric>
 #include "io/gnuplot.hpp"
 
 #include "example_define.hpp"
@@ -121,6 +122,8 @@ void OutputError(
         
     std::ofstream fout(ffn,std::ios::out);
 
+    std::list<double> lo1, lo2, loi;
+
     tfm::format(fout, "n,L1-Norm, O-L1, L2-Norm, O-L2, Linf-Norm, O-Linf\n");
     int count = 0;
     auto itervn = ln.begin();
@@ -135,11 +138,17 @@ void OutputError(
             auto pl1 = std::prev(iterl1);
             auto pl2 = std::prev(iterl2);
             auto pli = std::prev(iterli);
+            auto o1  = cal_order(*iterl1, *pl1);
+            auto o2  = cal_order(*iterl2, *pl2);
+            auto oi  = cal_order(*iterli, *pli);
             tfm::format(fout,
                     "%8d, %10.3e, %10.2f, %10.3e, %10.2f, %10.3e, %10.2f\n",
-                    *itervn, *iterl1, cal_order(*iterl1, *pl1),
-                             *iterl2, cal_order(*iterl2, *pl2), 
-                             *iterli, cal_order(*iterli, *pli));
+                    *itervn, *iterl1, o1,
+                             *iterl2, o2, 
+                             *iterli, oi);
+            lo1.push_back(o1);
+            lo2.push_back(o2);
+            loi.push_back(oi);
         }else{
             tfm::format(fout,
                     "%8d, %10.3e, %10s, %10.3e, %10s, %10.3e, %10s\n",
@@ -151,6 +160,12 @@ void OutputError(
         iterli++;
         count++;
     }
+    auto avg1 = std::accumulate(lo1.begin(), lo1.end(), 0.0) / lo1.size();
+    auto avg2 = std::accumulate(lo2.begin(), lo2.end(), 0.0) / lo2.size();
+    auto avgi = std::accumulate(loi.begin(), loi.end(), 0.0) / loi.size();
+    tfm::format(fout,
+        "Avg,  , %10.2f,  , %10.2f,  , %10.2f\n",
+        avg1, avg2, avgi);
     fout.close();
 }
 

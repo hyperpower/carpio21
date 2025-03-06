@@ -449,28 +449,28 @@ auto _FindBoundaryVertexValueInExp(
         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         return Value(field, bi, idx, idxg, axe, ori, time);
     }else{
-        // auto axe  = GetDeltaAxe(didx);
-        // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
-        // return Value(field, bi, idx, idxg, axe, ori, time);
+        auto axe  = GetDeltaAxe(didx);
+        auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        return Value(field, bi, idx, idxg, axe, ori, time);
 
-        std::array<Exp, FIELD::Dim> arrexp;
-        arrexp.fill(Exp(0));
-        std::array<Index, FIELD::Dim> arridx;
-        arridx.fill(idx);
-        for(auto d : ArrAxes<FIELD::Dim>()){
-            if(didx[d] != 0 ){
-                auto idxng = idxg.shift(d, -(Sign(didx[d])));
-                if(! (ghost.is_ghost(idxng, VertexTag()))){
-                    auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
-                    return Value(field, bi, idxng, idxg, d, ori, time); 
-                }else{
-                    arridx[d] = idxng;
-                    arrexp[d] = _FindBoundaryVertexValueInExp(field, idx, idxng, bi, time,
-                        GridTag(), GhostTag(), OrderTag(), DimTag());
-                }
-            }
-        }
-        return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
+        // std::array<Exp, FIELD::Dim> arrexp;
+        // arrexp.fill(Exp(0));
+        // std::array<Index, FIELD::Dim> arridx;
+        // arridx.fill(idx);
+        // for(auto d : ArrAxes<FIELD::Dim>()){
+        //     if(didx[d] != 0 ){
+        //         auto idxng = idxg.shift(d, -(Sign(didx[d])));
+        //         if(! (ghost.is_ghost(idxng, VertexTag()))){
+        //             auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
+        //             return Value(field, bi, idxng, idxg, d, ori, time); 
+        //         }else{
+        //             arridx[d] = idxng;
+        //             arrexp[d] = _FindBoundaryVertexValueInExp(field, idx, idxng, bi, time,
+        //                 GridTag(), GhostTag(), OrderTag(), DimTag());
+        //         }
+        //     }
+        // }
+        // return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
     }
 }
 template<class FIELD>

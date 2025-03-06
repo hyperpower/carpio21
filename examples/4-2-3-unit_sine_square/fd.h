@@ -56,7 +56,17 @@ void PlotFieldAsContour(const std::string& ffn, const Field& f){
 	gnu.plot();
 }
 
-
+std::string ShortName(const std::string& scheme){
+    std::string nshort;
+    if(scheme == "finite_difference_2"){
+        nshort = "fd2";
+    }else if(scheme == "HOC4"){
+        nshort = "hoc4";
+    }else{
+        nshort = "fd2";
+    }
+    return nshort;
+}
 
 void PoissonSolver(const std::string& scheme, int n, 
                    std::list<double>& l1, 
@@ -126,9 +136,9 @@ void PoissonSolver(const std::string& scheme, int n,
 
     equ.run();
     
-    if( n == 10 && scheme == "finite_difference_2"){
-        PlotFieldAsContour("PoissonFD_SolutionContour" + ToString(n), equ.field("phi"));
-    }
+   
+    std::string nshort = ShortName(scheme);
+    PlotFieldAsContour("Solution_" + nshort + "_" + ToString(n), equ.field("phi"));
 
     //residual 
     auto spsolver = equ.get_solver();
@@ -145,7 +155,7 @@ void PoissonSolver(const std::string& scheme, int n,
     });
     auto error = exact - equ.field("phi");
     
-    // PlotFieldAsContour("PoissonFD_ErrorContour"+ ToString(n), error);
+    PlotFieldAsContour("Error_" + nshort + "_" + ToString(n), error);
     auto n1 = Norm1(error);
     auto n2 = Norm2(error);
     auto ni = NormInf(error);
@@ -159,20 +169,10 @@ void PoissonSolver(const std::string& scheme, int n,
     li.push_back(ni);
 }
 
-std::string ShortName(const std::string& scheme){
-    std::string nshort;
-    if(scheme == "finite_difference_2"){
-        nshort = "fd2";
-    }else if(scheme == "HOC4"){
-        nshort = "hoc4";
-    }else{
-        nshort = "fd2";
-    }
-    return nshort;
-}
+
 
 int AScheme(const std::string& scheme){
-    std::vector<int> vn = {20, 40, 80};
+    std::vector<int> vn = {10, 20, 40, 80};
     std::list<double> l1,l2,li;
     std::list<std::list<double> > lr;
     for(auto& n : vn){
