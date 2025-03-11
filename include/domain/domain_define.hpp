@@ -50,6 +50,23 @@ template<>
 constexpr auto ArrAxes<3>(){
     return std::array<Axes, 3>{_X_, _Y_, _Z_};
 }
+template<St DIM>
+auto ArrAxes(const St& start){
+    SHOULD_NOT_REACH;
+    return std::array<Axes, 1>{ToAxes(start)};
+}
+template<>
+constexpr auto ArrAxes<1>(const St& start){
+    return std::array<Axes, 1>{ToAxes(start)};
+}
+template<>
+constexpr auto ArrAxes<2>(const St& start){
+    return std::array<Axes, 2>{ToAxes(start), ToAxes((start + 1) % 2)};
+}
+template<>
+constexpr auto ArrAxes<3>(const St& start){
+    return std::array<Axes, 3>{ToAxes(start), ToAxes((start + 1) % 3), ToAxes((start + 2) % 3)};
+}
 
 typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
 typedef std::function<Vt(Vt, Vt, Vt)>     FunXYZ_Value;

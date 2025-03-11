@@ -52,7 +52,7 @@ Second Order Finite Volume Method
    Error Norm in different mesh resolutions.
    
 Second Order Finite Difference Method
-==================================
+======================================
 
 .. figure:: fig/finite_difference_2_residual.png
    :align: center 

@@ -269,7 +269,7 @@ typename FIELD::ValueType GetBoundaryVertexExpType3(
     // std::cout << "here" << std::endl;
     auto& grid = fc.grid();
     typename FIELD::Index idxp(idxg);
-    for(auto& a : ArrAxes<FIELD::Dim>()){
+    for(auto& a : ArrAxes<FIELD::Dim>(axe)){
         auto  n = grid.n(a);
         auto ig = idxg[a];
         auto nn = n - 1;
@@ -380,7 +380,7 @@ void _ApplyBoundaryValueLocal(
     for(auto iter = exp.begin(); iter != exp.end();){
         auto& idxg = iter->first;
         auto& coe  = iter->second;
-        if(ghost.is_ghost(idxg, VertexTag())){
+        if(ghost.is_ghost_vertex(idxg)){
             
             auto v = _FindBoundaryVertexValueInExp(field, idx, idxg, bi, time,
                 GridTag(), GhostTag(), OrderTag(), DimTag());
@@ -428,6 +428,109 @@ auto _FindBoundaryVertexValueInExp(
     const typename FIELD::Index&  idxg,
     const BoundaryIndex& bi,
     const Vt&            time, 
+    SGridUniformTag, SGhostRegularTag, SOrderTag, DimTag)
+{
+    EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD);
+
+    typedef typename FIELD::ValueType Exp;
+
+    auto& ghost = field.ghost();
+    auto didx = GetDeltaIndex(idx, idxg); //ghost - idx
+
+    // if(ghost.is_ghost_vertex(idxg)){
+    //     auto bid  = ghost.boundary_id_vertex(idx, idxg, axe, ori);
+    //     auto spbc = bi.find(bid);
+    //     isbc3 = (spbc->type() == BoundaryCondition::_BC3_);
+    // }
+    if(OnSameAxe(didx)){
+        auto axe  = GetDeltaAxe(didx);
+        auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        return Value(field, bi, idx, idxg, axe, ori, time);
+    }else{
+        // std::cout << "_FindBoundaryVertexValueInExp Not on same axe" << std::endl;
+        // Not on same axes
+        // auto axe  = GetDeltaAxe(didx);
+        // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        // return Value(field, bi, idx, idxg, axe, ori, time);
+        
+        Exp expone(0);
+        // std::array<Index, FIELD::Dim> arridx;
+        // arridx.fill(idx);
+        std::array<int, FIELD::Dim> arrbid;
+        arrbid.fill(-1);
+        // std::cout << "input idx  = " << idx <<std::endl; 
+        // std::cout << "      idxg = " << idxg <<std::endl; 
+        // std::cout << "     didx  = " << didx << std::endl;
+        for(auto d : ArrAxes<FIELD::Dim>()){
+            // Go Back from ghost
+            auto step = Sign(didx[d]) * (std::abs(didx[d]) + 1);
+            auto idxng = idxg;
+            while( std::abs(step) > 0){
+                Shift(idxng, d, ToOrientationSign(-(Sign(step))));
+                if(! (ghost.is_ghost_vertex(idxng))){ 
+                    auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
+                    arrbid[d] = ghost.boundary_id_vertex(idxng, idxg, d, ori); 
+                    expone    = Value(field, bi, idxng, idxg, d, ori, time); 
+                }
+                step = (Sign(step)) * (std::abs(step) - 1);
+            }
+        }
+        int count_bid = std::count_if(arrbid.begin(), arrbid.end(), [](int i) { return i == -1; });
+        if(count_bid == 1){
+            return expone;
+        }
+        if(count_bid >= 2){
+            // std::cout << "idx  " << idx << std::endl;
+            // std::cout << "idxg " << idxg << std::endl;
+            // std::cout << "didx " << didx << std::endl;
+            // std::cout << "count_bid " << count_bid << std::endl;
+            std::array<Exp, FIELD::Dim> arrexp;
+            arrexp.fill(Exp(0));
+            std::array<Index, FIELD::Dim> arridx;
+            arridx.fill(idx);
+            std::array<int, FIELD::Dim> arrbtype;
+            arrbtype.fill(-1);
+            // Go from center
+            for(auto d : ArrAxes<FIELD::Dim>()){
+                auto step  = didx[d];
+                auto idxng = idx;
+                while( std::abs(step) > 0){
+                    Shift(idxng, d, ToOrientationSign(Sign(step)));
+                    // std::cout << "idxng " << idxng << std::endl;  
+                    if(ghost.is_ghost_vertex(idxng)){ 
+                        // std::cout << "idxng is ghost" << idxng << std::endl;  
+                        auto ori  = GetDeltaOrientOnAxe(idx, idxng, d); 
+                        auto bid = ghost.boundary_id_vertex(idx, idxng, d, ori); 
+                        auto spbc = bi.find(bid);
+                        arrbtype[d] = spbc->type();
+                        arridx[d]   = idxng;
+                        arrexp[d]   = Value(field, bi, idx, idxng, d, ori, time); 
+                    }
+                    step = (Sign(step)) * (std::abs(step) - 1);
+                } 
+            }
+            int count_b3type = std::count_if(arrbtype.begin(), arrbtype.end(), [](int i) { return i == BoundaryCondition::_BC3_; });
+            // std::cout << "count_bidc " << count_b3type << std::endl;
+            if(count_b3type >= 2){
+                // std::cout << "double 3 bc ------------" << std::endl;
+                auto axe  = GetDeltaAxe(didx);
+                auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+                return Value(field, bi, idx, idxg, axe, ori, time);
+            }
+            return _AverageCenterValueByDistance(field, idx, arridx, arrexp);  
+        }
+    }
+}
+
+
+template<class FIELD>
+auto _FindBoundaryVertexValueInExp(
+    FIELD&               field,
+    const typename FIELD::Index&  idx,
+    const typename FIELD::Index&  idxg,
+    const BoundaryIndex& bi,
+    const Vt&            time, 
     SGridUniformTag, SGhostTag, SOrderTag, DimTag)
 {
     EXPAND_FIELD(FIELD);
@@ -449,89 +552,94 @@ auto _FindBoundaryVertexValueInExp(
         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
         return Value(field, bi, idx, idxg, axe, ori, time);
     }else{
-        auto axe  = GetDeltaAxe(didx);
-        auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
-        return Value(field, bi, idx, idxg, axe, ori, time);
-
-        // std::array<Exp, FIELD::Dim> arrexp;
-        // arrexp.fill(Exp(0));
-        // std::array<Index, FIELD::Dim> arridx;
-        // arridx.fill(idx);
-        // for(auto d : ArrAxes<FIELD::Dim>()){
-        //     if(didx[d] != 0 ){
-        //         auto idxng = idxg.shift(d, -(Sign(didx[d])));
-        //         if(! (ghost.is_ghost(idxng, VertexTag()))){
-        //             auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
-        //             return Value(field, bi, idxng, idxg, d, ori, time); 
-        //         }else{
-        //             arridx[d] = idxng;
-        //             arrexp[d] = _FindBoundaryVertexValueInExp(field, idx, idxng, bi, time,
-        //                 GridTag(), GhostTag(), OrderTag(), DimTag());
-        //         }
-        //     }
-        // }
-        // return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
+        // Not on same axes
+        // auto axe  = GetDeltaAxe(didx);
+        // auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+        // return Value(field, bi, idx, idxg, axe, ori, time);
+        std::array<Exp, FIELD::Dim> arrexp;
+        arrexp.fill(Exp(0));
+        std::array<Index, FIELD::Dim> arridx;
+        arridx.fill(idx);
+        std::array<int, FIELD::Dim> arrbid;
+        arrbid.fill(-1);
+        for(auto d : ArrAxes<FIELD::Dim>()){
+            if(didx[d] != 0 ){
+                auto idxng = idxg.shift(d, -(Sign(didx[d])));
+                if(! (ghost.is_ghost(idxng, VertexTag()))){
+                    auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
+                    arrbid[d] = ghost.boundary_id_vertex(idxng, idxg, d, ori);
+                    arridx[d] = idxg;
+                    arrexp[d] = Value(field, bi, idxng, idxg, d, ori, time);
+                    return Value(field, bi, idxng, idxg, d, ori, time); 
+                }else{
+                    arridx[d] = idxng;
+                    arrexp[d] = _FindBoundaryVertexValueInExp(field, idx, idxng, bi, time,
+                        GridTag(), GhostTag(), OrderTag(), DimTag());
+                }
+            }
+        }
+        return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
     }
 }
-template<class FIELD>
-auto _SFindBoundaryValue(
-    FIELD&               field,
-    const BoundaryIndex& bi,
-    const typename FIELD::Index&  idx,
-    const typename FIELD::Index&  idxg,
-    const Vt&            time, 
-    SFieldVertexTag, SGridUniformTag , SGhostTag, SOrderTag, DimTag)
-{
-    EXPAND_FIELD(FIELD);
-    EXPAND_FIELD_TAG(FIELD);
+// template<class FIELD>
+// auto _SFindBoundaryValue(
+//     FIELD&               field,
+//     const BoundaryIndex& bi,
+//     const typename FIELD::Index&  idx,
+//     const typename FIELD::Index&  idxg,
+//     const Vt&            time, 
+//     SFieldVertexTag, SGridUniformTag , SGhostTag, SOrderTag, DimTag)
+// {
+//     EXPAND_FIELD(FIELD);
+//     EXPAND_FIELD_TAG(FIELD);
 
-    typedef typename FIELD::ValueType Exp;
+//     typedef typename FIELD::ValueType Exp;
 
-    auto& ghost = field.ghost();
+//     auto& ghost = field.ghost();
 
-    auto didx = GetDeltaIndex(idx, idxg);
-    if(OnSameAxe(didx)){
-        auto axe  = GetDeltaAxe(didx);
-        auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
-        return Value(field, bi, idx, idxg, axe, ori, time);
-    }else{
-        std::cout << "here" << std::endl;
-        auto axe  = GetDeltaAxe(didx);
-        auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
-        return Value(field, bi, idx, idxg, axe, ori, time);
-        // std::array<ValueType, FIELD::Dim> arrexp;
-        // arrexp.fill(Exp(0));
-        // std::array<Index, FIELD::Dim> arridx;
-        // arridx.fill(idx);
-        // for(auto d : ArrAxes<FIELD::Dim>()){
-        //     if(didx[d] != 0 ){
-        //         auto idxng = idxg.shift(d, -(Sign(didx[d])));
-        //         if(! (ghost.is_ghost_vertex(idxng))){
-        //             auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
-        //             return Value(field, bi, idxng, idxg, d, ori, time); 
-        //         }else{
-        //             arridx[d] = idxng;
-        //             arrexp[d] = _SFindBoundaryValue(field, bi, idx, idxng, time,
-        //                 FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-        //         }
-        //     }
-        // }
-        // return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
-    }
-}
-template<class FIELD>
-auto FindBoundaryValue(
-    FIELD&               field,
-    const BoundaryIndex& bi,
-    const typename FIELD::Index&  idx,
-    const typename FIELD::Index&  idxg,
-    const Vt&            time, 
-    SFieldVertexTag)
-{
-    EXPAND_FIELD_TAG(FIELD);
-    return _SFindBoundaryValue(field, bi, idx, idxg, time,
-        FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-}
+//     auto didx = GetDeltaIndex(idx, idxg);
+//     if(OnSameAxe(didx)){
+//         auto axe  = GetDeltaAxe(didx);
+//         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+//         return Value(field, bi, idx, idxg, axe, ori, time);
+//     }else{
+//         std::cout << "here" << std::endl;
+//         auto axe  = GetDeltaAxe(didx);
+//         auto ori  = GetDeltaOrientOnAxe(idx, idxg, axe); 
+//         return Value(field, bi, idx, idxg, axe, ori, time);
+//         // std::array<ValueType, FIELD::Dim> arrexp;
+//         // arrexp.fill(Exp(0));
+//         // std::array<Index, FIELD::Dim> arridx;
+//         // arridx.fill(idx);
+//         // for(auto d : ArrAxes<FIELD::Dim>()){
+//         //     if(didx[d] != 0 ){
+//         //         auto idxng = idxg.shift(d, -(Sign(didx[d])));
+//         //         if(! (ghost.is_ghost_vertex(idxng))){
+//         //             auto ori  = GetDeltaOrientOnAxe(idxng, idxg, d); 
+//         //             return Value(field, bi, idxng, idxg, d, ori, time); 
+//         //         }else{
+//         //             arridx[d] = idxng;
+//         //             arrexp[d] = _SFindBoundaryValue(field, bi, idx, idxng, time,
+//         //                 FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+//         //         }
+//         //     }
+//         // }
+//         // return _AverageCenterValueByDistance(field, idx, arridx, arrexp); 
+//     }
+// }
+// template<class FIELD>
+// auto FindBoundaryValue(
+//     FIELD&               field,
+//     const BoundaryIndex& bi,
+//     const typename FIELD::Index&  idx,
+//     const typename FIELD::Index&  idxg,
+//     const Vt&            time, 
+//     SFieldVertexTag)
+// {
+//     EXPAND_FIELD_TAG(FIELD);
+//     return _SFindBoundaryValue(field, bi, idx, idxg, time,
+//         FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
+// }
 
 } // namespace carpio
 

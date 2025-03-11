@@ -164,7 +164,7 @@ inline Axes Next(const Axes& a){
     return _X_;
 }
 
-inline Axes ToAxes(const St& i) {
+inline constexpr Axes ToAxes(const St& i) {
     ASSERT(i >= 0 && i < 3);
     switch (i) {
     case 0:
@@ -174,7 +174,7 @@ inline Axes ToAxes(const St& i) {
     case 2:
         return _Z_;
     default:
-        ASSERT_MSG(false, "Error input i");
+        ASSERT_MSG(false, "ToAxes(i) Error input i");
     }
     SHOULD_NOT_REACH;
     return _X_;
@@ -345,6 +345,16 @@ inline Orientation ToOrientation(const St& i) {
     }
     SHOULD_NOT_REACH;
     return _M_;
+}
+
+inline Orientation ToOrientationSign(const int& i) {
+    if(i < 0){
+        return _M_;
+    }else if(i > 0){
+        return _P_;
+    }else{
+        return _C_;
+    }
 }
 
 enum CoorPlane {
