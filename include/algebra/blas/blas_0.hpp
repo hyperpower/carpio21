@@ -9,7 +9,11 @@
 #ifdef OPENMP
 #include <omp.h>
 #endif
-
+#ifdef __x86_64__
+#include <immintrin.h>
+#elif defined(__arm64__)
+#include <arm_neon.h>
+#endif
 
 namespace carpio {
 template<typename ST, typename VT>
@@ -49,6 +53,7 @@ void DivideEqual(  const ST& , VT*, const VT&);
 
 template<typename ST, typename VT>
 void Assign(const ST& len, VT* src, const VT& value){
+#pragma omp parallel for
     for (int i = 0; i < len; ++i) {
         src[i] = value;
     }
@@ -56,7 +61,7 @@ void Assign(const ST& len, VT* src, const VT& value){
 
 template<typename ST, typename VT>
 void AddEqual(const ST& n, VT* src, const VT* dst) {
-#pragma omp parallel for
+// #pragma omp parallel for if(n > 1e5)
     for (int i = 0; i < n; ++i) {
         src[i] += dst[i];
     }
@@ -64,7 +69,34 @@ void AddEqual(const ST& n, VT* src, const VT* dst) {
 template<typename ST, typename VT, typename VT2>
 void AddEqual(const ST& n, VT* src, const VT2* dst) {
 #pragma omp parallel for
-    for (int i = 0; i < n; ++i) {
+    for (ST i = 0; i < n; ++i) {
+        src[i] += dst[i];
+    }
+}
+
+template<typename ST>
+void AddEqual_(const ST& n, float32_t* src, const float32_t* dst){
+	ST i = 0;
+	#ifdef __arm64__
+	for (; i <= n - 4; i += 4) {
+        auto vr = vaddq_f32(vld1q_f32(&src[i]), vld1q_f32(&dst[i]));
+        vst1q_f32(&src[i], vr);
+    }
+	#endif
+	for (; i < n; ++i) {
+        src[i] += dst[i];
+    }
+}
+template<typename ST>
+void AddEqual_(const ST& n, float64_t* src, const float64_t* dst){
+	ST i = 0;
+	#ifdef __arm64__
+	for (; i <= n - 2; i += 2) {
+        auto vr = vaddq_f64(vld1q_f64(&src[i]), vld1q_f64(&dst[i]));
+        vst1q_f64(&src[i], vr);
+    }
+	#endif
+	for (; i < n; ++i) {
         src[i] += dst[i];
     }
 }

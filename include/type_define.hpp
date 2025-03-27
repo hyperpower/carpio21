@@ -11,7 +11,7 @@
 #include <utility>     // for std::invoke()
 #ifdef OPENMP
 #include <omp.h>
-#endif
+#endif 
 
 #define ASSERT(expr) assert(expr)
 // #define ASSERT_MSG(expr, msg) assert((expr)&&(msg))

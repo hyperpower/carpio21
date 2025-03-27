@@ -53,8 +53,8 @@ public:
     // volume ==================================
     virtual inline Vt volume(const Index&) const {return 0;};
     // center ==================================
-    virtual Point c (Idx i, Idx j = 0, Idx k = 0)     const {return Point();}
-    virtual Point c (const Index&)              const {return Point();}
+    virtual inline Point c (Idx i, Idx j = 0, Idx k = 0)     const {return Point();}
+    virtual inline Point c (const Index&)              const {return Point();}
     virtual Vt  c_(const St& dim, const Idx& idx)   const {return 0;}
     virtual Vt  c_(const St& dim, const Index& idx) const {return 0;}
 

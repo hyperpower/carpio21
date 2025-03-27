@@ -17,6 +17,7 @@ endif (POLICY CMP0054)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 # window pre-define
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -35,20 +36,35 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(STATUS "COMPILER is GCC")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message(STATUS "COMPILER is Clang")
+    
 endif()
 
 
 # openmp
-OPTION(ENABLE_OPENMP "Enable openmp" OFF) # Enabled by default¢
-if (ENABLE_OPENMP)
-    message(STATUS "======== LOOKING FOR OPENMP ========================")
-    find_package(OpenMP REQUIRED)
-	if (OpenMP_CXX_FOUND)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        add_definitions(-DOPENMP)
-	endif()
-endif()
+OPTION(ENABLE_OPENMP "Enable openmp" ON) # Enabled by default
+IF(ENABLE_OPENMP)
+  message(STATUS "======== LOOKING FOR OPENMP ========================")
+  if(APPLE)
+    if(CMAKE_C_COMPILER_ID MATCHES "Clang\$")
+        set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp")
+        set(OpenMP_C_LIB_NAMES "omp")
+        set(OpenMP_omp_LIBRARY omp)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
+        set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
+        set(OpenMP_CXX_LIB_NAMES "omp")
+        set(OpenMP_omp_LIBRARY omp)
+    endif()
+  endif()
+  find_package(OpenMP REQUIRED)
+  if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+    add_definitions(-DOPENMP)
+  endif(OPENMP_FOUND) 
+ENDIF(ENABLE_OPENMP)
 
 
 # external project download form github

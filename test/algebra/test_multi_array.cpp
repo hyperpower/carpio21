@@ -1,11 +1,11 @@
 #include "algebra/array/multi_array.hpp"
 #include "gtest/gtest.h"
-#include "utility/clock.hpp"
 #include <valarray>
-
+#include <chrono>
 #include <omp.h>
 
 using namespace carpio;
+typedef std::chrono::milliseconds ms;
 
 TEST(array, add){
 	ArrayListV_<double> arrd(5);
@@ -49,13 +49,13 @@ TEST(array, openmp){
 	b.assign(1);
 	// a.show();
 	// b.show();
-	tick_t start = Clock::Tick();
+	auto start = std::chrono::steady_clock::now();
 	// omp_set_num_threads(1);
 //#pragma omp parallel
 	b = a + b - a * b + 5.0 * a;
 //  b.show();
-	tick_t end = Clock::Tick();
- 	std::cout << "Time = " << Clock::TimespanToMillisecondsD(start, end) << "ms" << std::endl;
+	auto end = std::chrono::steady_clock::now();
+ 	std::cout << "Time = " << std::chrono::duration_cast<ms>(end - start).count() << "ms" << std::endl;
 //  a.show();
 }
 
@@ -64,9 +64,9 @@ TEST(array, std_valarray){
 	// std::array is slower for debug mode
 	std::cout << "test std::valarray" << std::endl;
 	std::valarray<double> a(2.0, 1e7), b(1.0, 1e7);
-	tick_t start = Clock::Tick();
+	auto start = std::chrono::steady_clock::now();
 	b = a + b - a * b + 5.0 * a;
-	tick_t end = Clock::Tick();
- 	std::cout << "Time = " << Clock::TimespanToMillisecondsD(start, end) << "ms" << std::endl;
+	auto end = std::chrono::steady_clock::now();
+ 	std::cout << "Time = " << std::chrono::duration_cast<ms>(end - start).count() << "ms" << std::endl;
 }
 

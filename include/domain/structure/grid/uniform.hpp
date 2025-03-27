@@ -143,7 +143,7 @@ public:
         return res;
     };
     // center ==================================
-    Point c(Idx i, Idx j = 0, Idx k = 0) const {
+    inline Point c(Idx i, Idx j = 0, Idx k = 0) const {
         Point res;
         Idx ai[] = { i, j, k };
         for (St d = 0; d < Dim; ++d) {
@@ -151,7 +151,7 @@ public:
         }
         return res;
     }
-    Point c(const Index& index) const {
+    inline Point c(const Index& index) const {
         return c(index.i(), index.j(), index.k());
     }
     Vt  c_(const St& dim, const Idx& idx) const {

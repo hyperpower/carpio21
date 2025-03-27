@@ -327,9 +327,9 @@ VT Dot(ST n,         // size
 //
 
 template<class VT>
-VT Nrm1(const ArrayListV_<VT>& ax) {
+VT Nrm1(const ArrayListV_<VT>& arr) {
     typedef typename ArrayListV_<VT>::size_type St;
-    return Asum(ax.size(), ax.data(), St(1));
+    return Asum(arr.size(), arr.data(), St(1));
 }
 
 template<class VT>

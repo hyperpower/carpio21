@@ -693,14 +693,6 @@ ArrayListV_<V> operator-(const V &a, const ArrayListV_<V>& x){
 	res -= x;
 	return res;
 }
-//template<typename V>
-//ArrayListV_<V> ArrayListV_<V>::operator+(const ArrayListV_<V> &a) {
-//    ASSERT(a.size() == this->size());
-//    ArrayListV_<V> res(this->m_Len);
-//    Copy_(a.size(), this->m_p, res.m_p);
-//    AddEqual(a.size(), a.m_p, res.m_p);
-//    return res;
-//}
 template<typename V>
 ArrayListV_<V> ArrayListV_<V>::operator-() const{
 	ArrayListV_<V> tmp(this->m_Len);
@@ -718,6 +710,14 @@ ArrayListV_<V> ArrayListV_<V>::operator*(const ArrayListV_<V> &a) {
     return tmp;
 }
 template<typename V>
+ArrayListV_<V> ArrayListV_<V>::operator*(const V &a) {
+    ArrayListV_<V> sum(this->m_Len);
+    for (size_type i = 0; i < this->m_Len; i++) {
+        sum[i] = this->m_p[i] * a;
+    }
+    return sum;
+}
+template<typename V>
 ArrayListV_<V> ArrayListV_<V>::operator/(const ArrayListV_<V> &a) {
     ASSERT(a.size() == this->size());
     ArrayListV_<V> tmp(this->m_Len);
@@ -726,14 +726,7 @@ ArrayListV_<V> ArrayListV_<V>::operator/(const ArrayListV_<V> &a) {
     }
     return tmp;
 }
-template<typename V>
-ArrayListV_<V> ArrayListV_<V>::operator*(const V &a) {
-    ArrayListV_<V> sum(this->m_Len);
-    for (size_type i = 0; i < this->m_Len; i++) {
-        sum[i] = this->m_p[i] * a;
-    }
-    return sum;
-}
+
 template<typename V>
 ArrayListV_<V> ArrayListV_<V>::operator/(const V &a) {
     ArrayListV_<V> sum(this->m_Len);
@@ -888,32 +881,18 @@ ArrayListV_<V>& ArrayListV_<V>::operator/=(const V &a) {
 	DivideEqual(this->size(), this->m_p, a);
     return *this;
 }
-// template<typename V>
-// ArrayListV_<V>& ArrayListV_<V>::operator+=(const ArrayListV_<V> &a) {
-// 	ASSERT(this->size() == a.size());
-// 	AddEqual(this->size(), this->m_p, a.m_p);
-//     return *this;
-// }
 template<typename V>
 ArrayListV_<V>& ArrayListV_<V>::operator-=(const ArrayListV_<V> &a) {
 	ASSERT(this->size() == a.size());
 	MinusEqual(this->size(), this->m_p, a.m_p);
     return *this;
 }
-// template<typename V>
-// ArrayListV_<V>& ArrayListV_<V>::operator*=(const ArrayListV_<V> &a) {
-// 	ASSERT(this->size() == a.size());
-// 	MultiplyEqual(this->size(), this->m_p, a.m_p);
-//     return *this;
-// }
 template<typename V>
 ArrayListV_<V>& ArrayListV_<V>::operator/=(const ArrayListV_<V> &a) {
 	ASSERT(this->size() == a.size());
 	DivideEqual(this->size(), this->m_p, a.m_p);
     return *this;
 }
-
-
 template<typename V>
 ArrayListV_<V> operator*(const V& a, const ArrayListV_<V>& x) {
     ArrayListV_<V> res(x);

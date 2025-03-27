@@ -4,7 +4,6 @@
 #include <thread>
 #include <sstream>
 #include <chrono>
-#include "utility/clock.hpp"
 #ifdef OPENMP
 #include <omp.h>
 #endif 
@@ -135,9 +134,9 @@ double ArrayOp(int nt, double na){
     a.assign(2);
     b.assign(1);
     omp_set_num_threads(nt);
-    auto start = std::chrono::system_clock::now();
+    auto start = std::chrono::steady_clock::now();
     b = a + b - a * b + 5.0 * a;
-    auto end  = std::chrono::system_clock::now();
+    auto end  = std::chrono::steady_clock::now();
     std::cout << "Num of threads = " << nt;
     std::cout << " Size = " << na;
     auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
@@ -150,7 +149,7 @@ void ArrayOpPlot(){
     gnu.set_terminal_png("./fig/arrayop");
     gnu.set_grid();
     gnu.set("key left top");
-    gnu.set_yrange(0.0, 1.0);
+    gnu.set_yrange(0.0, 2.0);
     gnu.set_xlabel("Single Thread Wall Time (ms)");
     gnu.set_ylabel("Ratio");
     gnu.set_xlogscale();
