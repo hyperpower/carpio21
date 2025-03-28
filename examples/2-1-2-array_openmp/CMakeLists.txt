@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 project(array_openmp)
 
 message(STATUS "CXX COMPILER NAME    = ${CMAKE_CXX_COMPILER}")
@@ -17,20 +17,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/)
 
 set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
-# python =======
-set(REQUIRED_PYTHON_VERSION 3.4)
-# message(STATUS "======== LOOKING FOR PYTHON ${REQUIRED_PYTHON_VERSION} ========================")
-find_package ( PythonInterp ${REQUIRED_PYTHON_VERSION} REQUIRED)
-find_package ( PythonLibs ${REQUIRED_PYTHON_VERSION} REQUIRED)
+if(CMAKE_CXX_FLAGS_RELEASE MATCHES "-O[0-3]")
+    string(REPLACE "-O0" "-O3" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    string(REPLACE "-O1" "-O3" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+endif()
 
-message(STATUS "PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}")
-
-IF(PYTHONLIBS_FOUND)
-  INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}")
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
-ENDIF()
-# end python ===
 
 OPTION(ENABLE_OPENMP "Enable openmp" ON) # Enabled by default
 IF(ENABLE_OPENMP)
@@ -63,13 +57,6 @@ INCLUDE_DIRECTORIES(
 )
 
 add_executable(main ${SOURCE_FILES})
-
-
-if(PYTHON_LIBRARIES)
-  TARGET_LINK_LIBRARIES(main ${PYTHON_LIBRARIES})
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to link python libraries")
-ENDIF()
 
 if(APPLE)
   include_directories("/opt/homebrew/opt/libomp/include/")

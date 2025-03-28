@@ -42,7 +42,7 @@ int ThreadPrint(int nt){
 // input singal task time in milliseconds
 // ouput wall time of parallel runing
 double TimeTest(double single_dt, int n_threads, int n_loop){
-    auto begin = std::chrono::system_clock::now();
+    auto begin = std::chrono::steady_clock::now();
     omp_set_num_threads(n_threads);
 // #ifdef OPENMP
     // std::cout << "num thread = " << nt << std::endl;
@@ -58,7 +58,7 @@ double TimeTest(double single_dt, int n_threads, int n_loop){
 #endif
     }
 // #endif
-    auto end = std::chrono::system_clock::now();
+    auto end = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
     
     return elapsed.count() / 1000.0;
@@ -129,19 +129,37 @@ void TimeTestPlot(){
     gnu.plot();
 }
 
-double ArrayOp(int nt, double na){
-    ArrayListV_<double> a(na), b(na);
+template<class ST, class ARR>
+void ArrayOp(const ST& n, const ARR& a, const ARR& b, ARR& res){
+    #pragma omp parallel for
+    for (ST i = 0; i < n; ++i) {
+        res[i] = a[i] + b[i] - 3.0;
+    }
+    #pragma omp parallel for
+    for (ST i = 0; i < n; ++i) {
+        res[i] -= b[i];
+        res[i] *= b[i];
+        res[i] /= b[i];
+    }
+    #pragma omp parallel for
+    for (ST i = 0; i < n; ++i) {
+        res[i] += 4.0;
+    } 
+}
+
+double ArrayOpTest(int nt, double na){
+    ArrayListV_<double> a(na), b(na), res(na);
     a.assign(2);
     b.assign(1);
     omp_set_num_threads(nt);
     auto start = std::chrono::steady_clock::now();
-    b = a + b - a * b + 5.0 * a;
+    ArrayOp(int(na), a, b, res);
     auto end  = std::chrono::steady_clock::now();
     std::cout << "Num of threads = " << nt;
     std::cout << " Size = " << na;
     auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << " Time = " << elapsed.count() / 1000.0 << "ms" << std::endl;
-    return elapsed.count();
+    std::cout << " Time = " << elapsed.count() / 1000.0<< "ms" << std::endl;
+    return elapsed.count() / 1000.0;
 }
 
 void ArrayOpPlot(){
@@ -149,23 +167,24 @@ void ArrayOpPlot(){
     gnu.set_terminal_png("./fig/arrayop");
     gnu.set_grid();
     gnu.set("key left top");
-    gnu.set_yrange(0.0, 2.0);
+    gnu.set_yrange(0.0, 1.2);
     gnu.set_xlabel("Single Thread Wall Time (ms)");
     gnu.set_ylabel("Ratio");
     gnu.set_xlogscale();
     // gnu.set_ylogscale();
-    ArrayListV_<double> vna = {1e4, 1e5, 1e6, 5e6, 1e7, 5e7, 1e8, 5e8};
+    ArrayListV_<double> vna = {1e4, 1e5, 1e6, 5e6, 1e7, 3e7, 5e7, 1e8, 2e8, 3e8};
+    // ArrayListV_<double> vna = {1e4, 1e5, 1e6, 5e6};
     ArrayListV_<double> vnt = {2, 4, 6, 8}; // n > 2
     ArrayListV_<double> vst(vna.size());
     for(int i = 0; i< vna.size(); i++){
-        vst[i] = ArrayOp(1, vna[i]);
+        vst[i] = ArrayOpTest(1, vna[i]);
     }
     for(auto& nt: vnt){
         ArrayListV_<double> vr;
         ArrayListV_<double> vdt;
         for(int i = 0; i< vna.size(); i++){
             auto st = vst[i];
-            auto dt = ArrayOp(nt, vna[i]);
+            auto dt = ArrayOpTest(nt, vna[i]);
             double r = st / dt / nt;
             vr.push_back(r);
             vdt.push_back(st);
