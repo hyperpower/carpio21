@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include <valarray>
 #include <chrono>
+#include <armadillo>
 
 using namespace carpio;
 typedef std::chrono::milliseconds ms;
@@ -10,16 +11,16 @@ typedef float ft;
 
 auto test_vector_add(const long& n){
     std::cout << "n : " << n << "  ";
+    auto start = std::chrono::steady_clock::now();
     ft* a = new ft[n];
     ft* b = new ft[n];
     ft* result = new ft[n];
 
     for (int i = 0; i < n; ++i) {
-        a[i] = i * 1.0f;
-        b[i] = 1.0f;
+        a[i] = i * 1.0;
+        b[i] = 1.0;
     }
 
-    auto start = std::chrono::steady_clock::now();
     AddEqual(n, a, b);
     auto end = std::chrono::steady_clock::now();
 
@@ -34,16 +35,16 @@ auto test_vector_add(const long& n){
 
 auto test_vector_add_simd(const long& n){
     std::cout << "n : " << n << "  ";
+    auto start = std::chrono::steady_clock::now();
     ft* a = new ft[n];
     ft* b = new ft[n];
     ft* result = new ft[n];
 
     for (int i = 0; i < n; ++i) {
-        a[i] = i * 1.0f;
-        b[i] = 1.0f;
+        a[i] = i * 1.0;
+        b[i] = 1.0;
     }
 
-    auto start = std::chrono::steady_clock::now();
     AddEqual_(n, a, b);
     auto end = std::chrono::steady_clock::now();
 
@@ -54,6 +55,26 @@ auto test_vector_add_simd(const long& n){
     delete[] b;
     delete[] result;
     return duration; 
+}
+
+auto test_vector_add_arma(const long& n){
+    std::cout << "n : " << n << "  ";
+    auto start = std::chrono::steady_clock::now();
+    arma::vec v1(n); 
+    arma::vec v2(n); 
+
+    for (int i = 0; i < n; ++i) {
+        v1[i] = i * 1.0;
+        v2[i] = 1.0;
+    }
+
+    auto res = v1 + v2;
+    
+    auto end = std::chrono::steady_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "arma Time: " << duration.count() << " us" << std::endl;
+    return duration;
 }
 
 TEST(array, add_correct){
@@ -70,6 +91,7 @@ TEST(array, add_correct){
 }
 
 TEST(array, add){
-	auto dt  = test_vector_add(9e5);
-	auto dt2 = test_vector_add_simd(9e5);
+	auto dt  = test_vector_add(9e7);
+	auto dt2 = test_vector_add_simd(9e7);
+	auto dta = test_vector_add_arma(9e7);
 }

@@ -11,8 +11,12 @@ set(Sources
     # test_number.cpp
     # test_rational.cpp
 )
+find_package(Armadillo)
 
 add_executable(${This} ${Sources})
+
+target_include_directories(${This} PRIVATE ${ARMADILLO_INCLUDE_DIRS})
+# target_link_libraries(${This} PRIVATE ${ARMADILLO_LIBRARIES})
 
 # target_link_libraries(${This} PUBLIC
 #     gtest_main
@@ -22,8 +26,9 @@ if(APPLE)
   include_directories("/opt/homebrew/opt/libomp/include/")
   link_directories("/opt/homebrew/opt/libomp/lib/")
   target_link_directories(${This} PUBLIC "/opt/homebrew/opt/libomp/lib/")
-  target_link_libraries(${This} gtest_main omp)
 endif()
+
+target_link_libraries(${This} gtest_main omp ${ARMADILLO_LIBRARIES})
 
 add_test(
     NAME ${This}
