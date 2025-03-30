@@ -443,7 +443,7 @@ GnuplotActor _SFieldCenterToGASection(const ANY& f, Axes a, Vt v,
     for (auto &index : f.order()){
         Vt fpm = grid.f_(a, _M_, index);
         Vt fpp = grid.f_(a, _P_, index);
-        if (IsInRange(fpm, v, fpp, _co_)) {
+        if (IsInInterval(fpm, v, fpp, _co_)) {
             Vt cor = grid.c_((a == _X_) ? _Y_ : _X_, index);
             Vt val = f(index);
             actor.data().push_back(ToString(cor, val, val," "));

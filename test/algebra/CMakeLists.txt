@@ -3,19 +3,27 @@ cmake_minimum_required(VERSION 3.0)
 set(This Algebra)
 
 set(Sources
-    test_SIMD.cpp
+    # test_SIMD.cpp
     # test_solver_jacobi.cpp
     # test_linear_polynomial.cpp
     # test_multi_array.cpp
     # test_matrix_sparse.cpp
     # test_number.cpp
+    test_interp.cpp
     # test_rational.cpp
 )
 find_package(Armadillo)
+if(APPLE)
+    find_library(ACCELERATE_LIBRARY Accelerate)
+else()
+    message(FATAL_ERROR "This project only supports macOS!")
+endif()
+
 
 add_executable(${This} ${Sources})
 
 target_include_directories(${This} PRIVATE ${ARMADILLO_INCLUDE_DIRS})
+# target_include_directories(${This} PRIVATE ${ACCELERATE_INCLUDE_DIRS})
 # target_link_libraries(${This} PRIVATE ${ARMADILLO_LIBRARIES})
 
 # target_link_libraries(${This} PUBLIC

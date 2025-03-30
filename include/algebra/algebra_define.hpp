@@ -36,7 +36,7 @@ inline bool IsSameSign(const TYPE& x, const TYPE& y){
         return false;
     }
 }
-enum Range {
+enum IntervalType {
     _oo_, _oc_, _co_, _cc_,
 };
 

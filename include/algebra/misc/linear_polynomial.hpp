@@ -2,6 +2,7 @@
 #define _LINEAR_POLYNOMIAL_H_
 
 #include "type_define.hpp"
+#include "algebra/number/number_define.hpp"
 #include <utility>
 #include <map>
 

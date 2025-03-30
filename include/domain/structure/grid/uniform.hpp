@@ -343,7 +343,7 @@ public:
             Vt min = this->_min[d];
             Vt max = _cs * _n[d] + this->_min[d];
             Vt val = p[d];
-            res = res && IsInRange(min, val, max, _cc_);
+            res = res && IsInInterval(min, val, max, _cc_);
         }
         return res;
     }

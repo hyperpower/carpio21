@@ -33,8 +33,8 @@ IntersectLineSegment(
 		Point pe(ex, ey);
 		Point max = Max(ps, pe);
 		Point min = Min(ps, pe);
-		if (IsInRange(min.x(), res->x(), max.x(), _cc_)
-				&& IsInRange(min.y(), res->y(), max.y(), _cc_)) {
+		if (IsInInterval(min.x(), res->x(), max.x(), _cc_)
+				&& IsInInterval(min.y(), res->y(), max.y(), _cc_)) {
 			return res;
 		} else {
 			return std::shared_ptr<Point_<TYPE, 2> >(nullptr);

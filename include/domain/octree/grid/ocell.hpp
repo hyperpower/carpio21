@@ -150,13 +150,13 @@ protected:
 
 public:
 	bool is_in_on(const vt& x, const vt& y = 0, const vt& z = 0) const {
-		return (IsInRange(this->get(_M_, _X_), x, this->get(_P_, _X_), _cc_)
+		return (IsInInterval(this->get(_M_, _X_), x, this->get(_P_, _X_), _cc_)
 				&& ((Dim >= 2) ?
-						IsInRange(this->get(_M_, _Y_), y, this->get(_P_, _Y_),
+						IsInInterval(this->get(_M_, _Y_), y, this->get(_P_, _Y_),
 								_cc_) :
 						true)
 				&& ((Dim == 3) ?
-						IsInRange(this->get(_M_, _Z_), z, this->get(_P_, _Z_),
+						IsInInterval(this->get(_M_, _Z_), z, this->get(_P_, _Z_),
 								_cc_) :
 						true));
 	}
@@ -169,11 +169,11 @@ public:
 			return false;
 		}
 	}
-	bool is_in_on(const Axes& axes, const vt& cor, Range r = _cc_) const {
+	bool is_in_on(const Axes& axes, const vt& cor, IntervalType r = _cc_) const {
 		ASSERT(axes < Dim);
 		vt m = this->get(_M_, axes);
 		vt p = this->get(_P_, axes);
-		return IsInRange(m, cor, p, r);
+		return IsInInterval(m, cor, p, r);
 	}
 	bool is_in_on(const Segment_<vt, Dim>& seg) {
 		if (Dim >= 2) {

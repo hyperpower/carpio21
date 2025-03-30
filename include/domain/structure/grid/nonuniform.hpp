@@ -343,7 +343,7 @@ public:
             Vt min = this->_min[d];
             Vt max = this->_max[d];
             Vt val = p[d];
-            res = res && carpio::IsInRange(min, val, max, _cc_);
+            res = res && carpio::IsInInterval(min, val, max, _cc_);
         }
         return res;
     }

@@ -53,8 +53,6 @@ public:
 		return 0;
 	}
 
-
-
 	int max_iter() const {
 		return this->_max_iter;
 	}

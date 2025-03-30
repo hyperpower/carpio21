@@ -438,14 +438,7 @@ inline int Sign(const TYPE& x) {
         return 0;
     }
 }
-template <class TYPE>
-inline bool IsCloseTo(const TYPE& v, const TYPE& dst, const Vt tol = 1e-12){
-    return std::abs(v - dst) < tol;
-}
-template <class TYPE>
-inline bool IsCloseToZero(const TYPE& v, const Vt tol = 1e-12){
-    return std::abs(v - 0.0) < tol;
-}
+
 
 
 inline int LoopNext(const int& bgn, const int& end, const int& cur){

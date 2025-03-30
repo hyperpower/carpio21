@@ -25,10 +25,21 @@ template<class T>
 auto Zero(const T& num){
     return T(0.0);
 }
-template<class T, typename = std::enable_if_t<!std::is_integral<T>::value> >
-T EpsilonForComparison(const T& x, const T& y){
+
+template <class TYPE>
+inline bool IsCloseTo(const TYPE& v, const TYPE& dst, const Vt tol = 1e-12){
+    return std::abs(v - dst) < tol;
+}
+template <class TYPE>
+inline bool IsCloseToZero(const TYPE& v, const Vt tol = 1e-12){
+    return std::abs(v - 0.0) < tol;
+}
+
+template<class T>
+std::enable_if_t<std::is_floating_point<T>::value, T> 
+EpsilonForComparison(const T& x, const T& y){
     auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
-    return std::numeric_limits<T>::epsilon()*maxXYOne;
+    return std::numeric_limits<T>::epsilon() * maxXYOne;
 }
 template<class T ,
          typename std::enable_if<
@@ -69,12 +80,12 @@ inline bool IsGreaterEqual(const T& x, const T& y){  // x < y
 }
 template<typename T>
 inline std::enable_if_t<std::is_floating_point<T>::value, bool> 
-IsInRange(const T& down, const T& value, const T& up, Range range) {
+IsInInterval(const T& down, const T& value, const T& up, IntervalType interval) {
     auto maxXYOne = std::max( { T(1.0), std::fabs(down) , std::fabs(up), std::fabs(value) } );
     auto e = std::numeric_limits<T>::epsilon()*maxXYOne;
     auto vmd = value - down;
     auto umv = up - value;
-    switch (range) {
+    switch (interval) {
     case _oo_:
         return ((vmd >  e) && (umv >  e)) ? true : false;
     case _oc_:
@@ -88,8 +99,8 @@ IsInRange(const T& down, const T& value, const T& up, Range range) {
 }
 template<typename T>
 inline std::enable_if_t<std::is_integral<T>::value, bool> 
-IsInRange(const T& down, const T& value, const T& up, Range range) {
-    switch (range) {
+IsInInterval(const T& down, const T& value, const T& up, IntervalType interval) {
+    switch (interval) {
     case _oo_:
         return ((down < value) && (value < up)) ? true : false;
     case _oc_:
