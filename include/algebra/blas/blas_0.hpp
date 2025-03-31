@@ -61,16 +61,17 @@ void Assign(const ST& len, VT* src, const VT& value){
 
 template<typename ST, typename VT>
 void AddEqual(const ST& n, VT* src, const VT* dst) {
-// #pragma omp parallel for if(n > 1e5)
+#pragma omp parallel for
     for (int i = 0; i < n; ++i) {
         src[i] += dst[i];
     }
 }
 template<typename ST, typename VT, typename VT2>
-void AddEqual(const ST& n, VT* src, const VT2* dst) {
+void AddEqual(const ST& n, VT* a, const VT2* b) {
+	// std::cout << "Add Equal 2T" << std::endl;
 #pragma omp parallel for
     for (ST i = 0; i < n; ++i) {
-        src[i] += dst[i];
+        a[i] += b[i];
     }
 }
 
@@ -103,14 +104,14 @@ void AddEqual_(const ST& n, float64_t* src, const float64_t* dst){
 template<typename ST, typename VT>
 void MinusEqual(const ST& n, VT* src, const VT* dst) {
 #pragma omp parallel for
-	for (int i = 0; i < n; ++i) {
+	for (ST i = 0; i < n; ++i) {
 		src[i] -= dst[i];
 	}
 }
 template<typename ST, typename VT, typename VT2>
 void MinusEqual(const ST& n, VT* src, const VT2* dst) {
 #pragma omp parallel for
-	for (int i = 0; i < n; ++i) {
+	for (ST i = 0; i < n; ++i) {
 		src[i] -= dst[i];
 	}
 }
@@ -191,6 +192,16 @@ void Nagative(const ST& n, const VT* src,  VT* dst) {
 		dst[i] =  -(src[i]);
 	}
 }
+
+
+template<typename ST, typename VT>
+void Add(const ST& n, const VT* a, const VT* b, VT* c) {
+#pragma omp parallel for
+    for (ST i = 0; i < n; ++i) {
+        c[i] = a[i] + b[i];
+    }
+}
+
 }
 
 #endif

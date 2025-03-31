@@ -40,13 +40,17 @@ public:
     void reconstruct(size_type Len);
     //arrayListV(V *nd, size_type Len);
     //opertator====================================
-    ref_Self operator+=(const value_type& a);
+    ref_Self operator+=(const value_type& a){
+        AddEqual(this->size(), this->m_p, a);
+        return *this;
+    }
     ref_Self operator-=(const value_type& a);
     ref_Self operator*=(const V&);
     ref_Self operator/=(const value_type& a);
-    // ref_Self operator+=(const Self& a);
+
     template<class VT2>
     ref_Self operator+=(const ArrayListV_<VT2>& a){
+        // std::cout << "AL operator+= 2T" << std::endl;
         ASSERT(this->size() == a.size());
 	    AddEqual(this->size(), this->m_p, a.data());
         return *this;
@@ -98,8 +102,8 @@ public:
 
     void show() const;
 };
-template<typename V>
-ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V> &y);
+// template<typename V>
+// ArrayListV_<V> operator+(const ArrayListV_<V>& x, const ArrayListV_<V> &y);
 
 template<typename V, typename V2>
 ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V2> &y);
@@ -171,10 +175,12 @@ void ArrayListV_<V>::reconstruct(size_type Len) {
 }
 
 template<typename V>
-ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V> &y){
+ArrayListV_<V> operator+(const ArrayListV_<V>& x, const ArrayListV_<V> &y){
 	ASSERT(x.size() == y.size());
-	x += y;
-	return x;
+    ArrayListV_<V> res(x.size());
+    // std::cout << "here" << std::endl;
+	Add(x.size(), x.data(), y.data(), res.data());
+	return res;
 }
 template<typename V, typename V2>
 ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V2> &y){
@@ -380,11 +386,6 @@ void ArrayListV_<V>::show() const {
     }
 }
 //=========================================================
-template<typename V>
-ArrayListV_<V>& ArrayListV_<V>::operator+=(const V &a) {
-    AddEqual(this->size(), this->m_p, a);
-    return *this;
-}
 template<typename V>
 ArrayListV_<V>& ArrayListV_<V>::operator-=(const V &a) {
 	MinusEqual(this->size(), this->m_p, a);

@@ -127,6 +127,7 @@ ArrayListT_<T>::ArrayListT_() {
 
 template<typename T>
 ArrayListT_<T>::ArrayListT_(const ArrayListT_<T>& a) {
+    // std::cout << "ArrayListT assgin &" << std::endl;
     m_Len = a.size();
     m_p   = new T[m_Len];
     //unrolled loop
@@ -134,6 +135,7 @@ ArrayListT_<T>::ArrayListT_(const ArrayListT_<T>& a) {
 }
 template<typename T>
 ArrayListT_<T>::ArrayListT_(ArrayListT_<T>&& a) {
+    // std::cout << "ArrayListT move" << std::endl;
     m_Len = a.m_Len;
     m_p   = a.m_p;
     a.m_Len = 0;
@@ -237,6 +239,7 @@ T& ArrayListT_<T>::at(size_type index) {
 
 template<typename T>
 ArrayListT_<T>& ArrayListT_<T>::operator=(const ArrayListT_<T> &a) {
+    // std::cout << "ArrayListT operator= &" << std::endl;
     if (this == &a) {
         return *this;
     }
@@ -257,6 +260,7 @@ ArrayListT_<T>& ArrayListT_<T>::operator=(const ArrayListT_<T> &a) {
 }
 template<typename T>
 ArrayListT_<T>& ArrayListT_<T>::operator=(ArrayListT_<T> &&a) {
+    // std::cout << "ArrayListT operator= &&" << std::endl;
     if (this == &a) {
         return *this;
     } else {

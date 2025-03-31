@@ -64,6 +64,11 @@ class MultiArray_ {
 		}
 		this->m_array.reconstruct(len);
     }
+    MultiArray_(Self&& a) {
+        // std::cout << "MultiArray move" << std::endl;
+        this->m_len = a.m_len;
+        this->m_array = a.m_array;
+    }
 
     void reconstruct(St iLen, St jLen = 0, St kLen= 0){
 		St len         = iLen;

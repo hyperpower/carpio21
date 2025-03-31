@@ -68,7 +68,10 @@ class MultiArrayV_ {
 		}
 		this->m_array.reconstruct(len);
     }
-
+	MultiArrayV_(Self&& a): 
+		m_len(std::move(a.m_len)), m_array(std::move(a.m_array)){
+        // std::cout << "MultiArray move" << std::endl;
+    }
     void reconstruct(St iLen, St jLen = 0, St kLen= 0){
 		St Len = 0;
 		this->m_len[0] = iLen;
@@ -272,6 +275,7 @@ class MultiArrayV_ {
 	}
 	template<class VT2>
 	ref_Self operator+=(const MultiArrayV_<VT2, Dim>& a) {
+		// std::cout << "MA operator+= 2T" << std::endl;
 		ASSERT(this->is_compatible(a));
 		m_array += a.array();
 		return *this;
@@ -324,6 +328,7 @@ template<typename V, typename V2, St DIM>
 MultiArrayV_<V, DIM> operator+(      MultiArrayV_<V, DIM>   x, 
                                const MultiArrayV_<V2, DIM> &y){
 	ASSERT(x.size() == y.size());
+    // std::cout << "MultiArrayV operator +" << std::endl;
 	x += y;
 	return x;
 }

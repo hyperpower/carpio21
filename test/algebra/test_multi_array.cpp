@@ -15,7 +15,9 @@ TEST(array, add){
 	arrd.assign(1.0);
 	arri.assign(2);
 
+	std::cout << "res = arrd + arri -->" << std::endl;
 	auto res = arrd + arri;
+	std::cout << "<--" << std::endl;
 
 	std::cout << "arrd[1] = " << arrd[1] << std::endl;
 	ASSERT_EQ(arrd[1], 1.0);
@@ -36,7 +38,9 @@ TEST(multiarray, multiarray){
 	mb.assign(2);
 	ASSERT_EQ(mb(0,0), 2);
 
+	std::cout << "a = ma + mb -->" << std::endl;
 	auto a = ma + mb;
+	std::cout << "<-- " << std::endl;
 
 	ASSERT_EQ(a(0,0), 3);
 	std::cout << "ma(0,0) = " << ma(0,0) << std::endl;

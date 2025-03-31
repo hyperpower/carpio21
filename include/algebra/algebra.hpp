@@ -3,7 +3,9 @@
 
 #include "algebra_define.hpp"
 #include "array/array_list.hpp"
+#include "array/array_list_v.hpp"
 #include "array/multi_array.hpp"
+#include "array/multi_array_v.hpp"
 #include "array/vector_list.hpp"
 #include "array/vector.hpp"
 #include "matrix/matrix.hpp"

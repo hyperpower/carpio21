@@ -4,8 +4,6 @@
 #include <thread>
 #include <sstream>
 #include <chrono>
-#include "io/gnuplot.hpp"
-#include "utility/tinyformat.hpp"
 #include <benchmark/benchmark.h>
 #include <armadillo>
 
@@ -19,7 +17,30 @@
 
 #include <valarray>
 
+#include "io/gnuplot.hpp"
+#include "utility/tinyformat.hpp"
+#include "algebra/algebra.hpp"
+
 using namespace carpio;
+
+typedef double ft;
+void BM_ALVectorAdd(benchmark::State& state) {
+    for (auto _ : state){
+        auto n = state.range(0);
+        ArrayListV_<ft> v1(n);
+        ArrayListV_<ft> v2(n);
+        ArrayListV_<ft> result(n);
+
+        for (decltype(n) i = 0; i < n; ++i){
+            v1[i] = i * 1.0;
+            v2[i] = 1.0;
+        }
+        result = v2;
+        // result = v1 - v2;
+
+        benchmark::DoNotOptimize(result);
+    }
+}
 
 typedef double ft;
 void BM_stdVectorAdd(benchmark::State& state) {
@@ -33,8 +54,8 @@ void BM_stdVectorAdd(benchmark::State& state) {
             v1[i] = i * 1.0;
             v2[i] = 1.0;
         }
-        result = v1 + v2;
-        result = v1 - v2;
+        result = v2;
+        // result = v1 - v2;
 
         benchmark::DoNotOptimize(result);
     }
@@ -70,8 +91,8 @@ void BM_ArmaVectorAdd(benchmark::State& state) {
             v2[i] = 1.0;
         }
         
-        result = v1 + v2;
-        result = v1 - v2;
+        result =  v2;
+        // result = v1 - v2;
 
         benchmark::DoNotOptimize(result);
     }
@@ -90,11 +111,11 @@ void BM_RawVectorAdd(benchmark::State& state) {
         }
 
         for (decltype(n) i = 0; i < n; ++i) {
-            result[i] = a[i] + b[i];
+            result[i] = b[i];
         }
-        for (decltype(n) i = 0; i < n; ++i) {
-            result[i] = a[i] - b[i];
-        }
+        // for (decltype(n) i = 0; i < n; ++i) {
+        //     result[i] = a[i] - b[i];
+        // }
 
         benchmark::DoNotOptimize(result);
         delete[] a;
@@ -140,7 +161,7 @@ void BM_SimdVectorAdd(benchmark::State& state) {
         }
 
         Add_(n, a, b, result);
-        Add_(n, a, b, result);
+        // Add_(n, a, b, result);
 
         benchmark::DoNotOptimize(result);
         delete[] a;
@@ -150,9 +171,10 @@ void BM_SimdVectorAdd(benchmark::State& state) {
 }
 BENCHMARK(BM_ArmaVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
 BENCHMARK(BM_RawVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
-BENCHMARK(BM_SimdVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
-BENCHMARK(BM_EigenVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
-BENCHMARK(BM_stdVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
+// BENCHMARK(BM_SimdVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
+// BENCHMARK(BM_EigenVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
+BENCHMARK(BM_stdVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13)
+BENCHMARK(BM_ALVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13)
 
 // BENCHMARK_MAIN();
 

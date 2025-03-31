@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
-
+#ifdef OPENMP
+#include <omp.h>
+#endif
 
 namespace carpio {
 
@@ -100,13 +102,7 @@ VT Asum(ST n, const VT* sx, ST incx){
 
 template<typename ST, typename VT>
 int Copy(ST n, const VT * src, VT* dst) {
-#ifdef OPENMP
-# pragma omp for
-    for (int i = 0; i < n; ++i) {
-        dst[i] = src[i];
-    }
-    return 1;
-#else
+    // std::cout << "copy" << std::endl;
     //make sure: the length of a and b is equal
     //           and n>0
     ST LN = 7;
@@ -118,6 +114,7 @@ int Copy(ST n, const VT * src, VT* dst) {
         return 1;
     }
     ST mp1 = m + 1;
+#pragma omp parallel for
     for (ST i = mp1; i < n; i += LN) {
         dst[i    ] = src[i    ];
         dst[i + 1] = src[i + 1];
@@ -127,8 +124,7 @@ int Copy(ST n, const VT * src, VT* dst) {
         dst[i + 5] = src[i + 5];
         dst[i + 6] = src[i + 6];
     }
-    return 2;
-#endif
+    return 0;
 }
 
 //construct givens plane rotation.
