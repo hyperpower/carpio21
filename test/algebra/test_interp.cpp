@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include <chrono>
 #include "algebra/interpolation/interp_lagrange.hpp"
-#include "algebra/array/array_list.hpp"
+#include "algebra/array/array_list_v.hpp"
 #include "io/gnuplot.hpp"
 
 using namespace carpio;

@@ -1,4 +1,5 @@
 #include "algebra/array/multi_array.hpp"
+#include "algebra/array/multi_array_v.hpp"
 #include "gtest/gtest.h"
 #include <valarray>
 #include <chrono>

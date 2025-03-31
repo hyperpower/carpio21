@@ -6,10 +6,10 @@ set(Sources
     # test_SIMD.cpp
     # test_solver_jacobi.cpp
     # test_linear_polynomial.cpp
-    # test_multi_array.cpp
+    test_multi_array.cpp
     # test_matrix_sparse.cpp
     # test_number.cpp
-    test_interp.cpp
+    # test_interp.cpp
     # test_rational.cpp
 )
 find_package(Armadillo)
