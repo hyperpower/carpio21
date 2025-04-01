@@ -178,7 +178,7 @@ template<typename V>
 ArrayListV_<V> operator+(const ArrayListV_<V>& x, const ArrayListV_<V> &y){
 	ASSERT(x.size() == y.size());
     ArrayListV_<V> res(x.size());
-    // std::cout << "here" << std::endl;
+    std::cout << "here" << std::endl;
 	Add(x.size(), x.data(), y.data(), res.data());
 	return res;
 }

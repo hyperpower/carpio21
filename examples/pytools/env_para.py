@@ -32,7 +32,7 @@ class TermColor():
     UNDERLINE = '\033[4m'
     RESET     = '\033[0m'
 
-CMSG_YES = TermColor.GREEN + "YSE" + TermColor.RESET
+CMSG_YES = TermColor.GREEN + "YES" + TermColor.RESET
 CMSG_NO  = TermColor.RED   + "NO" + TermColor.RESET
 
 # pip package 

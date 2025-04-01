@@ -195,10 +195,10 @@ void Nagative(const ST& n, const VT* src,  VT* dst) {
 
 
 template<typename ST, typename VT>
-void Add(const ST& n, const VT* a, const VT* b, VT* c) {
+void Add(const ST& n, const VT* a, const VT* b, VT* res) {
 #pragma omp parallel for
     for (ST i = 0; i < n; ++i) {
-        c[i] = a[i] + b[i];
+        res[i] = a[i] + b[i];
     }
 }
 

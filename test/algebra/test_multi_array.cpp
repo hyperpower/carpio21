@@ -5,10 +5,34 @@
 #include <chrono>
 #include <omp.h>
 
+#include <valarray>
+
 using namespace carpio;
 typedef std::chrono::milliseconds ms;
 
-TEST(array, add){
+typedef ArrayListV_<double> Array;
+// typedef std::valarray<double> Array;
+TEST(array, add_1T){
+	Array arr1(5);
+	Array arr2(5);
+
+	arr1 = 1.0;
+	arr2 = 2;
+
+	std::cout << "res = arrd + arri -->" << std::endl;
+	auto res = arr1 + arr2;
+	std::cout << "<--" << std::endl;
+
+	std::cout << "arr1[1] = " << arr1[1] << std::endl;
+	ASSERT_EQ(arr1[1], 1.0);
+	std::cout << "arr2[1] = " << arr2[1] << std::endl;
+	ASSERT_EQ(arr2[1], 2);
+	std::cout << "res[1]  = " << res[1] << std::endl;
+	ASSERT_EQ(res[1], 3);
+
+
+}
+TEST(array, add_2T){
 	ArrayListV_<double> arrd(5);
 	ArrayListV_<int> arri(5);
 

@@ -17,6 +17,11 @@ _PIP_PACKAGE_REQUIRED_ = [
     "jinja2"
 ]
 
+_GIT_CLONE_PACKAGE_ = {
+   "googletest" : "https://github.com/google/googletest.git",
+   "eigen" : "https://gitlab.com/libeigen/eigen.git",
+}
+
 def check_path():
     cwd = os.path.abspath(os.getcwd())
     if not cwd == _FILE_DIR_:
@@ -36,11 +41,26 @@ def check_and_new_folder(foldername):
     if not os.path.isdir("./" + foldername):
         os.mkdir("./" + foldername)
 
+def git_clone(name, url):
+    d   = "./external/" + name
+    if not os.path.isdir(d):
+        print("git clone " + name)
+        os.system(" git clone --progress %s %s" % (url, d))
+    else:
+        print(d + " exist")
+
 def download_googletest():
     print("git clone googletest")
     d   = "./external/googletest"
     url = "https://github.com/google/googletest.git"
     os.system(" git clone --progress %s %s" % (url, d))
+
+def download_eigen():
+    print("git clone eigen")
+    d   = "./external/eigen"
+    url = "https://gitlab.com/libeigen/eigen.git"
+    os.system(" git clone --progress %s %s" % (url, d))
+
 
 def download_ffmpeg():
     print("download ffmpeg")
@@ -105,10 +125,8 @@ def main():
     check_pip_packages(_PIP_PACKAGE_REQUIRED_)
     check_and_new_folder("external")
     check_and_new_folder("fig")
-    if not os.path.isdir("./external/googletest"):
-        download_googletest()
-    else:
-        print("./external/googletest exist")
+    for name, url in _GIT_CLONE_PACKAGE_.items():
+        git_clone(name, url)
     restore_path()    
 
 if __name__ == '__main__':

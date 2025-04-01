@@ -59,8 +59,9 @@ def plot_data_frame_box(df, name_op):
     plt.figure(figsize=(6, 5))
     bar_width = 0.18   
 
-    sizes       = df['Size'].unique()
+    sizes        = df['Size'].unique()
     series_names = df['Name'].unique()
+    series_names.sort()
 
     index = range(len(sizes))
 
@@ -84,6 +85,7 @@ def plot_data_frame_box_r(df, name_op, name_ref):
 
     sizes        = df['Size'].unique()
     series_names = df['Name'].unique()
+    series_names.sort()
 
     index = range(len(sizes))
     

@@ -24,79 +24,29 @@
 using namespace carpio;
 
 typedef double ft;
-void BM_ALVectorAdd(benchmark::State& state) {
+template<class VECTORTYPE>
+void BM_VectorAdd(benchmark::State& state){
     for (auto _ : state){
         auto n = state.range(0);
-        ArrayListV_<ft> v1(n);
-        ArrayListV_<ft> v2(n);
-        ArrayListV_<ft> result(n);
+        VECTORTYPE v1(n);
+        VECTORTYPE v2(n);
+        VECTORTYPE result(n);
 
         for (decltype(n) i = 0; i < n; ++i){
             v1[i] = i * 1.0;
             v2[i] = 1.0;
         }
-        result = v2;
+        result = v1;
+        // result = v2;
         // result = v1 - v2;
 
+        benchmark::DoNotOptimize(v1);
+        benchmark::DoNotOptimize(v2);
         benchmark::DoNotOptimize(result);
-    }
+    } 
 }
 
-typedef double ft;
-void BM_stdVectorAdd(benchmark::State& state) {
-    for (auto _ : state){
-        auto n = state.range(0);
-        std::valarray<ft> v1(n);
-        std::valarray<ft> v2(n);
-        std::valarray<ft> result(n);
 
-        for (decltype(n) i = 0; i < n; ++i){
-            v1[i] = i * 1.0;
-            v2[i] = 1.0;
-        }
-        result = v2;
-        // result = v1 - v2;
-
-        benchmark::DoNotOptimize(result);
-    }
-}
-void BM_EigenVectorAdd(benchmark::State& state) {
-    for (auto _ : state){
-        auto n = state.range(0);
-        Eigen::VectorXd v1(n);
-        Eigen::VectorXd v2(n);
-        Eigen::VectorXd result(n);
-
-        for (decltype(n) i = 0; i < n; ++i){
-            v1[i] = i * 1.0;
-            v2[i] = 1.0;
-        }
-        result = v1 + v2;
-        result = v1 - v2;
-
-        benchmark::DoNotOptimize(result);
-    }
-}
-
-void BM_ArmaVectorAdd(benchmark::State& state) {
-
-    for (auto _ : state) {
-        auto n = state.range(0);
-        arma::vec v1(n);
-        arma::vec v2(n);
-        arma::vec result(n);
-
-        for (decltype(n) i = 0; i < n; ++i) {
-            v1[i] = i * 1.0;
-            v2[i] = 1.0;
-        }
-        
-        result =  v2;
-        // result = v1 - v2;
-
-        benchmark::DoNotOptimize(result);
-    }
-}
 
 void BM_RawVectorAdd(benchmark::State& state) {
     for (auto _ : state) {
@@ -113,9 +63,9 @@ void BM_RawVectorAdd(benchmark::State& state) {
         for (decltype(n) i = 0; i < n; ++i) {
             result[i] = b[i];
         }
-        // for (decltype(n) i = 0; i < n; ++i) {
-        //     result[i] = a[i] - b[i];
-        // }
+        for (decltype(n) i = 0; i < n; ++i) {
+            result[i] = b[i];
+        }
 
         benchmark::DoNotOptimize(result);
         delete[] a;
@@ -169,12 +119,11 @@ void BM_SimdVectorAdd(benchmark::State& state) {
         delete[] result;
     }
 }
-BENCHMARK(BM_ArmaVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
 BENCHMARK(BM_RawVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
-// BENCHMARK(BM_SimdVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
-// BENCHMARK(BM_EigenVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
-BENCHMARK(BM_stdVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13)
-BENCHMARK(BM_ALVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13)
+BENCHMARK(BM_VectorAdd<arma::vec>)->Range(8, 8<<10); // 8 to 8192（2^13)
+BENCHMARK(BM_VectorAdd<Eigen::VectorXd>)->Range(8, 8<<10); // 8 to 8192（2^13)
+BENCHMARK(BM_VectorAdd<std::valarray<ft> >)->Range(8, 8<<10); // 8 to 8192（2^13)
+BENCHMARK(BM_VectorAdd<ArrayListV_<ft> >)->Range(8, 8<<10); // 8 to 8192（2^13)
 
 // BENCHMARK_MAIN();
 

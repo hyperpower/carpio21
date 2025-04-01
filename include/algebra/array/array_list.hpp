@@ -75,6 +75,7 @@ public:
     const_reference at(size_type index) const;
     reference at(size_type index);
     //operator=====================================
+    ArrayListT_<T>& operator=(const T& a);
     ArrayListT_<T>& operator=(const ArrayListT_<T> &a);
     ArrayListT_<T>& operator=(ArrayListT_<T>&&a);
     // iterator support============================
@@ -236,7 +237,18 @@ T& ArrayListT_<T>::at(size_type index) {
     ASSERT(index >= 0 && index < m_Len);
     return m_p[index];
 }
+template<typename T>
+ArrayListT_<T>& ArrayListT_<T>::operator=(const T &a) {
+    std::cout << "ArrayListT operator= &T" << std::endl;
 
+    if (this->m_Len <= 0) {
+        this->resize(0);
+        return *this;
+    }
+    //unrolled loop
+    Copy(this->m_Len, a, this->m_p);
+    return *this;
+}
 template<typename T>
 ArrayListT_<T>& ArrayListT_<T>::operator=(const ArrayListT_<T> &a) {
     // std::cout << "ArrayListT operator= &" << std::endl;
