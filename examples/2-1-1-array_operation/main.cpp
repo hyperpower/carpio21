@@ -36,8 +36,8 @@ void BM_VectorAdd(benchmark::State& state){
             v1[i] = i * 1.0;
             v2[i] = 1.0;
         }
-        result = v1;
-        // result = v2;
+        result = v1 + v2;
+        // result = v2 + v1;
         // result = v1 - v2;
 
         benchmark::DoNotOptimize(v1);
@@ -61,11 +61,12 @@ void BM_RawVectorAdd(benchmark::State& state) {
         }
 
         for (decltype(n) i = 0; i < n; ++i) {
-            result[i] = b[i];
+            result[i] = a[i] + b[i];
         }
-        for (decltype(n) i = 0; i < n; ++i) {
-            result[i] = b[i];
-        }
+        // for (decltype(n) i = 0; i < n; ++i) {
+
+            // result[i] = b[i];
+        // }
 
         benchmark::DoNotOptimize(result);
         delete[] a;

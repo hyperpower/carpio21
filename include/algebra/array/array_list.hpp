@@ -53,7 +53,7 @@ public:
     ArrayListT_();
     ArrayListT_(const ArrayListT_<T>&  a);
     ArrayListT_(ArrayListT_<T>&& a);
-    ArrayListT_(size_type Len);
+    ArrayListT_(const size_type& Len);
     ArrayListT_(const std::initializer_list<T>& l);
     void reconstruct(size_type Len);
     ArrayListT_(size_type Len, const T& nd);
@@ -61,23 +61,23 @@ public:
     //=============================================
     virtual ~ArrayListT_();
     //=============================================
-    T* data() {
+    inline T* data() {
         return m_p;
     }
-    const T* data() const {
+    inline const T* data() const {
         return m_p;
     }
     //=============================================
-    const_reference operator[](size_type index) const;  //overload []
-    reference operator[](size_type index);
-    const_reference operator()(size_type index) const;
-    reference operator()(size_type index);
-    const_reference at(size_type index) const;
-    reference at(size_type index);
+    inline const_reference operator[](const size_type& index) const;  //overload []
+    inline reference operator[](const size_type& index);
+    inline const_reference operator()(const size_type& index) const;
+    inline reference operator()(const size_type& index);
+    inline const_reference at(const size_type& index) const;
+    inline reference at(const size_type& index);
     //operator=====================================
-    ArrayListT_<T>& operator=(const T& a);
-    ArrayListT_<T>& operator=(const ArrayListT_<T> &a);
-    ArrayListT_<T>& operator=(ArrayListT_<T>&&a);
+    // inline ArrayListT_<T>& operator=(const T& a);
+    inline ArrayListT_<T>& operator=(const ArrayListT_<T> &a);
+    inline ArrayListT_<T>& operator=(ArrayListT_<T>&& a);
     // iterator support============================
     iterator begin() {
         return m_p;
@@ -92,7 +92,7 @@ public:
         return m_p + m_Len;
     }
 
-    size_type size() const;  //!< get length of the array
+    inline size_type size() const{ return m_Len; }  //!< get length of the array
     T get(size_type i) const;
     void set(size_type i, const T& value);
     void assign(const T& nd);
@@ -109,6 +109,7 @@ public:
     void push_back(const T& nd);
     void pop_back();
     void erase(size_type i);
+    void clear();
     virtual void resize(const size_type& new_size);
 
     bool empty() const;
@@ -122,29 +123,26 @@ public:
 
 template<typename T>
 ArrayListT_<T>::ArrayListT_() {
+    // std::cout << "ArrayListT_()" << std::endl;
     m_Len = 0;
     m_p = nullptr;
 }
 
 template<typename T>
-ArrayListT_<T>::ArrayListT_(const ArrayListT_<T>& a) {
-    // std::cout << "ArrayListT assgin &" << std::endl;
-    m_Len = a.size();
+ArrayListT_<T>::ArrayListT_(const ArrayListT_<T>& a):m_Len(a.m_Len) {
+    // std::cout << "ArrayListT(&)" << std::endl;
     m_p   = new T[m_Len];
-    //unrolled loop
     Copy(m_Len, a.m_p, this->m_p);
 }
 template<typename T>
-ArrayListT_<T>::ArrayListT_(ArrayListT_<T>&& a) {
-    // std::cout << "ArrayListT move" << std::endl;
-    m_Len = a.m_Len;
-    m_p   = a.m_p;
+ArrayListT_<T>::ArrayListT_(ArrayListT_<T>&& a):m_Len(a.m_Len), m_p(a.m_p){
+    // std::cout << "ArrayListT(&&)" << std::endl;
     a.m_Len = 0;
     a.m_p   = nullptr;
 }
 
 template<typename T>
-ArrayListT_<T>::ArrayListT_(size_type Len) {
+ArrayListT_<T>::ArrayListT_(const size_type& Len) {
     m_Len = Len;
     m_p   = new T[m_Len];
 }
@@ -201,56 +199,67 @@ ArrayListT_<T>::ArrayListT_(T *nd,
 
 template<typename T>
 ArrayListT_<T>::~ArrayListT_() {
-    delete[] m_p;
+    this->clear();
 }
 
 template<typename T>
-const T& ArrayListT_<T>::operator[](size_type index) const {
-    ASSERT(index >= 0 && index < m_Len);
-    return m_p[index];
-}
-
-template<typename T>
-T& ArrayListT_<T>::operator[](size_type index) {
-    ASSERT(index >= 0 && index < m_Len);
+inline const T& ArrayListT_<T>::operator[](const size_type& index) const {
+    #ifndef NDEBUG
+        ASSERT(index >= 0 && index < m_Len);
+    #endif
     return m_p[index];
 }
 
 template<typename T>
-const T& ArrayListT_<T>::operator()(size_type index) const {
-    ASSERT(index >= 0 && index < m_Len);
+inline T& ArrayListT_<T>::operator[](const size_type& index) {
+    #ifndef NDEBUG
+        ASSERT(index >= 0 && index < m_Len);
+    #endif
     return m_p[index];
 }
 
 template<typename T>
-T& ArrayListT_<T>::operator()(size_type index) {
-    ASSERT(index >= 0 && index < m_Len);
+inline const T& ArrayListT_<T>::operator()(const size_type& index) const {
+    #ifndef NDEBUG
+        ASSERT(index >= 0 && index < m_Len);
+    #endif
     return m_p[index];
 }
-template<typename T>
-const T& ArrayListT_<T>::at(size_type index) const {
-    ASSERT(index >= 0 && index < m_Len);
-    return m_p[index];
-}
-template<typename T>
-T& ArrayListT_<T>::at(size_type index) {
-    ASSERT(index >= 0 && index < m_Len);
-    return m_p[index];
-}
-template<typename T>
-ArrayListT_<T>& ArrayListT_<T>::operator=(const T &a) {
-    std::cout << "ArrayListT operator= &T" << std::endl;
 
-    if (this->m_Len <= 0) {
-        this->resize(0);
-        return *this;
-    }
-    //unrolled loop
-    Copy(this->m_Len, a, this->m_p);
-    return *this;
+template<typename T>
+inline T& ArrayListT_<T>::operator()(const size_type& index) {
+    #ifndef NDEBUG
+        ASSERT(index >= 0 && index < m_Len);
+    #endif
+    return m_p[index];
 }
 template<typename T>
-ArrayListT_<T>& ArrayListT_<T>::operator=(const ArrayListT_<T> &a) {
+inline const T& ArrayListT_<T>::at(const size_type& index) const {
+    #ifndef NDEBUG
+        ASSERT(index >= 0 && index < m_Len);
+    #endif
+    return m_p[index];
+}
+template<typename T>
+inline T& ArrayListT_<T>::at(const size_type& index) {
+    #ifndef NDEBUG
+        ASSERT(index >= 0 && index < m_Len);
+    #endif
+    return m_p[index];
+}
+// template<typename T>
+// ArrayListT_<T>& ArrayListT_<T>::operator=(const T &a) {
+//     std::cout << "ArrayListT operator= &T" << std::endl;
+//     if (this->m_Len <= 0) {
+//         this->resize(0);
+//         return *this;
+//     }
+//     //unrolled loop
+//     Copy(this->m_Len, a, this->m_p);
+//     return *this;
+// }
+template<typename T>
+inline ArrayListT_<T>& ArrayListT_<T>::operator=(const ArrayListT_<T> &a) {
     // std::cout << "ArrayListT operator= &" << std::endl;
     if (this == &a) {
         return *this;
@@ -260,27 +269,29 @@ ArrayListT_<T>& ArrayListT_<T>::operator=(const ArrayListT_<T> &a) {
         return *this;
     }
     if (m_Len == a.size()) {
-        //unrolled loop
-        Copy(m_Len, a.m_p, m_p);
+        for(size_type i; i < m_Len; ++i){
+            this->m_p[i] = a.m_p[i];
+        }
     } else {
         delete[] this->m_p;
-        m_Len = a.size();
-        m_p = new T[m_Len];
-        Copy(m_Len, a.m_p, m_p);
+        this->m_Len = a.m_Len;
+        this->m_p = new T[this->m_Len];
+        for(size_type i; i < m_Len; ++i){
+            this->m_p[i] = a.m_p[i];
+        }
     }
     return *this;
 }
 template<typename T>
-ArrayListT_<T>& ArrayListT_<T>::operator=(ArrayListT_<T> &&a) {
-    // std::cout << "ArrayListT operator= &&" << std::endl;
+inline ArrayListT_<T>& ArrayListT_<T>::operator=(ArrayListT_<T>&& a) {
     if (this == &a) {
         return *this;
-    } else {
-        m_Len   = a.m_Len;
-        m_p     = a.m_p;
-        a.m_Len = 0;
-        a.m_p   = nullptr;
     }
+    this->clear();
+    this->m_Len   = a.m_Len;
+    this->m_p     = a.m_p;
+    a.m_Len = 0;
+    a.m_p   = nullptr;
     return *this;
 }
 template<typename T>
@@ -298,10 +309,6 @@ void ArrayListT_<T>::assign(ArrayListT_<T>::FunIndex fun) {
     for (size_type i = 0; i < m_Len; i++) {
         m_p[i] = fun(i);
     }
-}
-template<typename T>
-St ArrayListT_<T>::size() const {
-    return m_Len;
 }
 template<typename T>
 T& ArrayListT_<T>::front() {
@@ -379,12 +386,12 @@ void ArrayListT_<T>::push_back(const T& nd) {
 
 template<typename T>
 void ArrayListT_<T>::pop_back() {
-    if (m_p == NULL) {
+    if (m_p == nullptr) {
         return;
     } else if (m_Len == 1) {
         m_Len = 0;
         delete[] m_p;
-        m_p = NULL;
+        m_p = nullptr;
     } else {
         T *tmp = new T[m_Len];
         for (size_type i = 0; i < m_Len; i++) {
@@ -406,7 +413,7 @@ void ArrayListT_<T>::erase(size_type idx) {
     if (m_Len == 1) {
         m_Len = 0;
         delete[] m_p;
-        m_p = NULL;
+        m_p = nullptr;
     } else {
         T *tmp = new T[m_Len];
         for (size_type i = 0; i < m_Len; i++) {
@@ -445,8 +452,17 @@ void ArrayListT_<T>::resize(const size_type& new_size) {
 }
 
 template<typename T>
+void ArrayListT_<T>::clear() {
+    if(m_p != nullptr){
+        delete[] m_p;
+        m_p = nullptr;
+    }
+    m_Len = 0;
+}
+
+template<typename T>
 bool ArrayListT_<T>::has(const T& nd) const {
-    if (m_p == NULL) {
+    if (m_p == nullptr) {
         return false;
     } else {
         for (size_type i = 0; i < m_Len; i++) {
@@ -460,7 +476,7 @@ bool ArrayListT_<T>::has(const T& nd) const {
 
 template<typename T>
 St ArrayListT_<T>::find(const T& nd) const {
-    if (m_p == NULL) {
+    if (m_p == nullptr) {
         return -1;
     } else {
         for (size_type i = 0; i < m_Len; i++) {
@@ -474,7 +490,7 @@ St ArrayListT_<T>::find(const T& nd) const {
 template<typename T>
 St ArrayListT_<T>::count_equal(const T& nd) const { //overload ==
     size_type res = 0;
-    if (m_p == NULL) {
+    if (m_p == nullptr) {
         return 0;
     } else {
         for (size_type i = 0; i < m_Len; i++) {
@@ -487,7 +503,7 @@ St ArrayListT_<T>::count_equal(const T& nd) const { //overload ==
 }
 template<typename T>
 bool ArrayListT_<T>::empty() const {
-    if (m_p == NULL && m_Len == 0) {
+    if (m_p == nullptr && m_Len == 0) {
         return true;
     } else {
         return false;

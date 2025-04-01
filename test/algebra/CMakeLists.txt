@@ -13,11 +13,11 @@ set(Sources
     # test_rational.cpp
 )
 find_package(Armadillo)
-if(APPLE)
-    find_library(ACCELERATE_LIBRARY Accelerate)
-else()
-    message(FATAL_ERROR "This project only supports macOS!")
-endif()
+# if(APPLE)
+#     find_library(ACCELERATE_LIBRARY Accelerate)
+# else()
+#     message(FATAL_ERROR "This project only supports macOS!")
+# endif()
 
 
 add_executable(${This} ${Sources})

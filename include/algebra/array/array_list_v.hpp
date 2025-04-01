@@ -33,8 +33,9 @@ public:
     typedef ArrayListV_<V>&       ref_Self;
     typedef const ArrayListV_<V>& const_ref_Self;
     //constructor==================================
-    ArrayListV_();
+    ArrayListV_() : Base(){}
     ArrayListV_(size_type Len);
+    ArrayListV_(size_type Len, bool no_assign): Base(Len){};
     ArrayListV_(size_type Len, const V& nd);
     ArrayListV_(const std::initializer_list<V>& l):Base(l){};
     void reconstruct(size_type Len);
@@ -102,8 +103,6 @@ public:
 
     void show() const;
 };
-// template<typename V>
-// ArrayListV_<V> operator+(const ArrayListV_<V>& x, const ArrayListV_<V> &y);
 
 template<typename V, typename V2>
 ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V2> &y);
@@ -143,10 +142,6 @@ ArrayListV_<V> Linspace(V start, V stop, St n) {
 }
 
 template<typename V>
-ArrayListV_<V>::ArrayListV_() :
-    ArrayListT_<V>() {
-}
-template<typename V>
 ArrayListV_<V>::ArrayListV_(size_type Len) :
     ArrayListT_<V>(Len) {
     this->assign(V(0));
@@ -155,7 +150,6 @@ template<typename V>
 ArrayListV_<V>::ArrayListV_(size_type Len, const V& nd) :
     ArrayListT_<V>(Len, nd) {
 }
-
 
 template<typename V>
 void ArrayListV_<V>::reconstruct(size_type Len) {
@@ -176,15 +170,27 @@ void ArrayListV_<V>::reconstruct(size_type Len) {
 
 template<typename V>
 ArrayListV_<V> operator+(const ArrayListV_<V>& x, const ArrayListV_<V> &y){
-	ASSERT(x.size() == y.size());
-    ArrayListV_<V> res(x.size());
-    std::cout << "here" << std::endl;
+    #ifndef NDEBUG
+	    ASSERT(x.size() == y.size());
+    #endif
+    ArrayListV_<V> res(x.size(), false); // no assign
 	Add(x.size(), x.data(), y.data(), res.data());
 	return res;
 }
+// template<typename V>
+// ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V> &y){
+//     #ifndef NDEBUG
+// 	    ASSERT(x.size() == y.size());
+//     #endif
+// 	x += y;
+// 	return x;
+// }
+
 template<typename V, typename V2>
 ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V2> &y){
-	ASSERT(x.size() == y.size());
+    #ifndef NDEBUG
+	    ASSERT(x.size() == y.size());
+    #endif
     x += y;
 	return x;
 }

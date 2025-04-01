@@ -15,12 +15,13 @@ typedef ArrayListV_<double> Array;
 TEST(array, add_1T){
 	Array arr1(5);
 	Array arr2(5);
+	Array res(5);
 
-	arr1 = 1.0;
-	arr2 = 2;
+	arr1.assign(1.0);
+	arr2.assign(2);
 
 	std::cout << "res = arrd + arri -->" << std::endl;
-	auto res = arr1 + arr2;
+	res = arr1 + arr2;
 	std::cout << "<--" << std::endl;
 
 	std::cout << "arr1[1] = " << arr1[1] << std::endl;
