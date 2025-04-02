@@ -176,11 +176,11 @@ class Runer:
     def build(self):
         project_name = self._info["name"]
         if platform.system() == "Windows":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10 --clean-first")
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 4 --clean-first")
         elif platform.system() == "Linux":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10 --clean-first")
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 4 --clean-first")
         elif platform.system() == "Darwin":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 10 --clean-first")
+            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 4 --clean-first")
         print(cmd)
         result = os.popen(cmd)
         # result = subprocess.Popen(cmd)

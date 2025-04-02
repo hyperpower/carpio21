@@ -122,16 +122,12 @@ public:
 };
 
 template<typename T>
-ArrayListT_<T>::ArrayListT_() {
-    // std::cout << "ArrayListT_()" << std::endl;
-    m_Len = 0;
-    m_p = nullptr;
-}
+ArrayListT_<T>::ArrayListT_():m_Len(0), m_p(nullptr) {}
 
 template<typename T>
 ArrayListT_<T>::ArrayListT_(const ArrayListT_<T>& a):m_Len(a.m_Len) {
     // std::cout << "ArrayListT(&)" << std::endl;
-    m_p   = new T[m_Len];
+    this->m_p   = new T[m_Len];
     Copy(m_Len, a.m_p, this->m_p);
 }
 template<typename T>
@@ -455,8 +451,8 @@ template<typename T>
 void ArrayListT_<T>::clear() {
     if(m_p != nullptr){
         delete[] m_p;
-        m_p = nullptr;
     }
+    m_p = nullptr;
     m_Len = 0;
 }
 

@@ -25,27 +25,29 @@ Benchmark Result
 Vector Add
 ----------------
 
-A possible implimentation of Vector add function are shown as follows:
+A possible implimentation of Vector add benchmark function are shown as follows:
 
 .. code-block:: cpp
 
-    // new 2 vector 
-    double* a = new double[n];
-    double* b = new double[n];
-    double* result = new double[n];
-    // set initial value
-    for (decltype(n) i = 0; i < n; ++i) {
-      a[i] = i * 1.0;
-      b[i] = 1.0;
-    }
-    // two add functions
-    Add_(n, a, b, result);
-    Add_(n, a, b, result);
+   template<class VECTORTYPE>
+   void BM_VectorAdd(benchmark::State& state){
+      for (auto _ : state){
+        auto n = state.range(0);
+        VECTORTYPE v1(n);
+        VECTORTYPE v2(n);
+        VECTORTYPE result(n);
 
-    // delete values
-    delete[] a;
-    delete[] b;
-    delete[] result;
+        for (decltype(n) i = 0; i < n; ++i){
+            v1[i] = i * 1.0;
+            v2[i] = 1.0;
+        }
+        result = v1 + v2;
+
+        benchmark::DoNotOptimize(v1);
+        benchmark::DoNotOptimize(v2);
+        benchmark::DoNotOptimize(result);
+      } 
+   }
 
 
 

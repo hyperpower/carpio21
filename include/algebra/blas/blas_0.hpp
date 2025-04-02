@@ -202,6 +202,15 @@ void Add(const ST& n, const VT* a, const VT* b, VT* res) {
     }
 }
 
+template<typename ST, typename VT>
+void Minus(const ST& n, const VT* a, const VT* b, VT* res) {
+#pragma omp parallel for
+    for (ST i = 0; i < n; ++i) {
+        res[i] = a[i] - b[i];
+    }
+}
+
+
 }
 
 #endif

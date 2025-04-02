@@ -113,7 +113,7 @@ template<typename V>
 ArrayListV_<V> operator+(const V &a, ArrayListV_<V> x);
 
 template<typename V>
-ArrayListV_<V> operator-(ArrayListV_<V> x, const ArrayListV_<V> &y);
+ArrayListV_<V> operator-(const ArrayListV_<V>& x, const ArrayListV_<V> &y);
 template<typename V>
 ArrayListV_<V> operator-(ArrayListV_<V> x, const V &a);
 template<typename V>
@@ -207,10 +207,13 @@ ArrayListV_<V> operator+(const V &a, ArrayListV_<V> x){
 }
 
 template<typename V>
-ArrayListV_<V> operator-(ArrayListV_<V> x, const ArrayListV_<V> &y){
-	ASSERT(x.size() == y.size());
-	x -= y;
-	return x;
+ArrayListV_<V> operator-(const ArrayListV_<V>& x, const ArrayListV_<V> &y){
+	#ifndef NDEBUG
+	    ASSERT(x.size() == y.size());
+    #endif
+    ArrayListV_<V> res(x.size(), false); // no assign
+	Minus(x.size(), x.data(), y.data(), res.data());
+	return res;
 }
 template<typename V>
 ArrayListV_<V> operator-(ArrayListV_<V> x, const V &a){
