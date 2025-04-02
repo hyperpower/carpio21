@@ -174,17 +174,9 @@ ArrayListV_<V> operator+(const ArrayListV_<V>& x, const ArrayListV_<V> &y){
 	    ASSERT(x.size() == y.size());
     #endif
     ArrayListV_<V> res(x.size(), false); // no assign
-	Add(x.size(), x.data(), y.data(), res.data());
+	AddUnroll(x.size(), x.data(), y.data(), res.data());
 	return res;
 }
-// template<typename V>
-// ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V> &y){
-//     #ifndef NDEBUG
-// 	    ASSERT(x.size() == y.size());
-//     #endif
-// 	x += y;
-// 	return x;
-// }
 
 template<typename V, typename V2>
 ArrayListV_<V> operator+(ArrayListV_<V> x, const ArrayListV_<V2> &y){

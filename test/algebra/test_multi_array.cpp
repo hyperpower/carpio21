@@ -13,15 +13,17 @@ typedef std::chrono::milliseconds ms;
 typedef ArrayListV_<double> Array;
 // typedef std::valarray<double> Array;
 TEST(array, add_1T){
-	Array arr1(5);
-	Array arr2(5);
-	Array res(5);
+	Array::size_type n = 5;
+	Array arr1(n);
+	Array arr2(n);
+	Array res(n);
 
 	arr1.assign(1.0);
 	arr2.assign(2.0);
 
 	std::cout << "res = arrd + arri -->" << std::endl;
 	res = arr1 + arr2;
+	res.show();
 	std::cout << "<--" << std::endl;
 
 	std::cout << "arr1[1] = " << arr1[1] << std::endl;
@@ -30,6 +32,14 @@ TEST(array, add_1T){
 	ASSERT_EQ(arr2[1], 2);
 	std::cout << "res[1]  = " << res[1] << std::endl;
 	ASSERT_EQ(res[1], 3);
+	res += arr1;
+	ASSERT_EQ(res[1], 4);
+	res = 5.0 + arr1;
+	ASSERT_EQ(res[1], 6);
+	res = arr1 + 5.0 + 1.0;
+	ASSERT_EQ(res[1], 7);
+	res = arr1 + 5.0 + arr2;
+	ASSERT_EQ(res[1], 8);
 }
 TEST(array, minus_1T){
 	Array arr1(5);
