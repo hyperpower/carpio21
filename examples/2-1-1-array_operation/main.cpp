@@ -9,11 +9,11 @@
 
 #include <Eigen/Dense>
 
-#ifdef __x86_64__
-#include <immintrin.h>
-#elif defined(__arm64__)
-#include <arm_neon.h>
-#endif
+// #ifdef __x86_64__
+// #include <immintrin.h>
+// #elif defined(__arm64__)
+// #include <arm_neon.h>
+// #endif
 
 #include <valarray>
 
@@ -27,7 +27,7 @@ template<class VECTORTYPE>
 void Fun_VectorAdd(VECTORTYPE& a, VECTORTYPE& b, VECTORTYPE& c){
     c = a + b;
     c = b + a;
-    // c = a + b + b + a;
+    c = a + b + b + a;
 
     benchmark::DoNotOptimize(a);
     benchmark::DoNotOptimize(b);
@@ -76,58 +76,61 @@ void BM_RawVectorAdd(benchmark::State& state) {
         for (decltype(n) i = 0; i < n; ++i) {
             result[i] = b[i] + a[i];
         }
-        benchmark::DoNotOptimize(result);
-        delete[] a;
-        delete[] b;
-        delete[] result;
-    }
-}
-template<typename ST>
-void Add_(const ST& n, float32_t* v1, const float32_t* v2, float32_t* res){
-	ST i = 0;
-	#ifdef __arm64__
-	for (; i <= n - 4; i += 4) {
-        vst1q_f32(&res[i], vaddq_f32(vld1q_f32(&v1[i]), vld1q_f32(&v2[i])));
-    }
-	#endif
-	for (; i < n; ++i) {
-        res[i] = v1[i] + v2[i];
-    }
-}
-template<typename ST>
-void Add_(const ST& n, float64_t* v1, const float64_t* v2, float64_t* res){
-	ST i = 0;
-	#ifdef __arm64__
-	for (; i <= n - 2; i += 2) {
-        vst1q_f64(&res[i], vaddq_f64(vld1q_f64(&v1[i]), vld1q_f64(&v2[i])));
-    }
-	#endif
-	for (; i < n; ++i) {
-        res[i] = v1[i] + v2[i];
-    }
-}
-
-void BM_SimdVectorAdd(benchmark::State& state) {
-    for (auto _ : state) {
-        auto n = state.range(0);
-        ft* a = new ft[n];
-        ft* b = new ft[n];
-        ft* result = new ft[n];
-
         for (decltype(n) i = 0; i < n; ++i) {
-            a[i] = i * 1.0;
-            b[i] = 1.0;
+            result[i] = b[i] + a[i] + b[i] + a[i];
         }
-
-        Add_(n, a, b, result);
-        // Add_(n, a, b, result);
-
         benchmark::DoNotOptimize(result);
         delete[] a;
         delete[] b;
         delete[] result;
     }
 }
+// template<typename ST>
+// void Add_(const ST& n, float32_t* v1, const float32_t* v2, float32_t* res){
+// 	ST i = 0;
+// 	#ifdef __arm64__
+// 	for (; i <= n - 4; i += 4) {
+//         vst1q_f32(&res[i], vaddq_f32(vld1q_f32(&v1[i]), vld1q_f32(&v2[i])));
+//     }
+// 	#endif
+// 	for (; i < n; ++i) {
+//         res[i] = v1[i] + v2[i];
+//     }
+// }
+// template<typename ST>
+// void Add_(const ST& n, float64_t* v1, const float64_t* v2, float64_t* res){
+// 	ST i = 0;
+// 	#ifdef __arm64__
+// 	for (; i <= n - 2; i += 2) {
+//         vst1q_f64(&res[i], vaddq_f64(vld1q_f64(&v1[i]), vld1q_f64(&v2[i])));
+//     }
+// 	#endif
+// 	for (; i < n; ++i) {
+//         res[i] = v1[i] + v2[i];
+//     }
+// }
+
+// void BM_SimdVectorAdd(benchmark::State& state) {
+//     for (auto _ : state) {
+//         auto n = state.range(0);
+//         ft* a = new ft[n];
+//         ft* b = new ft[n];
+//         ft* result = new ft[n];
+
+//         for (decltype(n) i = 0; i < n; ++i) {
+//             a[i] = i * 1.0;
+//             b[i] = 1.0;
+//         }
+
+//         Add_(n, a, b, result);
+//         // Add_(n, a, b, result);
+
+//         benchmark::DoNotOptimize(result);
+//         delete[] a;
+//         delete[] b;
+//         delete[] result;
+//     }
+// }
 BENCHMARK(BM_RawVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
 BENCHMARK(BM_VectorAdd<arma::vec>)->Range(8, 8<<10); // 8 to 8192（2^13)
 BENCHMARK(BM_VectorAdd<Eigen::VectorXd>)->Range(8, 8<<10); // 8 to 8192（2^13)
@@ -143,8 +146,8 @@ BENCHMARK(BM_VectorAdd<ArrayListV_<ft> >)->Range(8, 8<<10); // 8 to 8192（2^13)
     if (!argv) {                                                        
       argc = 1;                                                         
       argv = &args_default;                                             
-    }                                                                   
-    benchmark::Initialize(&argc, argv);                               
+    }                                         
+    benchmark::Initialize(&argc, argv);                      
     if (benchmark::ReportUnrecognizedArguments(argc, argv)){
         return 1;
     } 

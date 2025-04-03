@@ -227,11 +227,28 @@ void AddUnrollNeon(const ST& n, const float64_t* a, const float64_t* b, float64_
     }
 }
 #endif
+
+template<typename VT>
+void AddUnroll8(const VT* a, const VT* b, VT* res) {
+	res[0] = a[0] + b[0];   
+	res[1] = a[1] + b[1];
+	res[2] = a[2] + b[2];
+	res[3] = a[3] + b[3];	
+	res[4] = a[4] + b[4];	
+	res[5] = a[5] + b[5];	
+	res[6] = a[6] + b[6];	
+	res[7] = a[7] + b[7];	
+}
+
 template<typename ST, typename VT>
 void AddUnroll(const ST& n, const VT* a, const VT* b, VT* res) {
-#ifdef __ARM_NEON_H
+#ifdef __ARM_NEON_ON
 	AddUnrollNeon(n, a, b, res);
 #else 	
+	if(n == 8){
+		AddUnroll8(a,b,res);
+		return;
+	}
 	ST i  = 0;
 	ST ns = n - 3;
 #pragma omp parallel for
