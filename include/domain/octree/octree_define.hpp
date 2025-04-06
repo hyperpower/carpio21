@@ -1,9 +1,6 @@
 #ifndef _O_DEFINE_HPP
 #define _O_DEFINE_HPP
 
-#include "domain/domain_define.hpp"
-#include "algebra/algebra.hpp"
-#include "geometry/geometry.hpp"
 #include <map>
 #include <memory>
 #include <iomanip>
@@ -11,6 +8,10 @@
 #include <utility>
 #include <unordered_map>
 #include <cmath>
+
+#include "domain/domain_define.hpp"
+#include "algebra/algebra.hpp"
+#include "geometry/geometry.hpp"
 
 namespace carpio {
 
@@ -342,3 +343,6 @@ inline Axes VerticalAxes2(const Axes& a) {
 	}
 	}
 }
+}
+
+#endif

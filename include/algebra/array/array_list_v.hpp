@@ -170,11 +170,17 @@ void ArrayListV_<V>::reconstruct(size_type Len) {
 
 template<typename V>
 ArrayListV_<V> operator+(const ArrayListV_<V>& x, const ArrayListV_<V> &y){
+    auto n = x.size();
     #ifndef NDEBUG
-	    ASSERT(x.size() == y.size());
+	    ASSERT(n == y.size());
     #endif
-    ArrayListV_<V> res(x.size(), false); // no assign
-	AddUnroll(x.size(), x.data(), y.data(), res.data());
+    ArrayListV_<V> res(n, false); // no assign
+    // auto nc = (n <= 256 ? n : 256);
+    // AddUnroll256(nc, x.data(), y.data(), res.data());
+    // if(n > 256){
+	//     AddInterval((decltype(n))257, n, x.data(), y.data(), res.data());
+    // }
+    Add(n, x.data(), y.data(), res.data());
 	return res;
 }
 

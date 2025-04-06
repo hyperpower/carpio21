@@ -61,11 +61,11 @@ public:
     //=============================================
     virtual ~ArrayListT_();
     //=============================================
-    inline T* data() {
-        return m_p;
+    T* data() {
+        return this->m_p;
     }
-    inline const T* data() const {
-        return m_p;
+    const T* data() const {
+        return this->m_p;
     }
     //=============================================
     inline const_reference operator[](const size_type& index) const;  //overload []

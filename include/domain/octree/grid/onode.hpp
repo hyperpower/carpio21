@@ -89,4 +89,6 @@ inline bool is_on_direction(St i, const Direction& dir) {
     return (hi & i) == (hi & lo);
 }
 
+}
 
+#endif

@@ -17,20 +17,10 @@ def read_json_from_file(file_path):
             data = json.load(file)
             return data
     except FileNotFoundError:
-        return "文件未找到"
+        return "File not Found"
     except json.JSONDecodeError:
-        return "JSON格式错误"
+        return "JSON file format error"
 
-def get_test_name_set(data):
-    name_set = set()
-    for t in data["benchmarks"]:
-        an = t["name"].split("/")
-        test_name = an[0]
-        test_n    = an[1]
-        test_time = t["real_time"]
-        unit      = t["time_unit"]
-        name_set.add(test_name)
-    return name_set
 
 def get_data_frame(data):
     df = pd.DataFrame(columns=['Name', 'Size', 'Time', 'TimeUnit'])
@@ -39,82 +29,79 @@ def get_data_frame(data):
         df.loc[len(df)] = [an[0], an[1], benchmark['real_time'], benchmark['time_unit']]
     return df 
 
+def select_by_name(df, name_op):
+    groups = []
+    for name, group in df.groupby('Name'):
+        if name.startswith("BM_" + name_op):
+            groups.append(group)
+    return groups
+
+def select_ref_group(groups, name_op, name_ref):
+    for group in groups:
+        sn = group["Name"].unique()[0]
+        if(sn.startswith("BM_" + name_op + name_ref)):
+            return group
+
+def plot_data_groups_ref(groups, name_op, name_ref):
+    plt.figure(figsize=(6, 5))
+    bar_width = 0.18    
+
+    refg = select_ref_group(groups, name_op, name_ref)
+    refg.sort_values(by='Size')
+    reft = refg['Time'].to_numpy() 
+    refs = refg['Size'].astype(float).unique()
+    refrange = range(len(refs))
+    for group in groups:
+        name = group["Name"].unique()
+        group.sort_values(by='Size')
+        t = group['Time'].to_numpy()
+        ratio = t / reft  
+
+        plt.plot(refs, ratio, marker='o', label = name )
+        
+    plt.xlabel('Vector Size')
+    plt.ylabel('Time (μs)')
+    # plt.xlim(10, 1e7)
+    # plt.yscale('log')
+    plt.xscale('log')
+    plt.legend()
+    plt.grid(True) 
+
+    plt.savefig(PATH_FIG + "/" +"BM_" + name_op + "_ratio")
+
+
 def plot_data_frame(df, name_op):
     plt.figure(figsize=(6, 5))
-    bar_width = 0.2    
     
     for name, group in df.groupby('Name'):
-        x = group["Size"]
-        y = group["Time"]
-        plt.plot(x, y, marker='o', label=name)
+        if name.startswith("BM_" + name_op):
+            x = group["Size"].astype(float)
+            y = group["Time"].astype(float)
+            plt.plot(x.values, y.values, marker='o', label=name)
 
     plt.xlabel('Vector Size')
     plt.ylabel('Time (μs)')
+    # plt.xlim(10, 1e7)
+    plt.yscale('log')
+    plt.xscale('log')
     plt.legend()
     plt.grid(True) 
 
-    plt.savefig(PATH_FIG + "/" +"bm_" + name_op)
+    plt.savefig(PATH_FIG + "/" +"BM_" + name_op)
 
-def plot_data_frame_box(df, name_op):
-    plt.figure(figsize=(6, 5))
-    bar_width = 0.18   
-
-    sizes        = df['Size'].unique()
-    series_names = df['Name'].unique()
-    series_names.sort()
-
-    index = range(len(sizes))
-
-    for i, sn in enumerate(series_names):
-        group = df[df['Name'] == sn]
-        x_offset = len(index) * bar_width * 0.5 - 0.5 * bar_width
-        x_pos = [(j - x_offset) + bar_width * i for j in index]
-        bars = plt.bar(x_pos, group['Time'], bar_width, label=sn)
-
-    plt.xticks(index, sizes)
-    plt.xlabel('Vector Size (n)')
-    plt.ylabel('Time (μs)')
-    plt.legend()
-    plt.grid(True) 
-
-    plt.savefig(PATH_FIG + "/" +"bm_" + name_op + "_box")
-
-def plot_data_frame_box_r(df, name_op, name_ref):
-    plt.figure(figsize=(6, 5))
-    bar_width = 0.18   
-
-    sizes        = df['Size'].unique()
-    series_names = df['Name'].unique()
-    series_names.sort()
-
-    index = range(len(sizes))
-    
-    groupr = df[df["Name"] == name_ref]
-    groupr.sort_values(by='Size')
-    ar = groupr['Time'].to_numpy()
-    for i, sn in enumerate(series_names):
-        group = df[df['Name'] == sn]
-        group.sort_values(by='Size')
-        av = group['Time'].to_numpy()
-        ratio = av / ar 
-       
-        x_offset = len(index) * bar_width * 0.5 - 0.5 * bar_width
-        x_pos = [(j - x_offset) + bar_width * i for j in index]
-        bars = plt.bar(x_pos, ratio, bar_width, label=sn)
-
-    plt.xticks(index, sizes)
-    plt.xlabel('Vector Size (n)')
-    plt.ylabel('Speed Ratio to Raw')
-    plt.legend()
-    plt.grid(True) 
-
-    plt.savefig(PATH_FIG + "/" +"bm_" + name_op + "_boxr") 
 
 if __name__ == "__main__":
-    name_op = "vector_add"
-    data = read_json_from_file("./data/bm_" + name_op+".txt")
+    data = read_json_from_file("./data/bm_result.txt")
 
+    name_op = "BLAS0Add"
     df = get_data_frame(data)
     plot_data_frame(df, name_op)
-    plot_data_frame_box_r(df, name_op, "BM_RawVectorAdd")
+    gs = select_by_name(df, name_op)
+    plot_data_groups_ref(gs, name_op, "_Normal")
+
+
+    name_op = "VectorAdd"
+    plot_data_frame(df, name_op)
+    gs = select_by_name(df, name_op)
+    plot_data_groups_ref(gs, name_op, "Raw")
     

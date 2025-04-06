@@ -6,13 +6,11 @@
 
 namespace carpio {
 
-
-
 template<typename VALUE, St DIM>
 class OCellRect_ {
 public:
-	static const St Dim = DIM;
-	static const St NumFaces = DIM + DIM;
+	static const St Dim         = DIM;
+	static const St NumFaces    = DIM + DIM;
 	static const St NumVertexes = (DIM == 3) ? 8 : (DIM + DIM);
 
 	typedef VALUE vt;

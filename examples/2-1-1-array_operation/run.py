@@ -11,7 +11,8 @@ FILE_ORIGINAL = [
     "CMakeLists.txt",
     "run.py",
     "report.rst",
-    "plot.py"
+    "plot.py",
+    "blas0_add_bm.hpp"
 ]
 
 if __name__ == '__main__':

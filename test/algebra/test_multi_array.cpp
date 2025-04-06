@@ -43,6 +43,31 @@ TEST(array, add_1T){
 	res = arr1 + arr2 + arr2 + arr1;
 	ASSERT_EQ(res[1], 6);
 }
+
+
+TEST(array, unroll){
+	int n = 100;
+	Array arr1(n);
+	Array arr2(n);
+	Array res(n);
+
+	for(int i = 0; i<n ; i++){
+		arr1[i] = i * i;
+	}
+	arr2.assign(2.0);
+	
+	AddUnroll256(n, arr1.data(), arr2.data(), res.data());
+
+	// res.show();
+
+	ASSERT_EQ(res[1], 3);	
+	ASSERT_EQ(res[2], 6);	
+	ASSERT_EQ(res[n- 1], (n-1) * (n-1) + 2.0);	
+
+	Add(n, arr1.data(), arr2.data(), res.data());
+	ASSERT_EQ(res[1], 3);
+}
+
 TEST(array, minus_1T){
 	Array arr1(5);
 	Array arr2(5);

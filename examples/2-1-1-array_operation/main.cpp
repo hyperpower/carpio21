@@ -20,6 +20,7 @@
 #include "io/gnuplot.hpp"
 #include "utility/tinyformat.hpp"
 #include "algebra/algebra.hpp"
+#include "blas0_add_bm.hpp"
 
 using namespace carpio;
 
@@ -27,14 +28,18 @@ template<class VECTORTYPE>
 void Fun_VectorAdd(VECTORTYPE& a, VECTORTYPE& b, VECTORTYPE& c){
     c = a + b;
     c = b + a;
-    c = a + b + b + a;
+    c = a + b;
+    // c = a + b + b + a;
+    auto v = c[0];
 
     benchmark::DoNotOptimize(a);
     benchmark::DoNotOptimize(b);
     benchmark::DoNotOptimize(c); 
+    benchmark::DoNotOptimize(v); 
 }
 
 typedef double ft;
+
 template<class VECTORTYPE>
 void BM_VectorAdd(benchmark::State& state){
     for (auto _ : state){
@@ -58,7 +63,7 @@ void BM_VectorAdd(benchmark::State& state){
     } 
 }
 
-void BM_RawVectorAdd(benchmark::State& state) {
+void BM_VectorAddRaw(benchmark::State& state) {
     for (auto _ : state) {
         auto n = state.range(0);
         ft* a = new ft[n];
@@ -72,70 +77,36 @@ void BM_RawVectorAdd(benchmark::State& state) {
 
         for (decltype(n) i = 0; i < n; ++i) {
             result[i] = a[i] + b[i];
-        }
-        for (decltype(n) i = 0; i < n; ++i) {
             result[i] = b[i] + a[i];
+            result[i] = a[i] + b[i];
         }
-        for (decltype(n) i = 0; i < n; ++i) {
-            result[i] = b[i] + a[i] + b[i] + a[i];
-        }
+        // for (decltype(n) i = 0; i < n; ++i) {
+        //     result[i] = b[i] + a[i];
+        // }
+        // for (decltype(n) i = 0; i < n; ++i) {
+        //     result[i] = a[i] + b[i];
+        // }
+        // for (decltype(n) i = 0; i < n; ++i) {
+        //     result[i] = b[i] + a[i] + b[i] + a[i];
+        // }
         benchmark::DoNotOptimize(result);
         delete[] a;
         delete[] b;
         delete[] result;
     }
 }
-// template<typename ST>
-// void Add_(const ST& n, float32_t* v1, const float32_t* v2, float32_t* res){
-// 	ST i = 0;
-// 	#ifdef __arm64__
-// 	for (; i <= n - 4; i += 4) {
-//         vst1q_f32(&res[i], vaddq_f32(vld1q_f32(&v1[i]), vld1q_f32(&v2[i])));
-//     }
-// 	#endif
-// 	for (; i < n; ++i) {
-//         res[i] = v1[i] + v2[i];
-//     }
-// }
-// template<typename ST>
-// void Add_(const ST& n, float64_t* v1, const float64_t* v2, float64_t* res){
-// 	ST i = 0;
-// 	#ifdef __arm64__
-// 	for (; i <= n - 2; i += 2) {
-//         vst1q_f64(&res[i], vaddq_f64(vld1q_f64(&v1[i]), vld1q_f64(&v2[i])));
-//     }
-// 	#endif
-// 	for (; i < n; ++i) {
-//         res[i] = v1[i] + v2[i];
-//     }
-// }
 
-// void BM_SimdVectorAdd(benchmark::State& state) {
-//     for (auto _ : state) {
-//         auto n = state.range(0);
-//         ft* a = new ft[n];
-//         ft* b = new ft[n];
-//         ft* result = new ft[n];
 
-//         for (decltype(n) i = 0; i < n; ++i) {
-//             a[i] = i * 1.0;
-//             b[i] = 1.0;
-//         }
+double start = 2.;
+double end   = 256.;
+// double end   = 32768.;
+double multiplier = 2;
 
-//         Add_(n, a, b, result);
-//         // Add_(n, a, b, result);
-
-//         benchmark::DoNotOptimize(result);
-//         delete[] a;
-//         delete[] b;
-//         delete[] result;
-//     }
-// }
-BENCHMARK(BM_RawVectorAdd)->Range(8, 8<<10); // 8 to 8192（2^13）
-BENCHMARK(BM_VectorAdd<arma::vec>)->Range(8, 8<<10); // 8 to 8192（2^13)
-BENCHMARK(BM_VectorAdd<Eigen::VectorXd>)->Range(8, 8<<10); // 8 to 8192（2^13)
-BENCHMARK(BM_VectorAdd<std::valarray<ft> >)->Range(8, 8<<10); // 8 to 8192（2^13)
-BENCHMARK(BM_VectorAdd<ArrayListV_<ft> >)->Range(8, 8<<10); // 8 to 8192（2^13)
+BENCHMARK(BM_VectorAddRaw)->RangeMultiplier(multiplier)->Range(start, end); 
+BENCHMARK(BM_VectorAdd<ArrayListV_<ft> >)->RangeMultiplier(multiplier)->Range(start, end); 
+BENCHMARK(BM_VectorAdd<arma::vec>)->RangeMultiplier(multiplier)->Range(start, end); 
+BENCHMARK(BM_VectorAdd<Eigen::VectorXd>)->RangeMultiplier(multiplier)->Range(start, end); 
+BENCHMARK(BM_VectorAdd<std::valarray<ft> >)->RangeMultiplier(multiplier)->Range(start, end); 
 
 // BENCHMARK_MAIN();
 
@@ -157,9 +128,9 @@ BENCHMARK(BM_VectorAdd<ArrayListV_<ft> >)->Range(8, 8<<10); // 8 to 8192（2^13)
     // benchmark::RunSpecifiedBenchmarks(&console_reporter);
 
     benchmark::JSONReporter reporter;
-    std::ofstream ofs("data/bm_vector_add.txt");
+    std::ofstream ofs("data/bm_result.txt");
     if (!ofs.is_open()) {
-        std::cerr << "Error: Unable to open file 'data/bm_vector_add.txt' for writing!" << std::endl;
+        std::cerr << "Error: Unable to open file 'data/bm_result.txt' for writing!" << std::endl;
         return 1;
     }
     reporter.SetOutputStream(&ofs);

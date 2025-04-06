@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #include "algebra/array/array_list.hpp"
+#include "algebra/array/array_list_v.hpp"
 #include "algebra/array/multi_array.hpp"
+#include "algebra/array/multi_array_v.hpp"
 #include "algebra/misc/linear_polynomial.hpp"
 
 using namespace carpio;

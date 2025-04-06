@@ -51,13 +51,32 @@ A possible implimentation of Vector add benchmark function are shown as follows:
 
 
 
-.. figure:: fig/bm_vector_add.png
+.. figure:: fig/BM_VectorAdd.png
    :align: center 
 
    Benchmark result of vetor add.
 
 
-.. figure:: fig/bm_vector_add_boxr.png
+.. figure:: fig/BM_VectorAdd_ratio.png
    :align: center 
 
    Speed Ratio to Raw array version.
+
+
+Loop Unrolling or Not Unroll
+=================================
+
+This benchmark shows the loop Unrolling.
+
+.. figure:: fig/BM_BLAS0Add.png
+   :align: center 
+
+   Benchmark result of the loop unroll.
+
+
+.. figure:: fig/BM_BLAS0Add_ratio.png
+   :align: center 
+
+   Speed Ratio to normal loop.
+
+
