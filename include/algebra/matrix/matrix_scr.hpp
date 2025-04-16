@@ -10,6 +10,7 @@
 
 #include "algebra/algebra_define.hpp"
 #include "algebra/array/array_list.hpp"
+#include "algebra/array/array_list_v.hpp"
 #include "matrix.hpp"
 
 namespace carpio {

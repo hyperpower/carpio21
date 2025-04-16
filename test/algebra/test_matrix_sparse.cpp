@@ -1,3 +1,4 @@
+#include "algebra/array/multi_array_v.hpp"
 #include "algebra/matrix/matrix_sco.hpp"
 #include "algebra/matrix/matrix_scr.hpp"
 #include "algebra/io/mmio.hpp"

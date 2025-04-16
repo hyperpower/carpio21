@@ -135,7 +135,7 @@ double ArrayOp(int nt, double na){
     b.assign(1);
     omp_set_num_threads(nt);
     auto start = std::chrono::steady_clock::now();
-    b = a + b;
+    b = a + b - a * b + 5.0 * a;
     auto end  = std::chrono::steady_clock::now();
     std::cout << "Num of threads = " << nt;
     std::cout << " Size = " << na;
@@ -155,7 +155,6 @@ void ArrayOpPlot(){
     gnu.set_xlogscale();
     // gnu.set_ylogscale();
     ArrayListV_<double> vna = {1e4, 1e5, 1e6, 5e6, 1e7, 5e7, 1e8, 5e8};
-    // ArrayListV_<double> vna = {1e4, 1e5, 1e6, 5e6, 1e7 };
     ArrayListV_<double> vnt = {2, 4, 6, 8}; // n > 2
     ArrayListV_<double> vst(vna.size());
     for(int i = 0; i< vna.size(); i++){
@@ -172,8 +171,8 @@ void ArrayOpPlot(){
             vdt.push_back(st);
         }
         auto a = ToGnuplotActor(vdt, vr);
-        a.command("using 1:2 title \"Num of Thread = " + ToString(nt) + "\" ");
-        a.style("with linespoints ps 2 lw 2");
+        a.command() = "using 1:2 title \"Num of Thread = " + ToString(nt) + "\" ";
+        a.style()   = "with linespoints ps 2 lw 2";
         gnu.add(a);
     }
     gnu.plot();

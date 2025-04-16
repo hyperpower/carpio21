@@ -53,9 +53,8 @@ void BM_VectorAdd(benchmark::State& state){
             v2[i] = 1.0;
         }
         Fun_VectorAdd(v1, v2, result);
-        // result = v1 + v2;
-        // result = v2 + v1;
-        // result = v1 + 3.0;
+        // result = v2;
+        // result = v1 - v2;
 
         benchmark::DoNotOptimize(v1);
         benchmark::DoNotOptimize(v2);

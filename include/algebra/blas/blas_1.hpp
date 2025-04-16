@@ -98,20 +98,10 @@ VT Asum(ST n, const VT* sx, ST incx){
     }
     return asum;
 }
-template<typename ST, typename VT>
-int Copy(ST n, const VT* src, VT* dst) {
-    // std::cout << "copy" << std::endl;
-    //make sure: the length of a and b is equal
-    //           and n>0
-#pragma omp parallel for
-    for (ST i = 0; i < n; ++i) {
-        dst[i] = src[i];
-    }
-    return 0;
-}
+
 
 template<typename ST, typename VT>
-int CopyUnroll(ST n, const VT* src, VT* dst) {
+int Copy(ST n, const VT * src, VT* dst) {
     // std::cout << "copy" << std::endl;
     //make sure: the length of a and b is equal
     //           and n>0
@@ -136,32 +126,32 @@ int CopyUnroll(ST n, const VT* src, VT* dst) {
     }
     return 0;
 }
-// template<typename ST, typename VT>
-// int Copy(ST n, const VT& src, VT* dst) {
-//     // std::cout << "copy" << std::endl;
-//     //make sure: the length of a and b is equal
-//     //           and n>0
-//     ST LN = 7;
-//     ST m = (n - 1) % LN;
-//     for (ST i = 0; i <= m; ++i) {
-//         dst[i] = src;
-//     }
-//     if (n <= LN) {
-//         return 1;
-//     }
-//     ST mp1 = m + 1;
-// #pragma omp parallel for
-//     for (ST i = mp1; i < n; i += LN) {
-//         dst[i    ] = src;
-//         dst[i + 1] = src;
-//         dst[i + 2] = src;
-//         dst[i + 3] = src;
-//         dst[i + 4] = src;
-//         dst[i + 5] = src;
-//         dst[i + 6] = src;
-//     }
-//     return 0;
-// }
+template<typename ST, typename VT>
+int Copy(ST n, const VT& src, VT* dst) {
+    // std::cout << "copy" << std::endl;
+    //make sure: the length of a and b is equal
+    //           and n>0
+    ST LN = 7;
+    ST m = (n - 1) % LN;
+    for (ST i = 0; i <= m; ++i) {
+        dst[i] = src;
+    }
+    if (n <= LN) {
+        return 1;
+    }
+    ST mp1 = m + 1;
+#pragma omp parallel for
+    for (ST i = mp1; i < n; i += LN) {
+        dst[i    ] = src;
+        dst[i + 1] = src;
+        dst[i + 2] = src;
+        dst[i + 3] = src;
+        dst[i + 4] = src;
+        dst[i + 5] = src;
+        dst[i + 6] = src;
+    }
+    return 0;
+}
 //construct givens plane rotation.
 template<class VT>
 int Rotg(VT& sa, //
