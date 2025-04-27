@@ -27,6 +27,7 @@ template<class VALUE>
 class MatrixSCR_ {
 public:
 	typedef VALUE Vt;
+	typedef MatrixSCR_<VALUE> Self;
 private:
 	ArrayListV_<Vt> val_;       // data values (nz_ elements)
 	ArrayListV_<St> rowptr_;    // row_ptr     (dim_[0]+1 elements)
@@ -42,7 +43,7 @@ public:
 		dim_[1] = 0;
 	}
 	//MatrixSCC(const Matrix &M);
-	MatrixSCR_(const MatrixSCR_<Vt> &S) :
+	MatrixSCR_(const Self &S) :
 			val_(S.val_), rowptr_(S.rowptr_), colind_(S.colind_), nz_(S.nz_) {
 		dim_[0] = S.dim_[0];
 		dim_[1] = S.dim_[1];
