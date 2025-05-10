@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 
 set(This Algebra)
 
@@ -12,9 +12,12 @@ set(Sources
     # test_interp.cpp
     # test_rational.cpp
 )
+
 find_package(Armadillo)
 if(APPLE)
     find_library(ACCELERATE_LIBRARY Accelerate)
+elseif(UNIX AND NOT APPLE)
+    message("Running on Ubuntu")
 else()
     message(FATAL_ERROR "This project only supports macOS!")
 endif()
@@ -35,9 +38,11 @@ if(APPLE)
   link_directories("/opt/homebrew/opt/libomp/lib/")
   target_link_directories(${This} PUBLIC "/opt/homebrew/opt/libomp/lib/")
 endif()
-
-target_link_libraries(${This} gtest_main omp ${ARMADILLO_LIBRARIES})
-
+if(APPLE)
+    target_link_libraries(${This} gtest_main omp ${ARMADILLO_LIBRARIES})
+elseif(UNIX AND NOT APPLE)
+    target_link_libraries(${This} gtest_main OpenMP::OpenMP_CXX ${ARMADILLO_LIBRARIES})
+endif()
 add_test(
     NAME ${This}
     COMMAND ${This}

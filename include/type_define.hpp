@@ -9,6 +9,7 @@
 #include <functional>  // for std::forward()
 #include <type_traits> // for std::is_same<> and invoke_result<>
 #include <utility>     // for std::invoke()
+#include <cstdint> 
 #ifdef OPENMP
 #include <omp.h>
 #endif 
