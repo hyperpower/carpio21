@@ -42,7 +42,7 @@ endif()
 
 
 # openmp
-OPTION(ENABLE_OPENMP "Enable openmp" ON) # Enabled by default
+OPTION(ENABLE_OPENMP "Enable openmp" OFF) # Enabled by default
 IF(ENABLE_OPENMP)
   message(STATUS "======== LOOKING FOR OPENMP ========================")
   if(APPLE)

@@ -46,7 +46,7 @@ void BM_BLAS0Add_Unroll(benchmark::State& state) {
 }
 namespace _local{
 double start = 2.;
-double end   = 256.;
+double end   = std::pow(2,14);
 double multiplier = 2;
 }
 
@@ -72,7 +72,7 @@ void BM_BLAS0Add_FixUnroll(benchmark::State& state) {
     }
 }
 
-BENCHMARK(BM_BLAS0Add_FixUnroll<double>)->RangeMultiplier(_local::multiplier)->Range(_local::start, _local::end); 
+BENCHMARK(BM_BLAS0Add_Unroll<double>)->RangeMultiplier(_local::multiplier)->Range(_local::start, _local::end); 
 BENCHMARK(BM_BLAS0Add_Normal<double>)->RangeMultiplier(_local::multiplier)->Range(_local::start, _local::end); 
 
 #endif

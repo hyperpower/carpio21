@@ -34,8 +34,8 @@ cmake_minimum_required(VERSION 3.10)
   add_test(NAME TestGTest COMMAND TestGTest)
 
   ## Uncomment here to run the test
-  add_subdirectory(algebra)
-  # add_subdirectory(io)
+  # add_subdirectory(algebra)
+  add_subdirectory(io)
   # add_subdirectory(utility)
   # add_subdirectory(substance)
   # add_subdirectory(geometry)

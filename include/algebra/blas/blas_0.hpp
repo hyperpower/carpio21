@@ -280,15 +280,18 @@ void AddUnroll(const ST& n, const VT* a, const VT* b, VT* res) {
     // }
     ST i  = 0;
     ST ns = (n < 3) ? 0 : (n - 3);
+    ST i1 = i + 1; 
+    ST i2 = i + 2; 
+    ST i3 = i + 3; 
 #pragma omp parallel for
     for (i = 0; i < ns; i += 4) {
-        ST i1 = i + 1; 
-        ST i2 = i + 2; 
-        ST i3 = i + 3; 
         res[i ] = a[i ] + b[i ];   
         res[i1] = a[i1] + b[i1];
         res[i2] = a[i2] + b[i2];
         res[i3] = a[i3] + b[i3];
+        i1 += 4; 
+        i2 += 4; 
+        i3 += 4; 
     }
     for (; i < n; ++i) {
         res[i] = a[i] + b[i];

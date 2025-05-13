@@ -42,7 +42,7 @@ int case_random() {
         gnu.set_label(count, wn? "  IN ":"  OUT ", p.x(), p.y(), "left" );
         count++;
     }
-    auto a_arrows = ToGnuplotActorAsVector(pc);
+    auto a_arrows = ToGnuplotActorVector(pc);
     a_arrows.style("with vectors lw 2 lc 2");
     gnu.add(a_arrows);
     gnu.plot();
@@ -81,7 +81,7 @@ int case_on_edge() {
         gnu.set_label(count, wn? "  IN ":"  OUT ", p.x(), p.y(), "left" );
         count++;
     }
-    auto a_arrows = ToGnuplotActorAsVector(pc);
+    auto a_arrows = ToGnuplotActorVector(pc);
     a_arrows.style("with vectors lw 2 lc 2");
     gnu.add(a_arrows);
     gnu.plot();
@@ -121,7 +121,7 @@ int case_on_vertex() {
         gnu.set_label(count, wn? "  IN ":"  OUT ", p.x(), p.y(), "left" );
         count++;
     }
-    auto a_arrows = ToGnuplotActorAsVector(pc);
+    auto a_arrows = ToGnuplotActorVector(pc);
     a_arrows.style("with vectors lw 2 lc 2");
     gnu.add(a_arrows);
     gnu.plot();

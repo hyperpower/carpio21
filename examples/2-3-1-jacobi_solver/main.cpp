@@ -47,7 +47,7 @@ void Read_Matrix(TextFile& f, const std::string& name, MatSCO& mat){
 // input singal task time in milliseconds
 // ouput wall time of parallel runing
 void SolverTest(const MatSCR& mat){
-    auto start = std::chrono::system_clock::now();
+    auto start = std::chrono::steady_clock::now();
 
 	Arr    x(mat.size_i());
 	x.assign(0.0);
@@ -56,14 +56,14 @@ void SolverTest(const MatSCR& mat){
 	b.assign(1.0);
 	Solver solver(10000, 1e-7);
 	solver.solve(mat, x, b);
-	auto end = std::chrono::system_clock::now();
+	auto end = std::chrono::steady_clock::now();
 	plot_residual("./fig/residual", solver);
   	double dt = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
 	std::cout << "D Time = " << dt << "s" << std::endl;
 }
 
 double SolverTimeTest(const MatSCR& mat, int nt){
-    auto start = std::chrono::system_clock::now();
+    auto start = std::chrono::steady_clock::now();
 	Solver solver(10000, 1e-7);
 #ifdef OPENMP
 	omp_set_num_threads(nt);
@@ -75,7 +75,7 @@ double SolverTimeTest(const MatSCR& mat, int nt){
 #else
 	std::cout << "No OpenMP " << std::endl;
 #endif
-	auto end = std::chrono::system_clock::now();
+	auto end = std::chrono::steady_clock::now();
   	double dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 	std::cout << "D Time = " << dt << "ms" << std::endl;
 	return dt;

@@ -80,12 +80,12 @@ auto AddActorsTransformed(Gnuplot& gnu, const PointChain2& box, const PointChain
 
 auto AddAxes(Gnuplot& gnu){
     gnu.set_label(1, "x",  0.45, -0.08, "textcolor rgb \"#00A4EF\"");
-    auto actor_x = ToGnuplotActorAsVector(Segment2(Point2(0.0,0.0), Point2(0.5,0.0)));
+    auto actor_x = ToGnuplotActorVector(Segment2(Point2(0.0,0.0), Point2(0.5,0.0)));
     actor_x.style("with vectors lt 1 lw 3 lc rgb \"#00A4EF\"");
     gnu.add(actor_x);
 
     gnu.set_label(2, "y", -0.08, 0.45, "textcolor rgb \"#F25022\"");
-    auto actor_y = ToGnuplotActorAsVector(Segment2(Point2(0.0,0.0), Point2(0.0,0.5)));
+    auto actor_y = ToGnuplotActorVector(Segment2(Point2(0.0,0.0), Point2(0.0,0.5)));
     actor_y.style("with vectors lt 1 lw 3 lc rgb \"#F25022\"");
     gnu.add(actor_y);
 }
@@ -101,7 +101,7 @@ void TestTranslate(){
     gnu.set_equal_aspect_ratio();
 
     Point2 trans_vec = {0.2, 0.3}; 
-    auto actor_tv = ToGnuplotActorAsVector(Segment2(Point2(0.0,0.0), Point2(trans_vec)));
+    auto actor_tv = ToGnuplotActorVector(Segment2(Point2(0.0,0.0), Point2(trans_vec)));
     actor_tv.style("with vectors lt 1 lw 3 lc rgb \"#7FBA00\"");
     gnu.add(actor_tv);
     Point2 mid = Mid(trans_vec, {0.0,0.0});
@@ -127,7 +127,7 @@ void TestScale(){
     gnu.set_equal_aspect_ratio();
 
     Point2 vec = {1.5, 1.2}; 
-    auto actor_tv = ToGnuplotActorAsVector(Segment2(Point2(0.0,0.0), Point2(vec)));
+    auto actor_tv = ToGnuplotActorVector(Segment2(Point2(0.0,0.0), Point2(vec)));
     actor_tv.style("with vectors lt 1 lw 3 lc rgb \"#7FBA00\"");
     gnu.add(actor_tv);
     Point2 mid = Mid(vec, {0.0,0.0});
