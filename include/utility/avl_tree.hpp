@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include "utility/binary_tree.hpp"
+#include "utility/sorted_binary_tree.hpp"
 // #include "Iterator.h"
 
 namespace carpio {

@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "utility/binary_tree.hpp"
+#include "utility/sorted_binary_tree.hpp"
 #include "utility/avl_tree.hpp"
 #include "utility/random.hpp"
 #include "geometry/geometry.hpp"

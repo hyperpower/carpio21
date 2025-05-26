@@ -85,16 +85,16 @@ namespace carpio {
 // value type
 typedef std::size_t St;    //size type
 typedef double      Vt;    //value type
-typedef int           Int;
+typedef int         Int;
 typedef unsigned int uInt;
-typedef double        Float;
+typedef double      Float;
 typedef void*             utPointer;
 typedef const void* const_utPointer;
 
 
-typedef std::function<Vt(Vt, Vt, Vt, Vt)>   FunXYZT_V;
+typedef std::function<  Vt(Vt, Vt, Vt, Vt)> FunXYZT_V;
 typedef std::function<void(Vt, Vt, Vt, Vt)> FunXYZT;
-typedef std::function<Vt(Vt, Vt, Vt)>       FunXYZ_V;
+typedef std::function<  Vt(Vt, Vt, Vt)>     FunXYZ_V;
 typedef std::function<void(Vt, Vt, Vt)>     FunXYZ;
 
 struct BaseTag{};
