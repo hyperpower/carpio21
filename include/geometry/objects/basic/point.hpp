@@ -136,7 +136,7 @@ public:
             return 0;
         }
     }
-    bool is_zero(){
+    bool is_zero() const{
         for(auto& v : *this){
             if (v != 0 ){
                 return false;
@@ -345,9 +345,12 @@ public:
      *  \return Vt - an distance from to this point
      */
     CV dist(const Point& p) const {
-        double dx = x() - p.x();
-        double dy = y() - p.y();
-        return sqrt(dx * dx + dy * dy);
+        double sum = 0.0;
+        for (St i = 0; i < Dim; ++i) {
+            double d = double(this->at(i)) - double(p[i]);
+            sum += d * d;
+        }
+        return std::sqrt(sum);
     }
 
     /**
@@ -416,6 +419,18 @@ public:
         return *this;
     }
 
+    friend std::ostream& operator<<(std::ostream& stream, const Point_& point) {
+        stream << "(";
+        for (St d = 0; d < DIM; ++d) {
+            stream << point[d];
+            if (d != DIM - 1) {
+                stream << ", ";
+            }
+        }
+        stream << ")";
+        return stream;
+    }
+
 };
 template<typename TYPE, St DIM>
 inline Point_<TYPE, DIM> operator*(
@@ -448,19 +463,6 @@ inline Point_<TYPE, DIM> operator/(
     return lhs;
 }
 
-
-template<typename TYPE, St DIM>
-std::ostream& operator<<(std::ostream& stream, const Point_<TYPE, DIM>& point) {
-    stream << "(";
-    for (St d = 0; d < DIM; ++d) {
-        stream << point[d];
-        if (d != DIM - 1) {
-            stream << ", ";
-        }
-    }
-    stream << ")";
-    return stream;
-}
 
 template<typename TYPE, St DIM>
 std::string ToString(const Point_<TYPE, DIM>& p){

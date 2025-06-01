@@ -16,16 +16,14 @@ release = '0.0.1'
 
 extensions = ['breathe', 'exhale']
 
-# Exhale 配置
 exhale_args = {
-    # 必需参数
     "containmentFolder": "./api",  # API 文档生成的目录
     "rootFileName": "library_root.rst",  # 根 RST 文件名
     "doxygenStripFromPath":  "..",
     # "doxygenPath": "../xml",  # Doxygen XML 输出路径
-    # 可选参数
-    "rootFileTitle": "C++ API 文档",  # 文档标题
-    "createTreeView": True,  # 生成树状结构
+    # 
+    "rootFileTitle": "C++ API 文档",  # 
+    "createTreeView": True,  # 
     "exhaleExecutesDoxygen": False,  # 是否由 Exhale 运行 Doxygen
     "afterTitleDescription": "以下是项目的 C++ API 文档。",
     "fullApiSubSectionTitle": "完整 API 列表",
@@ -41,7 +39,6 @@ breathe_default_project = "carpio-doc"
 
 templates_path = ['_templates']
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------

@@ -95,7 +95,7 @@ def annote_label(cx, cy, cz, name, c):
         "ax"        : 50,
         "ay"        : 0,
         "font"      :{"color": c,
-                      "size" : 14
+                      "size" : 16
                       },
         "xanchor"   : "left",
         "yanchor"   : "bottom"

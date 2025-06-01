@@ -20,9 +20,9 @@ from plotly_helper import *
 
 # data part
 t1 = [
-    [3, 1, 1],
-    [1, 4, 1],
     [1, 1, 1],
+    [1, 4, 1],
+    [4, 1, 1],
 ]
 
 t2 = [
@@ -52,13 +52,13 @@ traces["T1"] = go.Scatter3d(x = t1xyz[0],
                                  color="#4285F4",
                                  width=3))
 
-arrow0 = arrow(go, [0,0,0], t1[0], "#4285F4" )
-arrow1 = arrow(go, [0,0,0], t1[1], "#4285F4" )
-arrow2 = arrow(go, [0,0,0], t1[2], "#4285F4" )
+arrow0 = arrow(go, [0,0,0], t1[0], cs["blue"] )
+arrow1 = arrow(go, [0,0,0], t1[1], cs["blue"] )
+arrow2 = arrow(go, [0,0,0], t1[2], cs["blue"] )
 
-arrowt0 = arrow(go, [0,0,0], t2[0], "#FBBD0C" )
-arrowt1 = arrow(go, [0,0,0], t2[1], "#FBBD0C" )
-arrowt2 = arrow(go, [0,0,0], t2[2], "#FBBD0C" )
+arrowt0 = arrow(go, [0,0,0], t2[0], cs["yellow"] )
+arrowt1 = arrow(go, [0,0,0], t2[1], cs["yellow"] )
+arrowt2 = arrow(go, [0,0,0], t2[2], cs["yellow"] )
 
 
 traces["T1Surface"] = go.Mesh3d(x = t1xyz[0], 
@@ -100,14 +100,14 @@ fig=go.Figure(data)
 
 camera = dict(
     up    =dict(x=0, y=0, z=1),
-    center=dict(x=0, y=-0.2, z=0.1),
-    eye   =dict(x=0.8, y=-0.9, z=0.3)
+    center=dict(x=0, y=0.5, z=0),
+    eye   =dict(x=1.0, y=-0.5, z=0.5)
 )
 
 
 fig.update_layout(
     scene_camera = camera,
-    height       = 300,
+    height       = 500,
     margin_t     = 0,
     margin_b     = 0,
     margin_r     = 10,
@@ -117,12 +117,12 @@ fig.update_layout(
         yaxis=dict(visible=False),
         zaxis=dict(visible=False),
         annotations=[
-         annote_label(t1[0][0], t1[0][1], t1[0][2], "P0", "#4285F4"),
-         annote_label(t1[1][0], t1[1][1], t1[1][2], "P1", "#4285F4"),
-         annote_label(t1[2][0], t1[2][1], t1[2][2], "P2", "#4285F4"),
-         annote_label(t2[0][0], t2[0][1], t2[0][2], "Q0", "#FBBD0C"),
-         annote_label(t2[1][0], t2[1][1], t2[1][2], "Q1", "#FBBD0C"),
-         annote_label(t2[2][0], t2[2][1], t2[2][2], "Q2", "#FBBD0C"),
+         annote_label(t1[0][0], t1[0][1], t1[0][2], r'$P_0$', "#4285F4"),
+         annote_label(t1[1][0], t1[1][1], t1[1][2], r'$P_1$', "#4285F4"),
+         annote_label(t1[2][0], t1[2][1], t1[2][2], r'$P_2$', "#4285F4"),
+         annote_label(t2[0][0], t2[0][1], t2[0][2], r'$Q_0$', "#FBBD0C"),
+         annote_label(t2[1][0], t2[1][1], t2[1][2], r'$Q_1$', "#FBBD0C"),
+         annote_label(t2[2][0], t2[2][1], t2[2][2], r'$Q_2$', "#FBBD0C"),
          annote_label(1, 0, 0, "x", "green"),
          annote_label(0, 1, 0, "y", "red"),
          annote_label(0, 0, 1, "z", "blue"),
@@ -133,4 +133,4 @@ fig.update_layout(
 
 # fig.write_html("fig1.html")
 # fig.write_html(join(_PATH_THIS_, "fig1_tt.div"),full_html=False)
-# fig.show()
+fig.show()
