@@ -73,18 +73,10 @@ traces={}
 traces["T1"] = go.Scatter3d(x = t1xyz[0], 
                             y = t1xyz[1],
                             z = t1xyz[2],
-                            name='T1',
+                            name='U',
                             line=dict(
                                  color="#4285F4",
                                  width=3))
-
-arrow0 = plh.arrow(go, [0,0,0], t1[0], cs["blue"] )
-arrow1 = plh.arrow(go, [0,0,0], t1[1], cs["blue"] )
-arrow2 = plh.arrow(go, [0,0,0], t1[2], cs["blue"] )
-
-arrowt0 = plh.arrow(go, [0,0,0], t2[0], cs["yellow"] )
-arrowt1 = plh.arrow(go, [0,0,0], t2[1], cs["yellow"] )
-arrowt2 = plh.arrow(go, [0,0,0], t2[2], cs["yellow"] )
 
 
 traces["T1Surface"] = go.Mesh3d(x = t1xyz[0], 
@@ -96,7 +88,7 @@ traces["T1Surface"] = go.Mesh3d(x = t1xyz[0],
 traces["T2"]  = go.Scatter3d(x = t2xyz[0], 
                              y = t2xyz[1],
                              z = t2xyz[2],
-                            name='T2',
+                            name='V',
                             line=dict(
                                      color="#FBBD0C",
                                      width=3))
@@ -107,53 +99,9 @@ traces["T2Surface"] = go.Mesh3d(x = t2xyz[0],
                                 opacity=0.8,
                                 color  = "#FBBD0C")
 
-traces["Line"]  = go.Scatter3d(
-    x=[2,2], y=[0,5], z=[1,1],
-    mode='lines', name='Intersect Line',
-    line=dict(color=cs["green"], width=5)
-)
 
-# Triangle 1 intersection point on Plane 2
-# p0 -> p2
-pp02, pd02 = ph.line_equation_3d(t1[0], t1[2])
-pi = ph.line_plane_intersection(p2, pp02, pd02)
-traces["pi"]  = go.Scatter3d(
-    x=[pi[0]], y=[pi[1]], z=[pi[2]],
-    name="i", mode='markers',
-    marker =dict(size=5, color=cs["blue"])
-)
-pp12, pd12 = ph.line_equation_3d(t1[1], t1[2])
-pj = ph.line_plane_intersection(p2, pp12, pd12)
-traces["pj"]  = go.Scatter3d(
-    x=[pj[0]], y=[pj[1]], z=[pj[2]],
-    name="j", mode='markers',
-    marker =dict(size=5, color=cs["blue"])
-)
-# Triangle 2 intersection point on Plane 1
-qp02, qd02 = ph.line_equation_3d(t2[0], t2[2])
-pk = ph.line_plane_intersection(p1, qp02, qd02)
-traces["pk"]  = go.Scatter3d(
-    x=[pk[0]], y=[pk[1]], z=[pk[2]],
-    name="k", mode='markers',
-    marker =dict(size=5, color=cs["yellow"])
-)
-pp12, pd12 = ph.line_equation_3d(t2[1], t2[2])
-ql = ph.line_plane_intersection(p1, pp12, pd12)
-traces["ql"]  = go.Scatter3d(
-    x=[ql[0]], y=[ql[1]], z=[ql[2]],
-    name="l", mode='markers',
-    marker =dict(size=5, color=cs["yellow"])
-)
 
 data=list(traces.values())
-
-data.extend(list(arrow0.values()))
-data.extend(list(arrow1.values()))
-data.extend(list(arrow2.values()))
-
-data.extend(list(arrowt0.values()))
-data.extend(list(arrowt1.values()))
-data.extend(list(arrowt2.values()))
 
 data.extend(list(plh.coordinate(go).values()))
 
@@ -162,8 +110,12 @@ fig=go.Figure(data)
 
 camera = dict(
     up    = {"x": 0,"y": 0,"z": 1 },
-    center= {"x": 0.0835682267608771,"y": -0.16778116467798726,"z": -0.10649313647557461},
-    eye   = {"x": 1.0530442890234777,"y": -0.544530617157829,"z": 0.6340155268971976}
+    center= {"x": 0.06555170705854932,
+"y": 0.09590046995309226,
+"z": 0.005677779257753759},
+    eye   = {"x": 0.9845245216169527,
+"y": -0.4438988657389967,
+"z": 0.49982457626685406}
 )
 
 
@@ -185,14 +137,9 @@ fig.update_layout(
          plh.annote_label(t2[0][0], t2[0][1], t2[0][2], r'$Q_0$', "#FBBD0C"),
          plh.annote_label(t2[1][0], t2[1][1], t2[1][2], r'$Q_1$', "#FBBD0C"),
          plh.annote_label(t2[2][0], t2[2][1], t2[2][2], r'$Q_2$', "#FBBD0C"),
-         plh.annote_label(1, 0, 0, "x", "green"),
-         plh.annote_label(0, 1, 0, "y", "red"),
-         plh.annote_label(0, 0, 1, "z", "blue"),
-         plh.annote_label(2, 4, 1, r'$L$', cs["green"]),
-         plh.annote_label(pi[0], pi[1], pi[2], r'$i$', cs["red"]),
-         plh.annote_label(pj[0], pj[1], pj[2], r'$j$', cs["red"]),
-         plh.annote_label(pk[0], pk[1], pk[2], r'$k$', cs["red"]),
-         plh.annote_label(ql[0], ql[1], ql[2], r'$l$', cs["red"]),
+         plh.annote_label(0.9, 0, 0, "x", "green"),
+         plh.annote_label(0, 0.9, 0, "y", "red"  ),
+         plh.annote_label(0, 0, 0.9, "z", "blue" ),
         ]
     ),
 )
@@ -200,8 +147,8 @@ fig.update_layout(
 
 if __name__ == "__main__":
     ph.generate_0_svg(_PATH_THIS_)
-    html_path = abspath(join(_PATH_THIS_, "fig1_tt_ply.html"))
+    html_path = abspath(join(_PATH_THIS_, "fig1_ttdefine_ply.html"))
     fig.write_html(html_path)
-    # plh.append_js_to_show_camera_info(html_path)
-    fig.write_html(abspath(join(_PATH_THIS_, "fig1_tt_ply.div")), full_html=False, include_plotlyjs='cdn')
+    plh.append_js_to_show_camera_info(html_path)
+    fig.write_html(abspath(join(_PATH_THIS_, "fig1_ttdefine_ply.div")), full_html=False, include_plotlyjs='cdn')
 # 

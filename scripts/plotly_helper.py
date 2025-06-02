@@ -1,33 +1,4 @@
-import math
-import plotly.graph_objects as go
-
-def sub(p1, p0):
-    p = [p1[0]-p0[0],
-         p1[1]-p0[1],
-         p1[2]-p0[2]]
-    return p
-
-def mid(p1, p0):
-    p = [(p1[0]+p0[0])*0.5,
-         (p1[1]+p0[1])*0.5,
-         (p1[2]+p0[2])*0.5]
-    return p
-
-def to_xyz(p0, p1, p2):
-    res = [
-      [p0[0], p1[0], p2[0]], #x
-      [p0[1], p1[1], p2[1]], #y
-      [p0[2], p1[2], p2[2]], #z
-    ]
-    return res
-
-def length(p):
-    return math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2])
-    
-def normalize(p):
-    l = length(p)
-    s3 = math.sqrt(3.0)
-    return [p[0]/l*s3, p[1]/l*s3, p[2]/l*s3]
+import plot_helper as ph
 
 def arrow(go, p0, p1, c):
     traces = {}
@@ -40,8 +11,8 @@ def arrow(go, p0, p1, c):
                                line=dict(
                                  color=c, dash="longdash",
                                  width=5))
-    veo = sub(p1,p0)
-    veo = normalize(veo)
+    veo = ph.sub(p1,p0)
+    veo = ph.normalize(veo)
     traces["Cone"] = go.Cone(
                          x=[p1[0]], y=[p1[1]], z=[p1[2]],
                          u=[veo[0]], v=[veo[1]], w=[veo[2]],
@@ -83,7 +54,6 @@ def coordinate(go):
                                  width=5))
     return traces
 
-
 def annote_label(cx, cy, cz, name, c):
     res = {
         "showarrow" : False,
@@ -119,3 +89,39 @@ def annote_point_label(p, name, c):
         "yanchor"   : "bottom"
         }
     return res
+
+def append_js_to_show_camera_info(html_name):
+    with open(html_name, 'r') as file:
+        content = file.read()
+    
+    js_code = """
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var gd = document.querySelector('.js-plotly-plot');
+        var infoDiv = document.createElement('div');
+        infoDiv.style.position = 'fixed';
+        infoDiv.style.top = '10px';
+        infoDiv.style.right = '10px';
+        infoDiv.style.background = 'rgba(255,255,255,0.9)';
+        infoDiv.style.border = '1px solid #ccc';
+        infoDiv.style.padding = '8px';
+        infoDiv.style.zIndex = 1000;
+        infoDiv.style.fontSize = '12px';
+        infoDiv.style.fontFamily = 'monospace';
+        document.body.appendChild(infoDiv);
+
+        function updateCameraInfo(eventdata) {
+            if(eventdata && eventdata['scene.camera']) {
+                var cam = eventdata['scene.camera'];
+                infoDiv.innerText = JSON.stringify(cam, null, 2);
+            }
+        }
+        gd.on('plotly_relayout', updateCameraInfo);
+    });
+    </script>
+    """
+    
+    content += js_code
+    
+    with open(html_name, 'w') as file:
+        file.write(content)

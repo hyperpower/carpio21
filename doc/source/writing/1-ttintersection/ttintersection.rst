@@ -1,22 +1,23 @@
 Triangle intersection method
 ==============================
 
-基础向量运算
+Basic Vector Operations
 ----------------------
 
-向量的定义
-+++++++++++++++++
+Definition of a Vector
++++++++++++++++++++++
 
-向量 :math:`\mathbf{a}` 属于 :math:`\mathbf{R^3}`
+A vector :math:`\mathbf{a}` belongs to :math:`\mathbf{R^3}`
 
 .. math::
    :label: vector_define
 
    \mathbf{a} = (a_0, a_1, a_2)
 
-向量的叉乘
-+++++++++++++++++
-两个向量 :math:`\mathbf{a}` 和 :math:`\mathbf{b}` 的叉乘在三维空间表示为 :math:`\mathbf{a} \times \mathbf{b}`.
+Cross Product of Vectors
+++++++++++++++++++++++++
+The cross product of two vectors :math:`\mathbf{a}` and :math:`\mathbf{b}` 
+in three-dimensional space is denoted as :math:`\mathbf{a} \times \mathbf{b}`.
 
 .. math::
    :label: cross_product1
@@ -64,24 +65,30 @@ Triangle intersection method
    \mathbf{j}
 
 
-三角形定义
-++++++++++++++++++++
-三角形通常由三个点组成, :math:`T=(P_0, P_1, P_2)`. 三角形的法向定义为： :math:`\mathbf{n}= \mathbf{v_1} \times \mathbf{v_2}`, 其中，:math:`\mathbf{v_1} = (P_1 - P_0)`, :math:`\mathbf{v_2} = (P_2 - P_0)`.
+Definition of a Triangle
+++++++++++++++++++++++++
+A triangle is usually defined by three points, :math:`T=(P_0, P_1, P_2)`. The normal of the triangle is defined as: :math:`\mathbf{n}= \mathbf{v_1} \times \mathbf{v_2}`, where :math:`\mathbf{v_1} = (P_1 - P_0)`, :math:`\mathbf{v_2} = (P_2 - P_0)`.
 
 
-问题描述
+Problem Description
 ----------------------
-已知两个三角形, :math:`U=(P_0, P_1, P_2)`, :math:`V=(Q_0, Q_1, Q_2)`. 
+Given two triangles, :math:`U=(P_0, P_1, P_2)`, :math:`V=(Q_0, Q_1, Q_2)`. 
 
-- 三角形 :math:`U` 是否与 :math:`V` 相交?
-- 如果他们相交，结果是什么?
+- Do triangles :math:`U` and :math:`V` intersect?
+- If they intersect, what is the result?
    
-.. jupyter-execute:: fig1_tt_ply.py
-    :hide-code:
+.. raw:: html
+   :file: fig1_ttdefine_ply.div
 
-上图为三维坐标系下的两个三角形。
+.. figure:: 0.svg
+   :align: center
 
-方法
+   Triangles Definition
+
+The plane containing triangle :math:`U` is defined as :math:`\pi_1`, 
+and the plane containing triangle :math:`V` is defined as :math:`\pi_2`。
+
+Method
 ----------------------
 
 将三角形 :math:`U` 的 :math:`P_0` 点作为原点
@@ -107,7 +114,8 @@ Triangle intersection method
 计算三角形的相对位置
 ++++++++++++++++++++++
 
-以 :math:`P_0` 为原点三角形 :math:`U` 作为基准三角形。可以计算出三角形 :math:`V` 的三个顶点的相对位置。
+以 :math:`P_0` 为原点三角形 :math:`U` 作为基准三角形。
+可以计算出三角形 :math:`V` 的三个顶点的相对位置。
 
 .. math::
 
