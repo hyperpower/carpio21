@@ -11,13 +11,13 @@ set(Sources
     # test_point.cpp
     # test_affine.cpp
     # test_point_chain.cpp
-    # test_ts.cpp
+    test_ts.cpp
     # test_tri_tri.cpp
     # test_seg_tri.cpp
     # test_predicate.cpp
     # test_polygon_partition.cpp
     # test_segment.cpp
-    test_ben_ott2.cpp
+    # test_ben_ott2.cpp
 )
 set(Sources_Bezier test_bezier.cpp)
 

@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.12)
 set(This IO)
 
 set(Sources
-    test_gnuplot.cpp
+    # test_gnuplot.cpp
     # test_plotly.cpp
-    # test_ply.cpp
+    test_ply.cpp
     # test_csv.cpp
     # test_textfile.cpp
 )

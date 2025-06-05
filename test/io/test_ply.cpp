@@ -206,4 +206,26 @@ TEST(ply, read) {
 
 }
 
+TEST(ply, read_binary) {
+	std::string file_path = "./asset/ply_model/bunny_res1.ply";
+	std::ifstream ss(file_path);
+	ASSERT_TRUE(ss.is_open()) << "Failed to open file: " << file_path;
+	
+	PlyFile file(ss);
+
+	std::vector<float> verts;
+	size_t vertexCount = file.request_properties_from_element("vertex", { "x", "y", "z" }, verts);
+
+	std::cout << "Read " << verts.size() << " total vertices (" << vertexCount << " properties)." << std::endl;
+
+	file.read(ss);
+
+	for (size_t i = 0; i < (verts.size() > 10 ? 10 : verts.size()); i += 3) {
+            std::cout << "Vertex " << i / 3 << ": "
+                      << verts[i] << ", "
+                      << verts[i + 1] << ", "
+                      << verts[i + 2] << std::endl;
+        }
+
+}
 

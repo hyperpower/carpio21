@@ -11,6 +11,8 @@
 #include "objects/basic/segment.hpp"
 #include "objects/basic/box.hpp"
 #include "objects/basic/point_chain.hpp"
+#include "objects/basic/triangle.hpp"
+
 
 #include "objects/ts/vertex.hpp"
 #include "objects/ts/edge.hpp"

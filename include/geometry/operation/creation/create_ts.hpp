@@ -150,17 +150,21 @@ public:
 
     spGeo from_ply_file(const std::string& filename) {
         std::ifstream ss(filename);
+        if (!ss.is_open()) {
+            std::cerr << "Failed to open file: " << filename << std::endl;
+            return nullptr;
+        }
 		// Parse the ASCII header fields
 		PlyFile file(ss);
 
-        // auto eles = file.get_elements();
-        // for (auto& e : eles){
-        //     std::cout << e.name << std::endl;
-        //     for (auto& p : e.properties){
-        //         std::cout << p.name << std::endl;
-        //         std::cout << "Property Type : " << int(p.propertyType) << std::endl;
-        //     }
-        // }
+        auto eles = file.get_elements();
+        for (auto& e : eles){
+            std::cout << e.name << std::endl;
+            for (auto& p : e.properties){
+                std::cout << p.name << std::endl;
+                std::cout << "Property Type : " << int(p.propertyType) << std::endl;
+            }
+        }
         ASSERT(file.has_element("face"));
 
 

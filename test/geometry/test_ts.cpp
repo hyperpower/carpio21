@@ -71,14 +71,18 @@ TEST(TS, ts_initial3){
     // typedef GPlotlyActor_TS_<double, 3> PA;
 
     CreateTS creator;
-    // auto sur = creator.from_ply_file("./test/input_files/icosahedron.ply");
-    auto sur = creator.from_ply_file("./test/input_files/teapot.ply");
+    auto sur = creator.from_ply_file("./asset/ply_model/bunny_res4.ply");
+    auto ico = creator.from_ply_file("./asset/ply_model/icosahedron_ascii.ply");
+    // auto sur = creator.from_ply_file("./test/input_files/teapot.ply");
+
     // auto sur = creator.from_ply_file("./test/input_files/elephant.ply");
 
     Plotly_ plot;
     std::cout << "Plotly Version : " << plot.version() << std::endl;
     plot.add(ToPlotlyActor(*sur, "surface"));
-    plot.add(ToPlotlyActor(*sur));
+    // plot.add(ToPlotlyActor(*sur));
+    // plot.add(ToPlotlyActor(*ico, "surface"));
+    plot.add(ToPlotlyActor(*ico));
     // // out put div
     // plot.set_output_type("div");
     // plot.set_include_plotlyjs(false);
