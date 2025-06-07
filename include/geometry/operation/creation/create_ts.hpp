@@ -157,21 +157,21 @@ public:
 		// Parse the ASCII header fields
 		PlyFile file(ss);
 
-        auto eles = file.get_elements();
-        for (auto& e : eles){
-            std::cout << e.name << std::endl;
-            for (auto& p : e.properties){
-                std::cout << p.name << std::endl;
-                std::cout << "Property Type : " << int(p.propertyType) << std::endl;
-            }
-        }
+        // auto eles = file.get_elements();
+        // for (auto& e : eles){
+        //     std::cout << e.name << std::endl;
+        //     for (auto& p : e.properties){
+        //         std::cout << p.name << std::endl;
+        //         std::cout << "Property Type : " << int(p.propertyType) << std::endl;
+        //     }
+        // }
         ASSERT(file.has_element("face"));
 
 
 		std::vector<float> verts;
 		std::vector<uint32_t> faces;
         St vertexCount = file.request_properties_from_element("vertex", { "x","y", "z" }, verts);
-		// St faceCount   = file.request_properties_from_element("face",   {"vertex_indices"}, faces);
+		// // St faceCount   = file.request_properties_from_element("face",   {"vertex_indices"}, faces);
 		St faceCount   = file.request_properties_from_element("face",   {"vertex_indices"}, faces);
 		file.read(ss);
         

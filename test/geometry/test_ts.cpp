@@ -74,12 +74,21 @@ TEST(TS, ts_initial3){
     auto sur = creator.from_ply_file("./asset/ply_model/bunny_res4.ply");
     auto ico = creator.from_ply_file("./asset/ply_model/icosahedron_ascii.ply");
     // auto sur = creator.from_ply_file("./test/input_files/teapot.ply");
+    std::cout << "surface size = " <<  sur->size_face() << std::endl;
+    std::cout << "ico size     = " << ico->size_face() << std::endl;
+    std::vector<double> arr_s = {12,12,12};
+    Scale(*sur, arr_s);
+    std::vector<double> arr_trans = {0.0,-1.0,0.0};
+    Translate(*sur, arr_trans);
+
 
     // auto sur = creator.from_ply_file("./test/input_files/elephant.ply");
 
     Plotly_ plot;
     std::cout << "Plotly Version : " << plot.version() << std::endl;
-    plot.add(ToPlotlyActor(*sur, "surface"));
+    auto asurfce = ToPlotlyActor(*sur, "surface");
+    asurfce.update("color", "yellow");
+    plot.add(asurfce);
     // plot.add(ToPlotlyActor(*sur));
     // plot.add(ToPlotlyActor(*ico, "surface"));
     plot.add(ToPlotlyActor(*ico));

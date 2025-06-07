@@ -12,6 +12,9 @@
 #include <unordered_map>
 #include <bitset>
 
+//deprecate -----------------
+// new version moved to geometry/tri_tri/intersection.hpp
+
 namespace carpio {
 
 /**
