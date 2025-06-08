@@ -6,7 +6,7 @@
 #include "geometry/predicate.hpp"
 #include "geometry/objects/objects.hpp"
 
-DEFINE_HAS_MEMBER(data);
+
 
 namespace carpio{
 

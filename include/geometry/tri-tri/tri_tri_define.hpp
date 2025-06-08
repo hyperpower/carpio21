@@ -3,6 +3,8 @@
 
 #include <math.h>
 
+#include "geometry/geometry_define.hpp"
+
 
 
 #endif // TRI_TRI_DEFINE_HPP

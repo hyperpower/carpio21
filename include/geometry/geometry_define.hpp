@@ -5,6 +5,9 @@
 #include "utility/profile.hpp"
 
 #include <math.h>
+DEFINE_HAS_MEMBER(data);
+
+
 
 namespace carpio {
 

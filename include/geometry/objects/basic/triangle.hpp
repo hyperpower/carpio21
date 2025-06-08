@@ -11,10 +11,13 @@
 
 namespace carpio {
 
+struct TriangleTag: public GeometryTag {};
+
 template<typename TYPE, St DIM, class POINT = Point_<TYPE, DIM> >
 class Triangle_: public std::array<POINT, 3> {
 public:
     static const St Dim = DIM;
+    typedef TriangleTag Tag;
     typedef TYPE ValueType;
     typedef TYPE vt;
     typedef TYPE& ref_vt;

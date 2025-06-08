@@ -1,7 +1,7 @@
 #include "geometry/geometry.hpp"
 #include "gtest/gtest.h"
 
-#include "geometry/tri-tri/moller97.hpp"
+#include "geometry/tri-tri/tri_tri_intersection.hpp"
 
 
 using namespace carpio;

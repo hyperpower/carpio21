@@ -22,6 +22,7 @@
 namespace carpio {
 
 struct TriSurfaceTag: public TSTag {};
+
 template<class TYPE, St DIM>
 class TriSurface_ {
 public:
