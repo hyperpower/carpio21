@@ -337,14 +337,19 @@ public:
         return nullptr;
     }
 
-    void show() const {
+    friend std::ostream& operator<<(std::ostream& stream, const Self& face) {
         std::ios::fmtflags f(std::cout.flags());
-        std::cout.setf(std::ios::right);
-        this->e1->show();
-        this->e2->show();
-        this->e3->show();
-        std::cout << "    -> sur = " << surfaces.size() << "\n";
-        std::cout.setf(f);
+        stream.setf(std::ios::right);
+        face.e1->show();
+        face.e2->show();
+        face.e3->show();
+        stream << "    -> sur = " << face.surfaces.size() << "\n";
+        stream.setf(f);
+        return stream;
+    }
+
+    void show() const {
+        std::cout << *this << std::endl;
     }
 
     /**

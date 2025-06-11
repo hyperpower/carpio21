@@ -211,10 +211,11 @@
 
 namespace carpio {
 
-int coplanar_tri_tri(float N[3],float V0[3],float V1[3],float V2[3],
-                     float U0[3],float U1[3],float U2[3])
+template<class FLOAT>
+int coplanar_tri_tri(FLOAT N[3],FLOAT V0[3], FLOAT V1[3],FLOAT V2[3],
+                     FLOAT U0[3],FLOAT U1[3],FLOAT U2[3])
 {
-   float A[3];
+   FLOAT A[3];
    short i0,i1;
    /* first project onto an axis-aligned plane, that maximizes the area */
    /* of the triangles, compute indices: i0,i1. */
@@ -260,19 +261,20 @@ int coplanar_tri_tri(float N[3],float V0[3],float V1[3],float V2[3],
     return 0;
 }
 
-int tri_tri_intersect(float V0[3],float V1[3],float V2[3],
-                      float U0[3],float U1[3],float U2[3])
+template<class FLOAT>
+int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
+                      FLOAT U0[3],FLOAT U1[3],FLOAT U2[3])
 {
-  float E1[3],E2[3];
-  float N1[3],N2[3],d1,d2;
-  float du0,du1,du2,dv0,dv1,dv2;
-  float D[3];
-  float isect1[2], isect2[2];
-  float du0du1,du0du2,dv0dv1,dv0dv2;
+  FLOAT E1[3],E2[3];
+  FLOAT N1[3],N2[3],d1,d2;
+  FLOAT du0,du1,du2,dv0,dv1,dv2;
+  FLOAT D[3];
+  FLOAT isect1[2], isect2[2];
+  FLOAT du0du1,du0du2,dv0dv1,dv0dv2;
   short index;
-  float vp0,vp1,vp2;
-  float up0,up1,up2;
-  float b,c,max;
+  FLOAT vp0,vp1,vp2;
+  FLOAT up0,up1,up2;
+  FLOAT b,c,max;
 
   /* compute plane equation of triangle(V0,V1,V2) */
   SUB(E1,V1,V0);
@@ -354,14 +356,14 @@ int tri_tri_intersect(float V0[3],float V1[3],float V2[3],
   if(isect1[1]<isect2[0] || isect2[1]<isect1[0]) return 0;
   return 1;
 }
-
-void isect2(float VTX0[3],float VTX1[3],float VTX2[3],
-            float VV0,float VV1,float VV2,
-            float D0, float D1,float D2,
-            float *isect0,float *isect1,
-            float isectpoint0[3],float isectpoint1[3]) {
-  float tmp=D0/(D0-D1);          
-  float diff[3];
+template<class FLOAT>
+void isect2(FLOAT VTX0[3],FLOAT VTX1[3],FLOAT VTX2[3],
+            FLOAT VV0,FLOAT VV1,FLOAT VV2,
+            FLOAT D0, FLOAT D1,FLOAT D2,
+            FLOAT *isect0,FLOAT *isect1,
+            FLOAT isectpoint0[3],FLOAT isectpoint1[3]) {
+  FLOAT tmp=D0/(D0-D1);          
+  FLOAT diff[3];
   *isect0=VV0+(VV1-VV0)*tmp;         
   SUB(diff,VTX1,VTX0);              
   MULT(diff,diff,tmp);               
@@ -373,10 +375,11 @@ void isect2(float VTX0[3],float VTX1[3],float VTX2[3],
   ADD(isectpoint1,VTX0,diff);          
 }
 
-int compute_intervals_isectline(float VERT0[3],float VERT1[3],float VERT2[3],
-                       float VV0,float VV1,float VV2,float D0,float D1,float D2,
-                       float D0D1,float D0D2,float *isect0,float *isect1,
-                       float isectpoint0[3],float isectpoint1[3])
+template<class FLOAT>
+int compute_intervals_isectline(FLOAT VERT0[3],FLOAT VERT1[3],FLOAT VERT2[3],
+                       FLOAT VV0,FLOAT VV1,FLOAT VV2,FLOAT D0,FLOAT D1,FLOAT D2,
+                       FLOAT D0D1,FLOAT D0D2,FLOAT *isect0,FLOAT *isect1,
+                       FLOAT isectpoint0[3],FLOAT isectpoint1[3])
 {
   if(D0D1>0.0f)                                        
   {                                                    
@@ -410,24 +413,24 @@ int compute_intervals_isectline(float VERT0[3],float VERT1[3],float VERT2[3],
   return 0;
 }
 
-
-int tri_tri_intersect_with_isectline(float V0[3],float V1[3],float V2[3],
-                     float U0[3],float U1[3],float U2[3],int *coplanar,
-                     float isectpt1[3],float isectpt2[3])
+template<class FLOAT>
+int tri_tri_intersect_with_isectline(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
+                     FLOAT U0[3],FLOAT U1[3],FLOAT U2[3],int *coplanar,
+                     FLOAT isectpt1[3],FLOAT isectpt2[3])
 {
-  float E1[3],E2[3];
-  float N1[3],N2[3],d1,d2;
-  float du0,du1,du2,dv0,dv1,dv2;
-  float D[3];
-  float isect1[2], isect2[2];
-  float isectpointA1[3],isectpointA2[3];
-  float isectpointB1[3],isectpointB2[3];
-  float du0du1,du0du2,dv0dv1,dv0dv2;
+  FLOAT E1[3],E2[3];
+  FLOAT N1[3],N2[3],d1,d2;
+  FLOAT du0,du1,du2,dv0,dv1,dv2;
+  FLOAT D[3];
+  FLOAT isect1[2], isect2[2];
+  FLOAT isectpointA1[3],isectpointA2[3];
+  FLOAT isectpointB1[3],isectpointB2[3];
+  FLOAT du0du1,du0du2,dv0dv1,dv0dv2;
   short index;
-  float vp0,vp1,vp2;
-  float up0,up1,up2;
-  float b,c,max;
-  float tmp,diff[3];
+  FLOAT vp0,vp1,vp2;
+  FLOAT up0,up1,up2;
+  FLOAT b,c,max;
+  FLOAT tmp,diff[3];
   int smallest1,smallest2;
   
   /* compute plane equation of triangle(V0,V1,V2) */
