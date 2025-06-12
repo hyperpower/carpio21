@@ -325,7 +325,7 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
     return 0;                    /* no intersection occurs */
 
   /* compute direction of intersection line */
-  CROSS(D,N1,N2);
+  tri_tri::Cross(D,N1,N2);
 
   /* compute and index to the largest component of D */
   max=std::abs(D[0]);
@@ -376,7 +376,7 @@ void isect2(FLOAT VTX0[3],FLOAT VTX1[3],FLOAT VTX2[3],
 }
 
 template<class FLOAT>
-int compute_intervals_isectline(FLOAT VERT0[3],FLOAT VERT1[3],FLOAT VERT2[3],
+bool compute_intervals_isectline(FLOAT VERT0[3],FLOAT VERT1[3],FLOAT VERT2[3],
                        FLOAT VV0,FLOAT VV1,FLOAT VV2,FLOAT D0,FLOAT D1,FLOAT D2,
                        FLOAT D0D1,FLOAT D0D2,FLOAT *isect0,FLOAT *isect1,
                        FLOAT isectpoint0[3],FLOAT isectpoint1[3])
@@ -408,15 +408,17 @@ int compute_intervals_isectline(FLOAT VERT0[3],FLOAT VERT1[3],FLOAT VERT2[3],
   else                                               
   {                                                   
     /* triangles are coplanar */    
-    return 1;
+    return true;
   }
-  return 0;
+  return false;
 }
 
 template<class FLOAT>
-int tri_tri_intersect_with_isectline(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
-                     FLOAT U0[3],FLOAT U1[3],FLOAT U2[3],int *coplanar,
-                     FLOAT isectpt1[3],FLOAT isectpt2[3])
+int tri_tri_intersect_with_isectline(
+    FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
+    FLOAT U0[3],FLOAT U1[3],FLOAT U2[3],
+    bool& coplanar,
+    FLOAT isectpt1[3],FLOAT isectpt2[3])
 {
   FLOAT E1[3],E2[3];
   FLOAT N1[3],N2[3],d1,d2;
@@ -502,9 +504,9 @@ int tri_tri_intersect_with_isectline(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
   up2=U2[index];
 
   /* compute interval for triangle 1 */
-  *coplanar=compute_intervals_isectline(V0,V1,V2,vp0,vp1,vp2,dv0,dv1,dv2,
+  coplanar=compute_intervals_isectline(V0,V1,V2,vp0,vp1,vp2,dv0,dv1,dv2,
                        dv0dv1,dv0dv2,&isect1[0],&isect1[1],isectpointA1,isectpointA2);
-  if(*coplanar) return coplanar_tri_tri(N1,V0,V1,V2,U0,U1,U2);     
+  if(coplanar) return coplanar_tri_tri(N1,V0,V1,V2,U0,U1,U2);     
 
 
   /* compute interval for triangle 2 */

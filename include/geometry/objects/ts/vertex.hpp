@@ -14,13 +14,13 @@
 
 namespace carpio {
 
-struct VerTag: public TSTag {};
+struct VertexTag: public TSTag, PointTag {};
 
 template<class TYPE, St DIM, class EDGE>
 class Vertex_: public Point_<TYPE, DIM> {
 public:
     static const St Dim = DIM;
-    typedef VerTag Tag;
+    typedef VertexTag Tag;
     typedef Point_<TYPE, DIM>        Base;
     typedef Vertex_<TYPE, DIM, EDGE> Self;
     typedef St size_type;

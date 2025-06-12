@@ -111,8 +111,11 @@ TEST(TS, ts_intersect){
     std::vector<double> arr_trans = {0.0,-1.0,0.0};
     Translate(*sur, arr_trans); 
 
-    bool isinter = IsIntersect(*sur, *ico);
-    std::cout << "isinter = " << isinter << std::endl;
+    auto surf1 = *(sur->begin());
+    auto icof1 = *(ico->begin());
+    auto res = Intersect(*surf1, *icof1);
+    res.show();
+    // std::cout << "isinter = " << isinter << std::endl;
 
 }
 
