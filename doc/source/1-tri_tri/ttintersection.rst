@@ -2,29 +2,29 @@ Triangle intersection method
 ==============================
 
 Basic Vector Operations
-----------------------
+--------------------------
 
 Definition of a Vector
-+++++++++++++++++++++
+++++++++++++++++++++++++
 
-A vector :math:`\mathbf{a}` belongs to :math:`\mathbf{R^3}`
+A vector :math:`\vec{a}` belongs to :math:`\mathbf{R^3}`
 
 .. math::
    :label: vector_define
 
-   \mathbf{a} = (a_0, a_1, a_2)
+   \vec{a} = (a_0, a_1, a_2)
 
 Cross Product of Vectors
 ++++++++++++++++++++++++
-The cross product of two vectors :math:`\mathbf{a}` and :math:`\mathbf{b}` 
-in three-dimensional space is denoted as :math:`\mathbf{a} \times \mathbf{b}`.
+The cross product of two vectors :math:`\vec{a}` and :math:`\vec{b}` 
+in three-dimensional space is denoted as :math:`\vec{a} \times \vec{b}`.
 
 .. math::
    :label: cross_product1
 
-   \mathbf{a} \times \mathbf{b} = 
+   \vec{a} \times \vec{b} = 
    \begin{vmatrix} 
-   \mathbf{i} & \mathbf{j} & \mathbf{k}  \\
+   \vec{i} & \vec{j} & \vec{k}  \\
    a_{0} & a_{1} & a_{2}  \\
    b_{0} & b_{1} & b_{2}  \\
    \end{vmatrix} 
@@ -32,42 +32,89 @@ in three-dimensional space is denoted as :math:`\mathbf{a} \times \mathbf{b}`.
 .. math::
    :label: cross_product2
 
-   \mathbf{a} \times \mathbf{b} = 
+   \vec{a} \times \vec{b} = 
    \begin{vmatrix} 
    a_{1} & a_{2} \\
    b_{1} & b_{2} \\
    \end{vmatrix} 
-   \mathbf{i}
+   \vec{i}
    -
    \begin{vmatrix} 
    a_{0} & a_{2} \\
    b_{0} & b_{2} \\
    \end{vmatrix}
-   \mathbf{j}
+   \vec{j}
    +
    \begin{vmatrix} 
    a_{0} & a_{1} \\
    b_{0} & b_{1} \\
    \end{vmatrix}
-   \mathbf{j}
+   \vec{j}
 
 .. math::
    :label: cross_product3
 
-   \mathbf{a} \times \mathbf{b} = 
+   \vec{a} \times \vec{b} = 
    (a_1b_2-b_1a_2)
-   \mathbf{i}
+   \vec{i}
    -
    (a_0b_2-b_0a_2)
-   \mathbf{j}
+   \vec{j}
    +
    (a_0b_1-b_0a_1)
-   \mathbf{j}
+   \vec{j}
 
+Definition of a Plane Equation
+++++++++++++++++++++++++++++++++
+
+A plane equation is a mathematical expression describing a plane 
+in three-dimensional space. 
+A plane consists of all points satisfying a linear equation. 
+
+.. math::
+   n_x x + n_y y + n_z z + d = 0
+
+or 
+
+.. math::
+   :label: plane_eq
+
+   \vec{n} \cdot \vec{x} + d = 0
+
+where:
+  - :math:`n_x, n_y, n_z` are components of the plane's normal vector (:math:`\vec{n}`), 
+    which is perpendicular to the plane,
+  - :math:`x, y, z` are coordinates of points on the plane,
+  - :math:`d` is a constant representing the plane's offset from the origin.
+
+
+
+Distance from a Point to a Plane
++++++++++++++++++++++++++++++++++
+
+1. Given a point :math:`P(P_x, P_y, P_z)` and 
+   a plane with equation :math:`n_x x + n_y y + n_z z + d = 0`, 
+2. The normal vector of the plane is :math:`\vec{n} = (n_x, n_y, n_z)`.
+3. Take any point, :math:`Q(Q_x, Q_y, Q_z)` on the plane, 
+   satisfying :math:`\vec{n} \cdot Q + d = 0`.
+4. The vector :math:`\vec{PQ} = (P_x - Q_x, P_y - Q_y, P_z - Q_z)`.
+5. The distance from the point to the plane 
+   is the length of the projection of :math:`\vec{PQ}` 
+   onto the normal vector :math:`\vec{n}`.
+6. Using vector projection and magnitude, 
+   the distance (:math:`D`) of a Point to a Plane is derived.
+
+.. math::
+   :label: distance_point_plane
+
+   D = \frac{\vec{PQ} \cdot \vec{n} }{ \| \vec{n} \| }
 
 Definition of a Triangle
 ++++++++++++++++++++++++
-A triangle is usually defined by three points, :math:`T=(P_0, P_1, P_2)`. The normal of the triangle is defined as: :math:`\mathbf{n}= \mathbf{v_1} \times \mathbf{v_2}`, where :math:`\mathbf{v_1} = (P_1 - P_0)`, :math:`\mathbf{v_2} = (P_2 - P_0)`.
+A triangle is usually defined by three points, :math:`T=(P_0, P_1, P_2)`. 
+The normal of the triangle is defined as: 
+:math:`\vec{n}= \vec{v_1} \times \vec{v_2}`, 
+where :math:`\vec{v_1} = (P_1 - P_0)`, :math:`\vec{v_2} = (P_2 - P_0)`.
 
 
 Problem Description

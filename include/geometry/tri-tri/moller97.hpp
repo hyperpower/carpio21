@@ -279,7 +279,7 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
   /* compute plane equation of triangle(V0,V1,V2) */
   SUB(E1,V1,V0);
   SUB(E2,V2,V0);
-  CROSS(N1,E1,E2);
+  raw::Cross(N1,E1,E2);
   d1=-DOT(N1,V0);
   /* plane equation 1: N1.X+d1=0 */
 
@@ -303,7 +303,7 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
   /* compute plane of triangle (U0,U1,U2) */
   SUB(E1,U1,U0);
   SUB(E2,U2,U0);
-  CROSS(N2,E1,E2);
+  raw::Cross(N2,E1,E2);
   d2=-DOT(N2,U0);
   /* plane equation 2: N2.X+d2=0 */
 
@@ -325,7 +325,7 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
     return 0;                    /* no intersection occurs */
 
   /* compute direction of intersection line */
-  tri_tri::Cross(D,N1,N2);
+  raw::Cross(D,N1,N2);
 
   /* compute and index to the largest component of D */
   max=std::abs(D[0]);
@@ -438,7 +438,7 @@ int tri_tri_intersect_with_isectline(
   /* compute plane equation of triangle(V0,V1,V2) */
   SUB(E1,V1,V0);
   SUB(E2,V2,V0);
-  CROSS(N1,E1,E2);
+  raw::Cross(N1,E1,E2);
   d1=-DOT(N1,V0);
   /* plane equation 1: N1.X+d1=0 */
 
@@ -462,7 +462,7 @@ int tri_tri_intersect_with_isectline(
   /* compute plane of triangle (U0,U1,U2) */
   SUB(E1,U1,U0);
   SUB(E2,U2,U0);
-  CROSS(N2,E1,E2);
+  raw::Cross(N2,E1,E2);
   d2=-DOT(N2,U0);
   /* plane equation 2: N2.X+d2=0 */
 
@@ -484,7 +484,7 @@ int tri_tri_intersect_with_isectline(
     return 0;                    /* no intersection occurs */
 
   /* compute direction of intersection line */
-  CROSS(D,N1,N2);
+  raw::Cross(D,N1,N2);
 
   /* compute and index to the largest component of D */
   max=std::abs(D[0]);

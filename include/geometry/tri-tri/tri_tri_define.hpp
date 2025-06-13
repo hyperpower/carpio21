@@ -7,7 +7,7 @@
 
 namespace carpio
 {
-namespace tri_tri
+namespace raw
 {
 // Function to compute the cross product of two 3D vectors
 template<typename CVT>

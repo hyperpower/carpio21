@@ -11,9 +11,13 @@ Colors = {
 
 def generate_0_svg(p):
     fn = "0.svg"
-    f = open(os.path.abspath(os.path.join(p, fn)), "w")
-    f.write("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"0\"/>")
-    f.close()
+    fn_path = os.path.abspath(os.path.join(p, fn))
+    if os.path.exists(fn_path):
+        return  # already exists, do nothing
+    else:
+        f = open(fn_path, "w")
+        f.write("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"0\"/>")
+        f.close()
 
 
 def sub(p1, p0):

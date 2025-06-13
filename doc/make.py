@@ -17,7 +17,7 @@ def get_single_folder(num):
     """
     Get the folder name for the given number.
     """
-    path_source = os.path.join(_DOC_, "source", "writing")
+    path_source = os.path.join(_DOC_, "source")
     # find the folder name starting with the number
     for folder in os.listdir(path_source):
         if folder.startswith(str(num) + "-"):
