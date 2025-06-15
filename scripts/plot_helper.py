@@ -7,6 +7,7 @@ Colors = {
     "blue"   : "#4285F4",
     "red"    : "#F35325",
     "green"  : "#81BC06",
+    "black"  : "#1D1D1D",
 }
 
 def generate_0_svg(p):
@@ -18,7 +19,17 @@ def generate_0_svg(p):
         f = open(fn_path, "w")
         f.write("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"0\"/>")
         f.close()
-
+def add(p1, p0):
+    """
+    Add two 3D points.
+    :param p1: First point as a list or tuple of [x, y, z].
+    :param p0: Second point as a list or tuple of [x, y, z].
+    :return: Resulting point as a list [x', y', z'].
+    """
+    p = [p1[0]+p0[0],
+         p1[1]+p0[1],
+         p1[2]+p0[2]]
+    return p
 
 def sub(p1, p0):
     p = [p1[0]-p0[0],
@@ -26,14 +37,95 @@ def sub(p1, p0):
          p1[2]-p0[2]]
     return p
 
+def cross(p1, p0):
+    """
+    Calculate the cross product of two 3D vectors.
+    :param p1: First vector as a list or tuple of [x, y, z].
+    :param p0: Second vector as a list or tuple of [x, y, z].
+    :return: Cross product as a list [x', y', z'].
+    """
+    x = p1[1] * p0[2] - p1[2] * p0[1]
+    y = p1[2] * p0[0] - p1[0] * p0[2]
+    z = p1[0] * p0[1] - p1[1] * p0[0]
+    return [x, y, z]
+
+def scale(p, s):
+    """
+    Scale a 3D vector by a scalar.
+    :param p: Input vector as a list or tuple of [x, y, z].
+    :param s: Scalar value to scale the vector.
+    :return: Scaled vector as a list [x', y', z'].
+    """
+    return [p[0] * s, p[1] * s, p[2] * s]
+
 def mid(p1, p0):
     p = [(p1[0]+p0[0])*0.5,
          (p1[1]+p0[1])*0.5,
          (p1[2]+p0[2])*0.5]
     return p
 
+def rotate_90(index, vec):
+    """
+    Rotate a vector 90 degrees around the x-axis.
+    :param v: Input vector [x, y, z].
+    :return: Rotated vector [x', y', z'].
+    """
+    R_x = np.array([
+        [1, 0, 0],
+        [0, 0, -1],
+        [0, 1, 0]
+    ])
+    R_y = np.array([
+        [0, 0, 1],
+        [0, 1, 0],
+        [-1, 0, 0]
+    ])
+    R_z = np.array([
+        [0, -1, 0],
+        [1, 0, 0],
+        [0, 0, 1]
+    ])
+    R_rotation = [R_x, R_y, R_z]
+    if index < 0 or index >= len(R_rotation):
+        raise ValueError("Index must be between 0 and 2 (inclusive).")
+    return np.dot(R_rotation[index], vec)
+
+def absmin_v_and_i(arr):
+    """
+    Find the minimum absolute value in a 3D vector and its index.
+    :param arr: A list or tuple of [x, y, z].
+    :return: Tuple (min_value, index) where min_value is the minimum absolute value and index is its position in the vector.
+    """
+    abs_arr = [abs(x) for x in arr]
+    min_value = min(abs_arr)
+    index = abs_arr.index(min_value)
+    return min_value, index
+
+def avg_coordinate(points):
+    """
+    Calculate the average coordinate of a list of points.
+    :param points: List of points, each point is a list or tuple of [x, y, z].
+    :return: Average point as a list [x_avg, y_avg, z_avg].
+    """
+    x_avg = sum(p[0] for p in points) / len(points)
+    y_avg = sum(p[1] for p in points) / len(points)
+    z_avg = sum(p[2] for p in points) / len(points)
+    
+    return [x_avg, y_avg, z_avg]
+
 def length(p):
     return math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2])
+
+def normalize_vector(p):
+    """
+    Normalize a 3D vector.
+    :param p: A list or tuple of [x, y, z].
+    :return: Normalized vector as a list [x', y', z'].
+    """
+    l = length(p)
+    if l == 0:
+        return [0, 0, 0]  # Avoid division by zero
+    return [p[0] / l, p[1] / l, p[2] / l]
 
 def transpose(arr2d):
     """
@@ -104,6 +196,49 @@ def point_at_distance(point, direction, dist):
     return (point + direction_unit * dist).tolist()
 
 def normalize(p):
-    l = length(p)
-    s3 = math.sqrt(3.0)
-    return [p[0]/l*s3, p[1]/l*s3, p[2]/l*s3]
+    l  = length(p)
+    return [p[0]/l, p[1]/l, p[2]/l]
+
+def rectangle_from_center_and_normal(pc, n, scale):
+    """
+    Create a rectangle in 3D space from a center point and a normal vector.
+    :param pc: Center point of the rectangle as a list or tuple of [x, y, z].
+    :param n: Normal vector of the rectangle as a list or tuple of [nx, ny, nz].
+    :param scale: Scale factor for the rectangle size.
+    :return: A list of points representing the corners of the rectangle.
+    """
+    c = np.array(pc)
+    nz = np.array(normalize(n))  # normalize the normal vector
+    minv, mini = absmin_v_and_i(nz)
+    
+    # vertical vector of n
+    nx = np.array(rotate_90(mini, nz))   # rotate normal vector to be horizontal
+    ny = np.array(cross(nx, nz))   # cross product to get vertical vector
+
+    p0 = c - 0.5 * nx * scale - 0.5 * ny * scale
+    p1 = c + 0.5 * nx * scale - 0.5 * ny * scale
+    p2 = c + 0.5 * nx * scale + 0.5 * ny * scale
+    p3 = c - 0.5 * nx * scale + 0.5 * ny * scale
+
+    return [p0, p1, p2, p3, p0]
+
+def point_projection_to_plane(point, plane):
+    """
+    Calculate the projection of a point onto a plane.
+
+    :param point: The point as a list or tuple [x0, y0, z0].
+    :param plane: The plane equation coefficients [A, B, C, D].
+    :return: The projected point [x', y', z'].
+    """
+    x0, y0, z0 = point
+    A, B, C, D = plane
+
+    # Calculate the parameter t
+    t = -(A * x0 + B * y0 + C * z0 + D) / (A**2 + B**2 + C**2)
+
+    # Calculate the projected point
+    x_prime = x0 + A * t
+    y_prime = y0 + B * t
+    z_prime = z0 + C * t
+
+    return [x_prime, y_prime, z_prime]

@@ -117,17 +117,17 @@ The normal of the triangle is defined as:
 where :math:`\vec{v_1} = (P_1 - P_0)`, :math:`\vec{v_2} = (P_2 - P_0)`.
 
 
-Problem Description
-----------------------
+Intersection of Two Triangles
+------------------------------
 Given two triangles, :math:`U=(P_0, P_1, P_2)`, :math:`V=(Q_0, Q_1, Q_2)`. 
 
 - Do triangles :math:`U` and :math:`V` intersect?
 - If they intersect, what is the result?
    
 .. raw:: html
-   :file: fig1_ttdefine_ply.div
+   :file: fig/fig1_tt_define.div
 
-.. figure:: 0.svg
+.. figure:: fig/0.svg
    :align: center
 
    Triangles Definition
@@ -135,8 +135,104 @@ Given two triangles, :math:`U=(P_0, P_1, P_2)`, :math:`V=(Q_0, Q_1, Q_2)`.
 The plane containing triangle :math:`U` is defined as :math:`\pi_1`, 
 and the plane containing triangle :math:`V` is defined as :math:`\pi_2`。
 
-Method
+Method: Moller97
 ----------------------
+
+Step 1
++++++++++++++++++++++++++++++ 
+
+Calculate the plane equation of triangle :math:`V`. 
+
+The plane equation (:math:`\pi_2`) of triangle :math:`V` is defined as:
+
+.. math::
+   :label: plane_v
+
+   \vec{n_2} \cdot \vec{x} + d_2 = 0
+
+where :math:`\vec{n_2}` is the normal vector of triangle :math:`V`,
+
+.. math::
+   :label: n2
+
+   \vec{n_2} = (Q_1 - Q_0) \times (Q_2 - Q_0)
+
+and :math:`d_2` is the distance from the origin to the plane of triangle :math:`V`.
+
+.. math::
+   :label: d2
+
+   d_2 = - \vec{n_2} \cdot Q_0
+
+
+.. raw:: html
+   :file: fig/fig2_t1_plane2.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   Plane 2 and Triangle U
+
+
+Step 2
++++++++++++++++++++++++++++++
+Calculate the signed distances from the vertices of triangle :math:`U` 
+to the plane (:math:`\pi_2` ).
+
+The signed distance from vertices :math:`P_i (i=0,1,2)` to the plane :math:`\pi_2`
+is inserting the vertices into the plane equation:
+
+.. math::
+   :label: d_u
+
+   D_i = \vec{n_2} \cdot P_i + d_2 \quad i=0,1,2
+
+.. raw:: html
+   :file: fig/fig3_t1_plane2_distance.div
+
+.. figure:: fig/0.svg
+   :align: center
+
+   Distance from Vertices of Triangle U to Plane 2
+
+If :math:`D_i > 0`, then :math:`\mathbf{P_i}` is in the positive side of plane 2.
+
+If :math:`D_i < 0`, then :math:`\mathbf{P_i}` is in the negative side to plane 2.
+
+If :math:`D_i = 0`, then :math:`\mathbf{P_i}` is coplanar with plane 2.
+
+
+.. csv-table:: Triangle Intersection Cases
+   :header: ":math:`D_2`", ":math:`D_1`", ":math:`D_0`", "Case"
+   :widths: 20, 20, 20, 30
+
+   :math:`0`, :math:`0`, :math:`0`, Coplanar
+   :math:`0`, :math:`0`, －, Line Coplanar
+   :math:`0`, :math:`0`, ＋, Line Coplanar
+   :math:`0`, －, :math:`0`, Line Coplanar
+   :math:`0`, －, －, Point Coplanar
+   :math:`0`, －, ＋, Point Coplanar Opposite Side
+   :math:`0`, ＋, :math:`0`, Point Coplanar
+   :math:`0`, ＋, －, Point Coplanar Opposite Side
+   :math:`0`, ＋, ＋, Point Coplanar
+   －, :math:`0`, :math:`0`, Line Coplanar
+   －, :math:`0`, －, Point Coplanar
+   －, :math:`0`, ＋, Point Coplanar Opposite Side
+   －, －, :math:`0`, Line Coplanar
+   －, －, －, No Intersection
+   －, －, ＋, Opposite Side
+   －, ＋, :math:`0`, Point Coplanar Opposite Side
+   －, ＋, －, Opposite Side
+   －, ＋, ＋, Opposite Side
+   ＋, :math:`0`, :math:`0`, Line Coplanar
+   ＋, :math:`0`, －, Point Coplanar Opposite Side
+   ＋, :math:`0`, ＋, Point Coplanar
+   ＋, －, :math:`0`, Point Coplanar Opposite Side
+   ＋, －, －, Opposite Side
+   ＋, －, ＋, Opposite Side
+   ＋, ＋, :math:`0`, Point Coplanar
+   ＋, ＋, －, Opposite Side
+   ＋, ＋, +, No Intersection
 
 将三角形 :math:`U` 的 :math:`P_0` 点作为原点
 ++++++++++++++++++++++++++++++++++++++++++++

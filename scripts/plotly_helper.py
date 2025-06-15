@@ -1,6 +1,8 @@
 import plot_helper as ph
+import plotly.graph_objects as go
+import numpy as np
 
-def arrow(go, p0, p1, c):
+def arrow(p0, p1, c):
     traces = {}
     traces["arrow_line1"] = go.Scatter3d(
                                x = [p0[0],p1[0]], 
@@ -23,36 +25,30 @@ def arrow(go, p0, p1, c):
                          colorscale =[[0, c], [1, c]])
     return traces
 
-def coordinate(go):
+
+def rectangle_surface(_name, pc, n, d, _color):
+    """
+    Create a rectangle surface in 3D space.
+    
+    :param pc: Center point of the rectangle as a list or tuple [x, y, z].
+    :param n: Normal vector of the rectangle as a list or tuple [nx, ny, nz].
+    :param d: Half-length of the rectangle along each axis as a list or tuple [dx, dy, dz].
+    :param c: Color of the rectangle surface.
+    :return: A dictionary containing the mesh3d trace for the rectangle surface.
+    """
+    rect = ph.rectangle_from_center_and_normal(pc, n, d)
+    rectxyz = ph.transpose(rect)
     traces = {}
-    traces["coordinate_x"] = go.Scatter3d(
-                               x = [0,1], 
-                               y = [0,0],
-                               z = [0,0],
-                               showlegend=False,
-                               mode='lines',
-                               line=dict(
-                                 color="green",
-                                 width=5))
-    traces["coordinate_y"] = go.Scatter3d(
-                               x = [0,0], 
-                               y = [0,1],
-                               z = [0,0],
-                               showlegend=False,
-                               mode='lines',
-                               line=dict(
-                                 color="red",
-                                 width=5))
-    traces["coordinate_z"] = go.Scatter3d(
-                               x = [0,0], 
-                               y = [0,0],
-                               z = [0,1],
-                               showlegend=False,
-                               mode='lines',
-                               line=dict(
-                                 color="blue",
-                                 width=5))
-    return traces
+    traces[_name] = go.Mesh3d(
+                               x = rectxyz[0],
+                               y = rectxyz[1],
+                               z = rectxyz[2], 
+                               name= _name, 
+                               opacity=0.5,
+                               color=_color,
+                        )
+    return traces 
+
 
 def annote_label(cx, cy, cz, name, c):
     res = {
@@ -89,6 +85,44 @@ def annote_point_label(p, name, c):
         "yanchor"   : "bottom"
         }
     return res
+
+def coordinate():
+    traces = {}
+    traces["coordinate_x"] = go.Scatter3d(
+                               x = [0,1], 
+                               y = [0,0],
+                               z = [0,0],
+                               showlegend=False,
+                               mode='lines',
+                               line=dict(
+                                 color="green",
+                                 width=5))
+    traces["coordinate_y"] = go.Scatter3d(
+                               x = [0,0], 
+                               y = [0,1],
+                               z = [0,0],
+                               showlegend=False,
+                               mode='lines',
+                               line=dict(
+                                 color="red",
+                                 width=5))
+    traces["coordinate_z"] = go.Scatter3d(
+                               x = [0,0], 
+                               y = [0,0],
+                               z = [0,1],
+                               showlegend=False,
+                               mode='lines',
+                               line=dict(
+                                 color="blue",
+                                 width=5))
+    return traces
+
+def annote_coordinate_label():
+    return [
+        annote_label(0.9, 0, 0, "x", "green"),
+        annote_label(0, 0.9, 0, "y", "red"  ),
+        annote_label(0, 0, 0.9, "z", "blue" )]
+
 
 def append_js_to_show_camera_info(html_name):
     with open(html_name, 'r') as file:

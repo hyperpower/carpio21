@@ -21,6 +21,10 @@ _PATH_SOURCE_  = path
 _PATH_DOC_     = abspath(join(_PATH_SOURCE_, ".."))
 _PATH_PROJECT_ = abspath(join(_PATH_SOURCE_, "..", ".."))
 _PATH_SCRIPTS_ = abspath(join(_PATH_PROJECT_, "scripts"))
+_PATH_THIS_FIG_ = abspath(join(_PATH_THIS_, "fig"))
+
+if not os.path.exists(_PATH_THIS_FIG_):
+    os.makedirs(_PATH_THIS_FIG_)
 
 sys.path.append(_PATH_SCRIPTS_)
 
@@ -32,16 +36,18 @@ import plotly_helper as plh
 # two triangles in 3D space
 # t1 is the first triangle, t2 is the second triangle
 t1 = [
+    [0.5,   0.5,   2.5],
+    [0.5,   4.5,   2.5],
+    [3, 3.5,   0],
+]
+
+t2 = [
     [1, 1, 1],
     [1, 4, 1],
     [4, 1.5, 1],
 ]
 
-t2 = [
-    [1,   1,   2  ],
-    [1,   4,   2],
-    [3, 3.5,   0],
-]
+
 
 t1xyz   = ph.transpose(t1)
 t2xyz   = ph.transpose(t2)
@@ -58,56 +64,6 @@ print("Intersection Direction: ", pd)
 print("Plane 1: ", p1)
 print("Plane 2: ", p2)
 
-fig = go.Figure()
-
-cs = {
-    "yellow" : "#FBBD0C",
-    "blue"   : "#4285F4",
-    "red"    : "#F35325",
-    "green"  : "#81BC06",
-}
-
-# make multiple traces
-traces={}
-
-traces["T1"] = go.Scatter3d(x = t1xyz[0], 
-                            y = t1xyz[1],
-                            z = t1xyz[2],
-                            name='U',
-                            line=dict(
-                                 color="#4285F4",
-                                 width=3))
-
-
-traces["T1Surface"] = go.Mesh3d(x = t1xyz[0], 
-                                y = t1xyz[1],
-                                z = t1xyz[2],
-                                opacity=0.5,
-                                color  = "#4285F4")
-
-traces["T2"]  = go.Scatter3d(x = t2xyz[0], 
-                             y = t2xyz[1],
-                             z = t2xyz[2],
-                            name='V',
-                            line=dict(
-                                     color="#FBBD0C",
-                                     width=3))
-
-traces["T2Surface"] = go.Mesh3d(x = t2xyz[0], 
-                                y = t2xyz[1],
-                                z = t2xyz[2],
-                                opacity=0.8,
-                                color  = "#FBBD0C")
-
-
-
-data=list(traces.values())
-
-data.extend(list(plh.coordinate(go).values()))
-
-# build and plot figure
-fig=go.Figure(data)
-
 camera = dict(
     up    = {"x": 0,"y": 0,"z": 1 },
     center= {"x": 0.06555170705854932,
@@ -118,37 +74,173 @@ camera = dict(
 "z": 0.49982457626685406}
 )
 
+def make_triangle_trace(triangle, _name, _color):
+    tri_xyz = ph.transpose(triangle)
+    traces={}
 
-fig.update_layout(
-    scene_camera = camera,
-    height       = 300,
-    margin_t     = 0,
-    margin_b     = 0,
-    margin_r     = 10,
-    margin_l     = 10,
-    scene=dict(
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False),
-        zaxis=dict(visible=False),
-        annotations=[
-         plh.annote_label(t1[0][0], t1[0][1], t1[0][2], r'$P_0$', "#4285F4"),
-         plh.annote_label(t1[1][0], t1[1][1], t1[1][2], r'$P_1$', "#4285F4"),
-         plh.annote_label(t1[2][0], t1[2][1], t1[2][2], r'$P_2$', "#4285F4"),
-         plh.annote_label(t2[0][0], t2[0][1], t2[0][2], r'$Q_0$', "#FBBD0C"),
-         plh.annote_label(t2[1][0], t2[1][1], t2[1][2], r'$Q_1$', "#FBBD0C"),
-         plh.annote_label(t2[2][0], t2[2][1], t2[2][2], r'$Q_2$', "#FBBD0C"),
-         plh.annote_label(0.9, 0, 0, "x", "green"),
-         plh.annote_label(0, 0.9, 0, "y", "red"  ),
-         plh.annote_label(0, 0, 0.9, "z", "blue" ),
-        ]
-    ),
-)
+    traces[_name] = go.Scatter3d(x = tri_xyz[0], 
+                            y = tri_xyz[1],
+                            z = tri_xyz[2],
+                            name= _name,
+                            line=dict(
+                                 color= _color,
+                                 width=3))
+
+    traces[_name +"_Surface"] = go.Mesh3d(x = tri_xyz[0], 
+                                y = tri_xyz[1],
+                                z = tri_xyz[2],
+                                opacity=0.5,
+                                color  = _color)
+    return traces
+
+def make_tri_annotation(t1, _name, _color):
+    anno = []
+    anno.append(plh.annote_label(t1[0][0], t1[0][1], t1[0][2], r'$' + _name + r'_0$', _color))
+    anno.append(plh.annote_label(t1[1][0], t1[1][1], t1[1][2], r'$' + _name + r'_1$', _color))
+    anno.append(plh.annote_label(t1[2][0], t1[2][1], t1[2][2], r'$' + _name + r'_2$', _color))
+    return anno
+
+def fig_triangle_define(figname, t1, t2):
+    trace1 = make_triangle_trace(t1, "U", "#4285F4")
+    trace2 = make_triangle_trace(t2, "V", "#FBBD0C")
+
+    data=list(trace1.values())
+    data.extend(list(trace2.values()))
+    data.extend(list(plh.coordinate().values()))
+
+    # build and plot figure
+    fig=go.Figure(data)
+
+    anno = make_tri_annotation(t1, "P", "#4285F4")
+    anno.extend(make_tri_annotation(t2, "Q", "#FBBD0C"))
+    anno.extend(plh.annote_coordinate_label())
+
+    fig.update_layout(
+        scene_camera = camera,
+        height       = 300,
+        margin_t     = 0,
+        margin_b     = 0,
+        margin_r     = 10,
+        margin_l     = 10,
+        scene=dict(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            zaxis=dict(visible=False),
+            annotations=anno
+        ),
+    )
+    # output figure
+    html_path = abspath(join(_PATH_THIS_FIG_, figname + ".html"))
+    fig.write_html(html_path, include_plotlyjs='cdn', include_mathjax='cdn') 
+    plh.append_js_to_show_camera_info(html_path)
+    fig.write_html(abspath(join(_PATH_THIS_FIG_, figname + ".div" )), full_html=False, include_plotlyjs='cdn')
+
+
+def fig_t2_plane1(figname, t1, t2):
+    trace1 = make_triangle_trace(t1, "U", "#4285F4")
+    trace2 = make_triangle_trace(t2, "V", "#FBBD0C")
+    
+
+    # plane 2
+    p2 = ph.plane_equation(t2[0], t2[1], t2[2])
+    pc = ph.avg_coordinate(t2)
+    n = ph.normalize_vector(p2[:3])
+    rect = ph.rectangle_from_center_and_normal(pc, n, 2.8)
+    trace_rect = plh.rectangle_surface("Plane2", pc, n, 5.0,"#FBBD0C")    
+
+    data=list(trace1.values())
+    data.extend(list(trace2.values()))
+    data.extend(list(trace_rect.values()))  # add rectangle surface
+    # data.extend(list(plh.arrow(pc, ph.add(pc, n), "#4285F4").values()))
+    data.extend(list(plh.coordinate().values()))
+    
+    fig=go.Figure(data)
+
+    fig.update_layout(
+        scene_camera = camera,
+        height       = 300,
+        margin_t     = 0,
+        margin_b     = 0,
+        margin_r     = 10,
+        margin_l     = 10,
+        scene=dict(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            zaxis=dict(visible=False),
+            annotations= 
+                make_tri_annotation(t1, "P", ph.Colors["black"]) 
+                + make_tri_annotation(t2, "Q", ph.Colors["black"])
+                + plh.annote_coordinate_label()
+                + [plh.annote_label(rect[0][0], rect[0][1], rect[0][2], r'$\pi_2$', ph.Colors["black"])]
+        ),
+    )
+
+    html_path = abspath(join(_PATH_THIS_FIG_, figname + ".html"))
+    fig.write_html(html_path, include_plotlyjs='cdn', include_mathjax='cdn') 
+    # plh.append_js_to_show_camera_info(html_path)
+    fig.write_html(abspath(join(_PATH_THIS_FIG_, figname + ".div" )), full_html=False, include_plotlyjs='cdn')
+
+def fig_t2_plane1_distance(figname, t1, t2):
+    trace1 = make_triangle_trace(t1, "U", "#4285F4")
+    trace2 = make_triangle_trace(t2, "V", "#FBBD0C")
+
+    # plane 2
+    p2 = ph.plane_equation(t2[0], t2[1], t2[2])
+    pc2 = ph.avg_coordinate(t2)
+    n = ph.normalize_vector(p2[:3])
+    rect = ph.rectangle_from_center_and_normal(pc2, n, 2.8)
+    trace_rect = plh.rectangle_surface("Plane2", pc2, n, 5.0,"#FBBD0C")    
+
+    pj0 = ph.point_projection_to_plane(t1[0], p2)
+    pj1 = ph.point_projection_to_plane(t1[1], p2)
+    pj2 = ph.point_projection_to_plane(t1[2], p2)
+
+    pj0m = ph.mid(pj0, t1[0])
+    pj1m = ph.mid(pj1, t1[1])
+    pj2m = ph.mid(pj2, t1[2])
+
+    data=list(trace1.values())
+    data.extend(list(trace2.values()))
+    data.extend(list(trace_rect.values()))  # add rectangle surface
+    # data.extend(list(plh.arrow(pc, ph.add(pc, n), "#4285F4").values()))
+    data.extend(list(plh.coordinate().values()))
+    data.extend(plh.arrow(t1[0], pj0, ph.Colors["blue"]).values())
+    data.extend(plh.arrow(t1[1], pj1, ph.Colors["blue"]).values())
+    data.extend(plh.arrow(t1[2], pj2, ph.Colors["blue"]).values())
+
+
+    fig=go.Figure(data)
+
+    fig.update_layout(
+        scene_camera = camera,
+        height       = 300,
+        margin_t     = 0,
+        margin_b     = 0,
+        margin_r     = 10,
+        margin_l     = 10,
+        scene=dict(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            zaxis=dict(visible=False),
+            annotations= 
+                make_tri_annotation(t1, "P", ph.Colors["black"]) 
+                + make_tri_annotation(t2, "Q", ph.Colors["black"])
+                + plh.annote_coordinate_label()
+                + [plh.annote_label(rect[0][0], rect[0][1], rect[0][2], r'$\pi_2$', ph.Colors["black"])]
+                + [plh.annote_label(pj0m[0], pj0m[1], pj0m[2], r'$D_0$', ph.Colors["black"])]
+                + [plh.annote_label(pj1m[0], pj1m[1], pj1m[2], r'$D_1$', ph.Colors["black"])]
+                + [plh.annote_label(pj2m[0], pj2m[1], pj2m[2], r'$D_2$', ph.Colors["black"])]
+        ),
+    )
+
+    html_path = abspath(join(_PATH_THIS_FIG_, figname + ".html"))
+    fig.write_html(html_path, include_plotlyjs='cdn', include_mathjax='cdn') 
+    # plh.append_js_to_show_camera_info(html_path)
+    fig.write_html(abspath(join(_PATH_THIS_FIG_, figname + ".div" )), full_html=False, include_plotlyjs='cdn')
 
 
 if __name__ == "__main__":
-    ph.generate_0_svg(_PATH_THIS_)
-    html_path = abspath(join(_PATH_THIS_, "fig1_ttdefine_ply.html"))
-    fig.write_html(html_path)
-    plh.append_js_to_show_camera_info(html_path)
-    fig.write_html(abspath(join(_PATH_THIS_, "fig1_ttdefine_ply.div")), full_html=False, include_plotlyjs='cdn')
-# 
+    ph.generate_0_svg(_PATH_THIS_FIG_)
+    fig_triangle_define("fig1_tt_define", t1, t2)
+    fig_t2_plane1("fig2_t1_plane2", t1, t2)
+    fig_t2_plane1_distance("fig3_t1_plane2_distance", t1, t2)
