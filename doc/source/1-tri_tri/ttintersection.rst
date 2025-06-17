@@ -177,7 +177,8 @@ and :math:`d_2` is the distance from the origin to the plane of triangle :math:`
 Step 2
 +++++++++++++++++++++++++++++
 Calculate the signed distances from the vertices of triangle :math:`U` 
-to the plane (:math:`\pi_2` ).
+to the plane (:math:`\pi_2` ). Reject as trivial if all vertices of triangle :math:`U`
+are on the same side of the plane :math:`\pi_2`.
 
 The signed distance from vertices :math:`P_i (i=0,1,2)` to the plane :math:`\pi_2`
 is inserting the vertices into the plane equation:
@@ -195,44 +196,79 @@ is inserting the vertices into the plane equation:
 
    Distance from Vertices of Triangle U to Plane 2
 
-If :math:`D_i > 0`, then :math:`\mathbf{P_i}` is in the positive side of plane 2.
+- If :math:`D_i > 0`, then :math:`\mathbf{P_i}` is in the positive side of plane 2.
 
-If :math:`D_i < 0`, then :math:`\mathbf{P_i}` is in the negative side to plane 2.
+- If :math:`D_i < 0`, then :math:`\mathbf{P_i}` is in the negative side to plane 2.
 
-If :math:`D_i = 0`, then :math:`\mathbf{P_i}` is coplanar with plane 2.
+- If :math:`D_i = 0`, then :math:`\mathbf{P_i}` is coplanar with plane 2.
 
+All possible cases of :math:`D_i` are summarized in the table below:
 
 .. csv-table:: Triangle Intersection Cases
-   :header: ":math:`D_2`", ":math:`D_1`", ":math:`D_0`", "Case"
-   :widths: 20, 20, 20, 30
+   :header: ":math:`D_2`", ":math:`D_1`", ":math:`D_0`", ":math:`D_0 D_2`", ":math:`D_0 D_1`","Case"
+   :widths: 10, 10, 10, 10,10, 30
 
-   :math:`0`, :math:`0`, :math:`0`, Coplanar
-   :math:`0`, :math:`0`, －, Line Coplanar
-   :math:`0`, :math:`0`, ＋, Line Coplanar
-   :math:`0`, －, :math:`0`, Line Coplanar
-   :math:`0`, －, －, Point Coplanar
-   :math:`0`, －, ＋, Point Coplanar Opposite Side
-   :math:`0`, ＋, :math:`0`, Point Coplanar
-   :math:`0`, ＋, －, Point Coplanar Opposite Side
-   :math:`0`, ＋, ＋, Point Coplanar
-   －, :math:`0`, :math:`0`, Line Coplanar
-   －, :math:`0`, －, Point Coplanar
-   －, :math:`0`, ＋, Point Coplanar Opposite Side
-   －, －, :math:`0`, Line Coplanar
-   －, －, －, No Intersection
-   －, －, ＋, Opposite Side
-   －, ＋, :math:`0`, Point Coplanar Opposite Side
-   －, ＋, －, Opposite Side
-   －, ＋, ＋, Opposite Side
-   ＋, :math:`0`, :math:`0`, Line Coplanar
-   ＋, :math:`0`, －, Point Coplanar Opposite Side
-   ＋, :math:`0`, ＋, Point Coplanar
-   ＋, －, :math:`0`, Point Coplanar Opposite Side
-   ＋, －, －, Opposite Side
-   ＋, －, ＋, Opposite Side
-   ＋, ＋, :math:`0`, Point Coplanar
-   ＋, ＋, －, Opposite Side
-   ＋, ＋, +, No Intersection
+   :math:`0`, :math:`0`, :math:`0`,:math:`0`, :math:`0`,Coplanar
+   :math:`0`, :math:`0`, －, :math:`0`, :math:`0`, Line Coplanar
+   :math:`0`, :math:`0`, ＋, :math:`0`, :math:`0`, Line Coplanar
+   :math:`0`, －, :math:`0`, :math:`0`, :math:`0`, Line Coplanar
+   :math:`0`, －, －,:math:`0`, ＋,  Point Coplanar
+   :math:`0`, －, ＋,:math:`0`, －,  Point Coplanar Opposite Side
+   :math:`0`, ＋, :math:`0`, :math:`0`, :math:`0`, Point Coplanar
+   :math:`0`, ＋, －,:math:`0`, －, Point Coplanar Opposite Side
+   :math:`0`, ＋, ＋,:math:`0`, ＋, Point Coplanar
+   －, :math:`0`, :math:`0`, :math:`0`, :math:`0`,Line Coplanar
+   －, :math:`0`, －, ＋, :math:`0`,Point Coplanar
+   －, :math:`0`, ＋, －, :math:`0`,Point Coplanar Opposite Side
+   －, －, :math:`0`, :math:`0`, :math:`0`,Line Coplanar
+   －, －, －,＋, ＋, No Intersection
+   －, －, ＋,－, －, Opposite Side
+   －, ＋, :math:`0`,:math:`0`, :math:`0`,Point Coplanar Opposite Side
+   －, ＋, －, ＋, －, Opposite Side
+   －, ＋, ＋, －, ＋, Opposite Side
+   ＋, :math:`0`, :math:`0`, :math:`0`, :math:`0`,Line Coplanar
+   ＋, :math:`0`, －, －,  :math:`0`,Point Coplanar Opposite Side
+   ＋, :math:`0`, ＋, ＋, :math:`0`,Point Coplanar
+   ＋, －, :math:`0`, :math:`0`, :math:`0`,Point Coplanar Opposite Side
+   ＋, －, －, －, ＋, Opposite Side
+   ＋, －, ＋, ＋, －, Opposite Side
+   ＋, ＋, :math:`0`, :math:`0`, :math:`0`, Point Coplanar
+   ＋, ＋, －, －, －, Opposite Side
+   ＋, ＋, ＋, ＋, ＋, No Intersection
+
+
+No Intersection cases can be found 
+by checking :math:`D_0 D_1 > 0` and :math:`D_0 D_2 > 0`.
+
+Step 3
++++++++++++++++++++++++++++++ 
+
+Calculate the plane equation of triangle :math:`U`. 
+
+The plane equation (:math:`\pi_1`) of triangle :math:`U` is defined as:
+
+.. math::
+   :label: plane_v
+
+   \vec{n_1} \cdot \vec{x} + d_1 = 0
+
+where :math:`\vec{n_1}` is the normal vector of triangle :math:`U`,
+
+.. math::
+   :label: n1
+
+   \vec{n_1} = (P_1 - P_0) \times (P_2 - P_0)
+
+and :math:`d_1` is the distance from the origin to the plane of triangle :math:`U`.
+
+Step 4
++++++++++++++++++++++++++++++
+Calculate the signed distances from the vertices of triangle :math:`V`
+to the plane (:math:`\pi_1` ). Reject as trivial if all vertices of triangle :math:`V`
+are on the same side of the plane :math:`\pi_1`.
+
+The signed distance from vertices :math:`Q_i (i=0,1,2)` to the plane :math:`\pi_1`
+is inserting the vertices into the plane equation. Calculate method is similar to **Step 2**.
 
 将三角形 :math:`U` 的 :math:`P_0` 点作为原点
 ++++++++++++++++++++++++++++++++++++++++++++
