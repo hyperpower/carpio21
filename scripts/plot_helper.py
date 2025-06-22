@@ -242,3 +242,44 @@ def point_projection_to_plane(point, plane):
     z_prime = z0 + C * t
 
     return [x_prime, y_prime, z_prime]
+
+def point_projection_to_line(point, line_point, line_direction):
+    """
+    Project a point onto a line in 3D space.
+
+    :param point: The point to project, as [x, y, z].
+    :param line_point: A point on the line, as [x, y, z].
+    :param line_direction: The direction vector of the line, as [dx, dy, dz].
+    :return: The projected point on the line, as [x', y', z'].
+    """
+    p = np.array(point)
+    a = np.array(line_point)
+    d = np.array(line_direction)
+    d_unit = d / np.linalg.norm(d)
+    ap = p - a
+    t = np.dot(ap, d_unit)
+    proj = a + t * d_unit
+    return proj.tolist()
+
+def intersection_line_plane(line_point, line_direction, plane):
+    """
+    Calculate the intersection point of a line and a plane in 3D.
+
+    :param line_point: A point on the line, as [x, y, z].
+    :param line_direction: The direction vector of the line, as [dx, dy, dz].
+    :param plane: The plane equation coefficients [A, B, C, D] for Ax + By + Cz + D = 0.
+    :return: The intersection point as [x, y, z], or None if the line is parallel to the plane.
+    """
+    p0 = np.array(line_point)
+    d = np.array(line_direction)
+    A, B, C, D = plane
+    n = np.array([A, B, C])
+
+    denom = np.dot(n, d)
+    if abs(denom) < 1e-10:
+        # The line is parallel to the plane
+        return None
+
+    t = -(np.dot(n, p0) + D) / denom
+    intersection = p0 + t * d
+    return intersection.tolist()

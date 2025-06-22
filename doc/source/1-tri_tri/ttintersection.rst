@@ -270,6 +270,24 @@ are on the same side of the plane :math:`\pi_1`.
 The signed distance from vertices :math:`Q_i (i=0,1,2)` to the plane :math:`\pi_1`
 is inserting the vertices into the plane equation. Calculate method is similar to **Step 2**.
 
+Step 5
++++++++++++++++++++++++++++++
+Compute the intersection line and project ontot the largest axis.
+
+
+
+Step 6
+++++++++++++++++++++++++
+Computer the intervals for each triangle
+
+
+
+Step 7
+++++++++++++++++++++++++
+Intersect the intervals
+
+
+
 将三角形 :math:`U` 的 :math:`P_0` 点作为原点
 ++++++++++++++++++++++++++++++++++++++++++++
 对于三角形 :math:`U` ，

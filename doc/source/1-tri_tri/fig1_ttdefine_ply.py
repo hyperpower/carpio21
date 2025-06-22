@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from os.path import abspath, join, dirname
 import os, sys
 import importlib.util
+import numpy as np
 
 # Known that current script is in "source" folder or subfolder of "source"
 _PATH_THIS_ = abspath((dirname(__file__)))
@@ -136,7 +137,7 @@ def fig_triangle_define(figname, t1, t2):
     fig.write_html(abspath(join(_PATH_THIS_FIG_, figname + ".div" )), full_html=False, include_plotlyjs='cdn')
 
 
-def fig_t2_plane1(figname, t1, t2):
+def fig_t1_plane2(figname, t1, t2):
     trace1 = make_triangle_trace(t1, "U", "#4285F4")
     trace2 = make_triangle_trace(t2, "V", "#FBBD0C")
     
@@ -144,7 +145,7 @@ def fig_t2_plane1(figname, t1, t2):
     # plane 2
     p2 = ph.plane_equation(t2[0], t2[1], t2[2])
     pc = ph.avg_coordinate(t2)
-    n = ph.normalize_vector(p2[:3])
+    n =  ph.normalize_vector(p2[:3])
     rect = ph.rectangle_from_center_and_normal(pc, n, 2.8)
     trace_rect = plh.rectangle_surface("Plane2", pc, n, 5.0,"#FBBD0C")    
 
@@ -180,14 +181,14 @@ def fig_t2_plane1(figname, t1, t2):
     # plh.append_js_to_show_camera_info(html_path)
     fig.write_html(abspath(join(_PATH_THIS_FIG_, figname + ".div" )), full_html=False, include_plotlyjs='cdn')
 
-def fig_t2_plane1_distance(figname, t1, t2):
+def fig_t1_plane2_distance(figname, t1, t2):
     trace1 = make_triangle_trace(t1, "U", "#4285F4")
     trace2 = make_triangle_trace(t2, "V", "#FBBD0C")
 
     # plane 2
-    p2 = ph.plane_equation(t2[0], t2[1], t2[2])
+    p2  = ph.plane_equation(t2[0], t2[1], t2[2])
     pc2 = ph.avg_coordinate(t2)
-    n = ph.normalize_vector(p2[:3])
+    n   = ph.normalize_vector(p2[:3])
     rect = ph.rectangle_from_center_and_normal(pc2, n, 2.8)
     trace_rect = plh.rectangle_surface("Plane2", pc2, n, 5.0,"#FBBD0C")    
 
@@ -207,6 +208,7 @@ def fig_t2_plane1_distance(figname, t1, t2):
     data.extend(plh.arrow(t1[0], pj0, ph.Colors["blue"]).values())
     data.extend(plh.arrow(t1[1], pj1, ph.Colors["blue"]).values())
     data.extend(plh.arrow(t1[2], pj2, ph.Colors["blue"]).values())
+    data.extend(plh.arrow(pc2, pc2 + np.array(n), ph.Colors["black"]).values())
 
 
     fig=go.Figure(data)
@@ -230,6 +232,98 @@ def fig_t2_plane1_distance(figname, t1, t2):
                 + [plh.annote_label(pj0m[0], pj0m[1], pj0m[2], r'$D_0$', ph.Colors["black"])]
                 + [plh.annote_label(pj1m[0], pj1m[1], pj1m[2], r'$D_1$', ph.Colors["black"])]
                 + [plh.annote_label(pj2m[0], pj2m[1], pj2m[2], r'$D_2$', ph.Colors["black"])]
+                + [plh.annote_label((pc2 + np.array(n))[0],
+                                    (pc2 + np.array(n))[1],
+                                    (pc2 + np.array(n))[2], r'$n_2$', ph.Colors["black"])]
+        ),
+    )
+
+    html_path = abspath(join(_PATH_THIS_FIG_, figname + ".html"))
+    fig.write_html(html_path, include_plotlyjs='cdn', include_mathjax='cdn') 
+    # plh.append_js_to_show_camera_info(html_path)
+    fig.write_html(abspath(join(_PATH_THIS_FIG_, figname + ".div" )), full_html=False, include_plotlyjs='cdn')
+
+def fig_t1_plane2_similar(figname, t1, t2):
+    trace1 = make_triangle_trace(t1, "U", "#4285F4")
+    trace2 = make_triangle_trace(t2, "V", "#FBBD0C")
+
+    
+
+    # plane 2
+    p2  = ph.plane_equation(t2[0], t2[1], t2[2])
+    pc2 = ph.avg_coordinate(t2)
+    n   = ph.normalize_vector(p2[:3])
+    rect = ph.rectangle_from_center_and_normal(pc2, n, 2.8)
+    trace_rect = plh.rectangle_surface("Plane2", pc2, n, 5.0,"#FBBD0C")    
+
+    pj0 = ph.point_projection_to_plane(t1[0], p2)
+    pj1 = ph.point_projection_to_plane(t1[1], p2)
+    pj2 = ph.point_projection_to_plane(t1[2], p2)
+
+    # plane 1
+    p1  = ph.plane_equation(t1[0], t1[1], t1[2])
+    pc1 = ph.avg_coordinate(t1)
+    n1  = ph.normalize_vector(p1[:3])
+
+    #intersection point
+    e2 = np.array(t1[2]) - np.array(t1[0])
+    ip = ph.intersection_line_plane(t1[0], e2, p2)
+    t  = np.cross(n, n1)
+
+    pjl0 = ph.point_projection_to_line(t1[0], ip, t)
+    pjl2 = ph.point_projection_to_line(t1[2], ip, t)
+     
+    
+
+    pj0m = ph.mid(pj0, t1[0])
+    pj1m = ph.mid(pj1, t1[1])
+    pj2m = ph.mid(pj2, t1[2])
+
+    data=list(trace1.values())
+    data.extend(list(trace2.values()))
+    data.extend(list(trace_rect.values()))  # add rectangle surface
+    # data.extend(list(plh.arrow(pc, ph.add(pc, n), "#4285F4").values()))
+    data.extend(list(plh.coordinate().values()))
+    data.extend(plh.arrow(t1[0], pj0, ph.Colors["blue"]).values())
+    data.extend(plh.arrow(t1[1], pj1, ph.Colors["blue"]).values())
+    data.extend(plh.arrow(t1[2], pj2, ph.Colors["blue"]).values())
+    data.extend(plh.arrow(pc2, pc2 + np.array(n), ph.Colors["black"]).values())
+    data.extend(plh.dash_segment(pj0, pjl0, ph.Colors["blue"]).values())
+    data.extend(plh.dash_segment(pj2, pjl2, ph.Colors["blue"]).values())
+    data.extend(plh.dash_segment(pjl2, ip, ph.Colors["blue"]).values())
+    data.extend(plh.dash_segment(pjl0, ip, ph.Colors["blue"]).values())
+    data.extend(plh.dash_segment(pj0, ip, ph.Colors["blue"]).values())
+    data.extend(plh.dash_segment(pj2, ip, ph.Colors["blue"]).values())
+    data.extend(plh.line(ip, t, 3, ph.Colors["red"]).values())
+
+
+    fig=go.Figure(data)
+
+    fig.update_layout(
+        scene_camera = camera,
+        height       = 300,
+        margin_t     = 0,
+        margin_b     = 0,
+        margin_r     = 10,
+        margin_l     = 10,
+        scene=dict(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            zaxis=dict(visible=False),
+            annotations= 
+                make_tri_annotation(t1, "P", ph.Colors["black"]) 
+                + make_tri_annotation(t2, "Q", ph.Colors["black"])
+                + plh.annote_coordinate_label()
+                + [plh.annote_label(rect[0][0], rect[0][1], rect[0][2], r'$\pi_2$', ph.Colors["black"])]
+                + [plh.annote_label(pj0m[0], pj0m[1], pj0m[2], r'$D_0$', ph.Colors["black"])]
+                + [plh.annote_label(pj1m[0], pj1m[1], pj1m[2], r'$D_1$', ph.Colors["black"])]
+                + [plh.annote_label(pj2m[0], pj2m[1], pj2m[2], r'$D_2$', ph.Colors["black"])]
+                + [plh.annote_label((pc2 + np.array(n))[0],
+                                    (pc2 + np.array(n))[1],
+                                    (pc2 + np.array(n))[2], r'$n_2$', ph.Colors["black"])]
+                + [plh.annote_label(ip[0],
+                                    ip[1],
+                                    ip[2], r'$p_{02}$', ph.Colors["black"])] 
         ),
     )
 
@@ -242,5 +336,6 @@ def fig_t2_plane1_distance(figname, t1, t2):
 if __name__ == "__main__":
     ph.generate_0_svg(_PATH_THIS_FIG_)
     fig_triangle_define("fig1_tt_define", t1, t2)
-    fig_t2_plane1("fig2_t1_plane2", t1, t2)
-    fig_t2_plane1_distance("fig3_t1_plane2_distance", t1, t2)
+    fig_t1_plane2("fig2_t1_plane2", t1, t2)
+    fig_t1_plane2_distance("fig3_t1_plane2_distance", t1, t2)
+    fig_t1_plane2_similar("fig3_t1_plane2_similar", t1, t2)

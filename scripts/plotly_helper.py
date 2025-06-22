@@ -25,6 +25,39 @@ def arrow(p0, p1, c):
                          colorscale =[[0, c], [1, c]])
     return traces
 
+def dash_segment(p0, p1, c):
+    traces = {}
+    traces["arrow_line1"] = go.Scatter3d(
+                               x = [p0[0],p1[0]], 
+                               y = [p0[1],p1[1]],
+                               z = [p0[2],p1[2]],
+                               showlegend=False,
+                               mode='lines',
+                               line=dict(
+                                 color=c, dash="longdash",
+                                 width=5))
+    return traces
+
+def line(line_point, line_t, len, c):
+    traces = {}
+    p = np.array(line_point)
+    t = np.array(line_t)
+    t_unit = t / np.linalg.norm(t)
+    ps = p - len * t_unit
+    pe = p + len * t_unit
+    seg = np.array([ps, pe])
+    segxyz = seg.transpose()
+    traces["line1"] = go.Scatter3d(
+                               x = segxyz[0], 
+                               y = segxyz[1],
+                               z = segxyz[2],
+                               showlegend=False,
+                               mode='lines',
+                               line=dict(
+                                 color=c,
+                                 width=4))
+    return traces
+    
 
 def rectangle_surface(_name, pc, n, d, _color):
     """

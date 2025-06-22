@@ -280,13 +280,13 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
   SUB(E1,V1,V0);
   SUB(E2,V2,V0);
   raw::Cross(N1,E1,E2);
-  d1=-DOT(N1,V0);
+  d1=-raw::Dot(N1,V0);
   /* plane equation 1: N1.X+d1=0 */
 
   /* put U0,U1,U2 into plane equation 1 to compute signed distances to the plane*/
-  du0=DOT(N1,U0)+d1;
-  du1=DOT(N1,U1)+d1;
-  du2=DOT(N1,U2)+d1;
+  du0=raw::Dot(N1,U0)+d1;
+  du1=raw::Dot(N1,U1)+d1;
+  du2=raw::Dot(N1,U2)+d1;
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST==TRUE
