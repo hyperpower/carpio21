@@ -33,7 +33,7 @@ void Uniform2(){
     typedef SGhostRegular_<dim, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<dim, double, Grid, Ghost, Order> Field;
@@ -85,7 +85,7 @@ void NonUniform2(){
     typedef SGhostRegular_<dim, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<dim, double, Grid, Ghost, Order> Field;

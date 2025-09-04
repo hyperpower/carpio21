@@ -80,6 +80,7 @@
   else if(D0D2>0.0f)                                    \
   {                                                     \
     /* here we know that d0d1<=0.0 */                   \
+    /* D0, D2 are onth same side, D1 on the other or on th plane */ \
     ISECT(VV1,VV0,VV2,D1,D0,D2,isect0,isect1);          \
   }                                                     \
   else if(D1*D2>0.0f || D0!=0.0f)                       \
@@ -277,8 +278,8 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
   FLOAT b,c,max;
 
   /* compute plane equation of triangle(V0,V1,V2) */
-  SUB(E1,V1,V0);
-  SUB(E2,V2,V0);
+  raw::Sub(E1,V1,V0);
+  raw::Sub(E2,V2,V0);
   raw::Cross(N1,E1,E2);
   d1=-raw::Dot(N1,V0);
   /* plane equation 1: N1.X+d1=0 */
@@ -301,16 +302,16 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
     return 0;                    /* no intersection occurs */
 
   /* compute plane of triangle (U0,U1,U2) */
-  SUB(E1,U1,U0);
-  SUB(E2,U2,U0);
+  raw::Sub(E1,U1,U0);
+  raw::Sub(E2,U2,U0);
   raw::Cross(N2,E1,E2);
-  d2=-DOT(N2,U0);
+  d2=-raw::Dot(N2,U0);
   /* plane equation 2: N2.X+d2=0 */
 
   /* put V0,V1,V2 into plane equation 2 */
-  dv0=DOT(N2,V0)+d2;
-  dv1=DOT(N2,V1)+d2;
-  dv2=DOT(N2,V2)+d2;
+  dv0=raw::Dot(N2,V0)+d2;
+  dv1=raw::Dot(N2,V1)+d2;
+  dv2=raw::Dot(N2,V2)+d2;
 
 #if USE_EPSILON_TEST==TRUE
   if(std::abs(dv0)<EPSILON) dv0=0.0;
@@ -328,12 +329,13 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
   raw::Cross(D,N1,N2);
 
   /* compute and index to the largest component of D */
-  max=std::abs(D[0]);
-  index=0;
-  b=std::abs(D[1]);
-  c=std::abs(D[2]);
-  if(b>max) max=b,index=1;
-  if(c>max) max=c,index=2;
+  index = raw::MaxComponentIndex(D);
+  // max=std::abs(D[0]);
+  // index=0;
+  // b=std::abs(D[1]);
+  // c=std::abs(D[2]);
+  // if(b>max) max=b,index=1;
+  // if(c>max) max=c,index=2;
 
   /* this is the simplified projection onto L*/
   vp0=V0[index];

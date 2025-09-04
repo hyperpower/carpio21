@@ -138,6 +138,7 @@ and the plane containing triangle :math:`V` is defined as :math:`\pi_2`。
 Method: Moller97
 ----------------------
 
+.. _step_1_label:
 Step 1
 +++++++++++++++++++++++++++++ 
 
@@ -191,7 +192,10 @@ is inserting the vertices into the plane equation:
 .. raw:: html
    :file: fig/fig3_t1_plane2_distance.div
 
+
+.. _fig_distance:
 .. figure:: fig/0.svg
+   
    :align: center
 
    Distance from Vertices of Triangle U to Plane 2
@@ -260,6 +264,8 @@ where :math:`\vec{n_1}` is the normal vector of triangle :math:`U`,
    \vec{n_1} = (P_1 - P_0) \times (P_2 - P_0)
 
 and :math:`d_1` is the distance from the origin to the plane of triangle :math:`U`.
+Calculate method is similar to :ref:`Step 1 <step_1_label>`.
+
 
 Step 4
 +++++++++++++++++++++++++++++
@@ -272,7 +278,36 @@ is inserting the vertices into the plane equation. Calculate method is similar t
 
 Step 5
 +++++++++++++++++++++++++++++
-Compute the intersection line and project ontot the largest axis.
+Compute the intersection line and project onto the largest axis.
+
+The direction vector of intersection line of two plane $\pi_1$ and $\pi_2$ can be found by:
+
+.. math::
+   
+   \vec{\Gamma} = \vec{n_1} \times  \vec{n_2}
+
+The line, 
+
+.. math::
+   
+   \vec{L} = \vec{O} + t \vec{\Gamma}
+
+$O$ is some point on the line. We want to compute a scalar position on $L$ that represent
+the intersection between $\overline{P_0 P_2}$ and $\vec{L}$, as shown in :numref:`fig_similar_tri_label`. 
+For example, $P_0$ and $P_2$ lie on the different side of $\pi_2$. The vertices, $P_i$ ($i=0,2$), are first projected
+onto $\pi_2$, then projected onto $\vec{L}$. The projected points are $P_{ji}$ and $P_{jli}$.
+Two pairs of similar triangle can be found, which are $\Delta P_0 P_{02} P_{j0}$ and $\Delta P_2 P_{02} P_{j2}$, 
+$\Delta P_{j0} P_{02} P_{jl0}$ and $\Delta P_{j2} P_{02} P_{jl2}$.
+
+.. raw:: html
+   :file: fig/fig3_t1_plane2_similar.div
+
+.. _fig_similar_tri_label:
+
+.. figure:: fig/0.svg
+   :align: center
+
+   Intersection point and similar triangles.
 
 
 

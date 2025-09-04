@@ -36,6 +36,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     # 'sphinx.ext.mathbase',
+    'sphinx_math_dollar',
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
@@ -65,8 +66,17 @@ mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS
 mathjax_config = {
     'extensions': ['tex2jax.js'],
     'jax': ['input/TeX', 'output/HTML-CSS'],
+    'tex2jax': {
+        'inlineMath': [ ["\\(","\\)"] ],
+        'displayMath': [["\\[","\\]"] ],
+    },
 }
-
+mathjax3_config = {
+  "tex": {
+    "inlineMath": [['\\(', '\\)']],
+    "displayMath": [["\\[", "\\]"]],
+  }
+}
 # Figure Number
 # If true, figures, tables and code-blocks are automatically numbered if they has caption. 
 # For now, it works only with the HTML builder. Default is False.

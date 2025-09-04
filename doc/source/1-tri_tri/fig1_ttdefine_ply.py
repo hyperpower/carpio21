@@ -247,8 +247,6 @@ def fig_t1_plane2_similar(figname, t1, t2):
     trace1 = make_triangle_trace(t1, "U", "#4285F4")
     trace2 = make_triangle_trace(t2, "V", "#FBBD0C")
 
-    
-
     # plane 2
     p2  = ph.plane_equation(t2[0], t2[1], t2[2])
     pc2 = ph.avg_coordinate(t2)
@@ -283,7 +281,7 @@ def fig_t1_plane2_similar(figname, t1, t2):
     data.extend(list(trace2.values()))
     data.extend(list(trace_rect.values()))  # add rectangle surface
     # data.extend(list(plh.arrow(pc, ph.add(pc, n), "#4285F4").values()))
-    data.extend(list(plh.coordinate().values()))
+    # data.extend(list(plh.coordinate().values()))
     data.extend(plh.arrow(t1[0], pj0, ph.Colors["blue"]).values())
     data.extend(plh.arrow(t1[1], pj1, ph.Colors["blue"]).values())
     data.extend(plh.arrow(t1[2], pj2, ph.Colors["blue"]).values())
@@ -312,18 +310,18 @@ def fig_t1_plane2_similar(figname, t1, t2):
             zaxis=dict(visible=False),
             annotations= 
                 make_tri_annotation(t1, "P", ph.Colors["black"]) 
-                + make_tri_annotation(t2, "Q", ph.Colors["black"])
-                + plh.annote_coordinate_label()
                 + [plh.annote_label(rect[0][0], rect[0][1], rect[0][2], r'$\pi_2$', ph.Colors["black"])]
-                + [plh.annote_label(pj0m[0], pj0m[1], pj0m[2], r'$D_0$', ph.Colors["black"])]
-                + [plh.annote_label(pj1m[0], pj1m[1], pj1m[2], r'$D_1$', ph.Colors["black"])]
+                + [plh.annote_point_label(pj0, r'$P_{j0}$', ph.Colors["black"])]
+                + [plh.annote_point_label(pj2, r'$P_{j2}$', ph.Colors["black"])]
+                + [plh.annote_point_label(pjl0, r'$P_{jl0}$', ph.Colors["black"])]
+                + [plh.annote_point_label(pjl2, r'$P_{jl2}$', ph.Colors["black"])]
+                + [plh.annote_point_label(pj0m, r'$D_0$', ph.Colors["black"])]
+                + [plh.annote_point_label(pj1m, r'$D_1$', ph.Colors["black"])]
                 + [plh.annote_label(pj2m[0], pj2m[1], pj2m[2], r'$D_2$', ph.Colors["black"])]
                 + [plh.annote_label((pc2 + np.array(n))[0],
                                     (pc2 + np.array(n))[1],
                                     (pc2 + np.array(n))[2], r'$n_2$', ph.Colors["black"])]
-                + [plh.annote_label(ip[0],
-                                    ip[1],
-                                    ip[2], r'$p_{02}$', ph.Colors["black"])] 
+                + [plh.annote_point_label(ip, r'$P_{02}$', ph.Colors["black"])] 
         ),
     )
 

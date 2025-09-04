@@ -38,7 +38,16 @@ inline void MultiValue(CVT dest[3], const CVT v1[3], const CVT factor) {
     dest[1]=v1[1]*factor; 
     dest[2]=v1[2]*factor; 
 }
-
+template<typename CVT>
+inline short MaxComponentIndex(const CVT vec[3]) {
+    CVT max = std::abs(vec[0]);
+    short index=0;
+    CVT b=std::abs(vec[1]);
+    CVT c=std::abs(vec[2]);
+    if(b>max) max=b,index=1;
+    if(c>max) max=c,index=2;
+    return index;
+}
 } // namespace tri_tri
     
 } // namespace carpio
