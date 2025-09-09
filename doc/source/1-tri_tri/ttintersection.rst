@@ -139,6 +139,7 @@ Method: Moller97
 ----------------------
 
 .. _step_1_label:
+
 Step 1
 +++++++++++++++++++++++++++++ 
 
@@ -195,10 +196,10 @@ is inserting the vertices into the plane equation:
 
 .. _fig_distance:
 .. figure:: fig/0.svg
-   
    :align: center
 
    Distance from Vertices of Triangle U to Plane 2
+
 
 - If :math:`D_i > 0`, then :math:`\mathbf{P_i}` is in the positive side of plane 2.
 
@@ -252,7 +253,7 @@ Calculate the plane equation of triangle :math:`U`.
 The plane equation (:math:`\pi_1`) of triangle :math:`U` is defined as:
 
 .. math::
-   :label: plane_v
+   :label: plane_u
 
    \vec{n_1} \cdot \vec{x} + d_1 = 0
 
