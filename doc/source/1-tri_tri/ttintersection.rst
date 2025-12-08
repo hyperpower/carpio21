@@ -210,10 +210,11 @@ is inserting the vertices into the plane equation:
 All possible cases of :math:`D_i` are summarized in the table below:
 
 .. csv-table:: Triangle Intersection Cases
-   :header: ":math:`D_2`", ":math:`D_1`", ":math:`D_0`", ":math:`D_0 D_2`", ":math:`D_0 D_1`","Case"
-   :widths: 10, 10, 10, 10,10, 30
+   :header: ":math:`D_2`", ":math:`D_1`", ":math:`D_0`", ":math:`D_0 D_2`", "$D_0 D_1$","Case"
+   :align: center
+   :widths: 5, 5, 5, 10,10, 30
 
-   :math:`0`, :math:`0`, :math:`0`,:math:`0`, :math:`0`,Coplanar
+   :math:`0`, :math:`0`, :math:`0`,:math:`0`, :math:`0`, Coplanar
    :math:`0`, :math:`0`, －, :math:`0`, :math:`0`, Line Coplanar
    :math:`0`, :math:`0`, ＋, :math:`0`, :math:`0`, Line Coplanar
    :math:`0`, －, :math:`0`, :math:`0`, :math:`0`, Line Coplanar
@@ -294,7 +295,8 @@ The line,
    \vec{L} = \vec{O} + t \vec{\Gamma}
 
 $O$ is some point on the line. We want to compute a scalar position on $L$ that represent
-the intersection between $\overline{P_0 P_2}$ and $\vec{L}$, as shown in :numref:`fig_similar_tri_label`. 
+the intersection between $\overline{P_0 P_2}$ and $\vec{L}$, as shown in :numref:`fig_similar_tri_label`.
+The intersection point between $\overline{P_0 P_2}$ and $\vec{L}$ is denoted as $P_{02}$. 
 For example, $P_0$ and $P_2$ lie on the different side of $\pi_2$. The vertices, $P_i$ ($i=0,2$), are first projected
 onto $\pi_2$, then projected onto $\vec{L}$. The projected points are $P_{ji}$ and $P_{jli}$.
 Two pairs of similar triangle can be found, which are $\Delta P_0 P_{02} P_{j0}$ and $\Delta P_2 P_{02} P_{j2}$, 
@@ -310,11 +312,95 @@ $\Delta P_{j0} P_{02} P_{jl0}$ and $\Delta P_{j2} P_{02} P_{jl2}$.
 
    Intersection point and similar triangles.
 
+So, we have
 
+.. math::
+   :label: similar_tri
+
+   \frac{ \| P_{02} - P_{jl0} \| }{ \| P_{jl2} - P_{jl0} \| } 
+   = 
+   \frac{ \| P_0 - P_{j0} \| }{ \| P_0 - P_{j0} \| + \| P_2 - P_{j2} \| }
+
+The projection point $P_{ji} (i=0,1,2)$ is on the plane :math:`\pi_2`, so
+
+.. math::
+   :label: proj_plane2
+
+   \vec{n_2} \cdot P_{ji} + d_2 = 0 \quad i=0,1,2
+
+Considering the :eq:`d_u`, we have
+
+.. math::
+   :label: proj_point
+
+   \vec{n_2} \cdot (P_{0} - P_{j0}) = D_0 \\
+
+   \| n_2 \| \| P_{0} - P_{j0} \| \cos \theta = D_0 \\
+
+   \| n_2 \| \| P_{0} - P_{j0} \| = D_0  \quad (\text{since} \ \theta = 0) \\
+   
+   \| P_{0} - P_{j0} \| = \frac{D_0}{\| n_2 \| }
+
+Similarly, the right hand side of :eq:`similar_tri` can be calculated as
+
+.. math::
+   :label: proj_point2
+
+   \frac{ \| P_0 - P_{j0} \| }{ \| P_0 - P_{j0} \| + \| P_2 - P_{j2} \| }
+   =
+   \frac{ D_0 }{ D_0 - D_2 }
+
+The left hand side of :eq:`similar_tri` can be calculated by line parameter value $t$, 
+the $P_{02}$ can be denoted as $P_{02} = O + t_{02} \Gamma$. So,
+
+.. math::
+   :label: line_param
+
+   \frac{ \| P_{02} - P_{jl0} \| }{ \| P_{jl2} - P_{jl0} \| } 
+   = 
+   \frac{ t_{02} - t_{jl0} }{ t_{jl2} - t_{jl0} }
+
+Combining :eq:`similar_tri` , :eq:`proj_point2` and :eq:`line_param`, we have
+
+.. math::
+   :label: t_param
+
+   t_{02} = t_{jl0} + 
+   \frac{ D_0 }{ D_0 - D_2 } ( t_{jl2} - t_{jl0} )
+
+Similar calcuations can be done to compute $t_{12}$.
 
 Step 6
 ++++++++++++++++++++++++
 Computer the intervals for each triangle
+
+.. code-block:: python
+   :class: exec
+
+   import pandas as pd
+   import matplotlib.pyplot as plt
+   import plotly.express as px
+
+   # 1. 打印内容自动显示
+   print("2025 年销售数据如下：")
+
+   # 2. pandas 表格自动美化显示
+   df = pd.DataFrame({
+       "月份": ["1月", "2月", "3月", "4月"],
+       "销量": [120, 150, 180, 220],
+       "增长率": [0.15, 0.25, 0.20, 0.22]
+   })
+   df
+
+   # 3. matplotlib 自动显示图表
+   plt.figure(figsize=(8,4))
+   plt.plot(df["月份"], df["销量"], marker='o')
+   plt.title("2025 年销量趋势")
+   plt.show()
+
+   # 4. plotly 交互图也完美支持
+   fig = px.line(df, x="月份", y="销量", title="交互式销量趋势")
+   fig
 
 
 

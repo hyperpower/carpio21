@@ -48,7 +48,7 @@ inline short MaxComponentIndex(const CVT vec[3]) {
     if(c>max) max=c,index=2;
     return index;
 }
-} // namespace tri_tri
+} // namespace raw 
     
 } // namespace carpio
 
