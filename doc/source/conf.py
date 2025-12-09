@@ -31,6 +31,7 @@ release = '2021.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_codeautolink',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
@@ -47,6 +48,7 @@ extensions = [
     # 'sphinx_exec_code',
     #'breathe' 
     # 'exhale'
+    'linuxdoc.rstFlatTable'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -103,6 +105,9 @@ html_theme_options = {
     'show_powered_by' : False,
     'font_size'       : '18px'
 }
+
+codeautolink_autodoc_inject = True
+execution_timeout = 30
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

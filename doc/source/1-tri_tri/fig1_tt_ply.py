@@ -78,13 +78,13 @@ traces["T1"] = go.Scatter3d(x = t1xyz[0],
                                  color="#4285F4",
                                  width=3))
 
-arrow0  = plh.arrow(go, [0,0,0], t1[0], cs["blue"] )
-arrow1  = plh.arrow(go, [0,0,0], t1[1], cs["blue"] )
-arrow2  = plh.arrow(go, [0,0,0], t1[2], cs["blue"] )
+arrow0  = plh.arrow([0,0,0], t1[0], cs["blue"] )
+arrow1  = plh.arrow([0,0,0], t1[1], cs["blue"] )
+arrow2  = plh.arrow([0,0,0], t1[2], cs["blue"] )
 
-arrowt0 = plh.arrow(go, [0,0,0], t2[0], cs["yellow"] )
-arrowt1 = plh.arrow(go, [0,0,0], t2[1], cs["yellow"] )
-arrowt2 = plh.arrow(go, [0,0,0], t2[2], cs["yellow"] )
+arrowt0 = plh.arrow([0,0,0], t2[0], cs["yellow"] )
+arrowt1 = plh.arrow([0,0,0], t2[1], cs["yellow"] )
+arrowt2 = plh.arrow([0,0,0], t2[2], cs["yellow"] )
 
 
 traces["T1Surface"] = go.Mesh3d(x = t1xyz[0], 
@@ -155,7 +155,7 @@ data.extend(list(arrowt0.values()))
 data.extend(list(arrowt1.values()))
 data.extend(list(arrowt2.values()))
 
-data.extend(list(plh.coordinate(go).values()))
+data.extend(list(plh.coordinate().values()))
 
 # build and plot figure
 fig=go.Figure(data)

@@ -1,6 +1,6 @@
 
 import argparse
-import os
+import os,sys
 # sphinx should be installed
 from sphinx.cmd.build import main as sphinx_main
 
@@ -52,7 +52,7 @@ def run_figpy(path):
             # change directory to the script's directory
             os.chdir(path)
             # run the script
-            cmd = f"python {file}"
+            cmd = f"{sys.executable} {file}"
             os.system(cmd)
             # change back to the original directory
             os.chdir(original_path)
