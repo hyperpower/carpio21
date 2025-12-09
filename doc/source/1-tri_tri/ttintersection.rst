@@ -212,7 +212,7 @@ All possible cases of :math:`D_i` are summarized in the table below:
 .. csv-table:: Triangle Intersection Cases
    :header: ":math:`D_2`", ":math:`D_1`", ":math:`D_0`", ":math:`D_0 D_2`", "$D_0 D_1$","Case"
    :align: center
-   :widths: 5, 5, 5, 10,10, 30
+   :widths: 5, 5, 5, 7 , 7, 30
 
    :math:`0`, :math:`0`, :math:`0`,:math:`0`, :math:`0`, Coplanar
    :math:`0`, :math:`0`, －, :math:`0`, :math:`0`, Line Coplanar
@@ -374,34 +374,38 @@ Step 6
 ++++++++++++++++++++++++
 Computer the intervals for each triangle
 
-.. code-block:: python
-   :class: exec
 
-   import pandas as pd
-   import matplotlib.pyplot as plt
-   import plotly.express as px
+.. list-table:: Triangle Intersection Cases
+   :widths: 10 10 10 20
+   :header-rows: 1
 
-   # 1. 打印内容自动显示
-   print("2025 年销售数据如下：")
+   * - :class: cell-zero   
 
-   # 2. pandas 表格自动美化显示
-   df = pd.DataFrame({
-       "月份": ["1月", "2月", "3月", "4月"],
-       "销量": [120, 150, 180, 220],
-       "增长率": [0.15, 0.25, 0.20, 0.22]
-   })
-   df
+       :math:`D_2`
 
-   # 3. matplotlib 自动显示图表
-   plt.figure(figsize=(8,4))
-   plt.plot(df["月份"], df["销量"], marker='o')
-   plt.title("2025 年销量趋势")
-   plt.show()
+     - :class: cell-zero
 
-   # 4. plotly 交互图也完美支持
-   fig = px.line(df, x="月份", y="销量", title="交互式销量趋势")
-   fig
+       :math:`D_1`
 
+     - :class: cell-zero
+
+       :math:`D_0`
+
+     - Case
+
+   * - :class: cell-zero
+
+       0
+
+     - :class: cell-zero
+
+       0
+
+     - :class: cell-zero
+
+       0
+
+     - Coplanar
 
 
 Step 7
