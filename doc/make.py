@@ -42,7 +42,7 @@ def parse_args():
 
 def run_figpy(path):
     """
-    Run figX.py to generate figures.
+    Generate figures.
     """
     for file in os.listdir(path):
         # check if the file starts with "fig" and ends with ".py"
