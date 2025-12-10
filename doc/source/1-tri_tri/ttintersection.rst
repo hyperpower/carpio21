@@ -368,44 +368,25 @@ Combining :eq:`similar_tri` , :eq:`proj_point2` and :eq:`line_param`, we have
    t_{02} = t_{jl0} + 
    \frac{ D_0 }{ D_0 - D_2 } ( t_{jl2} - t_{jl0} )
 
-Similar calcuations can be done to compute $t_{12}$.
+Similar calcuations can be done to compute $t_{12}$. $t_{02}$ and $t_{12}$ are the interval on $\vec{\Gamma}$ for triangle U. Interval for triangle V can be computed in the same way.
+
+The actual value of :math:`t` is not important, only the relative order matters. So we can project the intersection line onto the largest axis of :math:`\vec{\Gamma}` to get the scalar value of :math:`t`. $t_{jl0}$, $t_{jl1}$, $t_{jl2}$ can be found by projecting the vertices of triangle U onto the largest axis.
+
+For example, assume that :math:`\vec{\Gamma} = (g_x, g_y, g_z)`. if the x component is the largest, then $t_{jl0} = P0_x$ $t_{jl1} = P1_x$ and $t_{jl2} = P2_x$.
 
 Step 6
 ++++++++++++++++++++++++
-Computer the intervals for each triangle
+Computer the intervals for each triangle. :eq:`t_param` shows the way to compute the intervals. But, the vertices must be carefully chosen according to the sign of $D_i$.
 
+.. code-block:: pseudocode
+   :linenos:
 
-.. list-table:: Triangle Intersection Cases
-   :widths: 10 10 10 20
-   :header-rows: 1
-
-   * - :class: cell-zero   
-
-       :math:`D_2`
-
-     - :class: cell-zero
-
-       :math:`D_1`
-
-     - :class: cell-zero
-
-       :math:`D_0`
-
-     - Case
-
-   * - :class: cell-zero
-
-       0
-
-     - :class: cell-zero
-
-       0
-
-     - :class: cell-zero
-
-       0
-
-     - Coplanar
+   algorithm MyAlgo(A):
+       i <- 0
+       while i < len(A):
+           if A[i] > 0:
+               print(A[i])
+           i <- i + 1
 
 
 Step 7

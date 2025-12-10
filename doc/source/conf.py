@@ -31,7 +31,6 @@ release = '2021.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx_codeautolink',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
@@ -48,7 +47,7 @@ extensions = [
     # 'sphinx_exec_code',
     #'breathe' 
     # 'exhale'
-    'linuxdoc.rstFlatTable'
+    # 'linuxdoc.rstFlatTable'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -60,7 +59,7 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 pygments_style = None
-
+highlight_language = 'pseudocode'
 
 # -- Options for HTML output -------------------------------------------------
 # mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
