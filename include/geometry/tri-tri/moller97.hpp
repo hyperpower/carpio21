@@ -355,8 +355,11 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
   SORT(isect1[0],isect1[1]);
   SORT(isect2[0],isect2[1]);
 
-  if(isect1[1]<isect2[0] || isect2[1]<isect1[0]) return 0;
-  return 1;
+  if(isect1[1]<isect2[0] || isect2[1]<isect1[0]) {
+    return 0;
+  }else{
+    return 1;
+  }
 }
 template<class FLOAT>
 void isect2(FLOAT VTX0[3],FLOAT VTX1[3],FLOAT VTX2[3],

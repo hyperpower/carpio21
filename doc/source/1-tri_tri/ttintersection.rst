@@ -121,8 +121,8 @@ Intersection of Two Triangles
 ------------------------------
 Given two triangles, :math:`U=(P_0, P_1, P_2)`, :math:`V=(Q_0, Q_1, Q_2)`. 
 
-- Do triangles :math:`U` and :math:`V` intersect?
-- If they intersect, what is the result?
+- **Problem 1:** Do triangles :math:`U` and :math:`V` intersect?
+- **Problem 2:** If they intersect, what is the result?
    
 .. raw:: html
    :file: fig/fig1_tt_define.div
@@ -210,44 +210,45 @@ is inserting the vertices into the plane equation:
 All possible cases of :math:`D_i` are summarized in the table below:
 
 .. csv-table:: Triangle Intersection Cases
-   :header: ":math:`D_2`", ":math:`D_1`", ":math:`D_0`", ":math:`D_0 D_2`", "$D_0 D_1$","Case"
+   :header: No., ":math:`D_0`", ":math:`D_1`", ":math:`D_2`","Case", "Count 0", "Count +", "Count -"
    :align: center
-   :widths: 5, 5, 5, 7 , 7, 30
+   :widths: 3, 3, 3, 3, 8 , 6, 6, 6
 
-   :math:`0`, :math:`0`, :math:`0`,:math:`0`, :math:`0`, Coplanar
-   :math:`0`, :math:`0`, －, :math:`0`, :math:`0`, Line Coplanar
-   :math:`0`, :math:`0`, ＋, :math:`0`, :math:`0`, Line Coplanar
-   :math:`0`, －, :math:`0`, :math:`0`, :math:`0`, Line Coplanar
-   :math:`0`, －, －,:math:`0`, ＋,  Point Coplanar
-   :math:`0`, －, ＋,:math:`0`, －,  Point Coplanar Opposite Side
-   :math:`0`, ＋, :math:`0`, :math:`0`, :math:`0`, Point Coplanar
-   :math:`0`, ＋, －,:math:`0`, －, Point Coplanar Opposite Side
-   :math:`0`, ＋, ＋,:math:`0`, ＋, Point Coplanar
-   －, :math:`0`, :math:`0`, :math:`0`, :math:`0`,Line Coplanar
-   －, :math:`0`, －, ＋, :math:`0`,Point Coplanar
-   －, :math:`0`, ＋, －, :math:`0`,Point Coplanar Opposite Side
-   －, －, :math:`0`, :math:`0`, :math:`0`,Line Coplanar
-   －, －, －,＋, ＋, No Intersection
-   －, －, ＋,－, －, Opposite Side
-   －, ＋, :math:`0`,:math:`0`, :math:`0`,Point Coplanar Opposite Side
-   －, ＋, －, ＋, －, Opposite Side
-   －, ＋, ＋, －, ＋, Opposite Side
-   ＋, :math:`0`, :math:`0`, :math:`0`, :math:`0`,Line Coplanar
-   ＋, :math:`0`, －, －,  :math:`0`,Point Coplanar Opposite Side
-   ＋, :math:`0`, ＋, ＋, :math:`0`,Point Coplanar
-   ＋, －, :math:`0`, :math:`0`, :math:`0`,Point Coplanar Opposite Side
-   ＋, －, －, －, ＋, Opposite Side
-   ＋, －, ＋, ＋, －, Opposite Side
-   ＋, ＋, :math:`0`, :math:`0`, :math:`0`, Point Coplanar
-   ＋, ＋, －, －, －, Opposite Side
-   ＋, ＋, ＋, ＋, ＋, No Intersection
+   1,$0$,$0$,$0$,Coplanar,3,0,0
+   2,－,$0$,$0$,Line Coplanar,2,0,1
+   3,＋,$0$,$0$,Line Coplanar,2,1,0
+   4,$0$,－,$0$,Line Coplanar,2,0,1
+   5,－,－,$0$,Point Coplanar,1,0,2
+   6,＋,－,$0$,Point Coplanar Opposite Side,1,1,1
+   7,$0$,＋,$0$,Point Coplanar,2,1,0
+   8,－,＋,$0$,Point Coplanar Opposite Side,1,1,1
+   9,＋,＋,$0$,Point Coplanar,1,2,0
+   10,$0$,$0$,－,Line Coplanar,2,0,1
+   11,－,$0$,－,Point Coplanar,1,0,2
+   12,＋,$0$,－,Point Coplanar Opposite Side,1,1,1
+   13,$0$,－,－,Line Coplanar,1,0,2
+   14,－,－,－,No Intersection,0,0,3
+   15,＋,－,－,Opposite Side,0,1,2
+   16,$0$,＋,－,Point Coplanar Opposite Side,1,1,1
+   17,－,＋,－,Opposite Side,0,1,2
+   18,＋,＋,－,Opposite Side,0,2,1
+   19,$0$,$0$,＋,Line Coplanar,2,1,0
+   20,－,$0$,＋,Point Coplanar Opposite Side,1,1,1
+   21,＋,$0$,＋,Point Coplanar,1,2,0
+   22,$0$,－,＋,Point Coplanar Opposite Side,1,1,1
+   23,－,－,＋,Opposite Side,0,1,2
+   24,＋,－,＋,Opposite Side,0,2,1
+   25,$0$,＋,＋,Point Coplanar,1,2,0
+   26,－,＋,＋,Opposite Side,0,2,1
+   27,＋,＋,＋,No Intersection,0,3,0
 
 
 No Intersection cases can be found 
 by checking :math:`D_0 D_1 > 0` and :math:`D_0 D_2 > 0`.
 
-Step 3
-+++++++++++++++++++++++++++++ 
+
+Step 3 Compute the plane equation of triangle U
+++++++++++++++++++++++++++++++++++++++++++++++++
 
 Calculate the plane equation of triangle :math:`U`. 
 
@@ -269,8 +270,8 @@ and :math:`d_1` is the distance from the origin to the plane of triangle :math:`
 Calculate method is similar to :ref:`Step 1 <step_1_label>`.
 
 
-Step 4
-+++++++++++++++++++++++++++++
+Step 4 Compute the signed distances of triangle V to plane 1
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Calculate the signed distances from the vertices of triangle :math:`V`
 to the plane (:math:`\pi_1` ). Reject as trivial if all vertices of triangle :math:`V`
 are on the same side of the plane :math:`\pi_1`.
@@ -278,8 +279,9 @@ are on the same side of the plane :math:`\pi_1`.
 The signed distance from vertices :math:`Q_i (i=0,1,2)` to the plane :math:`\pi_1`
 is inserting the vertices into the plane equation. Calculate method is similar to **Step 2**.
 
-Step 5
-+++++++++++++++++++++++++++++
+
+Step 5 Compute the intersection line
++++++++++++++++++++++++++++++++++++++++
 Compute the intersection line and project onto the largest axis.
 
 The direction vector of intersection line of two plane $\pi_1$ and $\pi_2$ can be found by:
@@ -372,21 +374,21 @@ Similar calcuations can be done to compute $t_{12}$. $t_{02}$ and $t_{12}$ are t
 
 The actual value of :math:`t` is not important, only the relative order matters. So we can project the intersection line onto the largest axis of :math:`\vec{\Gamma}` to get the scalar value of :math:`t`. $t_{jl0}$, $t_{jl1}$, $t_{jl2}$ can be found by projecting the vertices of triangle U onto the largest axis.
 
-For example, assume that :math:`\vec{\Gamma} = (g_x, g_y, g_z)`. if the x component is the largest, then $t_{jl0} = P0_x$ $t_{jl1} = P1_x$ and $t_{jl2} = P2_x$.
+For example, assume that :math:`\vec{\Gamma} = (g_x, g_y, g_z)`. if the x component ($g_x$) is the largest, then $t_{jl0} = P0_x$ $t_{jl1} = P1_x$ and $t_{jl2} = P2_x$.
 
-Step 6
-++++++++++++++++++++++++
-Computer the intervals for each triangle. :eq:`t_param` shows the way to compute the intervals. But, the vertices must be carefully chosen according to the sign of $D_i$.
+Step 6 Compute the intervals for each triangle
+++++++++++++++++++++++++++++++++++++++++++++++++
+:eq:`t_param` shows the way to compute the intervals. But, the vertices must be carefully chosen according to the sign of $D_i$.
 
-.. code-block:: pseudocode
+.. code-block:: python
    :linenos:
 
-   algorithm MyAlgo(A):
-       i <- 0
-       while i < len(A):
-           if A[i] > 0:
-               print(A[i])
-           i <- i + 1
+   def intersect_t(t0, t1, t2, D0, D1, D2):
+      isect0=t0+(t1-t0)*D0/(D0-D1)    
+      isect1=t0+(t2-t0)*D0/(D0-D2)    
+   return (isect0, isect1)
+
+
 
 
 Step 7

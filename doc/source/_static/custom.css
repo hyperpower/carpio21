@@ -1,0 +1,42 @@
+/* 整个表格边框 */
+table.docutils {
+    border-left: none;
+    border-right: none;
+    border-collapse: collapse;  /* 合并边框，推荐 */
+}
+
+/* 表头与单元格：只保留上/下边框，移除左右边框 */
+table.docutils th,
+table.docutils td {
+    border-left: none !important;
+    border-right: none !important;
+
+    /* 你可以按需要调整粗细颜色 */
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+/* 表头背景色 */
+table.docutils thead th {
+    border-top: 2px solid #757575;
+    border-bottom: 2px solid #757575;
+    background-color: #dddddd;
+    font-weight: bold;
+}
+table.docutils tr:last-child td {
+    border-bottom: 2px solid #757575;
+}
+
+/* 隔行换色 */
+table.docutils tbody tr:nth-child(odd) {
+    background-color: #fafafa;
+}
+table.docutils tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* Cell background colors */
+.cell-zero { background-color: #f0f0f0; color: #333; }
+.cell-minus { background-color: #ffe6e6; color: #c00; }
+.cell-plus { background-color: #e6ffe6; color: #0c0; }
+.cell-case { background-color: #f9f9f9; }
