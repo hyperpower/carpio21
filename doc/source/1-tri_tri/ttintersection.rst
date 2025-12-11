@@ -388,8 +388,80 @@ Step 6 Compute the intervals for each triangle
       isect1=t0+(t2-t0)*D0/(D0-D2)    
    return (isect0, isect1)
 
+:eq:`t_param` can be implemented as the function above. $D_0$ and $D_1$ should not be on the same side. So as the $D_0$ and $D_2$. The following code shows how to order the Vertices.
+
+.. code-block:: python
+   :linenos:
+
+   if D0*D1 > 0.:      #condition 1                                
+      # D0, D1 are on the same side, 
+      # D2 on the other side or on the plane. 
+      intersect_t(t2,t0,t1,D2,D0,D1)
+   elif D0*D2 > 0:     #condition 2
+      # Here we know that D0D1<=0.0                                  
+      # D0, D2 are on the same side, 
+      # D1 on the other or on the plane  
+      intersect_t(t1,t0,t2,D1,D0,D2)
+   elif D1*D2 > 0.0 or D0 != 0.0:  #condition 3                       
+      # here we know that D0D1<=0.0 or that D0!=0.0         
+      intersect_t(t0,t1,t2,D0,D1,D2)
+   elif D1!=0.0:       #condition 4                              
+      intersect_t(t1,t0,t2,D1,D0,D2)
+   elif D2!=0.0:       #condition 5                              
+      intersect_t(t2,t0,t1,D2,D0,D1)
+   else                #condition 6                              
+      # triangles are coplanar                        
+      return coplanar_tri_tri(N1,V0,V1,V2,U0,U1,U2)
+
+All the possible conditions are covered in the following table:
+
+.. csv-table:: Conditions Define
+   :header: No., Condition, Description
+   :align: center
+   :widths: 3, 15, 30
+
+   0, $D_0 D_1 > 0$ and $D_0 D_2 > 0$, No Intersection
+   1, $D_0 D_1 > 0$, "$D_0$ and $D_1$ are on the same side. $D_0 D_2 \leq 0$"
+   2, $D_0 D_2 > 0$, "$D_0$ and $D_2$ are on the same side. $D_0 D_1 \leq 0$"
+   3, $D_1 D_2 > 0$ or $D_0 \neq 0$, 
+   4, $D_1 \neq 0$, 
+   5, $D_2 \neq 0$, 
+   6, , Coplanar
 
 
+.. csv-table:: $D_i$ of a Triangle to the Plane of another Triangle
+   :header: $D_0$, $D_1$, $D_2$,$D_0 D_1$, $D_0 D_2$, $D_1 D_2$, "0","1","2", "3", "4", "5","6"
+   :align: center
+   :widths: 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+
+   0,0,0,0,0,0,,,,,,,1
+   －,0,0,0,0,0,,,,1,,,
+   ＋,0,0,0,0,0,,,,1,,,
+   0,－,0,0,0,0,,,,,1,,
+   －,－,0,＋,0,0,,1,,,,,
+   ＋,－,0,－,0,0,,,,1,,,
+   0,＋,0,0,0,0,,,,,1,,
+   －,＋,0,－,0,0,,,,1,,,
+   ＋,＋,0,＋,0,0,,1,,,,,
+   0,0,－,0,0,0,,,,,,1,
+   －,0,－,0,＋,0,,,1,,,,
+   ＋,0,－,0,－,0,,,,,,,
+   0,－,－,0,0,＋,,,,1,,,
+   －,－,－,＋,＋,＋,1,,,,,,
+   ＋,－,－,－,－,＋,,,,1,,,
+   0,＋,－,0,0,－,,,,,1,,
+   －,＋,－,－,＋,－,,,1,,,,
+   ＋,＋,－,＋,－,－,,1,,,,,
+   0,0,＋,0,0,0,,,,,,1,
+   －,0,＋,0,－,0,,,,1,,,
+   ＋,0,＋,0,＋,0,,,1,,,,
+   0,－,＋,0,0,－,,,,,1,,
+   －,－,＋,＋,－,－,,1,,,,,
+   ＋,－,＋,－,＋,－,,,1,,,,
+   0,＋,＋,0,0,＋,,,,1,,,
+   －,＋,＋,－,－,＋,,,,1,,,
+   ＋,＋,＋,＋,＋,＋,1,,,,,,
+   ,,,,,,2,4,4,9,4,2,1
 
 Step 7
 ++++++++++++++++++++++++
@@ -434,7 +506,7 @@ Intersect the intervals
 .. math::
    :label: d_vg
 
-   D_i = \mathbf{r_i} \cdot (\mathbf{e_1} \times \mathbf{e_2}) 
+   D_i = \mathbf{r_i} \cdot (\mathbf{e_1} \times \mathbf{e_2})    
                 = \mathbf{r_i} \cdot \mathbf{n_0} \quad i=0,1,2
 
 如果 :math:`D_i>0` 则 :math:`\mathbf{r_i}` 与 :math:`\mathbf{n_0}` 的同方向。

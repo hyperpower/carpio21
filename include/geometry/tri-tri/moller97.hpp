@@ -370,9 +370,9 @@ void isect2(FLOAT VTX0[3],FLOAT VTX1[3],FLOAT VTX2[3],
   FLOAT tmp=D0/(D0-D1);          
   FLOAT diff[3];
   *isect0=VV0+(VV1-VV0)*tmp;         
-  SUB(diff,VTX1,VTX0);              
-  MULT(diff,diff,tmp);               
-  ADD(isectpoint0,diff,VTX0);        
+  SUB(diff,VTX1,VTX0);         // diff= VTX1-VTX0    
+  MULT(diff,diff,tmp);         // diff= diff*tmp     
+  ADD(isectpoint0,diff,VTX0);  // isectpoint0=VTX0+diff   
   tmp=D0/(D0-D2);                    
   *isect1=VV0+(VV2-VV0)*tmp;          
   SUB(diff,VTX2,VTX0);                   
