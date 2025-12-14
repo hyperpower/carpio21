@@ -9,6 +9,7 @@ import os, sys
 
 
 _PATH_THIS_ = abspath((dirname(__file__)))
+_PATH_THIS_FIG_ = abspath(join(_PATH_THIS_, "fig"))
 
 
 

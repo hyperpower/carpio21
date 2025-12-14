@@ -21,6 +21,7 @@ _PATH_SOURCE_  = path
 _PATH_DOC_     = abspath(join(_PATH_SOURCE_, ".."))
 _PATH_PROJECT_ = abspath(join(_PATH_SOURCE_, "..", ".."))
 _PATH_SCRIPTS_ = abspath(join(_PATH_PROJECT_, "scripts"))
+_PATH_THIS_FIG_ = abspath(join(_PATH_THIS_, "fig"))
 
 sys.path.append(_PATH_SCRIPTS_)
 
@@ -199,9 +200,9 @@ fig.update_layout(
 
 
 if __name__ == "__main__":
-    ph.generate_0_svg(_PATH_THIS_)
-    html_path = abspath(join(_PATH_THIS_, "fig1_tt_ply.html"))
+    ph.generate_0_svg(_PATH_THIS_FIG_)
+    html_path = abspath(join(_PATH_THIS_FIG_, "fig1_tt_ply.html"))
     fig.write_html(html_path)
     # plh.append_js_to_show_camera_info(html_path)
-    fig.write_html(abspath(join(_PATH_THIS_, "fig1_tt_ply.div")), full_html=False, include_plotlyjs='cdn')
+    fig.write_html(abspath(join(_PATH_THIS_FIG_, "fig1_tt_ply.div")), full_html=False, include_plotlyjs='cdn')
 # 
