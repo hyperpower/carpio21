@@ -205,4 +205,4 @@ if __name__ == "__main__":
     fig.write_html(html_path)
     # plh.append_js_to_show_camera_info(html_path)
     fig.write_html(abspath(join(_PATH_THIS_FIG_, "fig1_tt_ply.div")), full_html=False, include_plotlyjs='cdn')
-# 
+#

@@ -284,6 +284,8 @@ Step 5 Compute the intersection line
 +++++++++++++++++++++++++++++++++++++++
 Compute the intersection line and project onto the largest axis.
 
+For **problem 1**. We want to know if the two triangles intersect. The intersection segement does not need to be computed exactly.
+
 The direction vector of intersection line of two plane $\pi_1$ and $\pi_2$ can be found by:
 
 .. math::
@@ -306,6 +308,7 @@ $\Delta P_{j0} P_{02} P_{jl0}$ and $\Delta P_{j2} P_{02} P_{jl2}$.
 
 .. raw:: html
    :file: fig/fig3_t1_plane2_similar.div
+
 
 .. _fig_similar_tri_label:
 
@@ -370,30 +373,315 @@ Combining :eq:`similar_tri` , :eq:`proj_point2` and :eq:`line_param`, we have
    t_{02} = t_{jl0} + 
    \frac{ D_0 }{ D_0 - D_2 } ( t_{jl2} - t_{jl0} )
 
-Similar calcuations can be done to compute $t_{12}$. $t_{02}$ and $t_{12}$ are the interval on $\vec{\Gamma}$ for triangle U. Interval for triangle V can be computed in the same way.
-
-The actual value of :math:`t` is not important, only the relative order matters. So we can project the intersection line onto the largest axis of :math:`\vec{\Gamma}` to get the scalar value of :math:`t`. $t_{jl0}$, $t_{jl1}$, $t_{jl2}$ can be found by projecting the vertices of triangle U onto the largest axis.
-
-For example, assume that :math:`\vec{\Gamma} = (g_x, g_y, g_z)`. if the x component ($g_x$) is the largest, then $t_{jl0} = P0_x$ $t_{jl1} = P1_x$ and $t_{jl2} = P2_x$.
-
-Step 6 Compute the intervals for each triangle
-++++++++++++++++++++++++++++++++++++++++++++++++
-:eq:`t_param` shows the way to compute the intervals. But, the vertices must be carefully chosen according to the sign of $D_i$.
+Similar calcuations can be done to compute $t_{12}$. $t_{02}$ and $t_{12}$ are the interval on $\vec{\Gamma}$ for triangle U. Interval for triangle V can be computed in the same way. The pesudo code is shown as folows.
 
 .. code-block:: python
    :linenos:
 
    def intersect_t(t0, t1, t2, D0, D1, D2):
-      isect0=t0+(t1-t0)*D0/(D0-D1)    
-      isect1=t0+(t2-t0)*D0/(D0-D2)    
-   return (isect0, isect1)
+      # D0 and D1 are on different sides 
+      isect0=t0+(t1-t0)*D0/(D0-D1)   
+      # D0 and D2 are on different sides 
+      isect1=t0+(t2-t0)*D0/(D0-D2)   
+      return (isect0, isect1)
+
+
+The actual value of :math:`t` is not important, only the relative order matters. So we can project the intersection line onto the largest axis of :math:`\vec{\Gamma}` to get the scalar value of :math:`t`. $t_{jl0}$, $t_{jl1}$, $t_{jl2}$ can be found by projecting the vertices of triangle U onto the largest axis.
+
+For example, assume that :math:`\vec{\Gamma} = (g_x, g_y, g_z)`. if the x component ($g_x$) is the largest, then $t_{jl0} = P0_x$ $t_{jl1} = P1_x$ and $t_{jl2} = P2_x$.
+
+
+For **problem 2**, if the two triangles intersect, we want to compute the intersection segment. So the exact intersection point must be computed. Another pairs of similar triangles can be found, which are $\Delta P_0 P_{02} P_{j0}$ and $\Delta P_{j2} P_{02} P_{2}$.
+
+.. math::
+   :label: similar2_tri
+
+   \frac{ \| P_{0} - P_{02} \| }{ \| P_{0} - P_{2} \| } 
+   = 
+   \frac{ \| P_0 - P_{j0} \| }{ \| P_0 - P_{j0} \| + \| P_2 - P_{j2} \| }
+
+Considerting the :eq:`proj_point2`, we have
+
+.. math::
+   :label: similar2_tri_2
+
+   \frac{ \| P_{0} - P_{02} \| }{ \| P_{0} - P_{2} \| } 
+   = 
+   \frac{ D_0 }{ D_0 - D_2 }
+
+following pseudocode shows how to compute the exact intersection points.
+
+.. code-block:: python
+   :linenos:
+
+   def intersect_p(p0, p1, p2, D0, D1, D2):
+      # D0 and D1 are on different sides 
+      Dr1  = D0 / (D0 - D1)
+      diff = p1 - p0 
+      isect0 = p0 + Dr1 * diff
+      # D0 and D2 are on different sides 
+      Dr2  = D0 / (D0 - D2)
+      diff = p2 - p0 
+      isect1 = p0 + Dr2 * diff
+      return (isect0, isect1)
+
+Step 6 Compute the intervals for each triangle
+++++++++++++++++++++++++++++++++++++++++++++++++
+:eq:`t_param` shows the way to compute the intervals. But, the vertices must be carefully chosen according to the sign of $D_i$. $D_0$ and $D_1$ should not be on the same side. So as the $D_0$ and $D_2$. The following code shows how to order the Vertices.
+
+.. code-block:: python
+   :linenos:
+
+   if D0*D1 > 0.:      #condition 1                                
+      # D0, D1 are on the same side, 
+      # D2 on the other side or on the plane. 
+      intersect_t(t2,t0,t1,D2,D0,D1)
+   elif D0*D2 > 0:     #condition 2
+      # Here we know that D0D1<=0.0                                  
+      # D0, D2 are on the same side, 
+      # D1 on the other or on the plane  
+      intersect_t(t1,t0,t2,D1,D0,D2)
+   elif D1*D2 > 0.0 or D0 != 0.0:  #condition 3                       
+      # here we know that D0D1<=0.0 or that D0!=0.0         
+      intersect_t(t0,t1,t2,D0,D1,D2)
+   elif D1!=0.0:       #condition 4                              
+      intersect_t(t1,t0,t2,D1,D0,D2)
+   elif D2!=0.0:       #condition 5                              
+      intersect_t(t2,t0,t1,D2,D0,D1)
+   else                #condition 6                              
+      # triangles are coplanar                        
+      return coplanar_tri_tri(N1,V0,V1,V2,U0,U1,U2)
+
+All the possible conditions are covered in the following table:
+
+.. csv-table:: Conditions Define
+   :header: No., Condition, Description
+   :align: center
+   :widths: 3, 15, 30
+
+   0, $D_0 D_1 > 0$ and $D_0 D_2 > 0$, No Intersection
+   1, $D_0 D_1 > 0$, "$D_0$ and $D_1$ are on the same side. $D_0 D_2 \leq 0$"
+   2, $D_0 D_2 > 0$, "$D_0$ and $D_2$ are on the same side. $D_0 D_1 \leq 0$"
+   3, $D_1 D_2 > 0$ or $D_0 \neq 0$, 
+   4, $D_1 \neq 0$, 
+   5, $D_2 \neq 0$, 
+   6, , Coplanar
+
+
+.. csv-table:: $D_i$ of a Triangle to the Plane of another Triangle
+   :header: $D_0$, $D_1$, $D_2$,$D_0 D_1$, $D_0 D_2$, $D_1 D_2$, "0","1","2", "3", "4", "5","6"
+   :align: center
+   :widths: 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+
+   0,0,0,0,0,0,,,,,,,1
+   －,0,0,0,0,0,,,,1,,,
+   ＋,0,0,0,0,0,,,,1,,,
+   0,－,0,0,0,0,,,,,1,,
+   －,－,0,＋,0,0,,1,,,,,
+   ＋,－,0,－,0,0,,,,1,,,
+   0,＋,0,0,0,0,,,,,1,,
+   －,＋,0,－,0,0,,,,1,,,
+   ＋,＋,0,＋,0,0,,1,,,,,
+   0,0,－,0,0,0,,,,,,1,
+   －,0,－,0,＋,0,,,1,,,,
+   ＋,0,－,0,－,0,,,,,,,
+   0,－,－,0,0,＋,,,,1,,,
+   －,－,－,＋,＋,＋,1,,,,,,
+   ＋,－,－,－,－,＋,,,,1,,,
+   0,＋,－,0,0,－,,,,,1,,
+   －,＋,－,－,＋,－,,,1,,,,
+   ＋,＋,－,＋,－,－,,1,,,,,
+   0,0,＋,0,0,0,,,,,,1,
+   －,0,＋,0,－,0,,,,1,,,
+   ＋,0,＋,0,＋,0,,,1,,,,
+   0,－,＋,0,0,－,,,,,1,,
+   －,－,＋,＋,－,－,,1,,,,,
+   ＋,－,＋,－,＋,－,,,1,,,,
+   0,＋,＋,0,0,＋,,,,1,,,
+   －,＋,＋,－,－,＋,,,,1,,,
+   ＋,＋,＋,＋,＋,＋,1,,,,,,
+   ,,,,,,2,4,4,9,4,2,1
+
+Step 7 Intersect the intervals
++++++++++++++++++++++++++++++++++++++++
+
+The intervals for each triangle can be computed in **Step 6**. Triangle :math:`U` has interval :math:`[t_{u0}, t_{u1}]` and triangle :math:`V` has interval :math:`[t_{v0}, t_{v1}]`.
+
+If the two intervals overlap, then the two triangles intersect. The overlapping interval is the intersection segment of the two triangles.
+
+For problem 1, pseudocode is shown as follows:
+
+.. code-block:: python
+   :linenos:
+
+   if (t_u1 < t_v0) or (t_v1 < t_u0):
+      return False   # no intersection
+   else:
+      return True    # intersection
+
+For problem 2, $t$ used to compute the order of intersection points.
+
+
+Coplanar Triangle Intersection
+----------------------------------
+
+When two triangles are coplanar, special handling is required to determine their intersection.
+
+
+Projection
+++++++++++++++++++++++++++++++++
+
+Two triangles share the same plane. $N$ is the normal of the plane. The triangles can be projected onto one of the three coordinate planes (XY, YZ, ZX) based on the component of $N$ with the largest absolute value.
+
+.. code-block:: python
+   :linenos:
+
+   abs_n = [abs(N.x), abs(N.y), abs(N.z)]
+   if abs_n[0] > abs_n[1]:
+      if abs_n[0] > abs_n[2]: # X is largest
+         # project onto YZ plane
+         return (1,2) #index of Y and Z
+      else: # Z is largest
+         # project onto XY plane
+         return (0,1) #index of X and Y
+   else:
+      if abs_n[1] > abs_n[2]: # Y is largest
+         # project onto XZ plane
+         return (0,2) #index of X and Z
+      else:
+         # project onto XY plane
+         return (0,1) #index of X and Y
+
+Edge Intersection Test
++++++++++++++++++++++++++++++++
+
+After projection, the 2D coordinates of the triangles' vertices are used to check for edge intersections. Each edge of triangle U is tested against each edge of triangle V for intersection.
+
+For example, one edge of triangle U is defined by points :math:`P_0` and :math:`P_1`, and one edge of triangle V is defined by points :math:`Q_0` and :math:`Q_1`.  
+
+- Edge of Triangle U: **$P_0 P_1$**
+- Edge of Triangle V: **$Q_0 Q_1$**
+
+They can be written in parametric form as
+
+.. math::
+
+   \begin{aligned}
+   P(t) &= P_0 + t(P_1 - P_0), \quad t \in [0,1] \\
+   Q(u) &= Q_0 + u(Q_1 - Q_0), \quad u \in [0,1]
+   \end{aligned}
+
+The two segments intersect if and only if there exist parameters
+:math:`t, u \in [0,1]` such that
+
+.. math::
+
+   P_0 + t(P_1 - P_0) = Q_0 + u(Q_1 - Q_0)
+
+Rearranging the equation gives
+
+.. math::
+
+   t(P_1 - P_0) - u(Q_1 - Q_0) = Q_0 - P_0
+
+
+Introduce the following vector notation:
+
+.. math::
+
+   \mathbf{A} = P_1 - P_0, \quad
+   \mathbf{B} = Q_1 - Q_0, \quad
+   \mathbf{C} = P_0 - Q_0
+
+Then the equation becomes
+
+.. math::
+
+   t\mathbf{A} - u\mathbf{B} = -\mathbf{C}
+
+
+To eliminate one parameter, take the cross product of both sides
+with :math:`\mathbf{B}`:
+
+.. math::
+
+   (t\mathbf{A} - u\mathbf{B}) \times \mathbf{B}
+   = (-\mathbf{C}) \times \mathbf{B} \\
+   t\mathbf{A} \times \mathbf{B} - u\mathbf{B} \times \mathbf{B}
+   = (-\mathbf{C}) \times \mathbf{B}  = \mathbf{B} \times \mathbf{C}
+
+Using :math:`\mathbf{B} \times \mathbf{B} = 0`, this simplifies to
+
+.. math::
+
+   t(\mathbf{A} \times \mathbf{B}) = \mathbf{B} \times \mathbf{C}
+
+Thus,
+
+.. math::
+
+   t = \frac{\mathbf{B} \times \mathbf{C}}{\mathbf{A} \times \mathbf{B}}
+
+Similarly, taking the cross product with :math:`\mathbf{A}` gives
+
+.. math::
+
+   u = \frac{\mathbf{A} \times \mathbf{C}}{\mathbf{A} \times \mathbf{B}}
+
+For the intersection point to lie on both segments, the parameters
+must satisfy
+
+.. math::
+
+   0 \le t \le 1, \quad 0 \le u \le 1
+
+Substituting the expressions for :math:`t` and :math:`u` yields
+
+.. math::
+
+   0 \le \frac{\mathbf{B} \times \mathbf{C}}{\mathbf{A} \times \mathbf{B}} \le 1,
+   \quad
+   0 \le \frac{\mathbf{A} \times \mathbf{C}}{\mathbf{A} \times \mathbf{B}} \le 1
+
+Let
+
+.. math::
+
+   f = \mathbf{A} \times \mathbf{B}, \quad
+   d = \mathbf{B} \times \mathbf{C}, \quad
+   e = \mathbf{A} \times \mathbf{C}
+
+Then the interval conditions can be evaluated *without division* by
+considering the sign of :math:`f`.
+
+- Case 1: :math:`f > 0`
+
+.. math::
+
+   0 \le d \le f
+   \quad \text{and} \quad
+   0 \le e \le f
+
+- Case 2: :math:`f < 0`
+
+.. math::
+
+   0 \ge d \ge f
+   \quad \text{and} \quad
+   0 \ge e \ge f
+
+These inequalities are algebraically equivalent to the original
+constraints :math:`t, u \in [0,1]`, but avoid any division operations.
+
+Point in Triangle Test
++++++++++++++++++++++++++++++++
+
+If no edge intersections are found, a final test is performed to check if one triangle is
+entirely contained within the other. This is done using a point-in-triangle test.
 
 
 
 
-Step 7
-++++++++++++++++++++++++
-Intersect the intervals
 
 
 
@@ -434,7 +722,7 @@ Intersect the intervals
 .. math::
    :label: d_vg
 
-   D_i = \mathbf{r_i} \cdot (\mathbf{e_1} \times \mathbf{e_2}) 
+   D_i = \mathbf{r_i} \cdot (\mathbf{e_1} \times \mathbf{e_2})    
                 = \mathbf{r_i} \cdot \mathbf{n_0} \quad i=0,1,2
 
 如果 :math:`D_i>0` 则 :math:`\mathbf{r_i}` 与 :math:`\mathbf{n_0}` 的同方向。
