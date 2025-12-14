@@ -213,8 +213,9 @@
 namespace carpio {
 
 template<class FLOAT>
-int coplanar_tri_tri(FLOAT N[3],FLOAT V0[3], FLOAT V1[3],FLOAT V2[3],
-                     FLOAT U0[3],FLOAT U1[3],FLOAT U2[3])
+int coplanar_tri_tri(FLOAT N[3],
+                     FLOAT V0[3], FLOAT V1[3],FLOAT V2[3],
+                     FLOAT U0[3], FLOAT U1[3], FLOAT U2[3])
 {
    FLOAT A[3];
    short i0,i1;

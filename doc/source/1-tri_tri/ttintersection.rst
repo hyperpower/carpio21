@@ -284,6 +284,8 @@ Step 5 Compute the intersection line
 +++++++++++++++++++++++++++++++++++++++
 Compute the intersection line and project onto the largest axis.
 
+For **problem 1**. We want to know if the two triangles intersect. The intersection segement does not need to be computed exactly.
+
 The direction vector of intersection line of two plane $\pi_1$ and $\pi_2$ can be found by:
 
 .. math::
@@ -306,6 +308,7 @@ $\Delta P_{j0} P_{02} P_{jl0}$ and $\Delta P_{j2} P_{02} P_{jl2}$.
 
 .. raw:: html
    :file: fig/fig3_t1_plane2_similar.div
+
 
 .. _fig_similar_tri_label:
 
@@ -370,25 +373,61 @@ Combining :eq:`similar_tri` , :eq:`proj_point2` and :eq:`line_param`, we have
    t_{02} = t_{jl0} + 
    \frac{ D_0 }{ D_0 - D_2 } ( t_{jl2} - t_{jl0} )
 
-Similar calcuations can be done to compute $t_{12}$. $t_{02}$ and $t_{12}$ are the interval on $\vec{\Gamma}$ for triangle U. Interval for triangle V can be computed in the same way.
-
-The actual value of :math:`t` is not important, only the relative order matters. So we can project the intersection line onto the largest axis of :math:`\vec{\Gamma}` to get the scalar value of :math:`t`. $t_{jl0}$, $t_{jl1}$, $t_{jl2}$ can be found by projecting the vertices of triangle U onto the largest axis.
-
-For example, assume that :math:`\vec{\Gamma} = (g_x, g_y, g_z)`. if the x component ($g_x$) is the largest, then $t_{jl0} = P0_x$ $t_{jl1} = P1_x$ and $t_{jl2} = P2_x$.
-
-Step 6 Compute the intervals for each triangle
-++++++++++++++++++++++++++++++++++++++++++++++++
-:eq:`t_param` shows the way to compute the intervals. But, the vertices must be carefully chosen according to the sign of $D_i$.
+Similar calcuations can be done to compute $t_{12}$. $t_{02}$ and $t_{12}$ are the interval on $\vec{\Gamma}$ for triangle U. Interval for triangle V can be computed in the same way. The pesudo code is shown as folows.
 
 .. code-block:: python
    :linenos:
 
    def intersect_t(t0, t1, t2, D0, D1, D2):
-      isect0=t0+(t1-t0)*D0/(D0-D1)    
-      isect1=t0+(t2-t0)*D0/(D0-D2)    
-   return (isect0, isect1)
+      # D0 and D1 are on different sides 
+      isect0=t0+(t1-t0)*D0/(D0-D1)   
+      # D0 and D2 are on different sides 
+      isect1=t0+(t2-t0)*D0/(D0-D2)   
+      return (isect0, isect1)
 
-:eq:`t_param` can be implemented as the function above. $D_0$ and $D_1$ should not be on the same side. So as the $D_0$ and $D_2$. The following code shows how to order the Vertices.
+
+The actual value of :math:`t` is not important, only the relative order matters. So we can project the intersection line onto the largest axis of :math:`\vec{\Gamma}` to get the scalar value of :math:`t`. $t_{jl0}$, $t_{jl1}$, $t_{jl2}$ can be found by projecting the vertices of triangle U onto the largest axis.
+
+For example, assume that :math:`\vec{\Gamma} = (g_x, g_y, g_z)`. if the x component ($g_x$) is the largest, then $t_{jl0} = P0_x$ $t_{jl1} = P1_x$ and $t_{jl2} = P2_x$.
+
+
+For **problem 2**, if the two triangles intersect, we want to compute the intersection segment. So the exact intersection point must be computed. Another pairs of similar triangles can be found, which are $\Delta P_0 P_{02} P_{j0}$ and $\Delta P_{j2} P_{02} P_{2}$.
+
+.. math::
+   :label: similar2_tri
+
+   \frac{ \| P_{0} - P_{02} \| }{ \| P_{0} - P_{2} \| } 
+   = 
+   \frac{ \| P_0 - P_{j0} \| }{ \| P_0 - P_{j0} \| + \| P_2 - P_{j2} \| }
+
+Considerting the :eq:`proj_point2`, we have
+
+.. math::
+   :label: similar2_tri_2
+
+   \frac{ \| P_{0} - P_{02} \| }{ \| P_{0} - P_{2} \| } 
+   = 
+   \frac{ D_0 }{ D_0 - D_2 }
+
+following pseudocode shows how to compute the exact intersection points.
+
+.. code-block:: python
+   :linenos:
+
+   def intersect_p(p0, p1, p2, D0, D1, D2):
+      # D0 and D1 are on different sides 
+      Dr1  = D0 / (D0 - D1)
+      diff = p1 - p0 
+      isect0 = p0 + Dr1 * diff
+      # D0 and D2 are on different sides 
+      Dr2  = D0 / (D0 - D2)
+      diff = p2 - p0 
+      isect1 = p0 + Dr2 * diff
+      return (isect0, isect1)
+
+Step 6 Compute the intervals for each triangle
+++++++++++++++++++++++++++++++++++++++++++++++++
+:eq:`t_param` shows the way to compute the intervals. But, the vertices must be carefully chosen according to the sign of $D_i$. $D_0$ and $D_1$ should not be on the same side. So as the $D_0$ and $D_2$. The following code shows how to order the Vertices.
 
 .. code-block:: python
    :linenos:
@@ -463,9 +502,30 @@ All the possible conditions are covered in the following table:
    ＋,＋,＋,＋,＋,＋,1,,,,,,
    ,,,,,,2,4,4,9,4,2,1
 
-Step 7
-++++++++++++++++++++++++
-Intersect the intervals
+Step 7 Intersect the intervals
++++++++++++++++++++++++++++++++++++++++
+
+The intervals for each triangle can be computed in **Step 6**. Triangle :math:`U` has interval :math:`[t_{u0}, t_{u1}]` and triangle :math:`V` has interval :math:`[t_{v0}, t_{v1}]`.
+
+If the two intervals overlap, then the two triangles intersect. The overlapping interval is the intersection segment of the two triangles.
+
+For problem 1, pseudocode is shown as follows:
+
+.. code-block:: python
+   :linenos:
+
+   if (t_u1 < t_v0) or (t_v1 < t_u0):
+      return False   # no intersection
+   else:
+      return True    # intersection
+
+For problem 2, $t$ used to compute the order of intersection points.
+
+
+Coplanar Triangle Intersection
+----------------------------------
+
+When two triangles are coplanar, special handling is required to determine their intersection.
 
 
 

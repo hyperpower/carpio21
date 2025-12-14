@@ -9,7 +9,7 @@ import os, sys
 
 
 _PATH_THIS_ = abspath((dirname(__file__)))
-
+_PATH_THIS_FIG_ = abspath(join(_PATH_THIS_, "fig"))
 
 
 cblue = "#4285F4"
@@ -57,5 +57,5 @@ plt.axis('off')
 plt.tight_layout()
 
 # plt.show()
-plt.savefig(join(_PATH_THIS_, "fig2_tt.png"))
+plt.savefig(join(_PATH_THIS_FIG_, "fig2_tt.png"))
 # plt.savefig("./fig2_tt.png")
