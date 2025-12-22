@@ -72,7 +72,7 @@ std::array<NUM, 3> Construct(const NUM& ax, const NUM& ay,
             res[1] = 1;
             res[2] = ay;
         } else {
-            res[0] = 1.0 / (ax - bx);
+            res[0] =  1.0 / (ax - bx);
             res[1] = -1.0 / (ay - by);
             res[2] = bx / (ax - bx) - by / (ay - by);
         }

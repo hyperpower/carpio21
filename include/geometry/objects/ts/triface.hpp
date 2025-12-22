@@ -27,6 +27,7 @@ public:
     typedef St size_type;
     typedef TYPE Vt;
     typedef Point_<TYPE, DIM> Poi;
+    typedef Point_<TYPE, DIM> Point;
     typedef Poi* pPoi;
     typedef Edge_<TYPE, DIM, Self> Edg;
     typedef Edg* pEdg;

@@ -113,8 +113,28 @@ TEST(TS, ts_intersect){
 
     auto surf1 = *(sur->begin());
     auto icof1 = *(ico->begin());
-    auto res = Intersect(*surf1, *icof1);
-    res.show();
+    // auto res = Intersect(*surf1, *icof1);
+    auto res = Intersect(*sur, *ico);
+    Plotly_ plot;
+    auto asurfce = ToPlotlyActor(*sur, "surface");
+    asurfce.update("color", "yellow");
+    plot.add(asurfce);
+    plot.add(ToPlotlyActor(*ico));
+
+    for(auto& rf : res){
+        std::cout << "Intersected Face: is_intersect = " << rf._is_intersect 
+                  << ", is_coplanar = " << rf._is_coplanar << std::endl;
+        auto aface = ToPlotlyActor(*rf._cpt1, "surface");
+        aface.update("color", "blue");
+        plot.add(aface);
+        auto bface = ToPlotlyActor(*rf._cpt2, "surface");
+        bface.update("color", "red");
+        plot.add(bface);
+    }
+    plot.write("./fig/out", "html");
+
+
+    // res.show();
     // std::cout << "isinter = " << isinter << std::endl;
 
 }

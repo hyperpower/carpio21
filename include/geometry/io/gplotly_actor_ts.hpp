@@ -5,6 +5,7 @@
 #include <array>
 // #include "geometry/objects/objects.hpp"
 #include "geometry/objects/ts/trisurface.hpp"
+#include "geometry/boolean/intersection_ts.hpp"
 // #include "io/python_interpreter.hpp"
 // #include "io/plotly.hpp"
 #include <memory>
@@ -195,12 +196,50 @@ inline std::string _ChooseType(const std::string& type){
     def_type = (def_type == "surface") ? "Mesh3d" : def_type;
     return def_type;
 }
+template<typename ANY >
+auto MakePlotlyActor(TriFaceTag, const ANY& face, const std::string& type){
+    auto ct = _ChooseType(type);
+    PlotlyActor actor(ct);
+    if(ct == "Scatter3d"){
+        
+        actor.update("name", "tri_wireframe");
+        actor.update("mode", "lines");
+
+        std::list<typename ANY::Point> list;
+
+        auto pf = &face;
+        for (typename ANY::size_type i = 0; i < 3; i++) {
+            list.push_back(*(pf->vertex(i)));
+        }
+        list.push_back(*(pf->vertex(0)));
+        actor.data_xyz(list,4);
+    }
+
+    if(ct == "Mesh3d"){
+        actor.update("name", "tri_surface");
+        // actor.update("mode", "lines");
+
+        std::list<typename ANY::Point> list;
+        std::list<std::array<double, 3> > ijk;
+
+        double count = 0;
+        auto pf = (&face);
+        for (typename ANY::size_type i = 0; i < 3; i++) {
+            list.push_back(*(pf->vertex(i)));
+        }
+        ijk.emplace_back(std::array<double,3>{count, count + 1, count + 2});
+        count += 3;
+        actor.data_xyz(list);
+        actor.data(ijk, "i", "j", "k");
+    }
+    return actor;
+}
 
 template<typename ANY >
 auto MakePlotlyActor(TriSurfaceTag, const ANY& sur, const std::string& type){
     auto ct = _ChooseType(type);
+    PlotlyActor actor(ct);
     if(ct == "Scatter3d"){
-        PlotlyActor actor(ct);
         
         actor.update("name", "tri_wireframe");
         actor.update("mode", "lines");
@@ -215,12 +254,9 @@ auto MakePlotlyActor(TriSurfaceTag, const ANY& sur, const std::string& type){
             list.push_back(*(pf->vertex(0)));
         }
         actor.data_xyz(list,4);
-        return actor;
     }
 
     if(ct == "Mesh3d"){
-        PlotlyActor actor(ct);
-        
         actor.update("name", "tri_surface");
         // actor.update("mode", "lines");
 
@@ -238,8 +274,8 @@ auto MakePlotlyActor(TriSurfaceTag, const ANY& sur, const std::string& type){
         }
         actor.data_xyz(list);
         actor.data(ijk, "i", "j", "k");
-        return actor;
     }
+    return actor;
 }
 
 

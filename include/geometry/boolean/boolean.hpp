@@ -37,7 +37,6 @@ auto Intersect(const GEO1& g1, const GEO2& g2, const std::string& method){
     return Intersect(g1, g2, method, Tag1(), Tag2());
 }
 
-
 template<class CONTAINER,
         typename std::enable_if<
                    (! IsGeometry<CONTAINER>::value)

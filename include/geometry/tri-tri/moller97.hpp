@@ -169,7 +169,7 @@
 { \
         if(D0D1>0.0f) \
         { \
-                /* here we know that D0D2<=0.0 */ \
+            /* here we know that D0D2<=0.0 */ \
             /* that is D0, D1 are on the same side, D2 on the other or on the plane */ \
                 A=VV2; B=(VV0-VV2)*D2; C=(VV1-VV2)*D2; X0=D2-D0; X1=D2-D1; \
         } \
@@ -445,13 +445,13 @@ int tri_tri_intersect_with_isectline(
   SUB(E1,V1,V0);
   SUB(E2,V2,V0);
   raw::Cross(N1,E1,E2);
-  d1=-DOT(N1,V0);
+  d1=-raw::Dot(N1,V0);
   /* plane equation 1: N1.X+d1=0 */
 
   /* put U0,U1,U2 into plane equation 1 to compute signed distances to the plane*/
-  du0=DOT(N1,U0)+d1;
-  du1=DOT(N1,U1)+d1;
-  du2=DOT(N1,U2)+d1;
+  du0=raw::Dot(N1,U0)+d1;
+  du1=raw::Dot(N1,U1)+d1;
+  du2=raw::Dot(N1,U2)+d1;
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST==TRUE
@@ -469,13 +469,13 @@ int tri_tri_intersect_with_isectline(
   SUB(E1,U1,U0);
   SUB(E2,U2,U0);
   raw::Cross(N2,E1,E2);
-  d2=-DOT(N2,U0);
+  d2=-raw::Dot(N2,U0);
   /* plane equation 2: N2.X+d2=0 */
 
   /* put V0,V1,V2 into plane equation 2 */
-  dv0=DOT(N2,V0)+d2;
-  dv1=DOT(N2,V1)+d2;
-  dv2=DOT(N2,V2)+d2;
+  dv0=raw::Dot(N2,V0)+d2;
+  dv1=raw::Dot(N2,V1)+d2;
+  dv2=raw::Dot(N2,V2)+d2;
 
 #if USE_EPSILON_TEST==TRUE
   if(std::abs(dv0)<EPSILON) dv0=0.0;

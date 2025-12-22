@@ -11,7 +11,7 @@ namespace carpio {
 
 template<class GEO1, class GEO2>
 auto IsIntersectN2(const GEO1& g1, const GEO2& g2, TriSurfaceTag, TriSurfaceTag){
-    std::cout << "Intersecting two TriSurfaces" << std::endl;
+    std::cout << "Intersecting two TriSurfaces N2" << std::endl;
     // Bounding box check -----
     // Todo
     // Iterate through all triangles in g1 and g2
@@ -34,7 +34,8 @@ auto IsIntersectN2(const GEO1& g1, const GEO2& g2, TriSurfaceTag, TriSurfaceTag)
 } 
 
 template<class GEO1, class GEO2>
-auto IsIntersect(const GEO1& g1, const GEO2& g2, const std::string& method, TriSurfaceTag, TriSurfaceTag){
+auto IsIntersect(const GEO1& g1, const GEO2& g2, const std::string& method,
+    TriSurfaceTag, TriSurfaceTag){
     std::cout << "Intersecting two TriSurfaces" << std::endl;
     // Bounding box check -----
     // Todo
@@ -97,7 +98,7 @@ template<class GEO1, class GEO2>
 auto Intersect(const GEO1& g1, const GEO2& g2, 
                const std::string& method,
                TriFaceTag, TriFaceTag){
-    std::cout << "Intersecting two TriFaces" << std::endl;
+    // std::cout << "Intersecting two TriFaces" << std::endl;
     // Bounding box check -----
     // Todo
     // Iterate through all triangles in g1 and g2
@@ -115,6 +116,74 @@ auto Intersect(const GEO1& g1, const GEO2& g2,
                   res._is_coplanar, res._ips.data(), res._ipe.data(), method);
     return res;
 } 
+
+template<class GEO1, class GEO2>
+struct IntersectionResultImplement_<GEO1, GEO2, TriSurfaceTag, TriSurfaceTag>{
+public:
+    typedef GEO1 TriSurface;
+    typedef typename TriSurface::Face TriFace;
+    typedef IntersectionResultImplement_<TriSurface, TriSurface, TriSurfaceTag, TriSurfaceTag> Self;
+    typedef IntersectionResultImplement_<TriFace, TriFace, TriFaceTag, TriFaceTag> ResultTriFace;
+    typedef typename ResultTriFace::Point Point;
+    typedef typename ResultTriFace::Ver Ver;
+
+    typedef std::list<ResultTriFace> ListResultTriFace;
+    
+    ListResultTriFace _results;
+public:
+    IntersectionResultImplement_(){};
+
+    void add(const ResultTriFace& result) {
+        _results.push_back(result);
+    }
+
+    void size() const {
+        return _results.size();
+    }   
+    
+    typename ListResultTriFace::iterator begin() {
+        return _results.begin();
+    }
+
+    typename ListResultTriFace::iterator end() {
+        return _results.end();
+    }
+
+    typename ListResultTriFace::const_iterator begin() const {
+        return _results.begin();
+    }
+
+    typename ListResultTriFace::const_iterator end() const {
+        return _results.end();
+    }
+};
+
+
+template<class GEO1, class GEO2>
+auto Intersect(const GEO1& g1, const GEO2& g2, 
+               const std::string& method,
+               TriSurfaceTag, TriSurfaceTag){
+    std::cout << "Intersecting TriSurfaces" << std::endl;
+    // Bounding box check -----
+    // Todo
+    // Iterate through all triangles in g1 and g2
+    typedef IntersectionResult_<GEO1, GEO2> Result;
+    typedef typename Result::ResultTriFace ResultTriFace;
+    Result res;
+    for (auto& pfac1 : g1){
+        for (auto& pfac2 : g2){
+            // Check if the triangles intersect
+            auto intersect_result = Intersect(*pfac1, *pfac2, method, 
+                                             TriFaceTag(), TriFaceTag());
+            if(intersect_result._is_intersect || intersect_result._is_coplanar){
+                // std::cout << "  Intersected TriFace found." << std::endl;
+                res.add(intersect_result);
+            }
+        }
+    }
+
+    return res;
+}
 
 } // namespace carpio
 
