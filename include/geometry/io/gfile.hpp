@@ -198,9 +198,9 @@ ANY ReadFile(const std::string& fullname){
     TextFile txtf(fullname);
     txtf.read();
     txtf.parse_config();
-    _FileTypeCheck(txtf, ANY::Dim, ANY::Tag());
+    _FileTypeCheck(txtf, ANY::Dim, typename ANY::Tag());
     
-    return _ReadLines<ANY>(txtf, ANY::Tag());
+    return _ReadLines<ANY>(txtf, typename ANY::Tag());
 
 }
 

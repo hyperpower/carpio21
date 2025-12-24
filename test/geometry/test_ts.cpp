@@ -95,6 +95,7 @@ TEST(TS, ts_initial3){
     plot.add(ToPlotlyActor(*ico));
     plot.write("./fig/out", "html");
 }
+
 TEST(TS, ts_intersect){
     typedef TriSurface_<double, 3> TS;
     typedef CreateTS_<double, 3> CreateTS;
@@ -121,16 +122,26 @@ TEST(TS, ts_intersect){
     plot.add(asurfce);
     plot.add(ToPlotlyActor(*ico));
 
+    std::list<TS::Point> ict_points;
     for(auto& rf : res){
         std::cout << "Intersected Face: is_intersect = " << rf._is_intersect 
                   << ", is_coplanar = " << rf._is_coplanar << std::endl;
         auto aface = ToPlotlyActor(*rf._cpt1, "surface");
         aface.update("color", "blue");
-        plot.add(aface);
+        // plot.add(aface);
         auto bface = ToPlotlyActor(*rf._cpt2, "surface");
         bface.update("color", "red");
-        plot.add(bface);
+        // plot.add(bface);
+        ict_points.push_back(rf._ips);
+        ict_points.push_back(rf._ipe);
+        // std::cout << "  Intersection Segment: " 
+                //   << rf._ips << " to " << rf._ipe << std::endl; 
+        // seg_actor.update("color", "red");
+        // seg_actor.update("width", 3);
     }
+    auto seg_actor = ToPlotlyActor(ict_points, "wireframe", 2);
+    seg_actor.update("line_color", "red");
+    plot.add(seg_actor);
     plot.write("./fig/out", "html");
 
 

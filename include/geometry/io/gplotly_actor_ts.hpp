@@ -278,8 +278,6 @@ auto MakePlotlyActor(TriSurfaceTag, const ANY& sur, const std::string& type){
     return actor;
 }
 
-
-
 }
 
 #endif

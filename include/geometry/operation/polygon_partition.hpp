@@ -42,9 +42,11 @@ public:
     // typedef Point_<TYPE, Dim> Point;
     typedef POINT Point;
     typedef const Point* pcPoint;
+    typedef Point::value_type Vt;
+    static const St Dim = Point::Dim;
     typedef std::array<pcPoint, 3> Tri;
     typedef std::list<Tri> ListTri;
-    // typedef PointChain_<TYPE, Dim> PointChain;
+    typedef PointChain_<Vt, Dim> PointChain;
     // typedef Segment_<TYPE, DIM> Segment;
     // typedef Operation_<TYPE, Dim> Op;
     // typedef Intersection_<TYPE, Dim> Isc;

@@ -49,7 +49,8 @@ TEST(partition, orient_test1){
 
 
 TEST(partition, test1){
-    auto pc = ReadFile<PointChain>("./test/input_files/examplepolygon");
+    auto pc = ReadFile<PointChain>("./test/input_files/examplepolygon.txt");
+    pc.set_close();
 
     std::cout << "PointChain size = " << pc.size() << std::endl;
 
@@ -69,7 +70,7 @@ TEST(partition, test1){
     for(auto& t : res){
         std::cout << "Tri count = " << c <<std::endl;
 	    auto tactor = ToGnuplotActor(t, 0);
-        tactor.style("with lines lc "+ ToString(c));
+        // tactor.style("with lines lc "+ ToString(c));
         gnu.add(tactor);
         c++;
     }
@@ -78,7 +79,7 @@ TEST(partition, test1){
 
 TEST(partition, trydata){
     typedef typename std::vector<double> Vec;
-    std::cout << HasData<Vec>::value << std::endl;
+    // std::cout << HasData<Vec>::value << std::endl;
     Point3 p1(0.0, 0.0, 0.0);
     Point3 p2(1.0, 0.0, 0.0);
     Point3 p3(0.0, 1.0, 0.0);

@@ -133,7 +133,7 @@ template<typename ANY,
         typename std::enable_if<
             IsContainer<ANY>::value, 
         bool>::type = true >
-auto MakePlotlyActor(PointTag, const ANY& con_point, const std::string& type ="auto"){
+auto MakePlotlyActor(PointTag, const ANY& con_point, const std::string& type ="auto", int jump =0){
     std::string trace_type = _ChooseType(type);
     PlotlyActor actor(trace_type);
     
@@ -145,9 +145,9 @@ auto MakePlotlyActor(PointTag, const ANY& con_point, const std::string& type ="a
     }
 
     if constexpr (ANY::value_type::Dim == 2){
-        actor.data_xy(con_point, 0);
+        actor.data_xy(con_point, jump);
     }else if constexpr (ANY::value_type::Dim == 3){
-        actor.data_xyz(con_point, 0);
+        actor.data_xyz(con_point, jump);
     }
     return actor;
     
@@ -246,10 +246,15 @@ auto MakePlotlyActor(BoxTag, const ANY& box, const std::string& type ="auto"){
     
 }
 
-
+// One geometry object
 template<typename ANY, ENABLE_IF(ANY, IsGeometry)>
 auto ToPlotlyActor(const ANY& geo, const std::string& type ="auto"){
     return MakePlotlyActor( typename ANY::Tag(), geo, type);    
+}
+// Two geometry objects
+template<typename ANY, ENABLE_IF(ANY, IsGeometry)>
+auto ToPlotlyActor(const ANY& geo1, const ANY& geo2, const std::string& type ="auto"){
+    return MakePlotlyActor( typename ANY::Tag(), geo1, geo2, type);    
 }
 template<typename ANY,
         typename std::enable_if<
@@ -257,9 +262,9 @@ template<typename ANY,
          && IsGeometry<typename ANY::value_type>::value
          && IsContainer<ANY>::value, 
         bool>::type = true >
-auto ToPlotlyActor(const ANY& container, const std::string& type ="auto"){
+auto ToPlotlyActor(const ANY& container, const std::string& type ="auto", int jump =0){
     typedef typename ANY::value_type::Tag Tag;
-    return MakePlotlyActor( Tag(), container, type);
+    return MakePlotlyActor( Tag(), container, type, jump);
 }
 template<typename ANY, typename CONTAINER,
         typename std::enable_if<

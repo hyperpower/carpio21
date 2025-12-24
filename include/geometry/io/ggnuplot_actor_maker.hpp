@@ -509,7 +509,7 @@ auto ToGnuplotActor(const ANY& any, unsigned int jump = 1) {
     GnuplotActor actor;
     int count = 0;
     for (auto& geo : any){
-        MakeGnuplotActor(actor, *geo, Type::Tag());
+        MakeGnuplotActor(actor, *geo, typename Type::Tag());
         if(jump > 0){
             if((count % jump == 0)){
                 ++count;
