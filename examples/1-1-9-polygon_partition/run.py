@@ -7,14 +7,17 @@ FILE_ORIGINAL = [
     "plot.py",
     "run.py",
     "report.rst",
+    "examplepolygon.txt",
+    "man.txt",
+    "shui.txt"
 ]
 
 PATH_PYTOOLS  = os.path.abspath(os.path.join(__file__, "../../pytools"))
+CURRENT = os.path.dirname(os.path.abspath(__file__))
 
 sys.path.append(PATH_PYTOOLS)
 import runtool as RT
 
-# import reporttool as REPORT
 
 if __name__ == '__main__':
     args = RT.parse_args()

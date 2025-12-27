@@ -158,7 +158,8 @@ Point_<TYPE, DIM> _ParseLineAs(const std::vector<std::string>& tokens, PointTag)
     }
     return res;
 }
-template<class ANY>
+
+template<typename ANY>
 ANY _ReadLines(const TextFile& tf, PointChainTag){
     ANY pc;
     for (auto& line : tf.content()) {

@@ -28,7 +28,6 @@
 #include "geometry/affine.hpp"
 #include "geometry/boolean/boolean.hpp"
 
-// #include "geometry/operation/operation.hpp"
 
 #include "geometry/io/ggnuplot_actor.hpp"
 #include "geometry/io/ggnuplot_actor_maker.hpp"
@@ -37,6 +36,7 @@
 #include "geometry/io/gfile.hpp"
 
 #include "geometry/operation/creation/create_ts.hpp"
+#include "geometry/operation/polygon_partition.hpp"
 
 // #include "geometry/cuboidtool/cuboidtool.hpp"
 

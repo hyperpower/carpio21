@@ -12,6 +12,7 @@ This project require following packages:
  - [jinja2](https://docs.jinkan.org/docs/jinja2/)
  - [sphinx](https://www.sphinx-doc.org/)
  - [plotly](https://plotly.com/python/)
+ - [imagemagick](https://imagemagick.org/)
 
 ## Reference Code
 
