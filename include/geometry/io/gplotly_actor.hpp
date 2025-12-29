@@ -133,7 +133,9 @@ template<typename ANY,
         typename std::enable_if<
             IsContainer<ANY>::value, 
         bool>::type = true >
-auto MakePlotlyActor(PointTag, const ANY& con_point, const std::string& type ="auto", int jump =0){
+auto MakePlotlyActor(PointTag, 
+                    const ANY& con_point, 
+                    const std::string& type ="auto", int jump =0){
     std::string trace_type = _ChooseType(type);
     PlotlyActor actor(trace_type);
     
@@ -245,11 +247,60 @@ auto MakePlotlyActor(BoxTag, const ANY& box, const std::string& type ="auto"){
     return actor;
     
 }
+template<typename ANY >
+auto MakePlotlyActor(TriangleTag, const ANY& tri, 
+                     const std::string& name, 
+                     const std::string& type){
+    std::string trace_type = _ChooseType(type);
+    PlotlyActor actor(trace_type);
+    
+    actor.update("name", name);
+    if ( type == "auto" ) { 
+        actor.update("mode", "lines+markers");
+    }else if( type == "vertex" ){
+        actor.update("mode", "markers");
+    }else if( type == "wireframe" ){
+        actor.update("mode", "lines");
+    }
 
+    if (tri.size() <= 0){
+        return actor;
+    }
+
+    std::list<typename ANY::Point> list;
+    std::list<std::array<double, 3> > ijk;
+
+    for (auto& p : tri){
+        list.emplace_back(p);
+    }
+    if( type !="surface"){
+        list.emplace_back(tri.front());
+    }
+    if constexpr (ANY::Dim == 2){
+        actor.data_xy(list, 0);
+    }else if constexpr (ANY::Dim == 3){
+        actor.data_xyz(list, 0);
+    }
+    if( trace_type == "Mesh3d"){
+        ijk.emplace_back(std::array<double,3>{0,1,2});
+        actor.data(ijk, "i", "j", "k");
+    }
+    return actor;
+}
+template<typename ANY >
+auto MakePlotlyActor(TriangleTag, const ANY& tri, 
+                     const std::string& type){
+    return MakePlotlyActor( TriangleTag(), tri, "triangle", type);
+}
 // One geometry object
 template<typename ANY, ENABLE_IF(ANY, IsGeometry)>
 auto ToPlotlyActor(const ANY& geo, const std::string& type ="auto"){
     return MakePlotlyActor( typename ANY::Tag(), geo, type);    
+}
+// One geometry object with name
+template<typename ANY, ENABLE_IF(ANY, IsGeometry)>
+auto ToPlotlyActor(const ANY& geo, const std::string& name, const std::string& type){
+    return MakePlotlyActor( typename ANY::Tag(), geo, name, type);    
 }
 // Two geometry objects
 template<typename ANY, ENABLE_IF(ANY, IsGeometry)>

@@ -213,9 +213,9 @@
 namespace carpio {
 
 template<class FLOAT>
-int coplanar_tri_tri(FLOAT N[3],
-                     FLOAT V0[3], FLOAT V1[3],FLOAT V2[3],
-                     FLOAT U0[3], FLOAT U1[3], FLOAT U2[3])
+int coplanar_tri_tri(const FLOAT* N,
+                     const FLOAT* V0, const FLOAT* V1, const FLOAT* V2,
+                     const FLOAT* U0, const FLOAT* U1, const FLOAT* U2)
 {
    FLOAT A[3];
    short i0,i1;
@@ -264,8 +264,8 @@ int coplanar_tri_tri(FLOAT N[3],
 }
 
 template<class FLOAT>
-int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
-                      FLOAT U0[3],FLOAT U1[3],FLOAT U2[3])
+int tri_tri_intersect(const FLOAT* V0, const FLOAT* V1, const FLOAT* V2,
+                      const FLOAT* U0, const FLOAT* U1, const FLOAT* U2)
 {
   FLOAT E1[3],E2[3];
   FLOAT N1[3],N2[3],d1,d2;
@@ -363,12 +363,12 @@ int tri_tri_intersect(FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
   }
 }
 template<class FLOAT>
-void isect2(FLOAT VTX0[3],FLOAT VTX1[3],FLOAT VTX2[3],
+void isect2(const FLOAT* VTX0,const FLOAT* VTX1,const FLOAT* VTX2,
             FLOAT VV0,FLOAT VV1,FLOAT VV2,
             FLOAT D0, FLOAT D1,FLOAT D2,
             FLOAT *isect0,FLOAT *isect1,
-            FLOAT isectpoint0[3],FLOAT isectpoint1[3]) {
-  FLOAT tmp=D0/(D0-D1);          
+            FLOAT* isectpoint0,FLOAT* isectpoint1) {
+  FLOAT tmp=D0/(D0-D1);
   FLOAT diff[3];
   *isect0=VV0+(VV1-VV0)*tmp;         
   SUB(diff,VTX1,VTX0);         // diff= VTX1-VTX0    
@@ -382,10 +382,12 @@ void isect2(FLOAT VTX0[3],FLOAT VTX1[3],FLOAT VTX2[3],
 }
 
 template<class FLOAT>
-bool compute_intervals_isectline(FLOAT VERT0[3],FLOAT VERT1[3],FLOAT VERT2[3],
-                       FLOAT VV0,FLOAT VV1,FLOAT VV2,FLOAT D0,FLOAT D1,FLOAT D2,
-                       FLOAT D0D1,FLOAT D0D2,FLOAT *isect0,FLOAT *isect1,
-                       FLOAT isectpoint0[3],FLOAT isectpoint1[3])
+bool compute_intervals_isectline(
+      const FLOAT* VERT0,const FLOAT* VERT1,const FLOAT* VERT2,
+      FLOAT VV0,FLOAT VV1,FLOAT VV2,FLOAT D0,FLOAT D1,FLOAT D2,
+      FLOAT D0D1,FLOAT D0D2,
+      FLOAT *isect0,FLOAT *isect1,
+      FLOAT* isectpoint0,FLOAT* isectpoint1)
 {
   if(D0D1>0.0f)                                        
   {                                                    
@@ -421,10 +423,10 @@ bool compute_intervals_isectline(FLOAT VERT0[3],FLOAT VERT1[3],FLOAT VERT2[3],
 
 template<class FLOAT>
 int tri_tri_intersect_with_isectline(
-    FLOAT V0[3],FLOAT V1[3],FLOAT V2[3],
-    FLOAT U0[3],FLOAT U1[3],FLOAT U2[3],
+    const FLOAT* V0, const FLOAT* V1, const FLOAT* V2,
+    const FLOAT* U0, const FLOAT* U1, const FLOAT* U2,
     bool& coplanar,
-    FLOAT isectpt1[3],FLOAT isectpt2[3])
+    FLOAT* isectpt1,FLOAT* isectpt2)
 {
   FLOAT E1[3],E2[3];
   FLOAT N1[3],N2[3],d1,d2;

@@ -1,12 +1,13 @@
 #include "geometry/geometry.hpp"
 #include "gtest/gtest.h"
+#include "geometry/io/gplotly_actor.hpp"
 
 #include "geometry/tri-tri/tri_tri_intersection.hpp"
 
 
 using namespace carpio;
 
-const std::string OUTPUTPATH = "./test_output/";
+const std::string OUTPUTPATH = "./fig/";
 const St dim = 3;
 
 typedef Point_<float, dim> Point;
@@ -31,8 +32,8 @@ TEST(tritri, initial){
     t1.show();
     t2.show();
 
-    auto res = tri_tri_intersect(t1[0].data(), t1[1].data(), t1[2].data(),
-                        t2[0].data(), t2[1].data(), t2[2].data());
+    auto res = IsIntersect(t1[0], t1[1], t1[2],
+                           t2[0], t2[1], t2[2]);
     std::cout << "Intersection Result : " << res << std::endl;
     // IntersectionTriTri_<Vt, 3> inter(t1, t2);
     // std::cout << "Is Init     : " << inter.is_init() <<std::endl;
@@ -52,8 +53,7 @@ TEST(tritri, inter3){
     Point U2 = {0.5, -0.5, 0.0}; // Triangle 2 vertex 2
 
     // Test if the triangles intersect
-    int result = carpio::tri_tri_intersect(V0.data(), V1.data(), V2.data(),
-                                           U0.data(), U1.data(), U2.data());
+    int result = IsIntersect(V0, V1, V2, U0, U1, U2);
     if (result == 1) {
         std::cout << "Triangles intersect!" << std::endl;
     } else {
@@ -61,10 +61,9 @@ TEST(tritri, inter3){
     }
 
     // Test if the triangles intersect and get the intersection line
-    int coplanar = 0; // Variable to check if triangles are coplanar
-    float isectpt1[3], isectpt2[3]; // Intersection line endpoints
-    result = carpio::tri_tri_intersect_with_isectline(V0.data(), V1.data(), V2.data(), 
-                                                      U0.data(), U1.data(), U2.data(), &coplanar, isectpt1, isectpt2);
+    bool coplanar = false; // Variable to check if triangles are coplanar
+    Point isectpt1, isectpt2; // Intersection line endpoints
+    result = Intersect(V0, V1, V2, U0, U1, U2, coplanar, isectpt1, isectpt2);
     if (result == 1) {
         if (coplanar) {
             std::cout << "Triangles are coplanar." << std::endl;
@@ -86,11 +85,9 @@ TEST(tritri, triangle){
     Point3 z(0.5, 0.5, 1.0);
     
     Tri t1(x,y,z);
-    std::list<Tri> ts;
-    ts.push_back(t1);
+    // Plot two triangles intersection
+    Plotly plot;
+    plot.add(ToPlotlyActor(t1, "wireframe"));
+    plot.write("./fig/atri", "html");
 
-    t1.show();
-
-    GFile_<double, 3> gf;
-    gf.WriteTriangles(OUTPUTPATH + "tri.txt", ts);
 }

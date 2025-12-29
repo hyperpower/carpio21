@@ -122,6 +122,10 @@ struct IntersectionResultImplement_<GEO1, GEO2, TriSurfaceTag, TriSurfaceTag>{
 public:
     typedef GEO1 TriSurface;
     typedef typename TriSurface::Face TriFace;
+    typedef typename TriFace::Edg Edge;
+    typedef typename TriFace::pEdg pEdge;
+    typedef typename TriFace::Ver Vertex;
+    typedef typename TriFace::pVer pVertex;
     typedef IntersectionResultImplement_<TriSurface, TriSurface, TriSurfaceTag, TriSurfaceTag> Self;
     typedef IntersectionResultImplement_<TriFace, TriFace, TriFaceTag, TriFaceTag> ResultTriFace;
     typedef typename ResultTriFace::Point Point;
@@ -143,6 +147,14 @@ public:
 
     void add(const ResultTriFace& result) {
         _results.push_back(result);
+        if(IsSame(result._ips, result._ipe)){
+            // Intersection line is a point
+            
+        }else{
+            // Intersection segment
+
+        }
+
     }
 
     void size() const {

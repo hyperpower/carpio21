@@ -13,8 +13,6 @@
 
 namespace carpio {
 
-// using namespace PlotlyActor;
-
 // template<typename TYPE, St DIM>
 // class GPlotlyActor_TS_ {
 // public:
@@ -64,44 +62,8 @@ namespace carpio {
 // 		return res;
 // 	}
 
-// 	static spPA_scatter WireFrame(const TriSurface2& sur) {
-// 		Listd lx;
-// 		Listd ly;
-// 		for (auto iter = sur.faces.begin(); iter != sur.faces.end(); ++iter) {
-// 			typename TriSurface2::pFac pf = (*iter);
-// 			for (typename TriSurface2::size_type i = 0; i < 3; i++) {
-// 				lx.push_back(pf->vertex(i)->x());
-// 				ly.push_back(pf->vertex(i)->y());
-// 			}
-// 			lx.push_back(pf->vertex(0)->x());
-// 			ly.push_back(pf->vertex(0)->y());
-// 		}
-// 		spPA_scatter res = spPA_scatter(new Plotly_actor_scatter(lx, ly, 4));
-// 		res->set_mode("lines");
-// 		return res;
-// 	}
 
-// 	static spPA_scatter3d WireFrame(const TriSurface3& sur) {
-// 		Listd lx;
-// 		Listd ly;
-// 		Listd lz;
-// 		for (auto iter = sur.faces.begin(); iter != sur.faces.end(); ++iter) {
-// 			typename TriSurface3::pFac pf = (*iter);
-// 			for (typename TriSurface3::size_type i = 0; i < 3; i++) {
-// 				lx.push_back(pf->vertex(i)->x());
-// 				ly.push_back(pf->vertex(i)->y());
-// 				lz.push_back(pf->vertex(i)->z());
-// 			}
-// 			lx.push_back(pf->vertex(0)->x());
-// 			ly.push_back(pf->vertex(0)->y());
-// 			lz.push_back(pf->vertex(0)->z());
-// 		}
-// 		spPA_scatter3d res = spPA_scatter3d(
-// 				new Plotly_actor_scatter3d(lx, ly, lz, 4));
-// 		res->set_mode("lines");
-// 		return res;
 
-// 	}
 
 // 	static spPA_mesh3d Face(const TriFace3& r) {
 // 		std::vector<Vt> ax(3);
