@@ -20,19 +20,7 @@
 #include "curve/bezier_high_order.hpp"
 
 #include "ts/trisurface.hpp"
-//#include "_box.hpp"
-//#include "_line.hpp"
-//#include "_segment.hpp"
-//#include "_plane.hpp"
-//#include "_polygon.hpp"
-//#include "_contour.hpp"
-//#include "_point_chain.hpp"
-//#include "_triangle.hpp"
-//#include "_edge.hpp"
-//#include "_triface.hpp"
-//#include "_trisurface.hpp"
-//#include "_vertex.hpp"
-//#include "_bbtree.hpp"
+
 
 namespace carpio {
 

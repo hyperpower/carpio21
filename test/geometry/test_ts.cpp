@@ -31,7 +31,7 @@ TEST(TS, ts_initial){
 
     Plotly_ plot;
     plot.add(ToPlotlyActor(*sur));
-    // plot.write("./fig/out", "html");
+    plot.write("./fig/atri", "html");
 
 }
 
@@ -62,7 +62,7 @@ TEST(TS, ts_initial2){
     // str = plot.plot();
 
     // std::cout << str << std::endl;
-    // plot.write("./fig/out", "html");
+    plot.write("./fig/cone", "html");
 
 }
 
@@ -93,7 +93,7 @@ TEST(TS, ts_initial3){
     // plot.add(ToPlotlyActor(*sur));
     // plot.add(ToPlotlyActor(*ico, "surface"));
     plot.add(ToPlotlyActor(*ico));
-    plot.write("./fig/out", "html");
+    // plot.write("./fig/out", "html");
 }
 
 TEST(TS, ts_intersect){
