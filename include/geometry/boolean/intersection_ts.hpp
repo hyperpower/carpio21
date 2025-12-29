@@ -127,9 +127,17 @@ public:
     typedef typename ResultTriFace::Point Point;
     typedef typename ResultTriFace::Ver Ver;
 
+    typedef const TriFace* cpTriFace;
+    typedef std::list<cpTriFace> ListcpTriFace;
+    typedef const ResultTriFace* cpResultTriFace;
+
     typedef std::list<ResultTriFace> ListResultTriFace;
-    
+
+    typedef std::map<cpTriFace, cpResultTriFace> MapGroup;
+
     ListResultTriFace _results;
+    MapGroup _group1;
+    MapGroup _group2;
 public:
     IntersectionResultImplement_(){};
 
@@ -156,6 +164,17 @@ public:
     typename ListResultTriFace::const_iterator end() const {
         return _results.end();
     }
+
+    void group_by_first(){
+        for (const auto& res : _results){
+            _group1[res._cpt1] = &res;
+        }
+    }
+    void group_by_second(){
+        for (const auto& res : _results){
+            _group2[res._cpt2] = &res;
+        }
+    }
 };
 
 
@@ -181,6 +200,8 @@ auto Intersect(const GEO1& g1, const GEO2& g2,
             }
         }
     }
+    res.group_by_first();
+    res.group_by_second();
 
     return res;
 }

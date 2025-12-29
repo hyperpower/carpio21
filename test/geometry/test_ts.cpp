@@ -29,7 +29,7 @@ TEST(TS, ts_initial){
             TS::Poi(0.1, 0.1, 0.1),
             TS::Poi(0.0, 0.5, 0.3));
 
-    Plotly_ plot;
+    Plotly plot;
     plot.add(ToPlotlyActor(*sur));
     // plot.write("./fig/out", "html");
 
@@ -43,7 +43,7 @@ TEST(TS, ts_initial2){
     CreateTS creator;
     auto sur = creator.cone(50, 0.5, 0.0, 1.0);
 
-    Plotly_ plot;
+    Plotly plot;
     std::cout << "Plotly Version : " << plot.version() << std::endl;
     plot.add(ToPlotlyActor(*sur));
     plot.add(ToPlotlyActor(*sur, "surface"));
@@ -85,7 +85,7 @@ TEST(TS, ts_initial3){
 
     // auto sur = creator.from_ply_file("./test/input_files/elephant.ply");
 
-    Plotly_ plot;
+    Plotly plot;
     std::cout << "Plotly Version : " << plot.version() << std::endl;
     auto asurfce = ToPlotlyActor(*sur, "surface");
     asurfce.update("color", "yellow");
@@ -116,7 +116,7 @@ TEST(TS, ts_intersect){
     auto icof1 = *(ico->begin());
     // auto res = Intersect(*surf1, *icof1);
     auto res = Intersect(*sur, *ico);
-    Plotly_ plot;
+    Plotly plot;
     auto asurfce = ToPlotlyActor(*sur, "surface");
     asurfce.update("color", "yellow");
     plot.add(asurfce);

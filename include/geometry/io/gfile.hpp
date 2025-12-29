@@ -192,7 +192,7 @@ ANY _ReadLines(const TextFile& tf, PointChainTag){
 
 // =============================
 template<typename ANY,
-        typename std::enable_if<
+         typename std::enable_if<
             IsGeometry<ANY>::value,
         bool>::type = true>
 ANY ReadFile(const std::string& fullname){

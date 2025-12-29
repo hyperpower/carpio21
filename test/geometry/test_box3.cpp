@@ -39,7 +39,7 @@ TEST(box, points){
     arr.push_back(p3);  
 
 
-    Plotly_ plotly;
+    Plotly plotly;
 
     auto ap = ToPlotlyActor(arr);
 
@@ -58,7 +58,7 @@ TEST(box, box3_vs_plane_plotly){
     std::cout << "The box 1 is " << box1 << std::endl;
 
     std::cout << ToString(max1.max_axes()) << std::endl; 
-    Plotly_ plotly;
+    Plotly plotly;
 
     auto abox = ToPlotlyActor(box1);
     abox.update("name", "box");
@@ -126,7 +126,7 @@ TEST(box, box3_plane_plotly){
     std::cout << "The box 1 is " << box1 << std::endl;
 
     std::cout << ToString(max1.max_axes()) << std::endl; 
-    Plotly_ plotly;
+    Plotly plotly;
 
     auto abox = ToPlotlyActor(box1);
     abox.update("name", "box");

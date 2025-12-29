@@ -70,7 +70,7 @@ TEST(partition, test1){
     for(auto& t : res){
         std::cout << "Tri count = " << c <<std::endl;
 	    auto tactor = ToGnuplotActor(t, 0);
-        // tactor.style("with lines lc "+ ToString(c));
+        tactor.style("with lines lc "+ ToString(c));
         gnu.add(tactor);
         c++;
     }

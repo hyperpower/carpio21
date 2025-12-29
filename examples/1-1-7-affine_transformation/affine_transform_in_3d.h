@@ -23,7 +23,7 @@ auto MakeShape3d(){
     return creator.from_ply_file("./teapot.ply");
 }
 
-void AddActorOriginal(Plotly_& plot, const Surface& sur){
+void AddActorOriginal(Plotly& plot, const Surface& sur){
     auto actor = ToPlotlyActor(sur, "surface");
     actor.update("opacity", 0.3);
     actor.update("color", c_yellow);
@@ -32,7 +32,7 @@ void AddActorOriginal(Plotly_& plot, const Surface& sur){
     plot.add(actor);
 }
 
-void AddActorTransformed(Plotly_& plot, const Surface& sur){
+void AddActorTransformed(Plotly& plot, const Surface& sur){
     auto actor = ToPlotlyActor(sur, "surface");
     actor.update("opacity", 0.3);
     // actor.update("line_color", c_blue);
@@ -43,7 +43,7 @@ void AddActorTransformed(Plotly_& plot, const Surface& sur){
     plot.add(actor);
 }
 
-void PlotlyLayoutSetup(Plotly_& plotly){
+void PlotlyLayoutSetup(Plotly& plotly){
     plotly.add(MakePlotlyCoordinateArrow<3>(2.0,2.0,2.0));
 
     plotly.margin(0, 0, 0, 0);
@@ -70,7 +70,7 @@ void PlotlyLayoutSetup(Plotly_& plotly){
 void TestTranslateIn3d(){
     auto teapot = MakeShape3d();
 
-    Plotly_ plotly;
+    Plotly plotly;
     PlotlyLayoutSetup(plotly);
 
     AddActorOriginal(plotly, *teapot);
@@ -86,7 +86,7 @@ void TestTranslateIn3d(){
 void TestScaleIn3d(){
     auto teapot = MakeShape3d();
 
-    Plotly_ plotly;
+    Plotly plotly;
     PlotlyLayoutSetup(plotly);
 
     AddActorOriginal(plotly, *teapot);
@@ -101,7 +101,7 @@ void TestScaleIn3d(){
 void TestRotateIn3d(){
     auto teapot = MakeShape3d();
 
-    Plotly_ plotly;
+    Plotly plotly;
     PlotlyLayoutSetup(plotly);
 
     AddActorOriginal(plotly, *teapot);
@@ -116,7 +116,7 @@ void TestRotateIn3d(){
 void TestShearIn3d(){
     auto teapot = MakeShape3d();
 
-    Plotly_ plotly;
+    Plotly plotly;
     PlotlyLayoutSetup(plotly);
 
     AddActorOriginal(plotly, *teapot);
@@ -129,7 +129,7 @@ void TestShearIn3d(){
 void TestReflectIn3d(){
     auto teapot = MakeShape3d();
 
-    Plotly_ plotly;
+    Plotly plotly;
     PlotlyLayoutSetup(plotly);
     plotly.layout("scene_zaxis_range", -4.0, 4);
 

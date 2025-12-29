@@ -12,14 +12,14 @@ typedef Point_<double, 3> Point3;
 TEST(test_p1, test1) {
     std::cout << "Test python lib works" << std::endl;
     PlotlyActor actor("Scatter3d");
-    Plotly_ plotly;
+    Plotly plotly;
     std::cout << "Plotly version : " << plotly.version() << std::endl;
 }
 
 TEST(test_plotly, test2) {
     std::cout << "aa" << std::endl;
     PlotlyActor actor("Scatter3d");
-    Plotly_ plotly;
+    Plotly plotly;
     std::cout << "Plotly version : " << plotly.version() << std::endl;
     actor.name("first");
     std::cout << "actor name     : " << actor.name() << std::endl;

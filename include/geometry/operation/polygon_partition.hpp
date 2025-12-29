@@ -42,7 +42,7 @@ public:
     // typedef Point_<TYPE, Dim> Point;
     typedef POINT Point;
     typedef const Point* pcPoint;
-    typedef Point::value_type Vt;
+    typedef typename Point::value_type Vt;
     static const St Dim = Point::Dim;
     typedef std::array<pcPoint, 3> Tri;
     typedef std::list<Tri> ListTri;
@@ -567,8 +567,8 @@ public:
     //   parts : resulting list of convex polygons
     //returns 1 on success, 0 on failure
     // int ConvexPartition_OPT(Contour *poly, std::list<Contour> *parts);
-}
-;
+};
+
 
 }
 

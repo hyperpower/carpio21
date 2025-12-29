@@ -232,7 +232,7 @@ TEST(equation, DISABLED_explicit_3d){
         return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y) * std::sin(2 * _PI_ * z);
     });
 
-    Plotly_ plotly;
+    Plotly plotly;
     plotly.margin(0, 0, 0, 0);
     plotly.layout("width",  660.0);
     plotly.layout("height", 400.0);

@@ -220,7 +220,7 @@ auto MakeShape3d(){
     return creator.from_ply_file("./test/input_files/teapot.ply");
 }
 
-void AddActorOriginal(Plotly_& plot, const Surface& sur){
+void AddActorOriginal(Plotly& plot, const Surface& sur){
     auto actor = ToPlotlyActor(sur, "surface");
     actor.update("opacity", 0.3);
     actor.update("color", c_yellow);
@@ -229,7 +229,7 @@ void AddActorOriginal(Plotly_& plot, const Surface& sur){
     plot.add(actor);
 }
 
-void AddActorTransformed(Plotly_& plot, const Surface& sur){
+void AddActorTransformed(Plotly& plot, const Surface& sur){
     auto actor = ToPlotlyActor(sur, "surface");
     actor.update("opacity", 0.3);
     // actor.update("line_color", c_blue);
@@ -243,7 +243,7 @@ void AddActorTransformed(Plotly_& plot, const Surface& sur){
 TEST(trans_3d, trans){
     auto teapot = MakeShape3d();
 
-    Plotly_ plotly;
+    Plotly plotly;
 
     plotly.add(MakePlotlyCoordinateArrow<3>(2.0,2.0,2.0));
 

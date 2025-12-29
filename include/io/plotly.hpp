@@ -707,7 +707,7 @@ typedef std::map<std::string, PlotlyActor> PlotlyActorGroup;
 
 
 
-class Plotly_ {
+class Plotly {
 public:
     typedef PyObject* pPO;
     typedef std::map<std::string, pPO> Map;
@@ -723,12 +723,12 @@ protected:
     pPO _layout;
 
 public:
-    Plotly_() {
+    Plotly() {
         this->_py = PythonInterpreter::Get();
         _init();
     }
 
-    ~Plotly_() {
+    ~Plotly() {
         Py_DECREF(this->_plotly);
         Py_DECREF(this->_plotly_go);
         Py_DECREF(this->_figure);
