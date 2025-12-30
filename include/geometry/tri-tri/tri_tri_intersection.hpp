@@ -34,37 +34,7 @@ int IsIntersect(const CVT* V0, const CVT* V1, const CVT* V2,
         throw std::invalid_argument("Unknown intersection method: " + method);
     }
 }
-template<typename CVT>
-int Intersect(CVT V0[3], CVT V1[3], CVT V2[3],
-              CVT U0[3], CVT U1[3], CVT U2[3], 
-              bool& coplanar,
-              CVT isectpt1[3],CVT isectpt2[3],
-              const std::string& method = "moller97") {
-    if (method == "moller97" || method == "") {
-        return tri_tri_intersect_with_isectline(
-                V0, V1, V2, U0, U1, U2, coplanar, isectpt1, isectpt2);
-    } else {
-        throw std::invalid_argument("Unknown intersection method: " + method);
-    }
-}
-template<typename POINT>
-typename std::enable_if<std::is_same<typename POINT::Tag, PointTag>::value, int>::type
-Intersect(const POINT& V0, const POINT& V1, const POINT& V2,
-          const POINT& U0, const POINT& U1, const POINT& U2,
-          bool& coplanar,
-          POINT& isectpt1, POINT& isectpt2,
-          const std::string& method = "moller97") {
-    typedef typename POINT::value_type CVT;
-    if (method == "moller97" || method == "") {
-        return tri_tri_intersect_with_isectline(
-                V0.data(), V1.data(), V2.data(), 
-                U0.data(), U1.data(), U2.data(), 
-                coplanar, 
-                isectpt1.data(), isectpt2.data());
-    } else {
-        throw std::invalid_argument("Unknown intersection method: " + method);
-    }
-}
+
 /**
  * @brief Checks if two triangles intersect using the specified method, 
  *        with vertices represented as Point objects.
@@ -106,6 +76,39 @@ IsIntersect(const TRI& V0,
     return IsIntersect(V0[0], V0[1], V0[2],
                        V1[0], V1[1], V1[2], method);
 }
+
+template<typename CVT>
+int Intersect(CVT V0[3], CVT V1[3], CVT V2[3],
+              CVT U0[3], CVT U1[3], CVT U2[3], 
+              bool& coplanar,
+              CVT isectpt1[3],CVT isectpt2[3],
+              const std::string& method = "moller97") {
+    if (method == "moller97" || method == "") {
+        return tri_tri_intersect_with_isectline(
+                V0, V1, V2, U0, U1, U2, coplanar, isectpt1, isectpt2);
+    } else {
+        throw std::invalid_argument("Unknown intersection method: " + method);
+    }
+}
+template<typename POINT>
+typename std::enable_if<std::is_same<typename POINT::Tag, PointTag>::value, int>::type
+Intersect(const POINT& V0, const POINT& V1, const POINT& V2,
+          const POINT& U0, const POINT& U1, const POINT& U2,
+          bool& coplanar,
+          POINT& isectpt1, POINT& isectpt2,
+          const std::string& method = "moller97") {
+    typedef typename POINT::value_type CVT;
+    if (method == "moller97" || method == "") {
+        return tri_tri_intersect_with_isectline(
+                V0.data(), V1.data(), V2.data(), 
+                U0.data(), U1.data(), U2.data(), 
+                coplanar, 
+                isectpt1.data(), isectpt2.data());
+    } else {
+        throw std::invalid_argument("Unknown intersection method: " + method);
+    }
+}
+
 
 } // namespace carpio
 

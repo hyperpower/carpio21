@@ -13,7 +13,8 @@
 namespace carpio {
 
 template<typename ANY, typename CONTAINER, 
-          typename std::enable_if<std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
+          typename std::enable_if<
+            std::is_arithmetic<typename CONTAINER::value_type>::value, bool>::type = true>
 PlotlyActor MakePlotlyActor(PlaneTag, 
                      const ANY& plane, const CONTAINER& con1, const CONTAINER& con2, 
                      const std::string& type = "auto"){
@@ -107,7 +108,8 @@ PlotlyActorGroup MakePlotlyArrow(const std::string& name, const POINT& p0, const
     actor_cone.update("name", name + "_arraw_cone");
     actor_cone.update("anchor", "tip");
     actor_cone.update_false("showscale");
-    actor_cone.update("sizeref",   0.25);
+    auto len = Distance(p0, p1);
+    actor_cone.update("sizeref",  len * 0.25);
     actor_cone.update_colorscale(color, color);
     group[name +"_arrow_cone"] = actor_cone;
     
@@ -152,8 +154,21 @@ auto MakePlotlyActor(PointTag,
         actor.data_xyz(con_point, jump);
     }
     return actor;
-    
 }
+template<typename ANY, 
+        typename std::enable_if<
+            IsGeometry<ANY>::value, 
+        bool>::type = true >
+auto MakePlotlyActor(PointTag, 
+                    const ANY& point1, 
+                    const ANY& point2, 
+                    const std::string& type ="auto", int jump =0){
+    std::list<ANY> list;
+    list.emplace_back(point1);
+    list.emplace_back(point2);
+    return MakePlotlyActor(PointTag(), list, type, jump);
+}
+
 template<typename ANY >
 auto MakePlotlyActor(PointChainTag, const ANY& pc, const std::string& type ="auto"){
     std::string trace_type = _ChooseType(type);
@@ -306,6 +321,12 @@ auto ToPlotlyActor(const ANY& geo, const std::string& name, const std::string& t
 template<typename ANY, ENABLE_IF(ANY, IsGeometry)>
 auto ToPlotlyActor(const ANY& geo1, const ANY& geo2, const std::string& type ="auto"){
     return MakePlotlyActor( typename ANY::Tag(), geo1, geo2, type);    
+}
+// Two geometry objects with name
+template<typename ANY, ENABLE_IF(ANY, IsGeometry)>
+auto ToPlotlyActor(const ANY& geo1, const ANY& geo2, 
+                   const std::string& name, const std::string& type){
+    return MakePlotlyActor( typename ANY::Tag(), geo1, geo2, name, type);    
 }
 template<typename ANY,
         typename std::enable_if<

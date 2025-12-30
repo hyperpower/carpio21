@@ -82,12 +82,36 @@ TEST(tritri, inter3){
 TEST(tritri, triangle){
     Point3 x(0,   0,    0);
     Point3 y(0.5, 0.5, -1.0);
-    Point3 z(0.5, 0.5, 1.0);
+    Point3 z(0.5, -0.5, 1.0);
     
     Tri t1(x,y,z);
+    
+    Point3 x2(0.1, 0.1,    0);
+    Point3 y2(0.5, 0.5,  0.0);
+    Point3 z2(0.5, -0.5, 0.0);
+    
+    Tri t2(x2,y2,z2);
     // Plot two triangles intersection
+    bool coplanar = false; // Variable to check if triangles are coplanar
+    Point isectpt1, isectpt2; // Intersection line endpoints
+    auto result = Intersect(x, y, z, x2, y2, z2, coplanar, isectpt1, isectpt2);
+    if (result == 1) {
+        if (coplanar) {
+            std::cout << "Triangles are coplanar." << std::endl;
+        } else {
+            std::cout << "Triangles intersect!" << std::endl;
+            std::cout << "Intersection line endpoints: (" 
+                      << isectpt1[0] << ", " << isectpt1[1] << ", " << isectpt1[2] << ") and ("
+                      << isectpt2[0] << ", " << isectpt2[1] << ", " << isectpt2[2] << ")" << std::endl;
+        }
+    } else {
+        std::cout << "Triangles do not intersect." << std::endl;
+    }
     Plotly plot;
-    plot.add(ToPlotlyActor(t1, "wireframe"));
+    plot.add(ToPlotlyActor(t1, "t1", "wireframe"));
+    plot.add(ToPlotlyActor(t2, "t2", "surface"));
+    // plot.add(ToPlotlyActor(isectpt1, isectpt2, "wireframe"));
+    plot.add(MakePlotlyArrow("intersection", isectpt1, isectpt2));
     plot.write("./fig/atri", "html");
 
 }
