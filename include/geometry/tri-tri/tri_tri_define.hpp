@@ -11,35 +11,35 @@ namespace raw
 {
 // Function to compute the cross product of two 3D vectors
 template<typename CVT>
-inline void Cross(CVT dest[3], const CVT v1[3], const CVT v2[3]) {
+inline void Cross3(CVT dest[3], const CVT v1[3], const CVT v2[3]) {
     dest[0] = v1[1] * v2[2] - v1[2] * v2[1];
     dest[1] = v1[2] * v2[0] - v1[0] * v2[2];
     dest[2] = v1[0] * v2[1] - v1[1] * v2[0];
 }
 template<typename CVT>
-inline CVT Dot(const CVT v1[3], const CVT v2[3]) {
+inline CVT Dot3(const CVT v1[3], const CVT v2[3]) {
     return (v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]);
 }
 template<typename CVT>
-inline void Sub(CVT dest[3], const CVT v1[3], const CVT v2[3]) {
+inline void Sub3(CVT dest[3], const CVT v1[3], const CVT v2[3]) {
     dest[0]=v1[0]-v2[0];
     dest[1]=v1[1]-v2[1]; 
     dest[2]=v1[2]-v2[2]; 
 }
 template<typename CVT>
-inline void Add(CVT dest[3], const CVT v1[3], const CVT v2[3]) {
+inline void Add3(CVT dest[3], const CVT v1[3], const CVT v2[3]) {
     dest[0]=v1[0]+v2[0];
     dest[1]=v1[1]+v2[1]; 
     dest[2]=v1[2]+v2[2]; 
 }
 template<typename CVT>
-inline void MultiValue(CVT dest[3], const CVT v1[3], const CVT factor) {
+inline void MultiValue3(CVT dest[3], const CVT v1[3], const CVT factor) {
     dest[0]=v1[0]*factor;
     dest[1]=v1[1]*factor; 
     dest[2]=v1[2]*factor; 
 }
 template<typename CVT>
-inline short MaxComponentIndex(const CVT vec[3]) {
+inline short MaxComponentIndex3(const CVT vec[3]) {
     CVT max = std::abs(vec[0]);
     short index=0;
     CVT b=std::abs(vec[1]);

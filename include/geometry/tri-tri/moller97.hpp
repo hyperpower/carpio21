@@ -40,19 +40,6 @@
 #define EPSILON 1e-6
 
 /* some macros */
-#define CROSS(dest,v1,v2)                      \
-              dest[0]=v1[1]*v2[2]-v1[2]*v2[1]; \
-              dest[1]=v1[2]*v2[0]-v1[0]*v2[2]; \
-              dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
-
-#define DOT(v1,v2) (v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])
-
-#define SUB(dest,v1,v2) dest[0]=v1[0]-v2[0]; dest[1]=v1[1]-v2[1]; dest[2]=v1[2]-v2[2]; 
-
-#define ADD(dest,v1,v2) dest[0]=v1[0]+v2[0]; dest[1]=v1[1]+v2[1]; dest[2]=v1[2]+v2[2]; 
-
-#define MULT(dest,v,factor) dest[0]=factor*v[0]; dest[1]=factor*v[1]; dest[2]=factor*v[2];
-
 #define SET(dest,src) dest[0]=src[0]; dest[1]=src[1]; dest[2]=src[2]; 
 
 /* sort so that a<=b */
@@ -279,16 +266,16 @@ int tri_tri_intersect(const FLOAT* V0, const FLOAT* V1, const FLOAT* V2,
   FLOAT b,c,max;
 
   /* compute plane equation of triangle(V0,V1,V2) */
-  raw::Sub(E1,V1,V0);
-  raw::Sub(E2,V2,V0);
-  raw::Cross(N1,E1,E2);
-  d1=-raw::Dot(N1,V0);
+  raw::Sub3(E1,V1,V0);
+  raw::Sub3(E2,V2,V0);
+  raw::Cross3(N1,E1,E2);
+  d1=-raw::Dot3(N1,V0);
   /* plane equation 1: N1.X+d1=0 */
 
   /* put U0,U1,U2 into plane equation 1 to compute signed distances to the plane*/
-  du0=raw::Dot(N1,U0)+d1;
-  du1=raw::Dot(N1,U1)+d1;
-  du2=raw::Dot(N1,U2)+d1;
+  du0=raw::Dot3(N1,U0)+d1;
+  du1=raw::Dot3(N1,U1)+d1;
+  du2=raw::Dot3(N1,U2)+d1;
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST==TRUE
@@ -303,16 +290,16 @@ int tri_tri_intersect(const FLOAT* V0, const FLOAT* V1, const FLOAT* V2,
     return 0;                    /* no intersection occurs */
 
   /* compute plane of triangle (U0,U1,U2) */
-  raw::Sub(E1,U1,U0);
-  raw::Sub(E2,U2,U0);
-  raw::Cross(N2,E1,E2);
-  d2=-raw::Dot(N2,U0);
+  raw::Sub3(E1,U1,U0);
+  raw::Sub3(E2,U2,U0);
+  raw::Cross3(N2,E1,E2);
+  d2=-raw::Dot3(N2,U0);
   /* plane equation 2: N2.X+d2=0 */
 
   /* put V0,V1,V2 into plane equation 2 */
-  dv0=raw::Dot(N2,V0)+d2;
-  dv1=raw::Dot(N2,V1)+d2;
-  dv2=raw::Dot(N2,V2)+d2;
+  dv0=raw::Dot3(N2,V0)+d2;
+  dv1=raw::Dot3(N2,V1)+d2;
+  dv2=raw::Dot3(N2,V2)+d2;
 
 #if USE_EPSILON_TEST==TRUE
   if(std::abs(dv0)<EPSILON) dv0=0.0;
@@ -327,10 +314,10 @@ int tri_tri_intersect(const FLOAT* V0, const FLOAT* V1, const FLOAT* V2,
     return 0;                    /* no intersection occurs */
 
   /* compute direction of intersection line */
-  raw::Cross(D,N1,N2);
+  raw::Cross3(D,N1,N2);
 
   /* compute and index to the largest component of D */
-  index = raw::MaxComponentIndex(D);
+  index = raw::MaxComponentIndex3(D);
   // max=std::abs(D[0]);
   // index=0;
   // b=std::abs(D[1]);
@@ -371,14 +358,14 @@ void isect2(const FLOAT* VTX0,const FLOAT* VTX1,const FLOAT* VTX2,
   FLOAT tmp=D0/(D0-D1);
   FLOAT diff[3];
   *isect0=VV0+(VV1-VV0)*tmp;         
-  SUB(diff,VTX1,VTX0);         // diff= VTX1-VTX0    
-  MULT(diff,diff,tmp);         // diff= diff*tmp     
-  ADD(isectpoint0,diff,VTX0);  // isectpoint0=VTX0+diff   
+  raw::Sub3(diff,VTX1,VTX0);         // diff= VTX1-VTX0
+  raw::MultiValue3(diff,diff,tmp);   // diff= diff*tmp
+  raw::Add3(isectpoint0,diff,VTX0);  // isectpoint0=VTX0+diff
   tmp=D0/(D0-D2);                    
   *isect1=VV0+(VV2-VV0)*tmp;          
-  SUB(diff,VTX2,VTX0);                   
-  MULT(diff,diff,tmp);                 
-  ADD(isectpoint1,VTX0,diff);          
+  raw::Sub3(diff,VTX2,VTX0);
+  raw::MultiValue3(diff,diff,tmp);
+  raw::Add3(isectpoint1,VTX0,diff);
 }
 
 template<class FLOAT>
@@ -444,16 +431,16 @@ int tri_tri_intersect_with_isectline(
   int smallest1,smallest2;
   
   /* compute plane equation of triangle(V0,V1,V2) */
-  SUB(E1,V1,V0);
-  SUB(E2,V2,V0);
-  raw::Cross(N1,E1,E2);
-  d1=-raw::Dot(N1,V0);
+  raw::Sub3(E1,V1,V0);
+  raw::Sub3(E2,V2,V0);
+  raw::Cross3(N1,E1,E2);
+  d1=-raw::Dot3(N1,V0);
   /* plane equation 1: N1.X+d1=0 */
 
   /* put U0,U1,U2 into plane equation 1 to compute signed distances to the plane*/
-  du0=raw::Dot(N1,U0)+d1;
-  du1=raw::Dot(N1,U1)+d1;
-  du2=raw::Dot(N1,U2)+d1;
+  du0=raw::Dot3(N1,U0)+d1;
+  du1=raw::Dot3(N1,U1)+d1;
+  du2=raw::Dot3(N1,U2)+d1;
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST==TRUE
@@ -468,16 +455,16 @@ int tri_tri_intersect_with_isectline(
     return 0;                    /* no intersection occurs */
 
   /* compute plane of triangle (U0,U1,U2) */
-  SUB(E1,U1,U0);
-  SUB(E2,U2,U0);
-  raw::Cross(N2,E1,E2);
-  d2=-raw::Dot(N2,U0);
+  raw::Sub3(E1,U1,U0);
+  raw::Sub3(E2,U2,U0);
+  raw::Cross3(N2,E1,E2);
+  d2=-raw::Dot3(N2,U0);
   /* plane equation 2: N2.X+d2=0 */
 
   /* put V0,V1,V2 into plane equation 2 */
-  dv0=raw::Dot(N2,V0)+d2;
-  dv1=raw::Dot(N2,V1)+d2;
-  dv2=raw::Dot(N2,V2)+d2;
+  dv0=raw::Dot3(N2,V0)+d2;
+  dv1=raw::Dot3(N2,V1)+d2;
+  dv2=raw::Dot3(N2,V2)+d2;
 
 #if USE_EPSILON_TEST==TRUE
   if(std::abs(dv0)<EPSILON) dv0=0.0;
@@ -492,7 +479,7 @@ int tri_tri_intersect_with_isectline(
     return 0;                    /* no intersection occurs */
 
   /* compute direction of intersection line */
-  raw::Cross(D,N1,N2);
+  raw::Cross3(D,N1,N2);
 
   /* compute and index to the largest component of D */
   max=std::abs(D[0]);

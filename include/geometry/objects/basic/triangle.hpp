@@ -256,27 +256,17 @@ public:
             return false;
         }
     }
+    std::string to_string() const {
+        std::stringstream sstr;
+        sstr.precision(4);
+        sstr << std::scientific
+             << this->pa().to_string() << " --> "
+             << this->pb().to_string() << " --> "
+             << this->pc().to_string();
+        return sstr.str();
+    }
     void show() const {
-        std::cout.precision(4);
-        std::cout << "( " << pax() << ", " << pay();
-        if (Dim == 3) {
-            std::cout << ", " << paz();
-        } else {
-            std::cout << "";
-        }
-        std::cout << " )--->( " << this->pbx() << ", " << pby();
-        if (Dim == 3) {
-            std::cout << ", " << pbz();
-        } else {
-            std::cout << "";
-        }
-        std::cout << " )--->( " << this->pcx() << ", " << pcy();
-        if (Dim == 3) {
-            std::cout << ", " << pcz();
-        } else {
-            std::cout << "";
-        }
-        std::cout << " )\n";
+        std::cout << this->to_string() << "\n";
     }
 
     /*
@@ -329,6 +319,13 @@ protected:
         }
     }
 };
+
+template<typename TYPE, St DIM, class POINT>
+inline std::ostream& operator<<(std::ostream& stream,
+                                const Triangle_<TYPE, DIM, POINT>& tri) {
+    stream << tri.to_string();
+    return stream;
+}
 
 }
 #endif

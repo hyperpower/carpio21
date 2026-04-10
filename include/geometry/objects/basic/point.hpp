@@ -58,6 +58,7 @@ public:
     typedef PointTag Tag;
     typedef Point_<TYPE, DIM> Point;
     typedef Point_<TYPE, DIM> Self;
+    using Vt = TYPE;
 	typedef TYPE coord_value_type;
     typedef TYPE CV;  // short for CoordinateValue  
     // std like
@@ -85,14 +86,14 @@ public:
         reconstruct(a, b, c);
     }
 
-    Point_(std::initializer_list<TYPE> l) {
+    Point_(std::initializer_list<TYPE> l) : Base{} {
         St i = 0;
-        for(auto& v : l){
-            (*this)[i] = v;
-            ++i;
+        for(const auto& v : l){
             if(i >= Dim){
                 break;
             }
+            (*this)[i] = v;
+            ++i;
         }
     }
     template<class CONTAINER,
@@ -102,14 +103,14 @@ public:
                 && std::is_arithmetic<typename CONTAINER::value_type>::value
             >::value, 
         bool>::type = true>
-    Point_(const CONTAINER& con) {
+    Point_(const CONTAINER& con) : Base{} {
         St i = 0;
-        for(auto& v : con){
-            (*this)[i] = v;
-            ++i;
+        for(const auto& v : con){
             if(i >= Dim){
                 break;
             }
+            (*this)[i] = v;
+            ++i;
         }
     }
     const_reference operator()(St idx) const {
@@ -160,7 +161,7 @@ public:
     }
     void z(const Vt& value){
         if constexpr ( Dim > 2){
-            (*this)(1) = value;
+            (*this)(2) = value;
         }else{
             throw std::out_of_range("not z");
         }
@@ -220,17 +221,6 @@ public:
         }
         return res;
     }
-    Point operator-() {
-        Point res;
-        res[0] = -(this->at(0));
-        if constexpr (Dim >= 2) {
-            res[1] = -(this->at(1));
-        }
-        if constexpr (Dim >= 3) {
-            res[2] = -(this->at(2));
-        }
-        return res;
-    } 
     bool operator<(const Point_<CV, Dim>& a) const {
         for (St i = 0; i < Dim; i++) {
             if (this->at(i) < a[i]) {
@@ -577,7 +567,7 @@ template<typename TYPE, St DIM>
 Point_<TYPE, DIM> BetweenByRatio(
         const Point_<TYPE, DIM>& start,
         const Point_<TYPE, DIM>& end,
-        const Vt& ratio) {
+        const double& ratio) {
     // -1 <= ratio <= 1
     if (ratio == 1) {
         return end;
@@ -601,10 +591,9 @@ template<typename TYPE, St DIM>
 Point_<TYPE, DIM> NewPointFromStart(
         const Point_<TYPE, DIM>& start,
         const Point_<TYPE, DIM>& end,
-        const Vt& distance) {
+        const double& distance) {
     auto dis = Distance(start, end);
     auto ratio = distance / dis;
-    // -1 <= ratio <= 1
     if (distance == 1) {
         return end;
     }
@@ -621,10 +610,9 @@ template<typename TYPE, St DIM>
 Point_<TYPE, DIM> NewPointFromEnd(
         const Point_<TYPE, DIM>& start,
         const Point_<TYPE, DIM>& end,
-        const Vt& distance) {
+        const double& distance) {
     auto dis = Distance(start, end);
     auto ratio = distance / dis;
-    // -1 <= ratio <= 1
     if (distance == 1) {
         return end;
     }
