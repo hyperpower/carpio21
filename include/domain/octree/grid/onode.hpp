@@ -4,7 +4,6 @@
 //#include "../typedefine.hpp"
 #include "domain/octree/octree_define.hpp"
 #include "ocell.hpp"
-#include "odata.hpp"
 #include <functional>
 
 #include <math.h>
@@ -35,6 +34,10 @@ enum NodeIdx {
     //   |  MMM |  MMP |  |  PMM |  PMP |
     //   ---------------  ---------------
     //=========================
+
+    //1D
+    // _M_ = 0, //0
+    // _P_ = 1, //1
 
     //2D
     _MM_ = 0, //00
@@ -88,6 +91,69 @@ inline bool is_on_direction(St i, const Direction& dir) {
     unsigned short lo = LO(dir);
     return (hi & i) == (hi & lo);
 }
+
+
+
+template<typename DATA, typename CELL, St DIM>
+class ONode_ {
+public:
+    static const St Dim = DIM;
+    static const St NumFaces = DIM + DIM;
+    static const St NumVertexes = (DIM == 3) ? 8 : (DIM + DIM);
+    static const St NumNeighbors = NumFaces;
+    static const St NumChildren = NumVertexes;
+
+    typedef ONode_<DATA, CELL, DIM> Self;
+    typedef ONode_<DATA, CELL, DIM> *pSelf;
+
+    typedef CELL Cell;
+    typedef Cell *pCell;
+    typedef const Cell* const_pCell;
+    typedef Cell& ref_Cell;
+    typedef const Cell& const_ref_Cell;
+
+    typedef DATA  Data;
+    typedef Data *pData;
+    typedef const Data* const_pData;
+    typedef Data& ref_Data;
+    typedef const Data& const_ref_Data;
+
+    typedef Self Node;
+    typedef Self *pNode;
+    typedef const Self const_Node;
+    typedef const Self* const_pNode;
+
+protected:
+    St _level;
+    St _idx;
+public:
+    pNode father;
+    pNode child[NumChildren];
+    pNode neighbor[NumNeighbors];
+    pCell cell;
+    pData data;
+
+public:
+    /*
+     *  constructor
+     */
+    ONode_() :
+        _level(0),
+        _idx(0),
+        father(nullptr),
+        cell(nullptr),
+        data(nullptr) 
+    {
+        for (St i = 0; i < NumChildren; ++i) {
+            child[i] = nullptr;
+        }
+        for (St i = 0; i < NumNeighbors; ++i) {
+            neighbor[i] = nullptr;
+        }
+    }
+	
+};
+
 
 }
 

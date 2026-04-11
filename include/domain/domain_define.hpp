@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <functional>
+#include <array>
 #include "type_define.hpp"
 
 namespace carpio{
@@ -22,7 +23,7 @@ enum CellType{
 struct DomainTag{};
 
 struct StructureTag: public DomainTag{};
-struct OctreeTag:    public DomainTag{};
+struct OctreeTag:    public DomainTag{}; 
 
 struct LocationTag{};
 

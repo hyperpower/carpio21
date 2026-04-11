@@ -26,14 +26,14 @@ public:
 	/*
 	 *  constructor
 	 */
-	Cell_() {
+	OCellRect_() {
 		for (St i = 0; i < Dim; ++i) {
 			_center[i] = 0.0;
 			_hd[i] = 0.0;
 		}
 	}
 
-	Cell_(const vt &x, const vt &dhx, //
+	OCellRect_(const vt &x, const vt &dhx, //
 			const vt &y = 0.0, const vt &dhy = 0.0, //
 			const vt &z = 0.0, const vt &dhz = 0.0) {
 		for (St i = 0; i < Dim; ++i) {
@@ -52,7 +52,7 @@ public:
 			}
 		}
 	}
-	Cell_(const Self& s) {
+	OCellRect_(const Self& s) {
 		for (int i = 0; i < Dim; i++) {
 			_center[i] = s._center[i];
 			_hd[i] = s._hd[i];

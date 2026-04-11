@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.4)
 
 set(This Geometry)
 set(Bezier Bezier)
@@ -25,7 +24,7 @@ set(Sources_Bezier test_bezier.cpp)
 
 find_package(Python COMPONENTS Interpreter Development)
 
-find_package(CGAL)
+# find_package(CGAL)
 
 IF(Python_FOUND)
   INCLUDE_DIRECTORIES("${Python_INCLUDE_DIRS}")
@@ -38,7 +37,7 @@ add_executable(${Bezier} ${Sources_Bezier})
 
 target_link_libraries(${This} PUBLIC
     gtest_main
-    CGAL::CGAL
+    # CGAL::CGAL
 )
 target_link_libraries(${Bezier} PUBLIC
     gtest_main
