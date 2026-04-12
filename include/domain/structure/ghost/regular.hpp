@@ -3,7 +3,7 @@
 
 #include "domain/domain_define.hpp"
 #include "domain/structure/structure_define.hpp"
-#include "domain/structure/sindex.hpp"
+#include "domain/base/indices.hpp"
 #include "domain/structure/grid/sgrid.hpp"
 #include "sghost.hpp"
 
@@ -34,7 +34,7 @@ template<St DIM, class GRID>
 class SGhostRegular_ : public SGhost_<DIM, GRID>{
 public:
     typedef SGhost_<DIM, GRID> Base;
-    typedef SIndex_<Base::Dim> Index;
+    typedef Indices_<Base::Dim> Index;
     typedef typename DimTagTraits_<DIM>::Type DimTag;
     typedef GRID Grid;
     typedef std::shared_ptr<Grid> spGrid;

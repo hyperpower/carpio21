@@ -2,7 +2,7 @@
 #define _S_SGRIDUNIFORM_HPP
 
 #include "domain/structure/structure_define.hpp"
-#include "domain/structure/sindex.hpp"
+#include "domain/base/indices.hpp"
 #include "sgrid.hpp"
 #include <array>
 
@@ -18,7 +18,7 @@ public:
     typedef SGridUniformTag Tag;
     typedef ArrayListV_<double> Arr;
     typedef Point_<double, Dim> Point;
-    typedef SIndex_<Dim> Index;
+    typedef Indices_<Dim> Index;
     static const St NumVertex = DIM == 1 ? 2 : (DIM == 2 ? 4 : 8);
     static const St NumFace   = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
     typedef std::function<void(const Index&)> FunIndex;

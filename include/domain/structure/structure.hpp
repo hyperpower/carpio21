@@ -3,7 +3,7 @@
 
 #include "domain/domain_define.hpp"
 #include "structure_define.hpp"
-#include "sindex.hpp"
+#include "domain/base/indices.hpp"
 #include "grid/sgrid.hpp"
 #include "grid/uniform.hpp"
 #include "grid/nonuniform.hpp"

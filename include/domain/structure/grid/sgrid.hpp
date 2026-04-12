@@ -2,6 +2,7 @@
 #define S_GRID_HPP
 
 #include "domain/domain_define.hpp"
+#include "domain/base/indices.hpp"
 
 #include "algebra/algebra.hpp"
 #include "geometry/geometry.hpp"
@@ -16,7 +17,7 @@ public:
     static const St Dim = DIM;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef SGridTag Tag; 
-    typedef SIndex_<Dim> Index;
+    typedef Indices_<Dim> Index;
 
     typedef ArrayListT_<Vt> Arr;
     typedef Point_<Vt, Dim> Point;

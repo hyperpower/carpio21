@@ -1,5 +1,5 @@
-#ifndef _S_INDEX_HPP
-#define _S_INDEX_HPP
+#ifndef _INDICES_HPP
+#define _INDICES_HPP
 
 
 #include <array>
@@ -11,15 +11,15 @@ namespace carpio{
 typedef int Idx;
 
 template<St DIM>
-class SIndex_: public std::array<int, DIM> {
+class Indices_: public std::array<int, DIM> {
 public:
     static const St Dim = DIM;
-    typedef SIndex_<DIM> Self;
+    typedef Indices_<DIM> Self;
 public:
-    SIndex_() {
+    Indices_() {
         this->fill(0);
     }
-    SIndex_(int a, int b = 0, int c = 0) {
+    Indices_(int a, int b = 0, int c = 0) {
         this->at(0) = a;
         if (Dim >= 2) {
             this->at(1) = b;
@@ -28,7 +28,7 @@ public:
             this->at(2) = c;
         }
     }
-    SIndex_(const SIndex_<DIM>& other) {
+    Indices_(const Indices_<DIM>& other) {
         for (St d = 0; d < Dim; ++d) {
             this->at(d) = other[d];
         }
@@ -149,7 +149,7 @@ public:
         }
     }
 
-    bool operator==(const SIndex_<DIM>& other) const {
+    bool operator==(const Indices_<DIM>& other) const {
         bool res = true;
         for (St d = 0; d < Dim; ++d) {
             res = res && this->at(d) == other[d];
@@ -176,8 +176,8 @@ public:
     }
 };
 template<St DIM>
-struct SIndex_compare_ {
-    typedef SIndex_<DIM> Index;
+struct Indices_compare_ {
+    typedef Indices_<DIM> Index;
     bool operator()(const Index& a, const Index& b) const {
         for (St d = 0; d < DIM; d++) {
             if (a[d] < b[d]) {
@@ -193,8 +193,8 @@ struct SIndex_compare_ {
 };
 
 template<St DIM>
-struct SIndex_hash_ {
-    typedef SIndex_<DIM> Index;
+struct Indices_hash_ {
+    typedef Indices_<DIM> Index;
     std::size_t operator()(const Index& a) const {
         std::size_t res[DIM];
         for (St d = 0; d < DIM; d++) {
@@ -219,7 +219,7 @@ struct SIndex_hash_ {
 };
 
 template<St DIM>
-std::ostream& operator<<(std::ostream& stream, const SIndex_<DIM>& index) {
+std::ostream& operator<<(std::ostream& stream, const Indices_<DIM>& index) {
     stream << "(";
     for (St d = 0; d < DIM; ++d) {
         stream << index[d];
@@ -231,7 +231,7 @@ std::ostream& operator<<(std::ostream& stream, const SIndex_<DIM>& index) {
     return stream;
 }
 template<St DIM>
-void Shift(SIndex_<DIM>& index, St dim, St ori, St step = 1) {
+void Shift(Indices_<DIM>& index, St dim, St ori, St step = 1) {
     if(ori == _M_){
         index[dim] = index[dim] - step;
     }else if(ori == _P_){
@@ -239,27 +239,27 @@ void Shift(SIndex_<DIM>& index, St dim, St ori, St step = 1) {
     }
 }
 template<St DIM>
-SIndex_<DIM> Plus(const SIndex_<DIM>& index, St dim, St step = 1) {
-    SIndex_<DIM> res(index);
+Indices_<DIM> Plus(const Indices_<DIM>& index, St dim, St step = 1) {
+    Indices_<DIM> res(index);
     res[dim] = index[dim] + step;
     return res;
 }
 template<St DIM>
-SIndex_<DIM> Minus(const SIndex_<DIM>& index, St dim, St step = 1) {
-    SIndex_<DIM> res(index);
+Indices_<DIM> Minus(const Indices_<DIM>& index, St dim, St step = 1) {
+    Indices_<DIM> res(index);
     res[dim] = index[dim] - step;
     return res;
 }
 template<St DIM>
-SIndex_<DIM> GetDeltaIndex(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
-    SIndex_<DIM> res(c);
+Indices_<DIM> GetDeltaIndex(const Indices_<DIM>& c, const Indices_<DIM>& g) {
+    Indices_<DIM> res(c);
     for (St d = 0; d < DIM; ++d) {
         res[d] = g[d] - c[d];
     }
     return res;
 }
 template<St DIM>
-bool OnSameAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
+bool OnSameAxe(const Indices_<DIM>& c, const Indices_<DIM>& g) {
     auto d = GetDeltaIndex(c, g);
     short count = 0;
     for(int i = 0; i < DIM; ++i){
@@ -270,7 +270,7 @@ bool OnSameAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     return count <= 1;
 } 
 template<St DIM>
-bool OnSameAxe(const SIndex_<DIM>& delta_idx) {
+bool OnSameAxe(const Indices_<DIM>& delta_idx) {
     short count = 0;
     for(short i = 0; i < DIM; ++i){
         if(delta_idx[i] != 0){
@@ -280,7 +280,7 @@ bool OnSameAxe(const SIndex_<DIM>& delta_idx) {
     return count <= 1;
 } 
 template<St DIM>
-Axes GetDeltaAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
+Axes GetDeltaAxe(const Indices_<DIM>& c, const Indices_<DIM>& g) {
     auto d = GetDeltaIndex(c, g);
     for(int i = 0; i < DIM; ++i){
         if(d[i] != 0){
@@ -291,7 +291,7 @@ Axes GetDeltaAxe(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     return _X_;
 }
 template<St DIM>
-Axes GetDeltaAxe(const SIndex_<DIM>& didx) {
+Axes GetDeltaAxe(const Indices_<DIM>& didx) {
     for(int i = 0; i < DIM; ++i){
         if(didx[i] != 0){
             return ToAxes(i);
@@ -301,7 +301,7 @@ Axes GetDeltaAxe(const SIndex_<DIM>& didx) {
     return _X_;
 }
 template<St DIM>
-Orientation GetDeltaOrient(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
+Orientation GetDeltaOrient(const Indices_<DIM>& c, const Indices_<DIM>& g) {
     auto d = GetDeltaIndex(c, g);
     for(int i = 0; i < DIM; ++i){
         if(d[i] > 0)
@@ -312,7 +312,7 @@ Orientation GetDeltaOrient(const SIndex_<DIM>& c, const SIndex_<DIM>& g) {
     return _C_;
 }
 template<St DIM>
-Orientation GetDeltaOrientOnSameAxe(const SIndex_<DIM>& delta_idx) {
+Orientation GetDeltaOrientOnSameAxe(const Indices_<DIM>& delta_idx) {
     for(int i = 0; i < DIM; ++i){
         if(delta_idx[i] > 0)
             return _P_;
@@ -323,7 +323,7 @@ Orientation GetDeltaOrientOnSameAxe(const SIndex_<DIM>& delta_idx) {
 }
 template<St DIM>
 Orientation GetDeltaOrientOnAxe(
-    const SIndex_<DIM>& c, const SIndex_<DIM>& g, const Axes& a) {
+    const Indices_<DIM>& c, const Indices_<DIM>& g, const Axes& a) {
     if(g[a] > c[a])
         return _P_;
     else if(g[a] < c[a])
@@ -332,8 +332,8 @@ Orientation GetDeltaOrientOnAxe(
 }
 
 template<St DIM>
-auto CrossListIndex(const SIndex_<DIM>& idx){
-    typedef const SIndex_<DIM> Index;
+auto CrossListIndex(const Indices_<DIM>& idx){
+    typedef const Indices_<DIM> Index;
     std::list<Index> res;
     for(auto& d : ArrAxes<DIM>()){
         res.push_back(idx.m(d));

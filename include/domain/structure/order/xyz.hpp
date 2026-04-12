@@ -3,7 +3,7 @@
 
 
 #include "domain/structure/structure_define.hpp"
-#include "domain/structure/sindex.hpp"
+#include "domain/base/indices.hpp"
 #include "domain/structure/grid/sgrid.hpp"
 #include "domain/structure/ghost/sghost.hpp"
 #include "sorder.hpp"
@@ -23,7 +23,7 @@ class SOrderXYZ_ <DIM, GRID, GHOST, CenterTag>: public SOrder_<DIM, GRID, GHOST,
 public:
     static const St Dim = DIM;
     typedef SOrder_<DIM, GRID, GHOST, CenterTag> Base; 
-    typedef SIndex_<DIM> Index;
+    typedef Indices_<DIM> Index;
     typedef CenterTag LocationTag;
     typedef GRID  Grid;
     typedef SOrderXYZTag Tag;
@@ -210,7 +210,7 @@ class SOrderXYZ_ <DIM, GRID, GHOST, VertexTag>: public SOrder_<DIM, GRID, GHOST,
 public:
     static const St Dim = DIM;
     typedef SOrder_<DIM, GRID, GHOST, VertexTag> Base;
-    typedef SIndex_<DIM> Index;
+    typedef Indices_<DIM> Index;
     typedef VertexTag LocationTag;
     typedef GRID  Grid;
     typedef SOrderXYZTag Tag;

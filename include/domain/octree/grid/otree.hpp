@@ -34,15 +34,48 @@ public:
     typedef Data& ref_Data;
     typedef const Data& const_ref_Data;
 
-    typedef Self Node;
-    typedef Self *pNode;
-    typedef const Self const_Node;
-    typedef const Self* const_pNode;
+    typedef ONode_<DATA, CELL, DIM> Node;
+    typedef Node *pNode;
+    typedef const Node const_Node;
+    typedef const Node* const_pNode;
 
 protected:
     St _root_idx;
 public:
     pNode root;
+
+public:
+    OTree_() :
+        _root_idx(0),
+        root(new Node()) {
+    }
+
+    ~OTree_() {
+        delete root;
+        root = nullptr;
+    }
+
+    OTree_(const Self& s) :
+        _root_idx(s._root_idx),
+        root(s.root == nullptr ? nullptr : new Node(*s.root)) {
+        if (root != nullptr) {
+            root->father = nullptr;
+        }
+    }
+
+    Self& operator=(const Self& s) {
+        if (this == &s) {
+            return *this;
+        }
+
+        delete root;
+        _root_idx = s._root_idx;
+        root = s.root == nullptr ? nullptr : new Node(*s.root);
+        if (root != nullptr) {
+            root->father = nullptr;
+        }
+        return *this;
+    }
     
 };
 }

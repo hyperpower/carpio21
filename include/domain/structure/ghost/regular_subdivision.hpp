@@ -3,7 +3,7 @@
 
 #include "domain/domain_define.hpp"
 #include "domain/structure/structure_define.hpp"
-#include "domain/structure/sindex.hpp"
+#include "domain/base/indices.hpp"
 #include "domain/structure/grid/sgrid.hpp"
 #include "sghost.hpp"
 #include "regular.hpp"
@@ -28,7 +28,7 @@ public:
     static const St NumFace   = DIM == 1 ? 2 : (DIM == 2 ? 4 : 6);
 
     typedef SGhostRegular_<DIM, GRID> Base;
-    typedef SIndex_<DIM>              Index;
+    typedef Indices_<DIM>              Index;
     typedef GRID                      Grid;
     typedef std::shared_ptr<Grid>   spGrid;
     typedef SGhostSubdivisionTag       Tag;

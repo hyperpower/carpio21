@@ -5,7 +5,7 @@
 
 #include "sgrid.hpp"
 #include "domain/structure/structure_define.hpp"
-#include "domain/structure/sindex.hpp"
+#include "domain/base/indices.hpp"
 
 #undef max
 #undef min
@@ -24,7 +24,7 @@ public:
     typedef SGridNonUniformTag Tag;
     typedef ArrayListV_<double> Arr;
     typedef Point_<double, Dim> Point;
-    typedef SIndex_<Dim> Index;
+    typedef Indices_<Dim> Index;
 protected:
     Point   _min, _max;
     Index _n, _ng;  // number of node and number of node and ghost

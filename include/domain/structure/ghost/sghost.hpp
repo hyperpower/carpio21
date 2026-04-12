@@ -2,6 +2,7 @@
 #define S_GHOST_HPP
 
 #include "domain/domain_define.hpp"
+#include "domain/base/indices.hpp"
 #include "domain/base/base_field.hpp"
 
 namespace carpio{
@@ -14,7 +15,7 @@ public:
     static const St Dim = DIM;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
     
-    typedef SIndex_<Dim> Index;
+    typedef Indices_<Dim> Index;
     typedef GRID         Grid;
 
     typedef ArrayListT_<Vt> Arr;
