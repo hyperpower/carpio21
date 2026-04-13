@@ -31,7 +31,7 @@ public:
     typedef OGrid_<DATA, CELL, DIM> *pSelf;
     typedef typename DimTagTraits_<Dim>::Type DimTag;
     typedef OGridTag Tag;
-    typedef Indices_<Dim> Index;
+    typedef Indices_<Dim> Indices;
 
     typedef CELL Cell;
     typedef typename Cell::vt vt;
@@ -105,12 +105,24 @@ public:
         return GhostLayer;
     }
 
+    Tree& tree_1d_index(St idx) {
+        ASSERT(idx < size());
+        const auto arr = _to_idx(idx);
+        return tree(arr[0], Dim >= 2 ? arr[1] : 0, Dim >= 3 ? arr[2] : 0);
+    }
+
+    const Tree& tree_1d_index(St idx) const {
+        ASSERT(idx < size());
+        const auto arr = _to_idx(idx);
+        return tree(arr[0], Dim >= 2 ? arr[1] : 0, Dim >= 3 ? arr[2] : 0);
+    }
+
     Tree& tree(Int i, Int j = 0, Int k = 0) {
-        return _trees[_to_1d_idx(i, j, k)];
+        return _trees[to_1d_storage_idx(i, j, k)];
     }
 
     const Tree& tree(Int i, Int j = 0, Int k = 0) const {
-        return _trees[_to_1d_idx(i, j, k)];
+        return _trees[to_1d_storage_idx(i, j, k)];
     }
 
     pNode root_node(Int i, Int j = 0, Int k = 0) {
@@ -121,7 +133,62 @@ public:
         return tree(i, j, k).root;
     }
 
+    St to_1d_idx(Int i, Int j = 0, Int k = 0) const {
+        ASSERT(i >= 0);
+        ASSERT(i < Int(size_i()));
+        St idx = St(i);
+        if constexpr (Dim >= 2) {
+            ASSERT(j >= 0);
+            ASSERT(j < Int(size_j()));
+            idx += size_i() * St(j);
+        }
+        if constexpr (Dim >= 3) {
+            ASSERT(k >= 0);
+            ASSERT(k < Int(size_k()));
+            idx += size_i() * size_j() * St(k);
+        }
+        return idx;
+    }
+
+    St to_1d_storage_idx(Int i, Int j = 0, Int k = 0) const {
+        return _to_1d_storage_idx(
+            _to_storage_idx(i, _X_),
+            Dim >= 2 ? _to_storage_idx(j, _Y_) : 0,
+            Dim >= 3 ? _to_storage_idx(k, _Z_) : 0);
+    }
+
 protected:
+    St _to_1d_storage_idx(St i, St j = 0, St k = 0) const {
+        ASSERT(i < _len[0]);
+        St idx = i;
+        if constexpr (Dim >= 2) {
+            ASSERT(j < _len[1]);
+            idx += _len[0] * j;
+        }
+        if constexpr (Dim >= 3) {
+            ASSERT(k < _len[2]);
+            idx += _len[0] * _len[1] * k;
+        }
+        return idx;
+    }
+
+    std::array<Int, Dim> _to_idx(St idx) const {
+        std::array<Int, Dim> arr;
+        arr[0] = Int(idx);
+        if constexpr (Dim >= 2) {
+            arr[0] = Int(idx % size_i());
+            arr[1] = Int(idx / size_i());
+        }
+        if constexpr (Dim >= 3) {
+            const St ij_size = size_i() * size_j();
+            const St rem = idx % ij_size;
+            arr[0] = Int(rem % size_i());
+            arr[1] = Int(rem / size_i());
+            arr[2] = Int(idx / ij_size);
+        }
+        return arr;
+    }
+
     St _size(St dim) const {
         ASSERT(dim < Dim);
         return _len[dim] - GhostLayer - GhostLayer;
@@ -160,37 +227,6 @@ protected:
         ASSERT(idx >= -Int(GhostLayer));
         ASSERT(idx < Int(_len[dim]) - Int(GhostLayer));
         return St(idx + Int(GhostLayer));
-    }
-
-    St _to_1d_idx(Int i, Int j = 0, Int k = 0) const {
-        return _to_1d_storage_idx(
-            _to_storage_idx(i, _X_),
-            Dim >= 2 ? _to_storage_idx(j, _Y_) : 0,
-            Dim >= 3 ? _to_storage_idx(k, _Z_) : 0);
-    }
-
-    St _to_1d_storage_idx(St i, St j = 0, St k = 0) const {
-        ASSERT(i < _len[0]);
-        std::array<St, Dim> inp;
-        inp[0] = i;
-        if constexpr (Dim >= 2) {
-            ASSERT(j < _len[1]);
-            inp[1] = j;
-        }
-        if constexpr (Dim >= 3) {
-            ASSERT(k < _len[2]);
-            inp[2] = k;
-        }
-
-        St idx = 0;
-        for (St ii = 0; ii < Dim; ++ii) {
-            St b = 1;
-            for (St jj = ii + 1; jj < Dim; ++jj) {
-                b *= _len[jj];
-            }
-            idx += b * inp[ii];
-        }
-        return idx;
     }
 
     Tree& _tree_storage(St i, St j = 0, St k = 0) {

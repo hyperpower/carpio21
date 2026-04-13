@@ -4,6 +4,8 @@
 #include <iostream>
 #include <list>
 #include <algorithm>
+#include <string>
+#include <type_traits>
 #include "domain/domain_define.hpp"
 #include "io/gnuplot.hpp"
 
@@ -67,7 +69,8 @@ GnuplotActor ToGnuplotActorLabel(const ANY& a, const std::string& config = ""){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorLabel(a, config, Tag()); 
 }
-template<class ANY, class ANY2>
+template<class ANY, class ANY2,
+    std::enable_if_t<!std::is_convertible_v<std::decay_t<ANY2>, std::string>, int> = 0>
 auto ToGnuplotActorLabel(const ANY& a, const ANY2& a2, const std::string& config = ""){
     typedef typename ANY::Tag Tag;
     return _ToGnuplotActorLabel(a, a2, config, Tag()); 

@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "test_define.hpp"
 #include "domain/octree/grid/ogrid.hpp"
+#include "domain/octree/io/ognuplot_actor_label.hpp"
 #include "domain/octree/io/ognuplot_actor_wire_frame.hpp"
 
 #include <type_traits>
@@ -34,6 +35,60 @@ TEST(ogrid, constructs_padded_tree_array_2d){
     EXPECT_EQ(grid.size(), 12);
     ASSERT_NE(grid.root_node(0, 0), nullptr);
     EXPECT_TRUE(grid.root_node(0, 0)->is_root());
+}
+
+TEST(ogrid, accesses_tree_by_1d_index_2d){
+    using Cell = OCellNonUniform_<double, 2>;
+    using Grid = OGrid_<double, Cell, 2>;
+
+    Grid grid(3, 4);
+
+    EXPECT_EQ(&grid.tree_1d_index(0), &grid.tree(0, 0));
+    EXPECT_EQ(&grid.tree_1d_index(1), &grid.tree(1, 0));
+    EXPECT_EQ(&grid.tree_1d_index(3), &grid.tree(0, 1));
+    EXPECT_EQ(&grid.tree_1d_index(11), &grid.tree(2, 3));
+
+    const Grid& const_grid = grid;
+    EXPECT_EQ(&const_grid.tree_1d_index(0), &const_grid.tree(0, 0));
+    EXPECT_EQ(&const_grid.tree_1d_index(1), &const_grid.tree(1, 0));
+    EXPECT_EQ(&const_grid.tree_1d_index(3), &const_grid.tree(0, 1));
+    EXPECT_EQ(&const_grid.tree_1d_index(11), &const_grid.tree(2, 3));
+}
+
+TEST(ogrid, uses_x_then_y_then_z_storage_order){
+    using Cell2 = OCellNonUniform_<double, 2>;
+    using Grid2 = OGrid_<double, Cell2, 2>;
+
+    Grid2 grid2(3, 4);
+
+    EXPECT_EQ(grid2.to_1d_idx(0, 0), 0);
+    EXPECT_EQ(grid2.to_1d_idx(1, 0), 1);
+    EXPECT_EQ(grid2.to_1d_idx(0, 1), 3);
+    EXPECT_EQ(grid2.to_1d_idx(2, 3), 11);
+
+    EXPECT_EQ(grid2.to_1d_storage_idx(-1, -1), 0);
+    EXPECT_EQ(grid2.to_1d_storage_idx(0, -1), 1);
+    EXPECT_EQ(grid2.to_1d_storage_idx(-1, 0), 5);
+    EXPECT_EQ(grid2.to_1d_storage_idx(0, 0), 6);
+    EXPECT_EQ(grid2.to_1d_storage_idx(3, 4), 29);
+
+    using Cell3 = OCellNonUniform_<double, 3>;
+    using Grid3 = OGrid_<double, Cell3, 3>;
+
+    Grid3 grid3(2, 3, 4);
+
+    EXPECT_EQ(grid3.to_1d_idx(0, 0, 0), 0);
+    EXPECT_EQ(grid3.to_1d_idx(1, 0, 0), 1);
+    EXPECT_EQ(grid3.to_1d_idx(0, 1, 0), 2);
+    EXPECT_EQ(grid3.to_1d_idx(0, 0, 1), 6);
+    EXPECT_EQ(grid3.to_1d_idx(1, 2, 3), 23);
+
+    EXPECT_EQ(grid3.to_1d_storage_idx(-1, -1, -1), 0);
+    EXPECT_EQ(grid3.to_1d_storage_idx(0, -1, -1), 1);
+    EXPECT_EQ(grid3.to_1d_storage_idx(-1, 0, -1), 4);
+    EXPECT_EQ(grid3.to_1d_storage_idx(-1, -1, 0), 20);
+    EXPECT_EQ(grid3.to_1d_storage_idx(0, 0, 0), 25);
+    EXPECT_EQ(grid3.to_1d_storage_idx(2, 3, 4), 119);
 }
 
 TEST(ogrid, constructs_square_geometry_2d){
@@ -79,7 +134,7 @@ TEST(ogrid, gnuplot_simple_grid_2d){
     using Grid = OGridNonUniform_<double, Cell, 2>;
     using Point = Grid::Point;
 
-    Grid grid(Point(0.0, 0.0), 0.25, 5, 4);
+    Grid grid(Point(0.0, 0.0), 0.25, 3, 5);
     auto root = grid.root_node(1, 1);
     ASSERT_NE(root, nullptr);
     for (St i = 0; i < Grid::Node::NumChildren; ++i) {
@@ -91,9 +146,10 @@ TEST(ogrid, gnuplot_simple_grid_2d){
     gnu.set_yrange(-0.25, 1.25);
     gnu.set_equal_aspect_ratio();
     auto agrid = ToGnuplotActorWireFrame(grid);
-    agrid.title("OGrid");
+    auto aindex = ToGnuplotActorLabel(grid, "root_index");
     agrid.line_width(2);
     gnu.add(agrid);
+    gnu.add(aindex);
     gnu.set_terminal_png(FIG_PATH + "OctreeOGrid", fig_width, fig_height);
     gnu.plot();
 }
@@ -134,6 +190,19 @@ TEST(ogrid, constructs_padded_tree_array_3d){
     EXPECT_EQ(grid.size(), 24);
     ASSERT_NE(grid.root_node(0, 0, 0), nullptr);
     EXPECT_TRUE(grid.root_node(0, 0, 0)->is_root());
+}
+
+TEST(ogrid, accesses_tree_by_1d_index_3d){
+    using Cell = OCellNonUniform_<double, 3>;
+    using Grid = OGrid_<double, Cell, 3>;
+
+    Grid grid(2, 3, 4);
+
+    EXPECT_EQ(&grid.tree_1d_index(0), &grid.tree(0, 0, 0));
+    EXPECT_EQ(&grid.tree_1d_index(1), &grid.tree(1, 0, 0));
+    EXPECT_EQ(&grid.tree_1d_index(2), &grid.tree(0, 1, 0));
+    EXPECT_EQ(&grid.tree_1d_index(6), &grid.tree(0, 0, 1));
+    EXPECT_EQ(&grid.tree_1d_index(23), &grid.tree(1, 2, 3));
 }
 
 TEST(ogrid, constructs_cube_geometry_3d){
