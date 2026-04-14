@@ -90,3 +90,27 @@ TEST(onode, new_child_from_parent_cell){
     EXPECT_EQ(node.child[Node::Idx::_PP_]->father, &node);
     EXPECT_TRUE(node.child[Node::Idx::_PP_]->is_leaf());
 }
+
+TEST(onode, new_full_children_from_parent_cell){
+    using Cell = OCellUniform_<double, 2>;
+    using Node = ONode_<double, Cell, 2>;
+
+    Node node;
+    node.cell = Cell(2.0, 1.0, 1.0);
+    node.data = 7.0;
+
+    node.new_full_children();
+
+    EXPECT_TRUE(node.is_full_child());
+    EXPECT_FALSE(node.is_leaf());
+    EXPECT_EQ(node.height(), 1);
+    for (St i = 0; i < Node::NumChildren; ++i) {
+        ASSERT_TRUE(node.has_child(i));
+        auto child = node.child[i];
+        EXPECT_EQ(child->father, &node);
+        EXPECT_TRUE(child->is_leaf());
+        EXPECT_DOUBLE_EQ(child->data, node.data);
+        EXPECT_DOUBLE_EQ(child->cell.get_hd(_X_), 1.0);
+        EXPECT_DOUBLE_EQ(child->cell.get_hd(_Y_), 1.0);
+    }
+}

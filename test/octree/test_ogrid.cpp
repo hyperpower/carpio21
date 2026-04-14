@@ -9,6 +9,15 @@
 
 using namespace carpio;
 
+TEST(ogrid, converts_face_direction_to_orientation){
+    EXPECT_EQ(FaceDirectionToOrientation(_XM_), _M_);
+    EXPECT_EQ(FaceDirectionToOrientation(_XP_), _P_);
+    EXPECT_EQ(FaceDirectionToOrientation(_YM_), _M_);
+    EXPECT_EQ(FaceDirectionToOrientation(_YP_), _P_);
+    EXPECT_EQ(FaceDirectionToOrientation(_ZM_), _M_);
+    EXPECT_EQ(FaceDirectionToOrientation(_ZP_), _P_);
+}
+
 TEST(ogrid, constructs_padded_tree_array_1d){
     using Cell = OCellNonUniform_<double, 1>;
     using Grid = OGrid_<double, Cell, 1>;
@@ -91,6 +100,68 @@ TEST(ogrid, uses_x_then_y_then_z_storage_order){
     EXPECT_EQ(grid3.to_1d_storage_idx(2, 3, 4), 119);
 }
 
+TEST(ogrid, connects_root_neighbors_2d){
+    using Cell = OCellNonUniform_<double, 2>;
+    using Grid = OGrid_<double, Cell, 2>;
+    using Node = Grid::Node;
+
+    Grid grid(3, 4);
+    auto root = grid.root_node(0, 0);
+    ASSERT_NE(root, nullptr);
+    for (St i = 0; i < Node::NumNeighbors; ++i) {
+        EXPECT_EQ(root->neighbor[i], nullptr);
+    }
+
+    root->set_child(Node::Idx::_PP_, new Node());
+    auto child = root->child[Node::Idx::_PP_];
+    ASSERT_NE(child, nullptr);
+
+    grid.connect_neighbors();
+
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_XP_)], grid.root_node(1, 0));
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_XM_)], grid.root_node(-1, 0));
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YP_)], grid.root_node(0, 1));
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YM_)], grid.root_node(0, -1));
+    EXPECT_EQ(grid.find_neighbor(*root, _XP_), grid.root_node(1, 0));
+
+    EXPECT_EQ(grid.root_node(-1, 0)->neighbor[FaceDirectionInOrder(_XP_)],
+              grid.root_node(0, 0));
+    EXPECT_EQ(grid.root_node(-1, 0)->neighbor[FaceDirectionInOrder(_XM_)],
+              nullptr);
+
+    for (St i = 0; i < Node::NumNeighbors; ++i) {
+        EXPECT_EQ(child->neighbor[i], nullptr);
+    }
+}
+
+TEST(ogrid, connects_root_neighbors_3d){
+    using Cell = OCellNonUniform_<double, 3>;
+    using Grid = OGrid_<double, Cell, 3>;
+
+    Grid grid(2, 3, 4);
+    auto root = grid.root_node(0, 0, 0);
+    ASSERT_NE(root, nullptr);
+
+    grid.connect_neighbors();
+
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_XP_)], grid.root_node(1, 0, 0));
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YP_)], grid.root_node(0, 1, 0));
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_ZP_)], grid.root_node(0, 0, 1));
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_XM_)], grid.root_node(-1, 0, 0));
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YM_)], grid.root_node(0, -1, 0));
+    EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_ZM_)], grid.root_node(0, 0, -1));
+    EXPECT_EQ(grid.find_neighbor(*root, _ZP_), grid.root_node(0, 0, 1));
+
+    EXPECT_EQ(grid.root_node(-1, 0, 0)->neighbor[FaceDirectionInOrder(_XP_)],
+              grid.root_node(0, 0, 0));
+    EXPECT_EQ(grid.root_node(-1, 0, 0)->neighbor[FaceDirectionInOrder(_XM_)],
+              nullptr);
+    EXPECT_EQ(grid.root_node(0, 0, -1)->neighbor[FaceDirectionInOrder(_ZP_)],
+              grid.root_node(0, 0, 0));
+    EXPECT_EQ(grid.root_node(0, 0, -1)->neighbor[FaceDirectionInOrder(_ZM_)],
+              nullptr);
+}
+
 TEST(ogrid, constructs_square_geometry_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Grid = OGridNonUniform_<double, Cell, 2>;
@@ -140,6 +211,11 @@ TEST(ogrid, gnuplot_simple_grid_2d){
     for (St i = 0; i < Grid::Node::NumChildren; ++i) {
         root->new_child(i);
     }
+    auto c = root->child[3];
+    ASSERT_NE(c, nullptr);
+    c->new_full_children();
+    // auto root = grid.root_node(2,2);
+
 
     Gnuplot gnu;
     gnu.set_xrange(-0.25, 1.35);

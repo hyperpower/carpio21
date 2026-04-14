@@ -50,6 +50,11 @@ public:
         root(new Node()) {
     }
 
+    OTree_(St root_idx) :
+        _root_idx(root_idx),
+        root(new Node()) {
+    }
+
     ~OTree_() {
         delete root;
         root = nullptr;
@@ -76,7 +81,11 @@ public:
         }
         return *this;
     }
-    
+
+    void set_root_idx(St idx) {
+        _root_idx = idx;
+    }
+
 };
 }
 

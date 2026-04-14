@@ -299,6 +299,30 @@ public:
         ASSERT(idx < NumChildren);
         set_child(idx, new Node(idx, this, MakeSubCell(cell, idx), data));
     }
+
+    void new_full_children() {
+        for (St i = 0; i < NumChildren; ++i) {
+            new_child(i);
+        }
+    }
+
+    /*
+     *  height
+     */
+    St height() const {
+        if (this->is_leaf()) {
+            return 0;
+        } else {
+            St res = 0;
+            for (St i = 0; i < this->NumChildren; ++i) {
+                if (this->child[i] != nullptr) {
+                    res = std::max(res, this->child[i]->height());
+                }
+            }
+            return res + 1;
+        }
+    }
+    
 	
 };
 

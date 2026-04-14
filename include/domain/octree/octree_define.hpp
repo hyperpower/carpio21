@@ -97,26 +97,45 @@ inline Direction ToCornerDirection( //
 	return d1 | d2;
 }
 
-inline void FaceDirectionToOrientationAndAxes(const Direction &d,
-		Orientation &o, Axes &a) {
+inline Axes FaceDirectionToAxes(const Direction &d) {
 	ASSERT(IsFaceDirection(d));
+	Axes a;
 	unsigned short hi = d >> 3;
 	if ((hi & 1) == 1) {
 		a = _X_;
-        o = (GetBit(d, 0)) ? _P_ : _M_;
-		return;
+		return a;
 	}
 	if ((hi & 2) == 2) {
 		a = _Y_;
-		o = (GetBit(d, 1)) ? _P_ : _M_;
-		return;
+		return a;
 	}
+
 	if ((hi & 4) == 4) {
 		a = _Z_;
-		o = (GetBit(d, 2)) ? _P_ : _M_;
-		return;
+		return a;
 	}
 	SHOULD_NOT_REACH;
+	return _X_;
+}
+inline Orientation FaceDirectionToOrientation(const Direction &d) {
+	ASSERT(IsFaceDirection(d));
+	unsigned short hi = d >> 3;
+	if ((hi & 1) == 1) {
+		return (GetBit(d, 0)) ? _P_ : _M_;
+	}
+	if ((hi & 2) == 2) {
+		return (GetBit(d, 1)) ? _P_ : _M_;
+	}
+	if ((hi & 4) == 4) {
+		return (GetBit(d, 2)) ? _P_ : _M_;
+	}
+	SHOULD_NOT_REACH;
+	return _C_;
+}
+inline void FaceDirectionToOrientationAndAxes(const Direction &d,
+		Orientation &o, Axes &a) {
+	o = FaceDirectionToOrientation(d);
+	a = FaceDirectionToAxes(d);
 }
 inline void CornerDirectionToOrientationAndAxes(const Direction &d,
 		Orientation &o1, Axes &a1, Orientation &o2, Axes& a2) {
@@ -145,27 +164,6 @@ inline void CornerDirectionToOrientationAndAxes(const Direction &d,
 	}
 	SHOULD_NOT_REACH;
 }
-inline Axes FaceDirectionToAxes(const Direction &d) {
-	ASSERT(IsFaceDirection(d));
-	Axes a;
-	unsigned short hi = d >> 3;
-	if ((hi & 1) == 1) {
-		a = _X_;
-		return a;
-	}
-	if ((hi & 2) == 2) {
-		a = _Y_;
-		return a;
-	}
-
-	if ((hi & 4) == 4) {
-		a = _Z_;
-		return a;
-	}
-	SHOULD_NOT_REACH;
-	return a;
-}
-
 /*
  * Does Direction on axes active
  */

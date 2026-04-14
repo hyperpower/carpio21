@@ -133,6 +133,45 @@ public:
         return tree(i, j, k).root;
     }
 
+    pNode find_neighbor(const Node& node, const Direction& d) {
+        return const_cast<pNode>(
+            static_cast<const Self*>(this)->find_neighbor(node, d));
+    }
+
+    const_pNode find_neighbor(const Node& node, const Direction& d) const {
+        ASSERT(node.is_root());
+        ASSERT(IsFaceDirection(d));
+        if (!IsFaceDirection(d)) {
+            return nullptr;
+        }
+        Orientation ori;   Axes axis;
+        FaceDirectionToOrientationAndAxes(d, ori, axis);
+        ASSERT(St(axis) < Dim);
+        if (St(axis) >= Dim) {
+            return nullptr;
+        }
+        for (St i = 0; i < _trees.size(); ++i) {
+            if (_trees[i].root == &node) {
+                return _find_neighbor(_1d_storage_idx_to_indices(i), axis, ori);
+            }
+        }
+        ASSERT(false);
+        return nullptr;
+    }
+
+    void connect_neighbors() {
+        for (St i = 0; i < _trees.size(); ++i) {
+            auto node = _trees[i].root;
+            ASSERT(node != nullptr);
+            const auto idx = _1d_storage_idx_to_indices(i);
+            for (St n = 0; n < Node::NumNeighbors; ++n) {
+                Orientation ori;  Axes axis;
+                FaceDirectionToOrientationAndAxes(FaceDirectionInOrder(n), ori, axis);
+                node->neighbor[n] = _find_neighbor(idx, axis, ori);
+            }
+        }
+    }
+
     St to_1d_idx(Int i, Int j = 0, Int k = 0) const {
         ASSERT(i >= 0);
         ASSERT(i < Int(size_i()));
@@ -158,6 +197,44 @@ public:
     }
 
 protected:
+    Indices _1d_storage_idx_to_indices(St idx) const {
+        ASSERT(idx < _storage_size());
+        Indices res;
+        res[0] = Int(idx);
+        if constexpr (Dim >= 2) {
+            res[0] = Int(idx % _len[0]);
+            res[1] = Int(idx / _len[0]);
+        }
+        if constexpr (Dim >= 3) {
+            const St ij_size = _len[0] * _len[1];
+            const St rem = idx % ij_size;
+            res[0] = Int(rem % _len[0]);
+            res[1] = Int(rem / _len[0]);
+            res[2] = Int(idx / ij_size);
+        }
+        return res;
+    }
+
+    pNode _find_neighbor(
+        const Indices& storage_idx,
+        const Axes& axis,
+        const Orientation& ori) {
+        return const_cast<pNode>(
+            static_cast<const Self*>(this)->_find_neighbor(storage_idx, axis, ori));
+    }
+
+    const_pNode _find_neighbor(
+        const Indices& storage_idx,
+        const Axes& axis,
+        const Orientation& ori) const {
+        ASSERT(St(axis) < Dim);
+        auto target_indices = storage_idx.shift(axis, ori);
+        if (target_indices[axis] < 0 || target_indices[axis] >= Int(_len[axis])) {
+            return nullptr;
+        }
+        return _root_node_storage(target_indices);
+    }
+
     St _to_1d_storage_idx(St i, St j = 0, St k = 0) const {
         ASSERT(i < _len[0]);
         St idx = i;
@@ -237,12 +314,28 @@ protected:
         return _trees[_to_1d_storage_idx(i, j, k)];
     }
 
+    Tree& _tree_storage(const Indices& idx) {
+        return _tree_storage(St(idx.i()), St(idx.j()), St(idx.k()));
+    }
+
+    const Tree& _tree_storage(const Indices& idx) const {
+        return _tree_storage(St(idx.i()), St(idx.j()), St(idx.k()));
+    }
+
     pNode _root_node_storage(St i, St j = 0, St k = 0) {
         return _tree_storage(i, j, k).root;
     }
 
     const_pNode _root_node_storage(St i, St j = 0, St k = 0) const {
         return _tree_storage(i, j, k).root;
+    }
+
+    pNode _root_node_storage(const Indices& idx) {
+        return _tree_storage(idx).root;
+    }
+
+    const_pNode _root_node_storage(const Indices& idx) const {
+        return _tree_storage(idx).root;
     }
 
 };// <- End OGrid_
@@ -348,27 +441,13 @@ protected:
     }
 
     void _set_root_cells() {
-        if constexpr (Dim == 1) {
-            for (St i = 0; i < this->_storage_size_i(); ++i) {
-                ASSERT(this->_root_node_storage(i) != nullptr);
-                this->_root_node_storage(i)->cell = _make_cell(i);
-            }
-        } else if constexpr (Dim == 2) {
-            for (St i = 0; i < this->_storage_size_i(); ++i) {
-                for (St j = 0; j < this->_storage_size_j(); ++j) {
-                    ASSERT(this->_root_node_storage(i, j) != nullptr);
-                    this->_root_node_storage(i, j)->cell = _make_cell(i, j);
-                }
-            }
-        } else if constexpr (Dim == 3) {
-            for (St i = 0; i < this->_storage_size_i(); ++i) {
-                for (St j = 0; j < this->_storage_size_j(); ++j) {
-                    for (St k = 0; k < this->_storage_size_k(); ++k) {
-                        ASSERT(this->_root_node_storage(i, j, k) != nullptr);
-                        this->_root_node_storage(i, j, k)->cell = _make_cell(i, j, k);
-                    }
-                }
-            }
+        for (St i = 0; i < this->_trees.size(); ++i) {
+            auto& tree = this->_trees[i];
+            tree.set_root_idx(i);
+            auto root = tree.root;
+            ASSERT(root != nullptr);
+            const auto idx = this->_1d_storage_idx_to_indices(i);
+            root->cell = _make_cell(St(idx.i()), St(idx.j()), St(idx.k()));
         }
     }
 
