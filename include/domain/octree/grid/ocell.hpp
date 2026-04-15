@@ -456,10 +456,13 @@ public:
 								_cc_) :
 						true));
 	}
-	bool is_in_on(const Point_<vt, Dim>& p) const{
-		if (Dim >= 2) {
+
+	bool is_in_on(const Point& p) const{
+		if constexpr (Dim == 1) {
+			return this->is_in_on(p.x());
+		} else if constexpr (Dim == 2) {
 			return this->is_in_on(p.x(), p.y());
-		} else if (Dim >= 3) {
+		} else if constexpr (Dim == 3) {
 			return this->is_in_on(p.x(), p.y(), p.z());
 		} else {
 			return false;

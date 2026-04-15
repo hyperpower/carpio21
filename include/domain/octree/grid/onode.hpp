@@ -140,6 +140,7 @@ public:
 protected:
     St _level;
     St _idx;
+    St _root_idx;
 public:
     pNode father;
     pNode child[NumChildren];
@@ -154,6 +155,7 @@ public:
     ONode_() :
         _level(0),
         _idx(0),
+        _root_idx(0),
         father(nullptr),
         cell(),
         data()
@@ -169,6 +171,7 @@ public:
     ONode_(St idx, pNode f, const Cell& c, const Data& d) :
         _level(f == nullptr ? 0 : f->_level + 1),
         _idx(idx),
+        _root_idx(f == nullptr ? 0 : f->_root_idx),
         father(f),
         cell(c),
         data(d)
@@ -193,6 +196,7 @@ public:
     ONode_(const Self& s) :
         _level(s._level),
         _idx(s._idx),
+        _root_idx(s._root_idx),
         father(nullptr),
         cell(s.cell),
         data(s.data)
@@ -218,6 +222,7 @@ public:
         clear_children();
         _level = s._level;
         _idx   = s._idx;
+        _root_idx = s._root_idx;
         father = nullptr;
         cell   = s.cell;
         data   = s.data;
@@ -230,6 +235,19 @@ public:
             }
         }
         return *this;
+    }
+
+    St root_idx() const {
+        return _root_idx;
+    }
+
+    void set_root_idx(St idx) {
+        _root_idx = idx;
+        for (St i = 0; i < NumChildren; ++i) {
+            if (child[i] != nullptr) {
+                child[i]->set_root_idx(idx);
+            }
+        }
     }
 
     /*
@@ -292,6 +310,7 @@ public:
             pn->father = this;
             pn->_idx = idx;
             pn->_level = this->_level + 1;
+            pn->set_root_idx(this->_root_idx);
         }
     }
 
@@ -304,6 +323,18 @@ public:
         for (St i = 0; i < NumChildren; ++i) {
             new_child(i);
         }
+    }
+
+    pNode find_neighbor(const Node& node, const Direction& d) {
+        return const_cast<pNode>(
+            static_cast<const Self*>(this)->find_neighbor(node, d));
+    }
+
+    const_pNode find_neighbor(const Node& node, const Direction& d) const {
+        if (!_is_valid_neighbor_direction(d)) {
+            return nullptr;
+        }
+        return _find_neighbor(node, d);
     }
 
     /*
@@ -322,7 +353,38 @@ public:
             return res + 1;
         }
     }
-    
+
+protected:
+    static bool _is_valid_neighbor_direction(const Direction& d) {
+        if (!IsFaceDirection(d)) {
+            return false;
+        }
+        return St(FaceDirectionToAxes(d)) < Dim;
+    }
+
+    const_pNode _find_neighbor(const Node& node, const Direction& d) const {
+        ASSERT(_is_valid_neighbor_direction(d));
+        if (node.is_root()) {
+            return node.neighbor[FaceDirectionInOrder(d)];
+        }
+
+        const St mask = HI(d);
+        const St neighbor_child_idx = node._idx ^ mask;
+        if (!is_on_direction(node._idx, d)) {
+            return node.father->child[neighbor_child_idx];
+        }
+
+        const_pNode coarse_neighbor = _find_neighbor(*(node.father), d);
+        if (coarse_neighbor == nullptr) {
+            return nullptr;
+        }
+        if (coarse_neighbor->_level < node.father->_level) {
+            return coarse_neighbor;
+        }
+
+        const_pNode fine_neighbor = coarse_neighbor->child[neighbor_child_idx];
+        return fine_neighbor == nullptr ? coarse_neighbor : fine_neighbor;
+    }
 	
 };
 

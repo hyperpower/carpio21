@@ -170,3 +170,14 @@ TEST(ocell_uniform, works_as_ogrid_cell){
     EXPECT_DOUBLE_EQ(cell.get_hd(_X_), 0.125);
     EXPECT_DOUBLE_EQ(cell.get_hd(_Y_), 0.125);
 }
+
+TEST(ocell_nonuniform, point_in_on_checks_z_in_3d){
+    using Cell = OCellNonUniform_<double, 3>;
+    using Point = Cell::Point;
+
+    Cell cell(1.0, 0.5, 2.0, 0.5, 3.0, 0.5);
+
+    EXPECT_TRUE(cell.is_in_on(Point(1.0, 2.0, 3.0)));
+    EXPECT_TRUE(cell.is_in_on(Point(1.5, 2.5, 3.5)));
+    EXPECT_FALSE(cell.is_in_on(Point(1.0, 2.0, 3.51)));
+}

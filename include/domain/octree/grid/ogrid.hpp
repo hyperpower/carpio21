@@ -6,9 +6,11 @@
 #include "domain/base/indices.hpp"
 #include "onode.hpp"
 #include "ocell.hpp"
-#include "otree.hpp"
 
 #include <array>
+#include <cmath>
+#include <iterator>
+#include <type_traits>
 #include <vector>
 
 
@@ -16,6 +18,89 @@
 namespace carpio {
 
 struct OGridTag:  public OctreeTag, GridBaseTag{};
+
+template<class GRID, class NODE, class POINTER, class REFERENCE>
+class OGridIterator_ {
+    template<class, class, class, class>
+    friend class OGridIterator_;
+
+public:
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef NODE value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef POINTER pointer;
+    typedef REFERENCE reference;
+
+protected:
+    GRID* _grid;
+    St _idx;
+
+public:
+    OGridIterator_() :
+        _grid(nullptr),
+        _idx(0) {
+    }
+
+    OGridIterator_(GRID* grid, St idx) :
+        _grid(grid),
+        _idx(idx) {
+    }
+
+    template<
+        class OG, class ON, class OP, class OR,
+        std::enable_if_t<
+            std::is_convertible<OG*, GRID*>::value
+            && std::is_convertible<OP, POINTER>::value,
+            int> = 0>
+    OGridIterator_(const OGridIterator_<OG, ON, OP, OR>& other) :
+        _grid(other._grid),
+        _idx(other._idx) {
+    }
+
+    reference operator*() const {
+        ASSERT(_grid != nullptr);
+        ASSERT(_idx < _grid->size());
+        return *(_grid->root_node_1d_index(_idx));
+    }
+
+    pointer operator->() const {
+        return &(operator*());
+    }
+
+    OGridIterator_& operator++() {
+        ASSERT(_grid != nullptr);
+        ASSERT(_idx < _grid->size());
+        ++_idx;
+        return *this;
+    }
+
+    OGridIterator_ operator++(int) {
+        OGridIterator_ old(*this);
+        ++(*this);
+        return old;
+    }
+
+    OGridIterator_& operator--() {
+        ASSERT(_grid != nullptr);
+        ASSERT(_idx > 0);
+        --_idx;
+        return *this;
+    }
+
+    OGridIterator_ operator--(int) {
+        OGridIterator_ old(*this);
+        --(*this);
+        return old;
+    }
+
+    bool operator==(const OGridIterator_& other) const {
+        return _grid == other._grid && _idx == other._idx;
+    }
+
+    bool operator!=(const OGridIterator_& other) const {
+        return !(*this == other);
+    }
+};
 
 
 template<typename DATA, typename CELL, St DIM>
@@ -37,18 +122,16 @@ public:
     typedef typename Cell::vt vt;
     typedef typename Cell::Point Point;
 
-    typedef OTree_<DATA, CELL, DIM> Tree;
-    typedef Tree *pTree;
-    typedef const Tree *const_pTree;
-
-    typedef typename Tree::Node Node;
+    typedef ONode_<DATA, CELL, DIM> Node;
     typedef Node *pNode;
     typedef const Node *const_pNode;
+    typedef OGridIterator_<Self, Node, pNode, Node&> iterator;
+    typedef OGridIterator_<const Self, Node, const_pNode, const Node&> const_iterator;
 
 protected:
 
     std::array<St, Dim> _len;
-    std::vector<Tree> _trees;
+    std::vector<Node> _roots;
 
 public:
     /*
@@ -56,7 +139,7 @@ public:
      */
     OGrid_(St nx, St ny = 0, St nz = 0) :
         _len(),
-        _trees() {
+        _roots() {
         ASSERT(nx > 0);
         _len[0] = nx + 2;
         if constexpr (Dim >= 2) {
@@ -67,7 +150,8 @@ public:
             ASSERT(nz > 0);
             _len[2] = nz + 2;
         }
-        _trees.resize(_storage_size());
+        _roots.resize(_storage_size());
+        _set_root_indices();
     }
 
     OGrid_(const Self&) = delete;
@@ -105,32 +189,56 @@ public:
         return GhostLayer;
     }
 
-    Tree& tree_1d_index(St idx) {
+    iterator begin() {
+        return iterator(this, 0);
+    }
+
+    iterator end() {
+        return iterator(this, size());
+    }
+
+    const_iterator begin() const {
+        return const_iterator(this, 0);
+    }
+
+    const_iterator end() const {
+        return const_iterator(this, size());
+    }
+
+    const_iterator cbegin() const {
+        return const_iterator(this, 0);
+    }
+
+    const_iterator cend() const {
+        return const_iterator(this, size());
+    }
+
+    pNode root_node_1d_index(St idx) {
         ASSERT(idx < size());
         const auto arr = _to_idx(idx);
-        return tree(arr[0], Dim >= 2 ? arr[1] : 0, Dim >= 3 ? arr[2] : 0);
+        return root_node(arr[0], Dim >= 2 ? arr[1] : 0, Dim >= 3 ? arr[2] : 0);
     }
 
-    const Tree& tree_1d_index(St idx) const {
+    const_pNode root_node_1d_index(St idx) const {
         ASSERT(idx < size());
         const auto arr = _to_idx(idx);
-        return tree(arr[0], Dim >= 2 ? arr[1] : 0, Dim >= 3 ? arr[2] : 0);
-    }
-
-    Tree& tree(Int i, Int j = 0, Int k = 0) {
-        return _trees[to_1d_storage_idx(i, j, k)];
-    }
-
-    const Tree& tree(Int i, Int j = 0, Int k = 0) const {
-        return _trees[to_1d_storage_idx(i, j, k)];
+        return root_node(arr[0], Dim >= 2 ? arr[1] : 0, Dim >= 3 ? arr[2] : 0);
     }
 
     pNode root_node(Int i, Int j = 0, Int k = 0) {
-        return tree(i, j, k).root;
+        return &_roots[to_1d_storage_idx(i, j, k)];
     }
 
     const_pNode root_node(Int i, Int j = 0, Int k = 0) const {
-        return tree(i, j, k).root;
+        return &_roots[to_1d_storage_idx(i, j, k)];
+    }
+
+    pNode root_node(const Indices& idx) {
+        return root_node(idx.i(), idx.j(), idx.k());
+    }
+
+    const_pNode root_node(const Indices& idx) const {
+        return root_node(idx.i(), idx.j(), idx.k());
     }
 
     pNode find_neighbor(const Node& node, const Direction& d) {
@@ -140,6 +248,9 @@ public:
 
     const_pNode find_neighbor(const Node& node, const Direction& d) const {
         ASSERT(node.is_root());
+        if (!node.is_root()) {
+            return nullptr;
+        }
         ASSERT(IsFaceDirection(d));
         if (!IsFaceDirection(d)) {
             return nullptr;
@@ -150,24 +261,18 @@ public:
         if (St(axis) >= Dim) {
             return nullptr;
         }
-        for (St i = 0; i < _trees.size(); ++i) {
-            if (_trees[i].root == &node) {
-                return _find_neighbor(_1d_storage_idx_to_indices(i), axis, ori);
-            }
-        }
-        ASSERT(false);
-        return nullptr;
+        ASSERT(node.root_idx() < _storage_size());
+        return _find_neighbor(_1d_storage_idx_to_indices(node.root_idx()), axis, ori);
     }
 
     void connect_neighbors() {
-        for (St i = 0; i < _trees.size(); ++i) {
-            auto node = _trees[i].root;
-            ASSERT(node != nullptr);
+        for (St i = 0; i < _roots.size(); ++i) {
+            auto& node = _roots[i];
             const auto idx = _1d_storage_idx_to_indices(i);
             for (St n = 0; n < Node::NumNeighbors; ++n) {
                 Orientation ori;  Axes axis;
                 FaceDirectionToOrientationAndAxes(FaceDirectionInOrder(n), ori, axis);
-                node->neighbor[n] = _find_neighbor(idx, axis, ori);
+                node.neighbor[n] = _find_neighbor(idx, axis, ori);
             }
         }
     }
@@ -299,6 +404,12 @@ protected:
         }
     }
 
+    void _set_root_indices() {
+        for (St i = 0; i < _roots.size(); ++i) {
+            _roots[i].set_root_idx(i);
+        }
+    }
+
     St _to_storage_idx(Int idx, St dim) const {
         ASSERT(dim < Dim);
         ASSERT(idx >= -Int(GhostLayer));
@@ -306,36 +417,20 @@ protected:
         return St(idx + Int(GhostLayer));
     }
 
-    Tree& _tree_storage(St i, St j = 0, St k = 0) {
-        return _trees[_to_1d_storage_idx(i, j, k)];
-    }
-
-    const Tree& _tree_storage(St i, St j = 0, St k = 0) const {
-        return _trees[_to_1d_storage_idx(i, j, k)];
-    }
-
-    Tree& _tree_storage(const Indices& idx) {
-        return _tree_storage(St(idx.i()), St(idx.j()), St(idx.k()));
-    }
-
-    const Tree& _tree_storage(const Indices& idx) const {
-        return _tree_storage(St(idx.i()), St(idx.j()), St(idx.k()));
-    }
-
     pNode _root_node_storage(St i, St j = 0, St k = 0) {
-        return _tree_storage(i, j, k).root;
+        return &_roots[_to_1d_storage_idx(i, j, k)];
     }
 
     const_pNode _root_node_storage(St i, St j = 0, St k = 0) const {
-        return _tree_storage(i, j, k).root;
+        return &_roots[_to_1d_storage_idx(i, j, k)];
     }
 
     pNode _root_node_storage(const Indices& idx) {
-        return _tree_storage(idx).root;
+        return _root_node_storage(St(idx.i()), St(idx.j()), St(idx.k()));
     }
 
     const_pNode _root_node_storage(const Indices& idx) const {
-        return _tree_storage(idx).root;
+        return _root_node_storage(St(idx.i()), St(idx.j()), St(idx.k()));
     }
 
 };// <- End OGrid_
@@ -354,8 +449,9 @@ public:
     typedef typename Base::Point Point;
     typedef std::array<vt, Dim> ArrLength;
 
-    typedef typename Base::Tree Tree;
     typedef typename Base::Node Node;
+    typedef typename Base::pNode pNode;
+    typedef typename Base::const_pNode const_pNode;
 
 protected:
     Point _origin;
@@ -407,6 +503,35 @@ public:
         return _origin;
     }
 
+    pNode locate_root(const Point& p) {
+        return const_cast<pNode>(
+            static_cast<const Self*>(this)->locate_root(p));
+    }
+
+    const_pNode locate_root(const Point& p) const {
+        Int i = _locate_root_index(p, _X_);
+        Int j = 0;
+        Int k = 0;
+        if (!_is_valid_locate_root_index(i, _X_)) {
+            return nullptr;
+        }
+        if constexpr (Dim >= 2) {
+            j = _locate_root_index(p, _Y_);
+            if (!_is_valid_locate_root_index(j, _Y_)) {
+                return nullptr;
+            }
+        }
+        if constexpr (Dim >= 3) {
+            k = _locate_root_index(p, _Z_);
+            if (!_is_valid_locate_root_index(k, _Z_)) {
+                return nullptr;
+            }
+        }
+
+        const_pNode root = this->root_node(i, j, k);
+        return root->cell.is_in_on(p) ? root : nullptr;
+    }
+
 protected:
     Cell _make_cell(St i, St j = 0, St k = 0) const {
         vt cx = _center(i, _X_);
@@ -440,14 +565,30 @@ protected:
         return this->_size(dim);
     }
 
+    Int _locate_root_index(const Point& p, St dim) const {
+        ASSERT(dim < Dim);
+        const vt h = cell_size(dim);
+        const vt max = _origin(dim) + _length[dim];
+        if (p(dim) == max) {
+            return Int(_num_cells(dim)) - 1;
+        }
+        if (p(dim) == max + h) {
+            return Int(_num_cells(dim));
+        }
+        return Int(std::floor((p(dim) - _origin(dim)) / h));
+    }
+
+    bool _is_valid_locate_root_index(Int idx, St dim) const {
+        ASSERT(dim < Dim);
+        return idx >= -Int(Base::GhostLayer)
+            && idx <= Int(_num_cells(dim));
+    }
+
     void _set_root_cells() {
-        for (St i = 0; i < this->_trees.size(); ++i) {
-            auto& tree = this->_trees[i];
-            tree.set_root_idx(i);
-            auto root = tree.root;
-            ASSERT(root != nullptr);
+        for (St i = 0; i < this->_roots.size(); ++i) {
+            auto& root = this->_roots[i];
             const auto idx = this->_1d_storage_idx_to_indices(i);
-            root->cell = _make_cell(St(idx.i()), St(idx.j()), St(idx.k()));
+            root.cell = _make_cell(St(idx.i()), St(idx.j()), St(idx.k()));
         }
     }
 

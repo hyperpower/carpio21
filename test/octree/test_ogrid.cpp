@@ -4,6 +4,8 @@
 #include "domain/octree/io/ognuplot_actor_label.hpp"
 #include "domain/octree/io/ognuplot_actor_wire_frame.hpp"
 
+#include <iterator>
+#include <random>
 #include <type_traits>
 
 
@@ -30,6 +32,7 @@ TEST(ogrid, constructs_padded_tree_array_1d){
     EXPECT_EQ(grid.size(), 5);
     ASSERT_NE(grid.root_node(0), nullptr);
     EXPECT_TRUE(grid.root_node(0)->is_root());
+    EXPECT_EQ(grid.root_node(0)->root_idx(), grid.to_1d_storage_idx(0));
 }
 
 TEST(ogrid, constructs_padded_tree_array_2d){
@@ -44,24 +47,129 @@ TEST(ogrid, constructs_padded_tree_array_2d){
     EXPECT_EQ(grid.size(), 12);
     ASSERT_NE(grid.root_node(0, 0), nullptr);
     EXPECT_TRUE(grid.root_node(0, 0)->is_root());
+    EXPECT_EQ(grid.root_node(0, 0)->root_idx(), grid.to_1d_storage_idx(0, 0));
 }
 
-TEST(ogrid, accesses_tree_by_1d_index_2d){
+TEST(ogrid, accesses_root_node_by_1d_index_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Grid = OGrid_<double, Cell, 2>;
 
     Grid grid(3, 4);
 
-    EXPECT_EQ(&grid.tree_1d_index(0), &grid.tree(0, 0));
-    EXPECT_EQ(&grid.tree_1d_index(1), &grid.tree(1, 0));
-    EXPECT_EQ(&grid.tree_1d_index(3), &grid.tree(0, 1));
-    EXPECT_EQ(&grid.tree_1d_index(11), &grid.tree(2, 3));
+    EXPECT_EQ(grid.root_node_1d_index(0), grid.root_node(0, 0));
+    EXPECT_EQ(grid.root_node_1d_index(1), grid.root_node(1, 0));
+    EXPECT_EQ(grid.root_node_1d_index(3), grid.root_node(0, 1));
+    EXPECT_EQ(grid.root_node_1d_index(11), grid.root_node(2, 3));
 
     const Grid& const_grid = grid;
-    EXPECT_EQ(&const_grid.tree_1d_index(0), &const_grid.tree(0, 0));
-    EXPECT_EQ(&const_grid.tree_1d_index(1), &const_grid.tree(1, 0));
-    EXPECT_EQ(&const_grid.tree_1d_index(3), &const_grid.tree(0, 1));
-    EXPECT_EQ(&const_grid.tree_1d_index(11), &const_grid.tree(2, 3));
+    EXPECT_EQ(const_grid.root_node_1d_index(0), const_grid.root_node(0, 0));
+    EXPECT_EQ(const_grid.root_node_1d_index(1), const_grid.root_node(1, 0));
+    EXPECT_EQ(const_grid.root_node_1d_index(3), const_grid.root_node(0, 1));
+    EXPECT_EQ(const_grid.root_node_1d_index(11), const_grid.root_node(2, 3));
+}
+
+TEST(ogrid, accesses_root_node_by_indices){
+    using Cell = OCellNonUniform_<double, 2>;
+    using Grid = OGrid_<double, Cell, 2>;
+
+    Grid grid(3, 4);
+
+    EXPECT_EQ(grid.root_node(Grid::Indices(0, 0)), grid.root_node(0, 0));
+    EXPECT_EQ(grid.root_node(Grid::Indices(2, 3)), grid.root_node(2, 3));
+    EXPECT_EQ(grid.root_node(Grid::Indices(-1, -1)), grid.root_node(-1, -1));
+    EXPECT_EQ(grid.root_node(Grid::Indices(3, 4)), grid.root_node(3, 4));
+
+    const Grid& const_grid = grid;
+    EXPECT_EQ(const_grid.root_node(Grid::Indices(1, 2)), const_grid.root_node(1, 2));
+}
+
+TEST(ogrid, iterates_interior_root_nodes_2d){
+    using Cell = OCellNonUniform_<double, 2>;
+    using Grid = OGrid_<double, Cell, 2>;
+
+    Grid grid(3, 4);
+
+    static_assert(std::is_same_v<
+        typename std::iterator_traits<Grid::iterator>::iterator_category,
+        std::bidirectional_iterator_tag>);
+    static_assert(std::is_same_v<
+        typename std::iterator_traits<Grid::const_iterator>::iterator_category,
+        std::bidirectional_iterator_tag>);
+    static_assert(std::is_same_v<decltype(*grid.begin()), Grid::Node&>);
+
+    St count = 0;
+    for (auto& node : grid) {
+        const auto i = Int(count % grid.size_i());
+        const auto j = Int(count / grid.size_i());
+        EXPECT_EQ(&node, grid.root_node_1d_index(count));
+        EXPECT_EQ(node.root_idx(), grid.to_1d_storage_idx(i, j));
+        EXPECT_NE(node.root_idx(), grid.to_1d_storage_idx(-1, -1));
+        ++count;
+    }
+    EXPECT_EQ(count, grid.size());
+
+    auto last = grid.end();
+    --last;
+    EXPECT_EQ(&(*last), grid.root_node_1d_index(grid.size() - 1));
+
+    count = 0;
+    for (auto it = grid.end(); it != grid.begin();) {
+        --it;
+        const auto expected = grid.size() - 1 - count;
+        EXPECT_EQ(&(*it), grid.root_node_1d_index(expected));
+        ++count;
+    }
+    EXPECT_EQ(count, grid.size());
+}
+
+TEST(ogrid, iterates_const_interior_root_nodes_2d){
+    using Cell = OCellNonUniform_<double, 2>;
+    using Grid = OGrid_<double, Cell, 2>;
+
+    Grid grid(3, 4);
+    const Grid& const_grid = grid;
+
+    static_assert(std::is_same_v<decltype(*const_grid.begin()), const Grid::Node&>);
+    static_assert(std::is_same_v<decltype(*const_grid.cbegin()), const Grid::Node&>);
+
+    St count = 0;
+    for (auto it = const_grid.cbegin(); it != const_grid.cend(); ++it) {
+        EXPECT_EQ(&(*it), const_grid.root_node_1d_index(count));
+        ++count;
+    }
+    EXPECT_EQ(count, const_grid.size());
+
+    auto last = std::prev(const_grid.end());
+    EXPECT_EQ(&(*last), const_grid.root_node_1d_index(const_grid.size() - 1));
+}
+
+TEST(ogrid, iterates_interior_root_nodes_3d){
+    using Cell = OCellNonUniform_<double, 3>;
+    using Grid = OGrid_<double, Cell, 3>;
+
+    Grid grid(2, 3, 4);
+
+    St count = 0;
+    for (auto it = grid.begin(); it != grid.end(); ++it) {
+        const auto ij_size = grid.size_i() * grid.size_j();
+        const auto rem = count % ij_size;
+        const auto i = Int(rem % grid.size_i());
+        const auto j = Int(rem / grid.size_i());
+        const auto k = Int(count / ij_size);
+        EXPECT_EQ(&(*it), grid.root_node_1d_index(count));
+        EXPECT_EQ(it->root_idx(), grid.to_1d_storage_idx(i, j, k));
+        ++count;
+    }
+    EXPECT_EQ(count, grid.size());
+
+    count = 0;
+    for (auto it = grid.end(); it != grid.begin();) {
+        --it;
+        const auto expected = grid.size() - 1 - count;
+        EXPECT_EQ(&(*it), grid.root_node_1d_index(expected));
+        ++count;
+    }
+    EXPECT_EQ(count, grid.size());
 }
 
 TEST(ogrid, uses_x_then_y_then_z_storage_order){
@@ -115,6 +223,7 @@ TEST(ogrid, connects_root_neighbors_2d){
     root->set_child(Node::Idx::_PP_, new Node());
     auto child = root->child[Node::Idx::_PP_];
     ASSERT_NE(child, nullptr);
+    EXPECT_EQ(child->root_idx(), root->root_idx());
 
     grid.connect_neighbors();
 
@@ -230,6 +339,51 @@ TEST(ogrid, gnuplot_simple_grid_2d){
     gnu.plot();
 }
 
+TEST(ogrid, gnuplot_random_grid_4x5_2d){
+    using Cell = OCellUniform_<double, 2>;
+    using Grid = OGridNonUniform_<double, Cell, 2>;
+    using Node = Grid::Node;
+    using Point = Grid::Point;
+
+    Grid grid(Point(0.0, 0.0), 0.25, 4, 5);
+    std::mt19937 rng(20260415);
+    std::uniform_real_distribution<double> uniform(0.0, 1.0);
+    St refined = 0;
+
+    auto refine_randomly = [&](auto&& self, Node* node, St depth) -> void {
+        ASSERT(node != nullptr);
+        if (depth >= 3) {
+            return;
+        }
+        const double probability = depth == 0 ? 0.35 : 0.55;
+        if (uniform(rng) > probability) {
+            return;
+        }
+        node->new_full_children();
+        ++refined;
+        for (St i = 0; i < Node::NumChildren; ++i) {
+            self(self, node->child[i], depth + 1);
+        }
+    };
+
+    for (auto& root : grid) {
+        refine_randomly(refine_randomly, &root, 0);
+    }
+    EXPECT_GT(refined, 0);
+
+    Gnuplot gnu;
+    gnu.set_xrange(-0.05, 1.05);
+    gnu.set_yrange(-0.05, 1.30);
+    gnu.set_equal_aspect_ratio();
+    auto agrid = ToGnuplotActorWireFrame(grid);
+    auto aindex = ToGnuplotActorLabel(grid, "root_index");
+    agrid.line_width(2);
+    gnu.add(agrid);
+    gnu.add(aindex);
+    gnu.set_terminal_png(FIG_PATH + "OctreeOGridRandom4x5", fig_width, fig_height);
+    gnu.plot();
+}
+
 TEST(ogrid, constructs_by_cell_length_and_direction_counts_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Grid = OGridNonUniform_<double, Cell, 2>;
@@ -266,19 +420,20 @@ TEST(ogrid, constructs_padded_tree_array_3d){
     EXPECT_EQ(grid.size(), 24);
     ASSERT_NE(grid.root_node(0, 0, 0), nullptr);
     EXPECT_TRUE(grid.root_node(0, 0, 0)->is_root());
+    EXPECT_EQ(grid.root_node(0, 0, 0)->root_idx(), grid.to_1d_storage_idx(0, 0, 0));
 }
 
-TEST(ogrid, accesses_tree_by_1d_index_3d){
+TEST(ogrid, accesses_root_node_by_1d_index_3d){
     using Cell = OCellNonUniform_<double, 3>;
     using Grid = OGrid_<double, Cell, 3>;
 
     Grid grid(2, 3, 4);
 
-    EXPECT_EQ(&grid.tree_1d_index(0), &grid.tree(0, 0, 0));
-    EXPECT_EQ(&grid.tree_1d_index(1), &grid.tree(1, 0, 0));
-    EXPECT_EQ(&grid.tree_1d_index(2), &grid.tree(0, 1, 0));
-    EXPECT_EQ(&grid.tree_1d_index(6), &grid.tree(0, 0, 1));
-    EXPECT_EQ(&grid.tree_1d_index(23), &grid.tree(1, 2, 3));
+    EXPECT_EQ(grid.root_node_1d_index(0), grid.root_node(0, 0, 0));
+    EXPECT_EQ(grid.root_node_1d_index(1), grid.root_node(1, 0, 0));
+    EXPECT_EQ(grid.root_node_1d_index(2), grid.root_node(0, 1, 0));
+    EXPECT_EQ(grid.root_node_1d_index(6), grid.root_node(0, 0, 1));
+    EXPECT_EQ(grid.root_node_1d_index(23), grid.root_node(1, 2, 3));
 }
 
 TEST(ogrid, constructs_cube_geometry_3d){
@@ -299,6 +454,48 @@ TEST(ogrid, constructs_cube_geometry_3d){
     EXPECT_DOUBLE_EQ(grid.cell_size(_Y_), 1.0);
     EXPECT_DOUBLE_EQ(grid.cell_size(_Z_), 1.0);
     EXPECT_DOUBLE_EQ(grid.root_node(0, 0, 0)->cell.volume(), 1.0);
+}
+
+TEST(ogrid, locates_root_by_point_3d){
+    using Cell = OCellNonUniform_<double, 3>;
+    using Grid = OGridNonUniform_<double, Cell, 3>;
+    using Point = Grid::Point;
+
+    Grid grid(Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
+    const Grid& const_grid = grid;
+
+    EXPECT_EQ(grid.locate_root(Point(0.25, 0.25, 0.25)),
+              grid.root_node(0, 0, 0));
+    EXPECT_EQ(grid.locate_root(Point(1.25, 1.25, 0.25)),
+              grid.root_node(1, 1, 0));
+    EXPECT_EQ(grid.locate_root(Point(0.0, 0.0, 0.0)),
+              grid.root_node(0, 0, 0));
+    EXPECT_EQ(grid.locate_root(Point(2.0, 2.0, 2.0)),
+              grid.root_node(1, 1, 1));
+    EXPECT_EQ(grid.locate_root(Point(1.0, 0.25, 0.25)),
+              grid.root_node(1, 0, 0));
+    EXPECT_EQ(grid.locate_root(Point(-0.25, 0.25, 0.25)),
+              grid.root_node(-1, 0, 0));
+    EXPECT_EQ(grid.locate_root(Point(2.25, 1.25, 1.25)),
+              grid.root_node(2, 1, 1));
+    EXPECT_EQ(grid.locate_root(Point(3.01, 1.25, 1.25)), nullptr);
+    EXPECT_EQ(const_grid.locate_root(Point(1.25, 0.25, 1.25)),
+              const_grid.root_node(1, 0, 1));
+}
+
+TEST(ogrid, locates_root_by_point_2d){
+    using Cell = OCellNonUniform_<double, 2>;
+    using Grid = OGridNonUniform_<double, Cell, 2>;
+    using Point = Grid::Point;
+
+    Grid grid(Point(0.0, 0.0), 0.5, 3, 4);
+
+    EXPECT_EQ(grid.locate_root(Point(0.25, 0.25)), grid.root_node(0, 0));
+    EXPECT_EQ(grid.locate_root(Point(0.5, 0.25)), grid.root_node(1, 0));
+    EXPECT_EQ(grid.locate_root(Point(1.5, 2.0)), grid.root_node(2, 3));
+    EXPECT_EQ(grid.locate_root(Point(-0.25, 0.25)), grid.root_node(-1, 0));
+    EXPECT_EQ(grid.locate_root(Point(1.75, 0.25)), grid.root_node(3, 0));
+    EXPECT_EQ(grid.locate_root(Point(2.01, 0.25)), nullptr);
 }
 
 TEST(ogrid, is_not_copyable){
