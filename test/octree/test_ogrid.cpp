@@ -98,9 +98,11 @@ TEST(ogrid, iterates_interior_root_nodes_2d){
     static_assert(std::is_same_v<decltype(*grid.begin()), Grid::Node&>);
 
     St count = 0;
-    for (auto& node : grid) {
+    for (auto it = grid.begin(); it != grid.end(); ++it) {
+        auto& node = *it;
         const auto i = Int(count % grid.size_i());
         const auto j = Int(count / grid.size_i());
+        EXPECT_EQ(it.indices(), Grid::Indices(i, j));
         EXPECT_EQ(&node, grid.root_node_1d_index(count));
         EXPECT_EQ(node.root_idx(), grid.to_1d_storage_idx(i, j));
         EXPECT_NE(node.root_idx(), grid.to_1d_storage_idx(-1, -1));
@@ -111,11 +113,15 @@ TEST(ogrid, iterates_interior_root_nodes_2d){
     auto last = grid.end();
     --last;
     EXPECT_EQ(&(*last), grid.root_node_1d_index(grid.size() - 1));
+    EXPECT_EQ(last.indices(), Grid::Indices(2, 3));
 
     count = 0;
     for (auto it = grid.end(); it != grid.begin();) {
         --it;
         const auto expected = grid.size() - 1 - count;
+        const auto i = Int(expected % grid.size_i());
+        const auto j = Int(expected / grid.size_i());
+        EXPECT_EQ(it.indices(), Grid::Indices(i, j));
         EXPECT_EQ(&(*it), grid.root_node_1d_index(expected));
         ++count;
     }
@@ -134,6 +140,9 @@ TEST(ogrid, iterates_const_interior_root_nodes_2d){
 
     St count = 0;
     for (auto it = const_grid.cbegin(); it != const_grid.cend(); ++it) {
+        const auto i = Int(count % const_grid.size_i());
+        const auto j = Int(count / const_grid.size_i());
+        EXPECT_EQ(it.indices(), Grid::Indices(i, j));
         EXPECT_EQ(&(*it), const_grid.root_node_1d_index(count));
         ++count;
     }
@@ -156,6 +165,7 @@ TEST(ogrid, iterates_interior_root_nodes_3d){
         const auto i = Int(rem % grid.size_i());
         const auto j = Int(rem / grid.size_i());
         const auto k = Int(count / ij_size);
+        EXPECT_EQ(it.indices(), Grid::Indices(i, j, k));
         EXPECT_EQ(&(*it), grid.root_node_1d_index(count));
         EXPECT_EQ(it->root_idx(), grid.to_1d_storage_idx(i, j, k));
         ++count;
@@ -166,6 +176,12 @@ TEST(ogrid, iterates_interior_root_nodes_3d){
     for (auto it = grid.end(); it != grid.begin();) {
         --it;
         const auto expected = grid.size() - 1 - count;
+        const auto ij_size = grid.size_i() * grid.size_j();
+        const auto rem = expected % ij_size;
+        const auto i = Int(rem % grid.size_i());
+        const auto j = Int(rem / grid.size_i());
+        const auto k = Int(expected / ij_size);
+        EXPECT_EQ(it.indices(), Grid::Indices(i, j, k));
         EXPECT_EQ(&(*it), grid.root_node_1d_index(expected));
         ++count;
     }
@@ -182,6 +198,7 @@ TEST(ogrid, uses_x_then_y_then_z_storage_order){
     EXPECT_EQ(grid2.to_1d_idx(1, 0), 1);
     EXPECT_EQ(grid2.to_1d_idx(0, 1), 3);
     EXPECT_EQ(grid2.to_1d_idx(2, 3), 11);
+    EXPECT_EQ(grid2.to_indices(11), Grid2::Indices(2, 3));
 
     EXPECT_EQ(grid2.to_1d_storage_idx(-1, -1), 0);
     EXPECT_EQ(grid2.to_1d_storage_idx(0, -1), 1);
@@ -199,6 +216,7 @@ TEST(ogrid, uses_x_then_y_then_z_storage_order){
     EXPECT_EQ(grid3.to_1d_idx(0, 1, 0), 2);
     EXPECT_EQ(grid3.to_1d_idx(0, 0, 1), 6);
     EXPECT_EQ(grid3.to_1d_idx(1, 2, 3), 23);
+    EXPECT_EQ(grid3.to_indices(23), Grid3::Indices(1, 2, 3));
 
     EXPECT_EQ(grid3.to_1d_storage_idx(-1, -1, -1), 0);
     EXPECT_EQ(grid3.to_1d_storage_idx(0, -1, -1), 1);
@@ -231,7 +249,8 @@ TEST(ogrid, connects_root_neighbors_2d){
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_XM_)], grid.root_node(-1, 0));
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YP_)], grid.root_node(0, 1));
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YM_)], grid.root_node(0, -1));
-    EXPECT_EQ(grid.find_neighbor(*root, _XP_), grid.root_node(1, 0));
+    EXPECT_EQ(grid.find_face_neighbor(root, _XP_), grid.root_node(1, 0));
+    EXPECT_EQ(grid.find_face_neighbor(nullptr, _XP_), nullptr);
 
     EXPECT_EQ(grid.root_node(-1, 0)->neighbor[FaceDirectionInOrder(_XP_)],
               grid.root_node(0, 0));
@@ -259,7 +278,7 @@ TEST(ogrid, connects_root_neighbors_3d){
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_XM_)], grid.root_node(-1, 0, 0));
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YM_)], grid.root_node(0, -1, 0));
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_ZM_)], grid.root_node(0, 0, -1));
-    EXPECT_EQ(grid.find_neighbor(*root, _ZP_), grid.root_node(0, 0, 1));
+    EXPECT_EQ(grid.find_face_neighbor(root, _ZP_), grid.root_node(0, 0, 1));
 
     EXPECT_EQ(grid.root_node(-1, 0, 0)->neighbor[FaceDirectionInOrder(_XP_)],
               grid.root_node(0, 0, 0));
@@ -371,15 +390,32 @@ TEST(ogrid, gnuplot_random_grid_4x5_2d){
     }
     EXPECT_GT(refined, 0);
 
+    grid.connect_neighbors();
+
     Gnuplot gnu;
     gnu.set_xrange(-0.05, 1.05);
     gnu.set_yrange(-0.05, 1.30);
     gnu.set_equal_aspect_ratio();
     auto agrid = ToGnuplotActorWireFrame(grid);
-    auto aindex = ToGnuplotActorLabel(grid, "root_index");
-    agrid.line_width(2);
+    auto& n1 = *grid.locate(Point(0.4, 0.36));
+    auto anode = ToGnuplotActorWireFrame(n1);
+    anode.line_width(2);
+    anode.line_color("red");
+    agrid.line_width(1);
+    auto nn = n1.find_face_neighbor(&n1, _YM_);
+    if (nn != nullptr) {
+        auto anode2 = ToGnuplotActorWireFrame(*nn);
+        auto al = ToGnuplotActorLabel(*nn, "level");
+        anode2.line_width(2);
+        anode2.line_color("blue");
+        gnu.add(al);
+        gnu.add(anode2);
+    }else{
+        std::cerr << "No neighbor in direction\n";
+    }
+
     gnu.add(agrid);
-    gnu.add(aindex);
+    gnu.add(anode);
     gnu.set_terminal_png(FIG_PATH + "OctreeOGridRandom4x5", fig_width, fig_height);
     gnu.plot();
 }
@@ -496,6 +532,79 @@ TEST(ogrid, locates_root_by_point_2d){
     EXPECT_EQ(grid.locate_root(Point(-0.25, 0.25)), grid.root_node(-1, 0));
     EXPECT_EQ(grid.locate_root(Point(1.75, 0.25)), grid.root_node(3, 0));
     EXPECT_EQ(grid.locate_root(Point(2.01, 0.25)), nullptr);
+
+    Gnuplot gnu;
+    gnu.set_xrange(-0.05, 2.05);
+    gnu.set_yrange(-0.05, 2.30);
+    gnu.set_equal_aspect_ratio();
+    auto agrid = ToGnuplotActorWireFrame(grid);
+    agrid.line_width(1);
+    auto anode = ToGnuplotActorWireFrame(*grid.locate_root(Point(0.5, 2.0)));
+    anode.line_width(2);
+    gnu.add(agrid);
+    gnu.add(anode);
+
+    gnu.set_terminal_png(FIG_PATH + "OctreeLocateRoot2D", fig_width, fig_height);
+    gnu.plot();
+}
+
+TEST(ogrid, locates_deepest_existing_node_by_point_2d){
+    using Cell = OCellUniform_<double, 2>;
+    using Grid = OGridNonUniform_<double, Cell, 2>;
+    using Node = Grid::Node;
+    using Point = Grid::Point;
+
+    Grid grid(Point(0.0, 0.0), 1.0, 2, 2);
+    auto root = grid.root_node(0, 0);
+    ASSERT_NE(root, nullptr);
+    const Grid& const_grid = grid;
+
+    EXPECT_EQ(grid.locate(Point(0.25, 0.25)), root);
+
+    root->new_full_children();
+    EXPECT_EQ(grid.locate(Point(0.75, 0.75)), root->child[Node::Idx::_PP_]);
+    EXPECT_EQ(grid.locate(Point(0.5, 0.5)), root->child[Node::Idx::_PP_]);
+
+    auto child = root->child[Node::Idx::_PP_];
+    ASSERT_NE(child, nullptr);
+    child->new_full_children();
+    EXPECT_EQ(grid.locate(Point(0.875, 0.625)),
+              child->child[Node::Idx::_MP_]);
+    EXPECT_EQ(const_grid.locate(Point(0.875, 0.625)),
+              child->child[Node::Idx::_MP_]);
+}
+
+TEST(ogrid, locates_parent_when_target_child_is_missing_2d){
+    using Cell = OCellUniform_<double, 2>;
+    using Grid = OGridNonUniform_<double, Cell, 2>;
+    using Node = Grid::Node;
+    using Point = Grid::Point;
+
+    Grid grid(Point(0.0, 0.0), 1.0, 1, 1);
+    auto root = grid.root_node(0, 0);
+    ASSERT_NE(root, nullptr);
+
+    root->new_child(Node::Idx::_MM_);
+
+    EXPECT_EQ(grid.locate(Point(0.25, 0.25)), root->child[Node::Idx::_MM_]);
+    EXPECT_EQ(grid.locate(Point(0.75, 0.75)), root);
+    EXPECT_EQ(grid.locate(Point(2.01, 0.25)), nullptr);
+}
+
+TEST(ogrid, locates_deepest_existing_node_by_point_3d){
+    using Cell = OCellUniform_<double, 3>;
+    using Grid = OGridNonUniform_<double, Cell, 3>;
+    using Node = Grid::Node;
+    using Point = Grid::Point;
+
+    Grid grid(Point(0.0, 0.0, 0.0), 1.0, 1, 1, 1);
+    auto root = grid.root_node(0, 0, 0);
+    ASSERT_NE(root, nullptr);
+
+    root->new_full_children();
+
+    EXPECT_EQ(grid.locate(Point(0.75, 0.25, 0.75)),
+              root->child[Node::Idx::_PMP_]);
 }
 
 TEST(ogrid, is_not_copyable){

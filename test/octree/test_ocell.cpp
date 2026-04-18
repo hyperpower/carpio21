@@ -34,7 +34,11 @@ TEST(ocell_uniform, geometry_2d){
     EXPECT_DOUBLE_EQ(cell.get_hd(_Y_), 0.25);
     EXPECT_DOUBLE_EQ(cell.volume(), 0.25);
 
-    const auto origin = cell.get_origin();
+    const auto center = cell.center();
+    EXPECT_DOUBLE_EQ(center.x(), 1.0);
+    EXPECT_DOUBLE_EQ(center.y(), 2.0);
+
+    const auto origin = cell.origin();
     EXPECT_DOUBLE_EQ(origin.x(), 0.75);
     EXPECT_DOUBLE_EQ(origin.y(), 1.75);
 
@@ -92,6 +96,10 @@ TEST(ocell_uniform, geometry_3d){
     EXPECT_DOUBLE_EQ(cell.get_d(_Y_), 1.0);
     EXPECT_DOUBLE_EQ(cell.get_d(_Z_), 1.0);
     EXPECT_DOUBLE_EQ(cell.volume(), 1.0);
+    const auto center = cell.center();
+    EXPECT_DOUBLE_EQ(center.x(), 1.0);
+    EXPECT_DOUBLE_EQ(center.y(), 2.0);
+    EXPECT_DOUBLE_EQ(center.z(), 3.0);
     EXPECT_TRUE(cell.is_in_on(1.5, 2.5, 3.5));
     EXPECT_FALSE(cell.is_in_on(1.51, 2.0, 3.0));
 }
@@ -122,12 +130,12 @@ TEST(ocell_uniform, make_sub_cell_2d){
     EXPECT_DOUBLE_EQ(mm.get_hd(_Y_), 0.5);
 
     const auto mp = cell.make_sub_cell(1);
-    EXPECT_DOUBLE_EQ(mp.get(_C_, _X_), -0.5);
-    EXPECT_DOUBLE_EQ(mp.get(_C_, _Y_), 0.5);
+    EXPECT_DOUBLE_EQ(mp.get(_C_, _X_), 0.5);
+    EXPECT_DOUBLE_EQ(mp.get(_C_, _Y_), -0.5);
 
     const auto pm = cell.make_sub_cell(2);
-    EXPECT_DOUBLE_EQ(pm.get(_C_, _X_), 0.5);
-    EXPECT_DOUBLE_EQ(pm.get(_C_, _Y_), -0.5);
+    EXPECT_DOUBLE_EQ(pm.get(_C_, _X_), -0.5);
+    EXPECT_DOUBLE_EQ(pm.get(_C_, _Y_), 0.5);
 
     const auto pp = cell.make_sub_cell(3);
     EXPECT_DOUBLE_EQ(pp.get(_C_, _X_), 0.5);
@@ -146,6 +154,16 @@ TEST(ocell_uniform, make_sub_cell_3d){
     EXPECT_DOUBLE_EQ(mmm.get_hd(_X_), 0.5);
     EXPECT_DOUBLE_EQ(mmm.get_hd(_Y_), 0.5);
     EXPECT_DOUBLE_EQ(mmm.get_hd(_Z_), 0.5);
+
+    const auto mmp = cell.make_sub_cell(1);
+    EXPECT_DOUBLE_EQ(mmp.get(_C_, _X_), 0.5);
+    EXPECT_DOUBLE_EQ(mmp.get(_C_, _Y_), -0.5);
+    EXPECT_DOUBLE_EQ(mmp.get(_C_, _Z_), -0.5);
+
+    const auto pmm = cell.make_sub_cell(4);
+    EXPECT_DOUBLE_EQ(pmm.get(_C_, _X_), -0.5);
+    EXPECT_DOUBLE_EQ(pmm.get(_C_, _Y_), -0.5);
+    EXPECT_DOUBLE_EQ(pmm.get(_C_, _Z_), 0.5);
 
     const auto pmp = cell.make_sub_cell(5);
     EXPECT_DOUBLE_EQ(pmp.get(_C_, _X_), 0.5);
@@ -176,6 +194,11 @@ TEST(ocell_nonuniform, point_in_on_checks_z_in_3d){
     using Point = Cell::Point;
 
     Cell cell(1.0, 0.5, 2.0, 0.5, 3.0, 0.5);
+
+    const auto center = cell.center();
+    EXPECT_DOUBLE_EQ(center.x(), 1.0);
+    EXPECT_DOUBLE_EQ(center.y(), 2.0);
+    EXPECT_DOUBLE_EQ(center.z(), 3.0);
 
     EXPECT_TRUE(cell.is_in_on(Point(1.0, 2.0, 3.0)));
     EXPECT_TRUE(cell.is_in_on(Point(1.5, 2.5, 3.5)));

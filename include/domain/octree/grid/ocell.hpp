@@ -113,7 +113,15 @@ public:
 		return res;
 	}
 
-	inline Point get_origin() const {
+	inline Point center() const {
+		Point res;
+		for (St i = 0; i < Dim; ++i) {
+			res(i) = _center[i];
+		}
+		return res;
+	}
+
+	inline Point origin() const {
 		Point res;
 		for (St i = 0; i < Dim; ++i) {
 			res(i) = _center[i] - _hd;
@@ -135,7 +143,7 @@ public:
 		vt sub_hd = _hd * 0.5;
 		vt center[Dim];
 		for (St d = 0; d < Dim; ++d) {
-			const St bit = Dim - 1 - d;
+			const St bit = d;
 			const bool is_p = ((idx >> bit) & 1) == 1;
 			center[d] = _center[d] + (is_p ? sub_hd : -sub_hd);
 		}
@@ -386,7 +394,15 @@ public:
 		return res;
 	}
 
-	inline Point get_origin() const {
+	inline Point center() const {
+		Point res;
+		for (St i = 0; i < Dim; ++i) {
+			res(i) = _center[i];
+		}
+		return res;
+	}
+
+	inline Point origin() const {
 		Point res;
 		for (St i = 0; i < Dim; ++i) {
 			res(i) = this->get(_M_, i);

@@ -6,11 +6,10 @@
 #include "domain/base/indices.hpp"
 #include "onode.hpp"
 #include "ocell.hpp"
+#include "ogrid_root_iterator.hpp"
 
 #include <array>
 #include <cmath>
-#include <iterator>
-#include <type_traits>
 #include <vector>
 
 
@@ -18,90 +17,6 @@
 namespace carpio {
 
 struct OGridTag:  public OctreeTag, GridBaseTag{};
-
-template<class GRID, class NODE, class POINTER, class REFERENCE>
-class OGridIterator_ {
-    template<class, class, class, class>
-    friend class OGridIterator_;
-
-public:
-    typedef std::bidirectional_iterator_tag iterator_category;
-    typedef NODE value_type;
-    typedef std::ptrdiff_t difference_type;
-    typedef POINTER pointer;
-    typedef REFERENCE reference;
-
-protected:
-    GRID* _grid;
-    St _idx;
-
-public:
-    OGridIterator_() :
-        _grid(nullptr),
-        _idx(0) {
-    }
-
-    OGridIterator_(GRID* grid, St idx) :
-        _grid(grid),
-        _idx(idx) {
-    }
-
-    template<
-        class OG, class ON, class OP, class OR,
-        std::enable_if_t<
-            std::is_convertible<OG*, GRID*>::value
-            && std::is_convertible<OP, POINTER>::value,
-            int> = 0>
-    OGridIterator_(const OGridIterator_<OG, ON, OP, OR>& other) :
-        _grid(other._grid),
-        _idx(other._idx) {
-    }
-
-    reference operator*() const {
-        ASSERT(_grid != nullptr);
-        ASSERT(_idx < _grid->size());
-        return *(_grid->root_node_1d_index(_idx));
-    }
-
-    pointer operator->() const {
-        return &(operator*());
-    }
-
-    OGridIterator_& operator++() {
-        ASSERT(_grid != nullptr);
-        ASSERT(_idx < _grid->size());
-        ++_idx;
-        return *this;
-    }
-
-    OGridIterator_ operator++(int) {
-        OGridIterator_ old(*this);
-        ++(*this);
-        return old;
-    }
-
-    OGridIterator_& operator--() {
-        ASSERT(_grid != nullptr);
-        ASSERT(_idx > 0);
-        --_idx;
-        return *this;
-    }
-
-    OGridIterator_ operator--(int) {
-        OGridIterator_ old(*this);
-        --(*this);
-        return old;
-    }
-
-    bool operator==(const OGridIterator_& other) const {
-        return _grid == other._grid && _idx == other._idx;
-    }
-
-    bool operator!=(const OGridIterator_& other) const {
-        return !(*this == other);
-    }
-};
-
 
 template<typename DATA, typename CELL, St DIM>
 class OGrid_ {
@@ -125,8 +40,8 @@ public:
     typedef ONode_<DATA, CELL, DIM> Node;
     typedef Node *pNode;
     typedef const Node *const_pNode;
-    typedef OGridIterator_<Self, Node, pNode, Node&> iterator;
-    typedef OGridIterator_<const Self, Node, const_pNode, const Node&> const_iterator;
+    typedef OGridRootIterator_<Self, Node, pNode, Node&> iterator;
+    typedef OGridRootIterator_<const Self, Node, const_pNode, const Node&> const_iterator;
 
 protected:
 
@@ -215,14 +130,14 @@ public:
 
     pNode root_node_1d_index(St idx) {
         ASSERT(idx < size());
-        const auto arr = _to_idx(idx);
-        return root_node(arr[0], Dim >= 2 ? arr[1] : 0, Dim >= 3 ? arr[2] : 0);
+        const auto indices = to_indices(idx);
+        return root_node(indices[0], Dim >= 2 ? indices[1] : 0, Dim >= 3 ? indices[2] : 0);
     }
 
     const_pNode root_node_1d_index(St idx) const {
         ASSERT(idx < size());
-        const auto arr = _to_idx(idx);
-        return root_node(arr[0], Dim >= 2 ? arr[1] : 0, Dim >= 3 ? arr[2] : 0);
+        const auto indices = to_indices(idx);
+        return root_node(indices[0], Dim >= 2 ? indices[1] : 0, Dim >= 3 ? indices[2] : 0);
     }
 
     pNode root_node(Int i, Int j = 0, Int k = 0) {
@@ -241,14 +156,18 @@ public:
         return root_node(idx.i(), idx.j(), idx.k());
     }
 
-    pNode find_neighbor(const Node& node, const Direction& d) {
+    pNode find_face_neighbor(const_pNode node, const Direction& d) {
         return const_cast<pNode>(
-            static_cast<const Self*>(this)->find_neighbor(node, d));
+            static_cast<const Self*>(this)->find_face_neighbor(node, d));
     }
 
-    const_pNode find_neighbor(const Node& node, const Direction& d) const {
-        ASSERT(node.is_root());
-        if (!node.is_root()) {
+    const_pNode find_face_neighbor(const_pNode node, const Direction& d) const {
+        if (node == nullptr) {
+            return nullptr;
+        }
+        ASSERT(node != nullptr);
+        ASSERT(node->is_root());
+        if (!node->is_root()) {
             return nullptr;
         }
         ASSERT(IsFaceDirection(d));
@@ -261,8 +180,8 @@ public:
         if (St(axis) >= Dim) {
             return nullptr;
         }
-        ASSERT(node.root_idx() < _storage_size());
-        return _find_neighbor(_1d_storage_idx_to_indices(node.root_idx()), axis, ori);
+        ASSERT(node->root_idx() < _storage_size());
+        return _find_face_neighbor(_1d_storage_idx_to_indices(node->root_idx()), axis, ori);
     }
 
     void connect_neighbors() {
@@ -272,7 +191,7 @@ public:
             for (St n = 0; n < Node::NumNeighbors; ++n) {
                 Orientation ori;  Axes axis;
                 FaceDirectionToOrientationAndAxes(FaceDirectionInOrder(n), ori, axis);
-                node.neighbor[n] = _find_neighbor(idx, axis, ori);
+                node.neighbor[n] = _find_face_neighbor(idx, axis, ori);
             }
         }
     }
@@ -301,6 +220,23 @@ public:
             Dim >= 3 ? _to_storage_idx(k, _Z_) : 0);
     }
 
+    Indices to_indices(St idx) const {
+        Indices res;
+        res[0] = Int(idx);
+        if constexpr (Dim >= 2) {
+            res[0] = Int(idx % size_i());
+            res[1] = Int(idx / size_i());
+        }
+        if constexpr (Dim >= 3) {
+            const St ij_size = size_i() * size_j();
+            const St rem = idx % ij_size;
+            res[0] = Int(rem % size_i());
+            res[1] = Int(rem / size_i());
+            res[2] = Int(idx / ij_size);
+        }
+        return res;
+    }
+
 protected:
     Indices _1d_storage_idx_to_indices(St idx) const {
         ASSERT(idx < _storage_size());
@@ -320,15 +256,15 @@ protected:
         return res;
     }
 
-    pNode _find_neighbor(
+    pNode _find_face_neighbor(
         const Indices& storage_idx,
         const Axes& axis,
         const Orientation& ori) {
         return const_cast<pNode>(
-            static_cast<const Self*>(this)->_find_neighbor(storage_idx, axis, ori));
+            static_cast<const Self*>(this)->_find_face_neighbor(storage_idx, axis, ori));
     }
 
-    const_pNode _find_neighbor(
+    const_pNode _find_face_neighbor(
         const Indices& storage_idx,
         const Axes& axis,
         const Orientation& ori) const {
@@ -352,23 +288,6 @@ protected:
             idx += _len[0] * _len[1] * k;
         }
         return idx;
-    }
-
-    std::array<Int, Dim> _to_idx(St idx) const {
-        std::array<Int, Dim> arr;
-        arr[0] = Int(idx);
-        if constexpr (Dim >= 2) {
-            arr[0] = Int(idx % size_i());
-            arr[1] = Int(idx / size_i());
-        }
-        if constexpr (Dim >= 3) {
-            const St ij_size = size_i() * size_j();
-            const St rem = idx % ij_size;
-            arr[0] = Int(rem % size_i());
-            arr[1] = Int(rem / size_i());
-            arr[2] = Int(idx / ij_size);
-        }
-        return arr;
     }
 
     St _size(St dim) const {
@@ -496,7 +415,7 @@ public:
 
     vt cell_size(St dim) const {
         ASSERT(dim < Dim);
-        return _length[dim] / _num_cells(dim);
+        return _length[dim] / this->_size(dim);
     }
 
     const Point& origin() const {
@@ -532,7 +451,38 @@ public:
         return root->cell.is_in_on(p) ? root : nullptr;
     }
 
+    pNode locate(const Point& p) {
+        return const_cast<pNode>(
+            static_cast<const Self*>(this)->locate(p));
+    }
+
+    const_pNode locate(const Point& p) const {
+        const_pNode node = locate_root(p);
+        if (node == nullptr) {
+            return nullptr;
+        }
+
+        while (node->has_child()) {
+            const St child_idx = _locate_child_index(*node, p);
+            if (node->child[child_idx] == nullptr) {
+                return node;
+            }
+            node = node->child[child_idx];
+        }
+        return node;
+    }
+
 protected:
+    St _locate_child_index(const Node& node, const Point& p) const {
+        St idx = 0;
+        for (St d = 0; d < Dim; ++d) {
+            if (p(d) >= node.cell.get(_C_, ToAxes(d))) {
+                idx |= St(1) << d;
+            }
+        }
+        return idx;
+    }
+
     Cell _make_cell(St i, St j = 0, St k = 0) const {
         vt cx = _center(i, _X_);
         vt cy = 0;
@@ -560,20 +510,15 @@ protected:
         return _origin(dim) + (idx + vt(0.5)) * cell_size(dim);
     }
 
-    St _num_cells(St dim) const {
-        ASSERT(dim < Dim);
-        return this->_size(dim);
-    }
-
     Int _locate_root_index(const Point& p, St dim) const {
         ASSERT(dim < Dim);
         const vt h = cell_size(dim);
         const vt max = _origin(dim) + _length[dim];
         if (p(dim) == max) {
-            return Int(_num_cells(dim)) - 1;
+            return Int(this->_size(dim)) - 1;
         }
         if (p(dim) == max + h) {
-            return Int(_num_cells(dim));
+            return Int(this->_size(dim));
         }
         return Int(std::floor((p(dim) - _origin(dim)) / h));
     }
@@ -581,7 +526,7 @@ protected:
     bool _is_valid_locate_root_index(Int idx, St dim) const {
         ASSERT(dim < Dim);
         return idx >= -Int(Base::GhostLayer)
-            && idx <= Int(_num_cells(dim));
+            && idx <= Int(this->_size(dim));
     }
 
     void _set_root_cells() {

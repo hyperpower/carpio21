@@ -23,75 +23,106 @@ std::string _OLabelText(
 }
 
 template<class ANY>
+std::string _ONodeLabelText(
+    const ANY& node,
+    const std::string& config) {
+    if (config == "level") {
+        return ToString(node.level());
+    }
+    if (config == "idx") {
+        return ToString(node.idx());
+    }
+    return config;
+}
+
+template<class ANY>
 GnuplotActor _OToGnuplotActorLabelDim(
     const ANY& grid,
     const std::string& config,
-    OGridTag,
+    OGridTag) {
+    GnuplotActor actor;
+    if constexpr (ANY::Dim == 3) {
+        actor.command("using 1:2:3:4 title \"\" ");
+    } else {
+        actor.command("using 1:2:3 title \"\" ");
+    }
+    actor.style("with labels center textcolor lt 2");
+
+    for (auto it = grid.cbegin(); it != grid.cend(); ++it) {
+        const auto& node = *it;
+        const auto idx = it.indices();
+        const auto& cell = node.cell;
+        const auto text = _OLabelText(grid, config, idx.i(), idx.j(), idx.k());
+        if constexpr (ANY::Dim == 1) {
+            actor.data().push_back(
+                ToString(cell.get(_C_, _X_), 0.0, " ") + " \"" + text + "\"");
+        } else if constexpr (ANY::Dim == 2) {
+            actor.data().push_back(
+                ToString(cell.get(_C_, _X_), cell.get(_C_, _Y_), " ")
+                + " \"" + text + "\"");
+        } else if constexpr (ANY::Dim == 3) {
+            actor.data().push_back(
+                ToString(cell.get(_C_, _X_),
+                         cell.get(_C_, _Y_),
+                         cell.get(_C_, _Z_),
+                         " ") + " \"" + text + "\"");
+        }
+    }
+    return actor;
+}
+
+template<class ANY>
+GnuplotActor _OToGnuplotActorLabelDim(
+    const ANY& node,
+    const std::string& config,
+    ONodeTag,
     Dim1Tag) {
     GnuplotActor actor;
     actor.command("using 1:2:3 title \"\" ");
     actor.style("with labels center textcolor lt 2");
 
-    for (Int i = 0; i < Int(grid.size_i()); ++i) {
-        const auto node = grid.root_node(i);
-        ASSERT(node != nullptr);
-        const auto& cell = node->cell;
-        const auto text = _OLabelText(grid, config, i, 0, 0);
-        actor.data().push_back(
-            ToString(cell.get(_C_, _X_), 0.0, " ") + " \"" + text + "\"");
-    }
+    const auto& cell = node.cell;
+    const auto text = _ONodeLabelText(node, config);
+    actor.data().push_back(
+        ToString(cell.get(_C_, _X_), 0.0, " ") + " \"" + text + "\"");
     return actor;
 }
 
 template<class ANY>
 GnuplotActor _OToGnuplotActorLabelDim(
-    const ANY& grid,
+    const ANY& node,
     const std::string& config,
-    OGridTag,
+    ONodeTag,
     Dim2Tag) {
     GnuplotActor actor;
     actor.command("using 1:2:3 title \"\" ");
     actor.style("with labels center textcolor lt 2");
 
-    for (Int j = 0; j < Int(grid.size_j()); ++j) {
-        for (Int i = 0; i < Int(grid.size_i()); ++i) {
-            const auto node = grid.root_node(i, j);
-            ASSERT(node != nullptr);
-            const auto& cell = node->cell;
-            const auto text = _OLabelText(grid, config, i, j, 0);
-            actor.data().push_back(
-                ToString(cell.get(_C_, _X_), cell.get(_C_, _Y_), " ") 
-                + " \"" + text + "\"");
-        }
-    }
+    const auto& cell = node.cell;
+    const auto text = _ONodeLabelText(node, config);
+    actor.data().push_back(
+        ToString(cell.get(_C_, _X_), cell.get(_C_, _Y_), " ")
+        + " \"" + text + "\"");
     return actor;
 }
 
 template<class ANY>
 GnuplotActor _OToGnuplotActorLabelDim(
-    const ANY& grid,
+    const ANY& node,
     const std::string& config,
-    OGridTag,
+    ONodeTag,
     Dim3Tag) {
     GnuplotActor actor;
     actor.command("using 1:2:3:4 title \"\" ");
     actor.style("with labels center textcolor lt 2");
 
-    for (Int k = 0; k < Int(grid.size_k()); ++k) {
-        for (Int j = 0; j < Int(grid.size_j()); ++j) {
-            for (Int i = 0; i < Int(grid.size_i()); ++i) {
-                const auto node = grid.root_node(i, j, k);
-                ASSERT(node != nullptr);
-                const auto& cell = node->cell;
-                const auto text = _OLabelText(grid, config, i, j, k);
-                actor.data().push_back(
-                    ToString(cell.get(_C_, _X_),
-                             cell.get(_C_, _Y_),
-                             cell.get(_C_, _Z_),
-                             " ") + " \"" + text + "\"");
-            }
-        }
-    }
+    const auto& cell = node.cell;
+    const auto text = _ONodeLabelText(node, config);
+    actor.data().push_back(
+        ToString(cell.get(_C_, _X_),
+                 cell.get(_C_, _Y_),
+                 cell.get(_C_, _Z_),
+                 " ") + " \"" + text + "\"");
     return actor;
 }
 
@@ -101,8 +132,17 @@ GnuplotActor _ToGnuplotActorLabel(
     const std::string& config,
     OGridTag) {
     typedef typename ANY::Tag Tag;
+    return _OToGnuplotActorLabelDim(grid, config, Tag());
+}
+
+template<class ANY>
+GnuplotActor _ToGnuplotActorLabel(
+    const ANY& node,
+    const std::string& config,
+    ONodeTag) {
+    typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
-    return _OToGnuplotActorLabelDim(grid, config, Tag(), DimTag());
+    return _OToGnuplotActorLabelDim(node, config, Tag(), DimTag());
 }
 
 }

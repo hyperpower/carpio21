@@ -10,6 +10,8 @@
 
 namespace carpio {
 
+struct ONodeTag:  public OctreeTag{};
+
     //=========================
     //   y
     //   |
@@ -119,6 +121,8 @@ public:
 
     typedef ONode_<DATA, CELL, DIM> Self;
     typedef ONode_<DATA, CELL, DIM> *pSelf;
+    typedef typename DimTagTraits_<Dim>::Type DimTag;
+    typedef ONodeTag Tag;
 
     typedef CELL Cell;
     typedef Cell *pCell;
@@ -241,6 +245,14 @@ public:
         return _root_idx;
     }
 
+    St level() const {
+        return _level;
+    }
+
+    St idx() const {
+        return _idx;
+    }
+
     void set_root_idx(St idx) {
         _root_idx = idx;
         for (St i = 0; i < NumChildren; ++i) {
@@ -325,16 +337,16 @@ public:
         }
     }
 
-    pNode find_neighbor(const Node& node, const Direction& d) {
+    pNode find_face_neighbor(const_pNode node, const Direction& d) {
         return const_cast<pNode>(
-            static_cast<const Self*>(this)->find_neighbor(node, d));
+            static_cast<const Self*>(this)->find_face_neighbor(node, d));
     }
 
-    const_pNode find_neighbor(const Node& node, const Direction& d) const {
-        if (!_is_valid_neighbor_direction(d)) {
+    const_pNode find_face_neighbor(const_pNode node, const Direction& d) const {
+        if (node == nullptr || !_is_valid_face_direction(d)) {
             return nullptr;
         }
-        return _find_neighbor(node, d);
+        return _find_face_neighbor(node, d);
     }
 
     /*
@@ -354,31 +366,44 @@ public:
         }
     }
 
+    /*
+     * neighbor find
+    */
+    inline bool is_adjacent(const Direction &d) const {
+        // Direction on x y or z
+        unsigned short hi = d >> 3;
+        return ((hi & _idx) ^ (hi & d)) == 0;
+    }
+
+
 protected:
-    static bool _is_valid_neighbor_direction(const Direction& d) {
+
+
+    static bool _is_valid_face_direction(const Direction& d) {
         if (!IsFaceDirection(d)) {
             return false;
         }
         return St(FaceDirectionToAxes(d)) < Dim;
     }
 
-    const_pNode _find_neighbor(const Node& node, const Direction& d) const {
-        ASSERT(_is_valid_neighbor_direction(d));
-        if (node.is_root()) {
-            return node.neighbor[FaceDirectionInOrder(d)];
+    const_pNode _find_face_neighbor(const_pNode node, const Direction& d) const {
+        ASSERT(node != nullptr);
+        ASSERT(_is_valid_face_direction(d));
+        if (node->is_root()) {
+            return node->neighbor[FaceDirectionInOrder(d)];
         }
 
         const St mask = HI(d);
-        const St neighbor_child_idx = node._idx ^ mask;
-        if (!is_on_direction(node._idx, d)) {
-            return node.father->child[neighbor_child_idx];
+        const St neighbor_child_idx = node->_idx ^ mask;
+        if (!is_on_direction(node->_idx, d)) {
+            return node->father->child[neighbor_child_idx];
         }
 
-        const_pNode coarse_neighbor = _find_neighbor(*(node.father), d);
+        const_pNode coarse_neighbor = _find_face_neighbor(node->father, d);
         if (coarse_neighbor == nullptr) {
             return nullptr;
         }
-        if (coarse_neighbor->_level < node.father->_level) {
+        if (coarse_neighbor->_level < node->father->_level) {
             return coarse_neighbor;
         }
 

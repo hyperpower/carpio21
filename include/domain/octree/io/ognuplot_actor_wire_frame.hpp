@@ -55,6 +55,24 @@ void _OAppendNodeWireFrame(GnuplotActor& actor, const NODE* node, Dim3Tag) {
     }
 }
 
+template<class NODE>
+void _OAppendCurrentNodeWireFrame(GnuplotActor& actor, const NODE& node, Dim1Tag) {
+    actor.data().splice(actor.data().end(), _StringifyCell1D(node.cell));
+    actor.data().push_back("");
+}
+
+template<class NODE>
+void _OAppendCurrentNodeWireFrame(GnuplotActor& actor, const NODE& node, Dim2Tag) {
+    actor.data().splice(actor.data().end(), _StringifyCell2D(node.cell));
+    actor.data().push_back("");
+}
+
+template<class NODE>
+void _OAppendCurrentNodeWireFrame(GnuplotActor& actor, const NODE& node, Dim3Tag) {
+    actor.data().splice(actor.data().end(), _StringifyCell3D(node.cell));
+    actor.data().push_back("");
+}
+
 template<class ANY>
 GnuplotActor _OToGnuplotActorWireFrameDim(const ANY& grid, OGridTag, Dim1Tag) {
     GnuplotActor actor;
@@ -97,8 +115,44 @@ GnuplotActor _OToGnuplotActorWireFrameDim(const ANY& grid, OGridTag, Dim3Tag) {
     return actor;
 }
 
+template<class NODE>
+GnuplotActor _OToGnuplotActorWireFrameDim(const NODE& node, ONodeTag, Dim1Tag) {
+    GnuplotActor actor;
+    actor.command("using 1:2 title \"\" ");
+    actor.style("with line lc -1");
+    _OAppendCurrentNodeWireFrame(actor, node, Dim1Tag());
+    return actor;
+}
+
+template<class NODE>
+GnuplotActor _OToGnuplotActorWireFrameDim(const NODE& node, ONodeTag, Dim2Tag) {
+    GnuplotActor actor;
+    actor.command("using 1:2 title \"\" ");
+    actor.style("with line lc 0");
+    _OAppendCurrentNodeWireFrame(actor, node, Dim2Tag());
+    return actor;
+}
+
+template<class NODE>
+GnuplotActor _OToGnuplotActorWireFrameDim(const NODE& node, ONodeTag, Dim3Tag) {
+    GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with line lc 0");
+    _OAppendCurrentNodeWireFrame(actor, node, Dim3Tag());
+    return actor;
+}
+
 template<class ANY>
 GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, OGridTag) {
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    Tag t;
+    DimTag dt;
+    return _OToGnuplotActorWireFrameDim(a, t, dt);
+}
+
+template<class ANY>
+GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, ONodeTag) {
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
     Tag t;

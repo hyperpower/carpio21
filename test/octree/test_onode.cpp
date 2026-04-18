@@ -109,6 +109,9 @@ TEST(onode, new_full_children_from_parent_cell){
 
     node.new_full_children();
 
+    const double expected_x[Node::NumChildren] = {0.0, 2.0, 0.0, 2.0};
+    const double expected_y[Node::NumChildren] = {0.0, 0.0, 2.0, 2.0};
+
     EXPECT_TRUE(node.is_full_child());
     EXPECT_FALSE(node.is_leaf());
     EXPECT_EQ(node.height(), 1);
@@ -119,12 +122,14 @@ TEST(onode, new_full_children_from_parent_cell){
         EXPECT_EQ(child->root_idx(), 33);
         EXPECT_TRUE(child->is_leaf());
         EXPECT_DOUBLE_EQ(child->data, node.data);
+        EXPECT_DOUBLE_EQ(child->cell.get(_C_, _X_), expected_x[i]);
+        EXPECT_DOUBLE_EQ(child->cell.get(_C_, _Y_), expected_y[i]);
         EXPECT_DOUBLE_EQ(child->cell.get_hd(_X_), 1.0);
         EXPECT_DOUBLE_EQ(child->cell.get_hd(_Y_), 1.0);
     }
 }
 
-TEST(onode, find_neighbor_same_parent_siblings_2d){
+TEST(onode, find_face_neighbor_same_parent_siblings_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Node = ONode_<double, Cell, 2>;
 
@@ -133,13 +138,13 @@ TEST(onode, find_neighbor_same_parent_siblings_2d){
     root.set_child(Node::Idx::_MP_, new Node());
     root.set_child(Node::Idx::_PM_, new Node());
 
-    EXPECT_EQ(root.find_neighbor(*root.child[Node::Idx::_MM_], _XP_),
+    EXPECT_EQ(root.find_face_neighbor(root.child[Node::Idx::_MM_], _XP_),
               root.child[Node::Idx::_MP_]);
-    EXPECT_EQ(root.find_neighbor(*root.child[Node::Idx::_MM_], _YP_),
+    EXPECT_EQ(root.find_face_neighbor(root.child[Node::Idx::_MM_], _YP_),
               root.child[Node::Idx::_PM_]);
 }
 
-TEST(onode, find_neighbor_climbs_to_common_ancestor_2d){
+TEST(onode, find_face_neighbor_climbs_to_common_ancestor_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Node = ONode_<double, Cell, 2>;
 
@@ -152,11 +157,11 @@ TEST(onode, find_neighbor_climbs_to_common_ancestor_2d){
     left_parent->set_child(Node::Idx::_MP_, new Node());
     right_parent->set_child(Node::Idx::_MM_, new Node());
 
-    EXPECT_EQ(root.find_neighbor(*left_parent->child[Node::Idx::_MP_], _XP_),
+    EXPECT_EQ(root.find_face_neighbor(left_parent->child[Node::Idx::_MP_], _XP_),
               right_parent->child[Node::Idx::_MM_]);
 }
 
-TEST(onode, find_neighbor_crosses_root_neighbor_and_descends_2d){
+TEST(onode, find_face_neighbor_crosses_root_neighbor_and_descends_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Node = ONode_<double, Cell, 2>;
 
@@ -167,11 +172,11 @@ TEST(onode, find_neighbor_crosses_root_neighbor_and_descends_2d){
     left_root.set_child(Node::Idx::_MP_, new Node());
     right_root.set_child(Node::Idx::_MM_, new Node());
 
-    EXPECT_EQ(left_root.find_neighbor(*left_root.child[Node::Idx::_MP_], _XP_),
+    EXPECT_EQ(left_root.find_face_neighbor(left_root.child[Node::Idx::_MP_], _XP_),
               right_root.child[Node::Idx::_MM_]);
 }
 
-TEST(onode, find_neighbor_returns_coarser_neighbor_when_child_is_missing_2d){
+TEST(onode, find_face_neighbor_returns_coarser_neighbor_when_child_is_missing_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Node = ONode_<double, Cell, 2>;
 
@@ -181,30 +186,31 @@ TEST(onode, find_neighbor_returns_coarser_neighbor_when_child_is_missing_2d){
 
     left_root.set_child(Node::Idx::_MP_, new Node());
 
-    EXPECT_EQ(left_root.find_neighbor(*left_root.child[Node::Idx::_MP_], _XP_),
+    EXPECT_EQ(left_root.find_face_neighbor(left_root.child[Node::Idx::_MP_], _XP_),
               &right_root);
 }
 
-TEST(onode, find_neighbor_returns_nullptr_for_missing_boundary_neighbor_2d){
+TEST(onode, find_face_neighbor_returns_nullptr_for_missing_boundary_neighbor_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Node = ONode_<double, Cell, 2>;
 
     Node root;
     root.set_child(Node::Idx::_MP_, new Node());
 
-    EXPECT_EQ(root.find_neighbor(*root.child[Node::Idx::_MP_], _XP_), nullptr);
+    EXPECT_EQ(root.find_face_neighbor(root.child[Node::Idx::_MP_], _XP_), nullptr);
 }
 
-TEST(onode, find_neighbor_rejects_direction_outside_dimension_2d){
+TEST(onode, find_face_neighbor_rejects_direction_outside_dimension_2d){
     using Cell = OCellNonUniform_<double, 2>;
     using Node = ONode_<double, Cell, 2>;
 
     Node root;
 
-    EXPECT_EQ(root.find_neighbor(root, _ZP_), nullptr);
+    EXPECT_EQ(root.find_face_neighbor(&root, _ZP_), nullptr);
+    EXPECT_EQ(root.find_face_neighbor(nullptr, _XP_), nullptr);
 }
 
-TEST(onode, find_neighbor_climbs_to_common_ancestor_3d_z_direction){
+TEST(onode, find_face_neighbor_climbs_to_common_ancestor_3d_z_direction){
     using Cell = OCellNonUniform_<double, 3>;
     using Node = ONode_<double, Cell, 3>;
 
@@ -217,6 +223,6 @@ TEST(onode, find_neighbor_climbs_to_common_ancestor_3d_z_direction){
     lower_parent->set_child(Node::Idx::_PMM_, new Node());
     upper_parent->set_child(Node::Idx::_MMM_, new Node());
 
-    EXPECT_EQ(root.find_neighbor(*lower_parent->child[Node::Idx::_PMM_], _ZP_),
+    EXPECT_EQ(root.find_face_neighbor(lower_parent->child[Node::Idx::_PMM_], _ZP_),
               upper_parent->child[Node::Idx::_MMM_]);
 }
