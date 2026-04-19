@@ -10,6 +10,7 @@
 
 #include <array>
 #include <cmath>
+#include <functional>
 #include <vector>
 
 
@@ -17,6 +18,9 @@
 namespace carpio {
 
 struct OGridTag:  public OctreeTag, GridBaseTag{};
+
+template<class GRID>
+bool IsNodeInGrid(const typename GRID::Node& node, const GRID& grid);
 
 template<typename DATA, typename CELL, St DIM>
 class OGrid_ {
@@ -40,6 +44,10 @@ public:
     typedef ONode_<DATA, CELL, DIM> Node;
     typedef Node *pNode;
     typedef const Node *const_pNode;
+    typedef Node& ref_Node;
+    typedef const Node& const_ref_Node;
+    typedef std::function<void(ref_Node)> FunNode;
+    typedef std::function<void(const_ref_Node)> FunConstNode;
     typedef OGridRootIterator_<Self, Node, pNode, Node&> iterator;
     typedef OGridRootIterator_<const Self, Node, const_pNode, const Node&> const_iterator;
 
@@ -65,7 +73,7 @@ public:
             ASSERT(nz > 0);
             _len[2] = nz + 2;
         }
-        _roots.resize(_storage_size());
+        _roots.resize(storage_size());
         _set_root_indices();
     }
 
@@ -78,6 +86,11 @@ public:
             res *= _size(i);
         }
         return res;
+    }
+
+    St size(St dim) const {
+        ASSERT(dim < Dim);
+        return _size(dim);
     }
 
     St size_i() const {
@@ -104,6 +117,14 @@ public:
         return GhostLayer;
     }
 
+    St storage_size() const {
+        St res = 1;
+        for (St i = 0; i < Dim; ++i) {
+            res *= _len[i];
+        }
+        return res;
+    }
+
     iterator begin() {
         return iterator(this, 0);
     }
@@ -128,6 +149,18 @@ public:
         return const_iterator(this, size());
     }
 
+    void for_each_root(FunNode fun) {
+        for (St idx = 0; idx < size(); ++idx) {
+            fun(*root_node_1d_index(idx));
+        }
+    }
+
+    void for_each_root(FunConstNode fun) const {
+        for (St idx = 0; idx < size(); ++idx) {
+            fun(*root_node_1d_index(idx));
+        }
+    }
+
     pNode root_node_1d_index(St idx) {
         ASSERT(idx < size());
         const auto indices = to_indices(idx);
@@ -138,6 +171,16 @@ public:
         ASSERT(idx < size());
         const auto indices = to_indices(idx);
         return root_node(indices[0], Dim >= 2 ? indices[1] : 0, Dim >= 3 ? indices[2] : 0);
+    }
+
+    pNode root_node_1d_storage_index(St idx) {
+        ASSERT(idx < storage_size());
+        return &_roots[idx];
+    }
+
+    const_pNode root_node_1d_storage_index(St idx) const {
+        ASSERT(idx < storage_size());
+        return &_roots[idx];
     }
 
     pNode root_node(Int i, Int j = 0, Int k = 0) {
@@ -180,14 +223,14 @@ public:
         if (St(axis) >= Dim) {
             return nullptr;
         }
-        ASSERT(node->root_idx() < _storage_size());
-        return _find_face_neighbor(_1d_storage_idx_to_indices(node->root_idx()), axis, ori);
+        ASSERT(node->root_idx() < storage_size());
+        return _find_face_neighbor(_storage_1d_idx_to_storage_indices(node->root_idx()), axis, ori);
     }
 
     void connect_neighbors() {
         for (St i = 0; i < _roots.size(); ++i) {
             auto& node = _roots[i];
-            const auto idx = _1d_storage_idx_to_indices(i);
+            const auto idx = _storage_1d_idx_to_storage_indices(i);
             for (St n = 0; n < Node::NumNeighbors; ++n) {
                 Orientation ori;  Axes axis;
                 FaceDirectionToOrientationAndAxes(FaceDirectionInOrder(n), ori, axis);
@@ -237,9 +280,17 @@ public:
         return res;
     }
 
+    Indices storage_1d_idx_to_indices(St idx) const {
+        auto res = _storage_1d_idx_to_storage_indices(idx);
+        for (St d = 0; d < Dim; ++d) {
+            res[d] -= Int(GhostLayer);
+        }
+        return res;
+    }
+
 protected:
-    Indices _1d_storage_idx_to_indices(St idx) const {
-        ASSERT(idx < _storage_size());
+    Indices _storage_1d_idx_to_storage_indices(St idx) const {
+        ASSERT(idx < storage_size());
         Indices res;
         res[0] = Int(idx);
         if constexpr (Dim >= 2) {
@@ -295,14 +346,6 @@ protected:
         return _len[dim] - GhostLayer - GhostLayer;
     }
 
-    St _storage_size() const {
-        St res = 1;
-        for (St i = 0; i < Dim; ++i) {
-            res *= _len[i];
-        }
-        return res;
-    }
-
     St _storage_size_i() const {
         return _len[0];
     }
@@ -354,191 +397,19 @@ protected:
 
 };// <- End OGrid_
 
-template<typename DATA, typename CELL, St DIM>
-class OGridNonUniform_ : public OGrid_<DATA, CELL, DIM> {
-public:
-    static const St Dim = DIM;
-
-    typedef OGrid_<DATA, CELL, DIM> Base;
-    typedef OGridNonUniform_<DATA, CELL, DIM> Self;
-    typedef OGridNonUniform_<DATA, CELL, DIM> *pSelf;
-
-    typedef typename Base::Cell Cell;
-    typedef typename Base::vt vt;
-    typedef typename Base::Point Point;
-    typedef std::array<vt, Dim> ArrLength;
-
-    typedef typename Base::Node Node;
-    typedef typename Base::pNode pNode;
-    typedef typename Base::const_pNode const_pNode;
-
-protected:
-    Point _origin;
-    ArrLength _length;
-
-public:
-    OGridNonUniform_(const Point& origin, 
-                     const vt& cell_len, //the length of each cell
-                     St nx, // number of cells in x direction
-                     St ny = 0, // number of cells in y direction, only used when Dim 
-                     St nz = 0 // number of cells in z direction, only used when Dim >= 3
-                     ) :
-        Base(nx, Dim >= 2 ? ny : 0, Dim >= 3 ? nz : 0),
-        _origin(origin),
-        _length() {
-        ASSERT(cell_len > 0);
-        ASSERT(nx > 0);
-        _length[_X_] = cell_len * nx;
-        if constexpr (Dim >= 2) {
-            ASSERT(ny > 0);
-            _length[_Y_] = cell_len * ny;
-        }
-        if constexpr (Dim >= 3) {
-            ASSERT(nz > 0);
-            _length[_Z_] = cell_len * nz;
-        }
-        _set_root_cells();
+template<class GRID>
+bool IsNodeInGrid(const typename GRID::Node& node, const GRID& grid) {
+    const auto& root = node.find_root();
+    const St root_idx = root.root_idx();
+    if (root_idx >= grid.storage_size()) {
+        return false;
     }
-    
+    return &root == grid.root_node_1d_storage_index(root_idx);
+}
 
-    OGridNonUniform_(const Self&) = delete;
-    Self& operator=(const Self&) = delete;
-
-    const ArrLength& length() const {
-        return _length;
-    }
-
-    vt length(St dim) const {
-        ASSERT(dim < Dim);
-        return _length[dim];
-    }
-
-    vt cell_size(St dim) const {
-        ASSERT(dim < Dim);
-        return _length[dim] / this->_size(dim);
-    }
-
-    const Point& origin() const {
-        return _origin;
-    }
-
-    pNode locate_root(const Point& p) {
-        return const_cast<pNode>(
-            static_cast<const Self*>(this)->locate_root(p));
-    }
-
-    const_pNode locate_root(const Point& p) const {
-        Int i = _locate_root_index(p, _X_);
-        Int j = 0;
-        Int k = 0;
-        if (!_is_valid_locate_root_index(i, _X_)) {
-            return nullptr;
-        }
-        if constexpr (Dim >= 2) {
-            j = _locate_root_index(p, _Y_);
-            if (!_is_valid_locate_root_index(j, _Y_)) {
-                return nullptr;
-            }
-        }
-        if constexpr (Dim >= 3) {
-            k = _locate_root_index(p, _Z_);
-            if (!_is_valid_locate_root_index(k, _Z_)) {
-                return nullptr;
-            }
-        }
-
-        const_pNode root = this->root_node(i, j, k);
-        return root->cell.is_in_on(p) ? root : nullptr;
-    }
-
-    pNode locate(const Point& p) {
-        return const_cast<pNode>(
-            static_cast<const Self*>(this)->locate(p));
-    }
-
-    const_pNode locate(const Point& p) const {
-        const_pNode node = locate_root(p);
-        if (node == nullptr) {
-            return nullptr;
-        }
-
-        while (node->has_child()) {
-            const St child_idx = _locate_child_index(*node, p);
-            if (node->child[child_idx] == nullptr) {
-                return node;
-            }
-            node = node->child[child_idx];
-        }
-        return node;
-    }
-
-protected:
-    St _locate_child_index(const Node& node, const Point& p) const {
-        St idx = 0;
-        for (St d = 0; d < Dim; ++d) {
-            if (p(d) >= node.cell.get(_C_, ToAxes(d))) {
-                idx |= St(1) << d;
-            }
-        }
-        return idx;
-    }
-
-    Cell _make_cell(St i, St j = 0, St k = 0) const {
-        vt cx = _center(i, _X_);
-        vt cy = 0;
-        vt cz = 0;
-        if constexpr (Dim >= 2) {
-            cy = _center(j, _Y_);
-        }
-        if constexpr (Dim >= 3) {
-            cz = _center(k, _Z_);
-        }
-        vt hx = cell_size(_X_) * 0.5;
-        vt hy = 0;
-        vt hz = 0;
-        if constexpr (Dim >= 2) {
-            hy = cell_size(_Y_) * 0.5;
-        }
-        if constexpr (Dim >= 3) {
-            hz = cell_size(_Z_) * 0.5;
-        }
-        return Cell(cx, hx, cy, hy, cz, hz);
-    }
-
-    vt _center(St storage_index, St dim) const {
-        vt idx = vt(storage_index) - vt(Base::GhostLayer);
-        return _origin(dim) + (idx + vt(0.5)) * cell_size(dim);
-    }
-
-    Int _locate_root_index(const Point& p, St dim) const {
-        ASSERT(dim < Dim);
-        const vt h = cell_size(dim);
-        const vt max = _origin(dim) + _length[dim];
-        if (p(dim) == max) {
-            return Int(this->_size(dim)) - 1;
-        }
-        if (p(dim) == max + h) {
-            return Int(this->_size(dim));
-        }
-        return Int(std::floor((p(dim) - _origin(dim)) / h));
-    }
-
-    bool _is_valid_locate_root_index(Int idx, St dim) const {
-        ASSERT(dim < Dim);
-        return idx >= -Int(Base::GhostLayer)
-            && idx <= Int(this->_size(dim));
-    }
-
-    void _set_root_cells() {
-        for (St i = 0; i < this->_roots.size(); ++i) {
-            auto& root = this->_roots[i];
-            const auto idx = this->_1d_storage_idx_to_indices(i);
-            root.cell = _make_cell(St(idx.i()), St(idx.j()), St(idx.k()));
-        }
-    }
-
-};// <- End OGridNonUniform_
 }// <- End namespace carpio
 
+#include "domain/octree/grid/ogrid_nonuniform.hpp"
+#include "domain/octree/grid/ogrid_uniform.hpp"
 
 #endif

@@ -173,6 +173,14 @@ inline bool IsDirectionOn(const Direction &d, const Axes& a) {
 	return false;
 }
 
+template<St DIM>
+inline bool IsValidFaceDirection(const Direction& d) {
+	if (!IsFaceDirection(d)) {
+		return false;
+	}
+	return St(FaceDirectionToAxes(d)) < DIM;
+}
+
 inline bool IsFacePDirection(const Direction &d) {
 	unsigned short hi = d >> 3;
 	unsigned short low = d & 7;

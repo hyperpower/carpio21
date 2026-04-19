@@ -46,7 +46,7 @@ public:
     SGhostRegular_(): _grid(nullptr){
 
     }
-    SGhostRegular_(spGrid spg): _grid(spg){
+    explicit SGhostRegular_(spGrid spg): _grid(spg){
     }
     virtual ~SGhostRegular_(){
     }

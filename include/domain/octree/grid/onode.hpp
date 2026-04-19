@@ -4,6 +4,7 @@
 //#include "../typedefine.hpp"
 #include "domain/octree/octree_define.hpp"
 #include "ocell.hpp"
+#include "onode_iterator.hpp"
 #include <functional>
 
 #include <math.h>
@@ -69,43 +70,42 @@ struct ONodeIdx<3>{
     static const St _PPP_ = 7;
 };
 
-inline bool is_x_p(St i) {
+inline bool IsXP(St i) {
     ASSERT(i >= 0 && i < 8);
     return (i | 6) == 7;
 }
 
-inline bool is_x_m(St i) {
+inline bool IsXM(St i) {
     ASSERT(i >= 0 && i < 8);
     return (i | 6) == 6;
 }
 
-inline bool is_y_p(St i) {
+inline bool IsYP(St i) {
     ASSERT(i >= 0 && i < 8);
     return (i | 5) == 7;
 }
 
-inline bool is_y_m(St i) {
+inline bool IsYM(St i) {
     ASSERT(i >= 0 && i < 8);
     return (i | 5) == 5;
 }
 
-inline bool is_z_p(St i) {
+inline bool IsZP(St i) {
     ASSERT(i >= 0 && i < 8);
     return (i | 3) == 7;
 }
 
-inline bool is_z_m(St i) {
+inline bool IsZM(St i) {
     ASSERT(i >= 0 && i < 8);
     return (i | 3) == 3;
 }
 
-inline bool is_on_direction(St i, const Direction& dir) {
+inline bool IsOnDirection(St i, const Direction& dir) {
     ASSERT(i >= 0 && i < 8);
     unsigned short hi = HI(dir);
     unsigned short lo = LO(dir);
     return (hi & i) == (hi & lo);
 }
-
 
 
 template<typename DATA, typename CELL, St DIM>
@@ -140,6 +140,12 @@ public:
     typedef Self *pNode;
     typedef const Self const_Node;
     typedef const Self* const_pNode;
+    typedef Self& ref_Node;
+    typedef const Self& const_ref_Node;
+    typedef std::function<void(ref_Node)> FunNode;
+    typedef std::function<void(const_ref_Node)> FunConstNode;
+    typedef ONodeIterator_<Node, pNode, Node&> iterator;
+    typedef ONodeIterator_<Node, const_pNode, const Node&> const_iterator;
 
 protected:
     St _level;
@@ -253,6 +259,42 @@ public:
         return _idx;
     }
 
+    iterator begin() {
+        return iterator(this, this);
+    }
+
+    iterator end() {
+        return iterator(this, nullptr);
+    }
+
+    const_iterator begin() const {
+        return const_iterator(this, this);
+    }
+
+    const_iterator end() const {
+        return const_iterator(this, nullptr);
+    }
+
+    const_iterator cbegin() const {
+        return const_iterator(this, this);
+    }
+
+    const_iterator cend() const {
+        return const_iterator(this, nullptr);
+    }
+
+    void for_each(FunNode fun) {
+        for (auto& node : *this) {
+            fun(node);
+        }
+    }
+
+    void for_each(FunConstNode fun) const {
+        for (const auto& node : *this) {
+            fun(node);
+        }
+    }
+
     void set_root_idx(St idx) {
         _root_idx = idx;
         for (St i = 0; i < NumChildren; ++i) {
@@ -337,16 +379,29 @@ public:
         }
     }
 
-    pNode find_face_neighbor(const_pNode node, const Direction& d) {
+    pNode find_face_neighbor(const Direction& d) {
         return const_cast<pNode>(
-            static_cast<const Self*>(this)->find_face_neighbor(node, d));
+            static_cast<const Self*>(this)->find_face_neighbor(d));
     }
 
-    const_pNode find_face_neighbor(const_pNode node, const Direction& d) const {
-        if (node == nullptr || !_is_valid_face_direction(d)) {
+    const_pNode find_face_neighbor(const Direction& d) const {
+        if (!IsValidFaceDirection<Dim>(d)) {
             return nullptr;
         }
-        return _find_face_neighbor(node, d);
+        return _find_face_neighbor(this, d);
+    }
+
+    ref_Node find_root() {
+        return const_cast<ref_Node>(
+            static_cast<const Self*>(this)->find_root());
+    }
+
+    const_ref_Node find_root() const {
+        const_pNode res = this;
+        while (res->father != nullptr) {
+            res = res->father;
+        }
+        return *res;
     }
 
     /*
@@ -366,44 +421,26 @@ public:
         }
     }
 
-    /*
-     * neighbor find
-    */
-    inline bool is_adjacent(const Direction &d) const {
-        // Direction on x y or z
-        unsigned short hi = d >> 3;
-        return ((hi & _idx) ^ (hi & d)) == 0;
-    }
-
 
 protected:
-
-
-    static bool _is_valid_face_direction(const Direction& d) {
-        if (!IsFaceDirection(d)) {
-            return false;
-        }
-        return St(FaceDirectionToAxes(d)) < Dim;
-    }
-
-    const_pNode _find_face_neighbor(const_pNode node, const Direction& d) const {
-        ASSERT(node != nullptr);
-        ASSERT(_is_valid_face_direction(d));
-        if (node->is_root()) {
-            return node->neighbor[FaceDirectionInOrder(d)];
+    const_pNode _find_face_neighbor(const_pNode pnode, const Direction& d) const {
+        ASSERT(pnode != nullptr);
+        ASSERT(IsValidFaceDirection<Dim>(d));
+        if (pnode->is_root()) {
+            return pnode->neighbor[FaceDirectionInOrder(d)];
         }
 
         const St mask = HI(d);
-        const St neighbor_child_idx = node->_idx ^ mask;
-        if (!is_on_direction(node->_idx, d)) {
-            return node->father->child[neighbor_child_idx];
+        const St neighbor_child_idx = pnode->_idx ^ mask;
+        if (!IsOnDirection(pnode->_idx, d)) {
+            return pnode->father->child[neighbor_child_idx];
         }
 
-        const_pNode coarse_neighbor = _find_face_neighbor(node->father, d);
+        const_pNode coarse_neighbor = _find_face_neighbor(pnode->father, d);
         if (coarse_neighbor == nullptr) {
             return nullptr;
         }
-        if (coarse_neighbor->_level < node->father->_level) {
+        if (coarse_neighbor->_level < pnode->father->_level) {
             return coarse_neighbor;
         }
 

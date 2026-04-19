@@ -4,6 +4,7 @@
 #include <string>
 
 #include "domain/base/base_gnuplot_actor.hpp"
+#include "domain/octree/ghost/oghost.hpp"
 #include "domain/octree/grid/ogrid.hpp"
 #include "domain/octree/io/ostringify.hpp"
 #include "io/gnuplot.hpp"
@@ -142,6 +143,42 @@ GnuplotActor _OToGnuplotActorWireFrameDim(const NODE& node, ONodeTag, Dim3Tag) {
     return actor;
 }
 
+template<class GHOST>
+GnuplotActor _OToGnuplotActorWireFrameDim(const GHOST& ghost, OGhostTag, Dim1Tag) {
+    GnuplotActor actor;
+    actor.command("using 1:2 title \"\" ");
+    actor.style("with line lc -1");
+
+    ghost.for_each_root([&actor](const typename GHOST::Node& node) {
+        _OAppendNodeWireFrame(actor, &node, Dim1Tag());
+    });
+    return actor;
+}
+
+template<class GHOST>
+GnuplotActor _OToGnuplotActorWireFrameDim(const GHOST& ghost, OGhostTag, Dim2Tag) {
+    GnuplotActor actor;
+    actor.command("using 1:2 title \"\" ");
+    actor.style("with line lc 0");
+
+    ghost.for_each_root([&actor](const typename GHOST::Node& node) {
+        _OAppendNodeWireFrame(actor, &node, Dim2Tag());
+    });
+    return actor;
+}
+
+template<class GHOST>
+GnuplotActor _OToGnuplotActorWireFrameDim(const GHOST& ghost, OGhostTag, Dim3Tag) {
+    GnuplotActor actor;
+    actor.command("using 1:2:3 title \"\" ");
+    actor.style("with line lc 0");
+
+    ghost.for_each_root([&actor](const typename GHOST::Node& node) {
+        _OAppendNodeWireFrame(actor, &node, Dim3Tag());
+    });
+    return actor;
+}
+
 template<class ANY>
 GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, OGridTag) {
     typedef typename ANY::Tag Tag;
@@ -153,6 +190,15 @@ GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, OGridTag) {
 
 template<class ANY>
 GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, ONodeTag) {
+    typedef typename ANY::Tag Tag;
+    typedef typename ANY::DimTag DimTag;
+    Tag t;
+    DimTag dt;
+    return _OToGnuplotActorWireFrameDim(a, t, dt);
+}
+
+template<class ANY>
+GnuplotActor _ToGnuplotActorWireFrame(const ANY& a, OGhostTag) {
     typedef typename ANY::Tag Tag;
     typedef typename ANY::DimTag DimTag;
     Tag t;

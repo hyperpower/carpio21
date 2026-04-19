@@ -177,8 +177,7 @@ TEST(ocell_uniform, make_sub_cell_3d){
 }
 
 TEST(ocell_uniform, works_as_ogrid_cell){
-    using Cell = OCellUniform_<double, 2>;
-    using Grid = OGridNonUniform_<double, Cell, 2>;
+    using Grid = OGridUniform_<double, 2>;
 
     Grid grid(Grid::Point(0.0, 0.0), 0.25, 4, 4);
     const auto& cell = grid.root_node(0, 0)->cell;
