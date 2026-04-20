@@ -95,7 +95,7 @@ public:
     }
 
     virtual bool is_boundary(const_pNode node, const Direction& dir) const {
-        if (!_is_valid_face_direction(dir) || node == nullptr) {
+        if (!IsValidFaceDirection<Dim>(dir) || node == nullptr) {
             return false;
         }
         if (!this->has_grid()
@@ -111,11 +111,6 @@ public:
     // TODO: implement octree boundary mapping logic.
     virtual const_pNode boundary_node(const_pNode, const Direction&) const {
         return nullptr;
-    }
-
-protected:
-    static bool _is_valid_face_direction(const Direction& dir) {
-        return IsFaceDirection(dir) && St(FaceDirectionToAxes(dir)) < Dim;
     }
 };
 

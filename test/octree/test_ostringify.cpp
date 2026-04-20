@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "test_octree.h"
 #include "domain/octree/io/ognuplot_actor_label.hpp"
 #include "domain/octree/io/ognuplot_actor_wire_frame.hpp"
 #include "domain/octree/io/ostringify.hpp"
@@ -6,14 +7,13 @@
 #include <iterator>
 
 using namespace carpio;
+using namespace carpio::octree_test;
 
 TEST(ostringify, stringify_nonuniform_cell_2d) {
-    using Cell = OCellNonUniform_<double, 2>;
-    using Grid = OGridNonUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 0.25, 4, 4);
+    NonUniformGrid2 grid(NonUniformGrid2::Point(0.0, 0.0), 0.25, 4, 4);
 
-    const auto lines = StringifyCell(grid, Grid::Indices(0, 0));
+    const auto lines = StringifyCell(grid, NonUniformGrid2::Indices(0, 0));
 
     ASSERT_EQ(lines.size(), 5);
     auto it = lines.begin();
@@ -25,12 +25,10 @@ TEST(ostringify, stringify_nonuniform_cell_2d) {
 }
 
 TEST(ostringify, stringify_nonuniform_cell_3d) {
-    using Cell = OCellNonUniform_<double, 3>;
-    using Grid = OGridNonUniform_<double, 3>;
 
-    Grid grid(Grid::Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
+    NonUniformGrid3 grid(NonUniformGrid3::Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
 
-    const auto lines = StringifyCell(grid, Grid::Indices(0, 0, 0));
+    const auto lines = StringifyCell(grid, NonUniformGrid3::Indices(0, 0, 0));
 
     ASSERT_EQ(lines.size(), 9);
     EXPECT_EQ(lines.front(), "0 0 0");
@@ -38,11 +36,10 @@ TEST(ostringify, stringify_nonuniform_cell_3d) {
 }
 
 TEST(ostringify, stringify_uniform_cell_2d) {
-    using Grid = OGridUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 0.25, 4, 4);
+    UniformGrid2 grid(UniformGrid2::Point(0.0, 0.0), 0.25, 4, 4);
 
-    const auto lines = StringifyCell(grid, Grid::Indices(0, 0));
+    const auto lines = StringifyCell(grid, UniformGrid2::Indices(0, 0));
 
     ASSERT_EQ(lines.size(), 5);
     auto it = lines.begin();
@@ -54,10 +51,8 @@ TEST(ostringify, stringify_uniform_cell_2d) {
 }
 
 TEST(ostringify, wire_frame_actor_2d) {
-    using Cell = OCellNonUniform_<double, 2>;
-    using Grid = OGridNonUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 0.5, 2, 2);
+    NonUniformGrid2 grid(NonUniformGrid2::Point(0.0, 0.0), 0.5, 2, 2);
 
     const auto actor = ToGnuplotActorWireFrame(grid);
 
@@ -68,10 +63,8 @@ TEST(ostringify, wire_frame_actor_2d) {
 }
 
 TEST(ostringify, wire_frame_actor_3d) {
-    using Cell = OCellNonUniform_<double, 3>;
-    using Grid = OGridNonUniform_<double, 3>;
 
-    Grid grid(Grid::Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
+    NonUniformGrid3 grid(NonUniformGrid3::Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
 
     const auto actor = ToGnuplotActorWireFrame(grid);
 
@@ -82,10 +75,8 @@ TEST(ostringify, wire_frame_actor_3d) {
 }
 
 TEST(ostringify, wire_frame_actor_node_2d) {
-    using Cell = OCellNonUniform_<double, 2>;
-    using Grid = OGridNonUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 0.5, 2, 2);
+    NonUniformGrid2 grid(NonUniformGrid2::Point(0.0, 0.0), 0.5, 2, 2);
     const auto actor = ToGnuplotActorWireFrame(*grid.root_node(0, 0));
 
     EXPECT_EQ(actor.command(), "using 1:2 title \"\" ");
@@ -95,9 +86,8 @@ TEST(ostringify, wire_frame_actor_node_2d) {
 }
 
 TEST(ostringify, wire_frame_actor_refined_node_2d) {
-    using Grid = OGridUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 0.5, 2, 2);
+    UniformGrid2 grid(UniformGrid2::Point(0.0, 0.0), 0.5, 2, 2);
     auto root = grid.root_node(0, 0);
     root->new_full_children();
 
@@ -110,10 +100,8 @@ TEST(ostringify, wire_frame_actor_refined_node_2d) {
 }
 
 TEST(ostringify, wire_frame_actor_node_3d) {
-    using Cell = OCellNonUniform_<double, 3>;
-    using Grid = OGridNonUniform_<double, 3>;
 
-    Grid grid(Grid::Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
+    NonUniformGrid3 grid(NonUniformGrid3::Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
     const auto actor = ToGnuplotActorWireFrame(*grid.root_node(0, 0, 0));
 
     EXPECT_EQ(actor.command(), "using 1:2:3 title \"\" ");
@@ -123,10 +111,8 @@ TEST(ostringify, wire_frame_actor_node_3d) {
 }
 
 TEST(ostringify, label_actor_root_index_2d) {
-    using Cell = OCellNonUniform_<double, 2>;
-    using Grid = OGridNonUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 0.5, 2, 2);
+    NonUniformGrid2 grid(NonUniformGrid2::Point(0.0, 0.0), 0.5, 2, 2);
 
     const auto actor = ToGnuplotActorLabel(grid, "root_index");
 
@@ -137,10 +123,8 @@ TEST(ostringify, label_actor_root_index_2d) {
 }
 
 TEST(ostringify, label_actor_root_index_1d) {
-    using Cell = OCellNonUniform_<double, 1>;
-    using Grid = OGridNonUniform_<double, 1>;
 
-    Grid grid(Grid::Point(0.0), 0.5, 2);
+    NonUniformGrid1 grid(NonUniformGrid1::Point(0.0), 0.5, 2);
 
     const auto actor = ToGnuplotActorLabel(grid, "root_index");
 
@@ -153,10 +137,8 @@ TEST(ostringify, label_actor_root_index_1d) {
 }
 
 TEST(ostringify, label_actor_root_index1d_2d) {
-    using Cell = OCellNonUniform_<double, 2>;
-    using Grid = OGridNonUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 0.5, 2, 2);
+    NonUniformGrid2 grid(NonUniformGrid2::Point(0.0, 0.0), 0.5, 2, 2);
 
     const auto actor = ToGnuplotActorLabel(grid, "root_index1d");
 
@@ -169,10 +151,8 @@ TEST(ostringify, label_actor_root_index1d_2d) {
 }
 
 TEST(ostringify, label_actor_root_index1d_3d) {
-    using Cell = OCellNonUniform_<double, 3>;
-    using Grid = OGridNonUniform_<double, 3>;
 
-    Grid grid(Grid::Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
+    NonUniformGrid3 grid(NonUniformGrid3::Point(0.0, 0.0, 0.0), 1.0, 2, 2, 2);
 
     const auto actor = ToGnuplotActorLabel(grid, "root_index1d");
 
@@ -188,9 +168,8 @@ TEST(ostringify, label_actor_root_index1d_3d) {
 }
 
 TEST(ostringify, label_actor_node_level_2d) {
-    using Grid = OGridUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 1.0, 1, 1);
+    UniformGrid2 grid(UniformGrid2::Point(0.0, 0.0), 1.0, 1, 1);
     auto root = grid.root_node(0, 0);
 
     const auto actor = ToGnuplotActorLabel(*root, "level");
@@ -202,13 +181,11 @@ TEST(ostringify, label_actor_node_level_2d) {
 }
 
 TEST(ostringify, label_actor_child_node_level_idx_and_custom_text_2d) {
-    using Grid = OGridUniform_<double, 2>;
-    using Node = Grid::Node;
 
-    Grid grid(Grid::Point(0.0, 0.0), 1.0, 1, 1);
+    UniformGrid2 grid(UniformGrid2::Point(0.0, 0.0), 1.0, 1, 1);
     auto root = grid.root_node(0, 0);
     root->new_full_children();
-    const auto child = root->child[Node::Idx::_MP_];
+    const auto child = root->child[UniformGrid2::Node::Idx::_MP_];
 
     const auto level_actor = ToGnuplotActorLabel(*child, "level");
     ASSERT_EQ(level_actor.data().size(), 1);

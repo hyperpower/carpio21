@@ -1,14 +1,13 @@
 #include "gtest/gtest.h"
-#include "domain/octree/grid/ocell.hpp"
-#include "domain/octree/grid/ogrid.hpp"
+#include "test_octree.h"
 
 
 using namespace carpio;
+using namespace carpio::octree_test;
 
 TEST(ocell_uniform, initial){
-    using Cell = OCellUniform_<double, 2>;
 
-    Cell cell;
+    UniformCell2 cell;
 
     EXPECT_DOUBLE_EQ(cell.get(_C_, _X_), 0.0);
     EXPECT_DOUBLE_EQ(cell.get(_C_, _Y_), 0.0);
@@ -18,9 +17,8 @@ TEST(ocell_uniform, initial){
 }
 
 TEST(ocell_uniform, geometry_2d){
-    using Cell = OCellUniform_<double, 2>;
 
-    Cell cell(0.25, 1.0, 2.0);
+    UniformCell2 cell(0.25, 1.0, 2.0);
 
     EXPECT_DOUBLE_EQ(cell.get(_M_, _X_), 0.75);
     EXPECT_DOUBLE_EQ(cell.get(_C_, _X_), 1.0);
@@ -48,9 +46,8 @@ TEST(ocell_uniform, geometry_2d){
 }
 
 TEST(ocell_uniform, accepts_nonuniform_style_constructor){
-    using Cell = OCellUniform_<double, 2>;
 
-    Cell cell(1.0, 0.25, 2.0, 0.25, 0.0, 0.25);
+    UniformCell2 cell(1.0, 0.25, 2.0, 0.25, 0.0, 0.25);
 
     EXPECT_DOUBLE_EQ(cell.get(_C_, _X_), 1.0);
     EXPECT_DOUBLE_EQ(cell.get(_C_, _Y_), 2.0);
@@ -59,23 +56,20 @@ TEST(ocell_uniform, accepts_nonuniform_style_constructor){
 }
 
 TEST(ocell_uniform, in_on_2d){
-    using Cell = OCellUniform_<double, 2>;
-    using Point = Cell::Point;
 
-    Cell cell(0.25, 1.0, 2.0);
+    UniformCell2 cell(0.25, 1.0, 2.0);
 
     EXPECT_TRUE(cell.is_in_on(1.0, 2.0));
     EXPECT_TRUE(cell.is_in_on(0.75, 1.75));
-    EXPECT_TRUE(cell.is_in_on(Point(1.25, 2.25)));
+    EXPECT_TRUE(cell.is_in_on(UniformCell2::Point(1.25, 2.25)));
     EXPECT_TRUE(cell.is_in_on(_X_, 1.25));
     EXPECT_FALSE(cell.is_in_on(1.26, 2.0));
     EXPECT_FALSE(cell.is_in_on(_Y_, 2.26));
 }
 
 TEST(ocell_uniform, transfer_2d){
-    using Cell = OCellUniform_<double, 2>;
 
-    Cell cell(0.25, 1.0, 2.0);
+    UniformCell2 cell(0.25, 1.0, 2.0);
     cell.transfer(0.5, -1.0);
 
     EXPECT_DOUBLE_EQ(cell.get(_C_, _X_), 1.5);
@@ -85,9 +79,8 @@ TEST(ocell_uniform, transfer_2d){
 }
 
 TEST(ocell_uniform, geometry_3d){
-    using Cell = OCellUniform_<double, 3>;
 
-    Cell cell(0.5, 1.0, 2.0, 3.0);
+    UniformCell3 cell(0.5, 1.0, 2.0, 3.0);
 
     EXPECT_DOUBLE_EQ(cell.get(_C_, _X_), 1.0);
     EXPECT_DOUBLE_EQ(cell.get(_C_, _Y_), 2.0);
@@ -105,9 +98,8 @@ TEST(ocell_uniform, geometry_3d){
 }
 
 TEST(ocell_uniform, make_sub_cell_1d){
-    using Cell = OCellUniform_<double, 1>;
 
-    Cell cell(1.0, 0.0);
+    UniformCell1 cell(1.0, 0.0);
 
     const auto m = cell.make_sub_cell(0);
     EXPECT_DOUBLE_EQ(m.get(_C_, _X_), -0.5);
@@ -119,9 +111,8 @@ TEST(ocell_uniform, make_sub_cell_1d){
 }
 
 TEST(ocell_uniform, make_sub_cell_2d){
-    using Cell = OCellUniform_<double, 2>;
 
-    Cell cell(1.0, 0.0, 0.0);
+    UniformCell2 cell(1.0, 0.0, 0.0);
 
     const auto mm = cell.make_sub_cell(0);
     EXPECT_DOUBLE_EQ(mm.get(_C_, _X_), -0.5);
@@ -143,9 +134,8 @@ TEST(ocell_uniform, make_sub_cell_2d){
 }
 
 TEST(ocell_uniform, make_sub_cell_3d){
-    using Cell = OCellUniform_<double, 3>;
 
-    Cell cell(1.0, 0.0, 0.0, 0.0);
+    UniformCell3 cell(1.0, 0.0, 0.0, 0.0);
 
     const auto mmm = cell.make_sub_cell(0);
     EXPECT_DOUBLE_EQ(mmm.get(_C_, _X_), -0.5);
@@ -177,9 +167,8 @@ TEST(ocell_uniform, make_sub_cell_3d){
 }
 
 TEST(ocell_uniform, works_as_ogrid_cell){
-    using Grid = OGridUniform_<double, 2>;
 
-    Grid grid(Grid::Point(0.0, 0.0), 0.25, 4, 4);
+    UniformGrid2 grid(UniformGrid2::Point(0.0, 0.0), 0.25, 4, 4);
     const auto& cell = grid.root_node(0, 0)->cell;
 
     EXPECT_DOUBLE_EQ(cell.get(_C_, _X_), 0.125);
@@ -189,17 +178,15 @@ TEST(ocell_uniform, works_as_ogrid_cell){
 }
 
 TEST(ocell_nonuniform, point_in_on_checks_z_in_3d){
-    using Cell = OCellNonUniform_<double, 3>;
-    using Point = Cell::Point;
 
-    Cell cell(1.0, 0.5, 2.0, 0.5, 3.0, 0.5);
+    NonUniformCell3 cell(1.0, 0.5, 2.0, 0.5, 3.0, 0.5);
 
     const auto center = cell.center();
     EXPECT_DOUBLE_EQ(center.x(), 1.0);
     EXPECT_DOUBLE_EQ(center.y(), 2.0);
     EXPECT_DOUBLE_EQ(center.z(), 3.0);
 
-    EXPECT_TRUE(cell.is_in_on(Point(1.0, 2.0, 3.0)));
-    EXPECT_TRUE(cell.is_in_on(Point(1.5, 2.5, 3.5)));
-    EXPECT_FALSE(cell.is_in_on(Point(1.0, 2.0, 3.51)));
+    EXPECT_TRUE(cell.is_in_on(NonUniformCell3::Point(1.0, 2.0, 3.0)));
+    EXPECT_TRUE(cell.is_in_on(NonUniformCell3::Point(1.5, 2.5, 3.5)));
+    EXPECT_FALSE(cell.is_in_on(NonUniformCell3::Point(1.0, 2.0, 3.51)));
 }

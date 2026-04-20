@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "test_define.hpp"
-#include "domain/octree/grid/onode.hpp"
+#include "test_octree.h"
 #include "domain/octree/io/ognuplot_actor_label.hpp"
 #include "domain/octree/io/ognuplot_actor_wire_frame.hpp"
 
@@ -11,53 +11,48 @@
 
 
 using namespace carpio;
+using namespace carpio::octree_test;
 
 TEST(onode, initial){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node node;
+    NonUniformNode2 node;
 
     EXPECT_EQ(node.father, nullptr);
     EXPECT_EQ(node.root_idx(), 0);
 
-    for (St i = 0; i < Node::NumChildren; ++i) {
+    for (St i = 0; i < NonUniformNode2::NumChildren; ++i) {
         EXPECT_EQ(node.child[i], nullptr);
     }
-    for (St i = 0; i < Node::NumNeighbors; ++i) {
+    for (St i = 0; i < NonUniformNode2::NumNeighbors; ++i) {
         EXPECT_EQ(node.neighbor[i], nullptr);
     }
 }
 
 TEST(onode, child_ownership){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node node;
+    NonUniformNode2 node;
     node.set_root_idx(12);
-    node.set_child(Node::Idx::_PP_, new Node());
+    node.set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
 
-    ASSERT_TRUE(node.has_child(Node::Idx::_PP_));
+    ASSERT_TRUE(node.has_child(NonUniformNode2::Idx::_PP_));
     EXPECT_TRUE(node.has_child());
     EXPECT_FALSE(node.is_leaf());
-    EXPECT_EQ(node.child[Node::Idx::_PP_]->father, &node);
-    EXPECT_EQ(node.child[Node::Idx::_PP_]->root_idx(), 12);
+    EXPECT_EQ(node.child[NonUniformNode2::Idx::_PP_]->father, &node);
+    EXPECT_EQ(node.child[NonUniformNode2::Idx::_PP_]->root_idx(), 12);
 
-    node.delete_child(Node::Idx::_PP_);
+    node.delete_child(NonUniformNode2::Idx::_PP_);
 
-    EXPECT_FALSE(node.has_child(Node::Idx::_PP_));
+    EXPECT_FALSE(node.has_child(NonUniformNode2::Idx::_PP_));
     EXPECT_FALSE(node.has_child());
     EXPECT_TRUE(node.is_leaf());
 }
 
 TEST(onode, construct_child_node){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
+    NonUniformNode2 root;
     root.set_root_idx(7);
-    Cell cell(1.0, 0.25, 2.0, 0.25);
-    Node child(Node::Idx::_PP_, &root, cell, 3.0);
+    NonUniformCell2 cell(1.0, 0.25, 2.0, 0.25);
+    NonUniformNode2 child(NonUniformNode2::Idx::_PP_, &root, cell, 3.0);
 
     EXPECT_EQ(child.father, &root);
     EXPECT_FALSE(child.is_root());
@@ -66,27 +61,52 @@ TEST(onode, construct_child_node){
     EXPECT_DOUBLE_EQ(child.cell.get(_C_, _Y_), 2.0);
     EXPECT_DOUBLE_EQ(child.data, 3.0);
     EXPECT_EQ(child.root_idx(), 7);
-    for (St i = 0; i < Node::NumChildren; ++i) {
+    for (St i = 0; i < NonUniformNode2::NumChildren; ++i) {
         EXPECT_EQ(child.child[i], nullptr);
     }
-    for (St i = 0; i < Node::NumNeighbors; ++i) {
+    for (St i = 0; i < NonUniformNode2::NumNeighbors; ++i) {
         EXPECT_EQ(child.neighbor[i], nullptr);
     }
 }
 
-TEST(onode, new_child_from_parent_cell){
-    using Cell = OCellUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
+TEST(onode, exposes_morton_code){
 
-    Node node;
+    UniformNode2 root;
+
+    EXPECT_EQ(root.code(), UniformNode2::MortonCode::Code{0});
+
+    root.set_child(UniformNode2::Idx::_PP_, new UniformNode2());
+    auto child = root.child[UniformNode2::Idx::_PP_];
+    ASSERT_NE(child, nullptr);
+
+    EXPECT_EQ(child->code(),
+              (UniformNode2::MortonCode::Code{1} << UniformNode2::MortonCode::LevelShift)
+              | UniformNode2::MortonCode::Code{UniformNode2::Idx::_PP_});
+
+    child->set_child(UniformNode2::Idx::_MP_, new UniformNode2());
+    auto grandchild = child->child[UniformNode2::Idx::_MP_];
+    ASSERT_NE(grandchild, nullptr);
+
+    const auto expected_path =
+        UniformNode2::MortonCode::Code{UniformNode2::Idx::_PP_}
+        | (UniformNode2::MortonCode::Code{UniformNode2::Idx::_MP_}
+           << UniformNode2::MortonCode::BitsPerLevel);
+    EXPECT_EQ(grandchild->code(),
+              (UniformNode2::MortonCode::Code{2} << UniformNode2::MortonCode::LevelShift)
+              | expected_path);
+}
+
+TEST(onode, new_child_from_parent_cell){
+
+    UniformNode2 node;
     node.set_root_idx(21);
-    node.cell = Cell(1.0, 0.0, 0.0);
+    node.cell = UniformCell2(1.0, 0.0, 0.0);
     node.data = 7.0;
 
-    node.new_child(Node::Idx::_PP_);
+    node.new_child(UniformNode2::Idx::_PP_);
 
-    ASSERT_TRUE(node.has_child(Node::Idx::_PP_));
-    auto child = node.child[Node::Idx::_PP_];
+    ASSERT_TRUE(node.has_child(UniformNode2::Idx::_PP_));
+    auto child = node.child[UniformNode2::Idx::_PP_];
     EXPECT_EQ(child->father, &node);
     EXPECT_EQ(child->root_idx(), 21);
     EXPECT_DOUBLE_EQ(child->data, node.data);
@@ -95,34 +115,32 @@ TEST(onode, new_child_from_parent_cell){
     EXPECT_DOUBLE_EQ(child->cell.get_hd(_X_), 0.5);
     EXPECT_DOUBLE_EQ(child->cell.get_hd(_Y_), 0.5);
 
-    child->new_child(Node::Idx::_MM_);
-    ASSERT_TRUE(child->has_child(Node::Idx::_MM_));
+    child->new_child(UniformNode2::Idx::_MM_);
+    ASSERT_TRUE(child->has_child(UniformNode2::Idx::_MM_));
 
-    node.new_child(Node::Idx::_PP_);
+    node.new_child(UniformNode2::Idx::_PP_);
 
-    ASSERT_TRUE(node.has_child(Node::Idx::_PP_));
-    EXPECT_EQ(node.child[Node::Idx::_PP_]->father, &node);
-    EXPECT_TRUE(node.child[Node::Idx::_PP_]->is_leaf());
+    ASSERT_TRUE(node.has_child(UniformNode2::Idx::_PP_));
+    EXPECT_EQ(node.child[UniformNode2::Idx::_PP_]->father, &node);
+    EXPECT_TRUE(node.child[UniformNode2::Idx::_PP_]->is_leaf());
 }
 
 TEST(onode, new_full_children_from_parent_cell){
-    using Cell = OCellUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node node;
+    UniformNode2 node;
     node.set_root_idx(33);
-    node.cell = Cell(2.0, 1.0, 1.0);
+    node.cell = UniformCell2(2.0, 1.0, 1.0);
     node.data = 7.0;
 
     node.new_full_children();
 
-    const double expected_x[Node::NumChildren] = {0.0, 2.0, 0.0, 2.0};
-    const double expected_y[Node::NumChildren] = {0.0, 0.0, 2.0, 2.0};
+    const double expected_x[UniformNode2::NumChildren] = {0.0, 2.0, 0.0, 2.0};
+    const double expected_y[UniformNode2::NumChildren] = {0.0, 0.0, 2.0, 2.0};
 
     EXPECT_TRUE(node.is_full_child());
     EXPECT_FALSE(node.is_leaf());
     EXPECT_EQ(node.height(), 1);
-    for (St i = 0; i < Node::NumChildren; ++i) {
+    for (St i = 0; i < UniformNode2::NumChildren; ++i) {
         ASSERT_TRUE(node.has_child(i));
         auto child = node.child[i];
         EXPECT_EQ(child->father, &node);
@@ -137,65 +155,55 @@ TEST(onode, new_full_children_from_parent_cell){
 }
 
 TEST(onode, find_root_returns_self_for_root){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
+    NonUniformNode2 root;
 
     EXPECT_EQ(&root.find_root(), &root);
 }
 
 TEST(onode, find_root_returns_root_for_direct_child){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_PP_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
 
-    ASSERT_NE(root.child[Node::Idx::_PP_], nullptr);
-    EXPECT_EQ(&root.child[Node::Idx::_PP_]->find_root(), &root);
+    ASSERT_NE(root.child[NonUniformNode2::Idx::_PP_], nullptr);
+    EXPECT_EQ(&root.child[NonUniformNode2::Idx::_PP_]->find_root(), &root);
 }
 
 TEST(onode, find_root_returns_topmost_root_for_deep_descendant){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MM_, new Node());
-    ASSERT_NE(root.child[Node::Idx::_MM_], nullptr);
-    root.child[Node::Idx::_MM_]->set_child(Node::Idx::_PP_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    ASSERT_NE(root.child[NonUniformNode2::Idx::_MM_], nullptr);
+    root.child[NonUniformNode2::Idx::_MM_]->set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
 
-    auto grandchild = root.child[Node::Idx::_MM_]->child[Node::Idx::_PP_];
+    auto grandchild = root.child[NonUniformNode2::Idx::_MM_]->child[NonUniformNode2::Idx::_PP_];
     ASSERT_NE(grandchild, nullptr);
     EXPECT_EQ(&grandchild->find_root(), &root);
 }
 
 TEST(onode, find_root_const_returns_const_root_reference){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MP_, new Node());
-    ASSERT_NE(root.child[Node::Idx::_MP_], nullptr);
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    ASSERT_NE(root.child[NonUniformNode2::Idx::_MP_], nullptr);
 
-    const Node& const_child = *root.child[Node::Idx::_MP_];
-    static_assert(std::is_same_v<decltype(const_child.find_root()), const Node&>);
+    const NonUniformNode2& const_child = *root.child[NonUniformNode2::Idx::_MP_];
+    static_assert(std::is_same_v<decltype(const_child.find_root()), const NonUniformNode2&>);
     EXPECT_EQ(&const_child.find_root(), &root);
 }
 
 TEST(onode, iterator_visits_single_node_subtree){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node node;
+    NonUniformNode2 node;
 
     static_assert(std::is_same_v<
-        typename std::iterator_traits<Node::iterator>::iterator_category,
+        typename std::iterator_traits<NonUniformNode2::iterator>::iterator_category,
         std::bidirectional_iterator_tag>);
     static_assert(std::is_same_v<
-        typename std::iterator_traits<Node::const_iterator>::iterator_category,
+        typename std::iterator_traits<NonUniformNode2::const_iterator>::iterator_category,
         std::bidirectional_iterator_tag>);
-    static_assert(std::is_same_v<decltype(*node.begin()), Node&>);
+    static_assert(std::is_same_v<decltype(*node.begin()), NonUniformNode2&>);
 
     auto it = node.begin();
     ASSERT_NE(it, node.end());
@@ -209,113 +217,105 @@ TEST(onode, iterator_visits_single_node_subtree){
 }
 
 TEST(onode, iterator_visits_2d_subtree_in_preorder){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MM_, new Node());
-    root.set_child(Node::Idx::_PP_, new Node());
-    root.child[Node::Idx::_MM_]->set_child(Node::Idx::_MP_, new Node());
-    root.child[Node::Idx::_MM_]->set_child(Node::Idx::_PM_, new Node());
-    root.child[Node::Idx::_PP_]->set_child(Node::Idx::_MM_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
+    root.child[NonUniformNode2::Idx::_MM_]->set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    root.child[NonUniformNode2::Idx::_MM_]->set_child(NonUniformNode2::Idx::_PM_, new NonUniformNode2());
+    root.child[NonUniformNode2::Idx::_PP_]->set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
 
-    std::vector<Node*> visited;
+    std::vector<NonUniformNode2*> visited;
     for (auto& node : root) {
         visited.push_back(&node);
     }
 
-    std::vector<Node*> expected = {
+    std::vector<NonUniformNode2*> expected = {
         &root,
-        root.child[Node::Idx::_MM_],
-        root.child[Node::Idx::_MM_]->child[Node::Idx::_MP_],
-        root.child[Node::Idx::_MM_]->child[Node::Idx::_PM_],
-        root.child[Node::Idx::_PP_],
-        root.child[Node::Idx::_PP_]->child[Node::Idx::_MM_],
+        root.child[NonUniformNode2::Idx::_MM_],
+        root.child[NonUniformNode2::Idx::_MM_]->child[NonUniformNode2::Idx::_MP_],
+        root.child[NonUniformNode2::Idx::_MM_]->child[NonUniformNode2::Idx::_PM_],
+        root.child[NonUniformNode2::Idx::_PP_],
+        root.child[NonUniformNode2::Idx::_PP_]->child[NonUniformNode2::Idx::_MM_],
     };
     EXPECT_EQ(visited, expected);
 }
 
 TEST(onode, iterator_from_middle_node_stays_inside_that_subtree){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MM_, new Node());
-    root.set_child(Node::Idx::_MP_, new Node());
-    root.set_child(Node::Idx::_PP_, new Node());
-    auto subtree = root.child[Node::Idx::_MP_];
-    subtree->set_child(Node::Idx::_MM_, new Node());
-    subtree->set_child(Node::Idx::_PP_, new Node());
-    root.child[Node::Idx::_PP_]->set_child(Node::Idx::_MM_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
+    auto subtree = root.child[NonUniformNode2::Idx::_MP_];
+    subtree->set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    subtree->set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
+    root.child[NonUniformNode2::Idx::_PP_]->set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
 
-    std::vector<Node*> visited;
+    std::vector<NonUniformNode2*> visited;
     for (auto& node : *subtree) {
         visited.push_back(&node);
     }
 
-    std::vector<Node*> expected = {
+    std::vector<NonUniformNode2*> expected = {
         subtree,
-        subtree->child[Node::Idx::_MM_],
-        subtree->child[Node::Idx::_PP_],
+        subtree->child[NonUniformNode2::Idx::_MM_],
+        subtree->child[NonUniformNode2::Idx::_PP_],
     };
     EXPECT_EQ(visited, expected);
 }
 
 TEST(onode, for_each_visits_current_node_subtree_in_preorder){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MM_, new Node());
-    root.set_child(Node::Idx::_MP_, new Node());
-    root.set_child(Node::Idx::_PP_, new Node());
-    auto subtree = root.child[Node::Idx::_MP_];
-    subtree->set_child(Node::Idx::_MM_, new Node());
-    subtree->set_child(Node::Idx::_PP_, new Node());
-    root.child[Node::Idx::_PP_]->set_child(Node::Idx::_MM_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
+    auto subtree = root.child[NonUniformNode2::Idx::_MP_];
+    subtree->set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    subtree->set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
+    root.child[NonUniformNode2::Idx::_PP_]->set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
 
-    std::vector<Node*> visited;
-    subtree->for_each([&](Node::ref_Node node) {
+    std::vector<NonUniformNode2*> visited;
+    subtree->for_each([&](NonUniformNode2::ref_Node node) {
         visited.push_back(&node);
     });
 
-    std::vector<Node*> expected = {
+    std::vector<NonUniformNode2*> expected = {
         subtree,
-        subtree->child[Node::Idx::_MM_],
-        subtree->child[Node::Idx::_PP_],
+        subtree->child[NonUniformNode2::Idx::_MM_],
+        subtree->child[NonUniformNode2::Idx::_PP_],
     };
     EXPECT_EQ(visited, expected);
 
-    const Node& const_subtree = *subtree;
-    std::vector<const Node*> const_visited;
-    const_subtree.for_each([&](Node::const_ref_Node node) {
+    const NonUniformNode2& const_subtree = *subtree;
+    std::vector<const NonUniformNode2*> const_visited;
+    const_subtree.for_each([&](NonUniformNode2::const_ref_Node node) {
         const_visited.push_back(&node);
     });
 
-    std::vector<const Node*> const_expected = {
+    std::vector<const NonUniformNode2*> const_expected = {
         subtree,
-        subtree->child[Node::Idx::_MM_],
-        subtree->child[Node::Idx::_PP_],
+        subtree->child[NonUniformNode2::Idx::_MM_],
+        subtree->child[NonUniformNode2::Idx::_PP_],
     };
     EXPECT_EQ(const_visited, const_expected);
 }
 
 TEST(onode, iterator_reverse_order_matches_forward_order_reversed){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MM_, new Node());
-    root.set_child(Node::Idx::_MP_, new Node());
-    root.child[Node::Idx::_MM_]->set_child(Node::Idx::_PM_, new Node());
-    root.child[Node::Idx::_MP_]->set_child(Node::Idx::_PP_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    root.child[NonUniformNode2::Idx::_MM_]->set_child(NonUniformNode2::Idx::_PM_, new NonUniformNode2());
+    root.child[NonUniformNode2::Idx::_MP_]->set_child(NonUniformNode2::Idx::_PP_, new NonUniformNode2());
 
-    std::vector<Node*> forward;
+    std::vector<NonUniformNode2*> forward;
     for (auto it = root.begin(); it != root.end(); ++it) {
         forward.push_back(&(*it));
     }
 
-    std::vector<Node*> backward;
+    std::vector<NonUniformNode2*> backward;
     for (auto it = root.end(); it != root.begin();) {
         --it;
         backward.push_back(&(*it));
@@ -328,32 +328,28 @@ TEST(onode, iterator_reverse_order_matches_forward_order_reversed){
 }
 
 TEST(onode, const_iterator_dereferences_to_const_node){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node node;
-    const Node& const_node = node;
+    NonUniformNode2 node;
+    const NonUniformNode2& const_node = node;
 
-    static_assert(std::is_same_v<decltype(*const_node.begin()), const Node&>);
-    static_assert(std::is_same_v<decltype(*const_node.cbegin()), const Node&>);
+    static_assert(std::is_same_v<decltype(*const_node.begin()), const NonUniformNode2&>);
+    static_assert(std::is_same_v<decltype(*const_node.cbegin()), const NonUniformNode2&>);
     EXPECT_EQ(&(*const_node.begin()), &const_node);
     EXPECT_EQ(&(*const_node.cbegin()), &const_node);
 }
 
 TEST(onode, plots_random_subtree_2d){
-    using Cell = OCellUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
     std::mt19937 rng(20260419);
     std::uniform_real_distribution<double> center_dist(-1.0, 1.0);
     std::uniform_real_distribution<double> half_dist(0.8, 1.6);
     std::uniform_real_distribution<double> probability(0.0, 1.0);
 
-    Node root;
-    root.cell = Cell(1.0, 0.0, 0.0);
+    UniformNode2 root;
+    root.cell = UniformCell2(1.0, 0.0, 0.0);
 
     const St max_level = 4;
-    auto refine_randomly = [&](auto&& self, Node* node) -> void {
+    auto refine_randomly = [&](auto&& self, UniformNode2* node) -> void {
         ASSERT(node != nullptr);
         if (node->level() >= max_level) {
             return;
@@ -366,7 +362,7 @@ TEST(onode, plots_random_subtree_2d){
 
         node->new_full_children();
 
-        for (St i = 0; i < Node::NumChildren; ++i) {
+        for (St i = 0; i < UniformNode2::NumChildren; ++i) {
             if (node->child[i] != nullptr) {
                 self(self, node->child[i]);
             }
@@ -411,98 +407,84 @@ TEST(onode, plots_random_subtree_2d){
 }
 
 TEST(onode, find_face_neighbor_same_parent_siblings_2d){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MM_, new Node());
-    root.set_child(Node::Idx::_MP_, new Node());
-    root.set_child(Node::Idx::_PM_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_PM_, new NonUniformNode2());
 
-    EXPECT_EQ(root.child[Node::Idx::_MM_]->find_face_neighbor(_XP_),
-              root.child[Node::Idx::_MP_]);
-    EXPECT_EQ(root.child[Node::Idx::_MM_]->find_face_neighbor(_YP_),
-              root.child[Node::Idx::_PM_]);
+    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MM_]->find_face_neighbor(_XP_),
+              root.child[NonUniformNode2::Idx::_MP_]);
+    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MM_]->find_face_neighbor(_YP_),
+              root.child[NonUniformNode2::Idx::_PM_]);
 }
 
 TEST(onode, find_face_neighbor_climbs_to_common_ancestor_2d){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MM_, new Node());
-    root.set_child(Node::Idx::_MP_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+    root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
 
-    auto left_parent = root.child[Node::Idx::_MM_];
-    auto right_parent = root.child[Node::Idx::_MP_];
-    left_parent->set_child(Node::Idx::_MP_, new Node());
-    right_parent->set_child(Node::Idx::_MM_, new Node());
+    auto left_parent = root.child[NonUniformNode2::Idx::_MM_];
+    auto right_parent = root.child[NonUniformNode2::Idx::_MP_];
+    left_parent->set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    right_parent->set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
 
-    EXPECT_EQ(left_parent->child[Node::Idx::_MP_]->find_face_neighbor(_XP_),
-              right_parent->child[Node::Idx::_MM_]);
+    EXPECT_EQ(left_parent->child[NonUniformNode2::Idx::_MP_]->find_face_neighbor(_XP_),
+              right_parent->child[NonUniformNode2::Idx::_MM_]);
 }
 
 TEST(onode, find_face_neighbor_crosses_root_neighbor_and_descends_2d){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node left_root;
-    Node right_root;
+    NonUniformNode2 left_root;
+    NonUniformNode2 right_root;
     left_root.neighbor[FaceDirectionInOrder(_XP_)] = &right_root;
 
-    left_root.set_child(Node::Idx::_MP_, new Node());
-    right_root.set_child(Node::Idx::_MM_, new Node());
+    left_root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    right_root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
 
-    EXPECT_EQ(left_root.child[Node::Idx::_MP_]->find_face_neighbor(_XP_),
-              right_root.child[Node::Idx::_MM_]);
+    EXPECT_EQ(left_root.child[NonUniformNode2::Idx::_MP_]->find_face_neighbor(_XP_),
+              right_root.child[NonUniformNode2::Idx::_MM_]);
 }
 
 TEST(onode, find_face_neighbor_returns_coarser_neighbor_when_child_is_missing_2d){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node left_root;
-    Node right_root;
+    NonUniformNode2 left_root;
+    NonUniformNode2 right_root;
     left_root.neighbor[FaceDirectionInOrder(_XP_)] = &right_root;
 
-    left_root.set_child(Node::Idx::_MP_, new Node());
+    left_root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
 
-    EXPECT_EQ(left_root.child[Node::Idx::_MP_]->find_face_neighbor(_XP_),
+    EXPECT_EQ(left_root.child[NonUniformNode2::Idx::_MP_]->find_face_neighbor(_XP_),
               &right_root);
 }
 
 TEST(onode, find_face_neighbor_returns_nullptr_for_missing_boundary_neighbor_2d){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
-    root.set_child(Node::Idx::_MP_, new Node());
+    NonUniformNode2 root;
+    root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
 
-    EXPECT_EQ(root.child[Node::Idx::_MP_]->find_face_neighbor(_XP_), nullptr);
+    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MP_]->find_face_neighbor(_XP_), nullptr);
 }
 
 TEST(onode, find_face_neighbor_rejects_direction_outside_dimension_2d){
-    using Cell = OCellNonUniform_<double, 2>;
-    using Node = ONode_<double, Cell, 2>;
 
-    Node root;
+    NonUniformNode2 root;
 
     EXPECT_EQ(root.find_face_neighbor(_ZP_), nullptr);
 }
 
 TEST(onode, find_face_neighbor_climbs_to_common_ancestor_3d_z_direction){
-    using Cell = OCellNonUniform_<double, 3>;
-    using Node = ONode_<double, Cell, 3>;
 
-    Node root;
-    root.set_child(Node::Idx::_MMM_, new Node());
-    root.set_child(Node::Idx::_PMM_, new Node());
+    NonUniformNode3 root;
+    root.set_child(NonUniformNode3::Idx::_MMM_, new NonUniformNode3());
+    root.set_child(NonUniformNode3::Idx::_PMM_, new NonUniformNode3());
 
-    auto lower_parent = root.child[Node::Idx::_MMM_];
-    auto upper_parent = root.child[Node::Idx::_PMM_];
-    lower_parent->set_child(Node::Idx::_PMM_, new Node());
-    upper_parent->set_child(Node::Idx::_MMM_, new Node());
+    auto lower_parent = root.child[NonUniformNode3::Idx::_MMM_];
+    auto upper_parent = root.child[NonUniformNode3::Idx::_PMM_];
+    lower_parent->set_child(NonUniformNode3::Idx::_PMM_, new NonUniformNode3());
+    upper_parent->set_child(NonUniformNode3::Idx::_MMM_, new NonUniformNode3());
 
-    EXPECT_EQ(lower_parent->child[Node::Idx::_PMM_]->find_face_neighbor(_ZP_),
-              upper_parent->child[Node::Idx::_MMM_]);
+    EXPECT_EQ(lower_parent->child[NonUniformNode3::Idx::_PMM_]->find_face_neighbor(_ZP_),
+              upper_parent->child[NonUniformNode3::Idx::_MMM_]);
 }

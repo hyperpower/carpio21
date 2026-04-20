@@ -5,6 +5,7 @@
 #include "domain/octree/octree_define.hpp"
 #include "ocell.hpp"
 #include "onode_iterator.hpp"
+#include "domain/octree/order/morton.hpp"
 #include <functional>
 
 #include <math.h>
@@ -146,10 +147,10 @@ public:
     typedef std::function<void(const_ref_Node)> FunConstNode;
     typedef ONodeIterator_<Node, pNode, Node&> iterator;
     typedef ONodeIterator_<Node, const_pNode, const Node&> const_iterator;
+    typedef MortonCode_<DIM> MortonCode;
 
 protected:
-    St _level;
-    St _idx;
+    MortonCode _code;
     St _root_idx;
 public:
     pNode father;
@@ -163,8 +164,7 @@ public:
      *  constructor
      */
     ONode_() :
-        _level(0),
-        _idx(0),
+        _code(),
         _root_idx(0),
         father(nullptr),
         cell(),
@@ -179,8 +179,7 @@ public:
     }
 
     ONode_(St idx, pNode f, const Cell& c, const Data& d) :
-        _level(f == nullptr ? 0 : f->_level + 1),
-        _idx(idx),
+        _code(),
         _root_idx(f == nullptr ? 0 : f->_root_idx),
         father(f),
         cell(c),
@@ -193,6 +192,10 @@ public:
         for (St i = 0; i < NumNeighbors; ++i) {
             neighbor[i] = nullptr;
         }
+        if (f != nullptr) {
+            _code = f->_code;
+            _code.append(idx);
+        }
     }
 
     /*
@@ -204,8 +207,7 @@ public:
     }
 
     ONode_(const Self& s) :
-        _level(s._level),
-        _idx(s._idx),
+        _code(s._code),
         _root_idx(s._root_idx),
         father(nullptr),
         cell(s.cell),
@@ -230,8 +232,7 @@ public:
         }
 
         clear_children();
-        _level = s._level;
-        _idx   = s._idx;
+        _code = s._code;
         _root_idx = s._root_idx;
         father = nullptr;
         cell   = s.cell;
@@ -252,11 +253,15 @@ public:
     }
 
     St level() const {
-        return _level;
+        return _code.level();
+    }
+
+    typename MortonCode::Code code() const {
+        return _code.code();
     }
 
     St idx() const {
-        return _idx;
+        return level() == 0 ? 0 : _code.child_at(level() - 1);
     }
 
     iterator begin() {
@@ -362,8 +367,7 @@ public:
         child[idx] = pn;
         if (pn != nullptr) {
             pn->father = this;
-            pn->_idx = idx;
-            pn->_level = this->_level + 1;
+            pn->_reset_code_from_parent(idx);
             pn->set_root_idx(this->_root_idx);
         }
     }
@@ -431,8 +435,9 @@ protected:
         }
 
         const St mask = HI(d);
-        const St neighbor_child_idx = pnode->_idx ^ mask;
-        if (!IsOnDirection(pnode->_idx, d)) {
+        const St node_idx = pnode->idx();
+        const St neighbor_child_idx = node_idx ^ mask;
+        if (!IsOnDirection(node_idx, d)) {
             return pnode->father->child[neighbor_child_idx];
         }
 
@@ -440,12 +445,26 @@ protected:
         if (coarse_neighbor == nullptr) {
             return nullptr;
         }
-        if (coarse_neighbor->_level < pnode->father->_level) {
+        if (coarse_neighbor->level() < pnode->father->level()) {
             return coarse_neighbor;
         }
 
         const_pNode fine_neighbor = coarse_neighbor->child[neighbor_child_idx];
         return fine_neighbor == nullptr ? coarse_neighbor : fine_neighbor;
+    }
+
+    void _reset_code_from_parent(St idx) {
+        ASSERT(idx < NumChildren);
+        ASSERT(father != nullptr);
+
+        _code = father->_code;
+        _code.append(idx);
+        for (St i = 0; i < NumChildren; ++i) {
+            if (child[i] != nullptr) {
+                child[i]->father = this;
+                child[i]->_reset_code_from_parent(i);
+            }
+        }
     }
 	
 };

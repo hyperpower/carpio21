@@ -3,6 +3,8 @@
 
 #include "domain/octree/grid/ogrid.hpp"
 
+#include <numeric>
+
 namespace carpio {
 
 template<typename DATA, St DIM>
@@ -18,6 +20,7 @@ public:
     typedef typename Base::vt vt;
     typedef typename Base::Point Point;
     typedef std::array<vt, Dim> ArrLength;
+    typedef std::array<std::vector<vt>, Dim> ArrCellSize;
 
     typedef typename Base::Node Node;
     typedef typename Base::pNode pNode;
@@ -26,6 +29,7 @@ public:
 protected:
     Point _origin;
     ArrLength _length;
+    ArrCellSize _cell_size;
 
 public:
     OGridNonUniform_(const Point& origin,
@@ -34,20 +38,19 @@ public:
                      St ny = 0, // number of cells in y direction, only used when Dim
                      St nz = 0 // number of cells in z direction, only used when Dim >= 3
                      ) :
-        Base(nx, Dim >= 2 ? ny : 0, Dim >= 3 ? nz : 0),
+        OGridNonUniform_(origin, _make_uniform_cell_size(cell_len, nx, ny, nz)) {
+    }
+
+    OGridNonUniform_(const Point& origin,
+                     const ArrCellSize& cell_lengths) :
+        Base(_normal_size(cell_lengths, _X_),
+             Dim >= 2 ? _normal_size(cell_lengths, _Y_) : 0,
+             Dim >= 3 ? _normal_size(cell_lengths, _Z_) : 0),
         _origin(origin),
-        _length() {
-        ASSERT(cell_len > 0);
-        ASSERT(nx > 0);
-        _length[_X_] = cell_len * nx;
-        if constexpr (Dim >= 2) {
-            ASSERT(ny > 0);
-            _length[_Y_] = cell_len * ny;
-        }
-        if constexpr (Dim >= 3) {
-            ASSERT(nz > 0);
-            _length[_Z_] = cell_len * nz;
-        }
+        _length(),
+        _cell_size() {
+        _set_cell_size(cell_lengths);
+        _set_length();
         _set_root_cells();
     }
 
@@ -63,9 +66,23 @@ public:
         return _length[dim];
     }
 
-    vt cell_size(St dim) const {
+    const std::vector<vt>& cell_size(St dim) const {
         ASSERT(dim < Dim);
-        return _length[dim] / this->_size(dim);
+        return _cell_size[dim];
+    }
+
+    vt cell_size(Axes dim) const {
+        ASSERT(St(dim) < Dim);
+        return _cell_size[dim][Base::GhostLayer];
+    }
+
+    const ArrCellSize& cell_size() const {
+        return _cell_size;
+    }
+
+    vt cell_size(St dim, Int idx) const {
+        ASSERT(dim < Dim);
+        return _cell_size[dim][this->_to_storage_idx(idx, dim)];
     }
 
     const Point& origin() const {
@@ -143,34 +160,48 @@ protected:
         if constexpr (Dim >= 3) {
             cz = _center(k, _Z_);
         }
-        vt hx = cell_size(_X_) * 0.5;
+        vt hx = _cell_size[_X_][i] * 0.5;
         vt hy = 0;
         vt hz = 0;
         if constexpr (Dim >= 2) {
-            hy = cell_size(_Y_) * 0.5;
+            hy = _cell_size[_Y_][j] * 0.5;
         }
         if constexpr (Dim >= 3) {
-            hz = cell_size(_Z_) * 0.5;
+            hz = _cell_size[_Z_][k] * 0.5;
         }
         return Cell(cx, hx, cy, hy, cz, hz);
     }
 
     vt _center(St storage_index, St dim) const {
-        vt idx = vt(storage_index) - vt(Base::GhostLayer);
-        return _origin(dim) + (idx + vt(0.5)) * cell_size(dim);
+        vt face_m = _origin(dim) - _cell_size[dim].front();
+        for (St i = 0; i < storage_index; ++i) {
+            face_m += _cell_size[dim][i];
+        }
+        return face_m + _cell_size[dim][storage_index] * vt(0.5);
     }
 
     Int _locate_root_index(const Point& p, St dim) const {
         ASSERT(dim < Dim);
-        const vt h = cell_size(dim);
         const vt max = _origin(dim) + _length[dim];
         if (p(dim) == max) {
             return Int(this->_size(dim)) - 1;
         }
-        if (p(dim) == max + h) {
-            return Int(this->_size(dim));
+        const Int first = -Int(Base::GhostLayer);
+        const Int last = Int(this->_size(dim));
+        const Axes axis = ToAxes(dim);
+        const vt outer_max = _root_node_on_axis(last, dim)->cell.get(_P_, axis);
+        if (p(dim) == outer_max) {
+            return last;
         }
-        return Int(std::floor((p(dim) - _origin(dim)) / h));
+        for (Int idx = first; idx <= last; ++idx) {
+            const auto& cell = _root_node_on_axis(idx, dim)->cell;
+            if (p(dim) >= cell.get(_M_, axis) && p(dim) < cell.get(_P_, axis)) {
+                return idx;
+            }
+        }
+        return p(dim) < _root_node_on_axis(first, dim)->cell.get(_M_, axis)
+            ? first - 1
+            : last + 1;
     }
 
     bool _is_valid_locate_root_index(Int idx, St dim) const {
@@ -186,6 +217,77 @@ protected:
             root.cell = _make_cell(St(idx.i()), St(idx.j()), St(idx.k()));
         }
     }
+
+    const_pNode _root_node_on_axis(Int idx, St dim) const {
+        ASSERT(dim < Dim);
+        if (dim == _X_) {
+            return this->root_node(idx);
+        }
+        if constexpr (Dim >= 2) {
+            if (dim == _Y_) {
+                return this->root_node(0, idx);
+            }
+        }
+        if constexpr (Dim >= 3) {
+            if (dim == _Z_) {
+                return this->root_node(0, 0, idx);
+            }
+        }
+        SHOULD_NOT_REACH;
+        return nullptr;
+    }
+
+    static St _normal_size(const ArrCellSize& cell_lengths, St dim) {
+        ASSERT(dim < Dim);
+        ASSERT(cell_lengths[dim].size() > 0);
+        return cell_lengths[dim].size();
+    }
+
+    static ArrCellSize _make_uniform_cell_size(
+            const vt& cell_len,
+            St nx,
+            St ny = 0,
+            St nz = 0) {
+        ASSERT(cell_len > 0);
+        ASSERT(nx > 0);
+        ArrCellSize res;
+        res[_X_].assign(nx, cell_len);
+        if constexpr (Dim >= 2) {
+            ASSERT(ny > 0);
+            res[_Y_].assign(ny, cell_len);
+        }
+        if constexpr (Dim >= 3) {
+            ASSERT(nz > 0);
+            res[_Z_].assign(nz, cell_len);
+        }
+        return res;
+    }
+
+    void _set_cell_size(const ArrCellSize& cell_lengths) {
+        for (St dim = 0; dim < Dim; ++dim) {
+            const auto& normal = cell_lengths[dim];
+            ASSERT(normal.size() == this->_size(dim));
+            ASSERT(normal.size() > 0);
+            _cell_size[dim].clear();
+            _cell_size[dim].reserve(normal.size() + 2 * Base::GhostLayer);
+            _cell_size[dim].push_back(normal.front());
+            for (auto len : normal) {
+                ASSERT(len > vt(0));
+                _cell_size[dim].push_back(len);
+            }
+            _cell_size[dim].push_back(normal.back());
+        }
+    }
+
+    void _set_length() {
+        for (St dim = 0; dim < Dim; ++dim) {
+            _length[dim] = std::accumulate(
+                _cell_size[dim].begin() + Base::GhostLayer,
+                _cell_size[dim].end() - Base::GhostLayer,
+                vt(0));
+        }
+    }
+
 };
 
 }
