@@ -19,6 +19,7 @@ Restructure examples
    
    1-tri_tri/ttintersection
    2-poisson/poisson
+   3-octree/ogrid
    example
 
 

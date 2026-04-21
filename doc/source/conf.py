@@ -72,6 +72,10 @@ mathjax_config = {
         'inlineMath': [ ["\\(","\\)"] ],
         'displayMath': [["\\[","\\]"] ],
     },
+    'HTML-CSS': {
+        'preferredFont': 'STIX',
+        'webFont': 'STIX-Web',
+    },
 }
 mathjax3_config = {
   "tex": {
@@ -94,7 +98,12 @@ math_eqref_format   = "Eq.{number}"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinxawesome_theme'
+# Setting for sphinxawesome_theme
+from sphinxawesome_theme.postprocess import Icons
+html_permalinks_icon = Icons.permalinks_icon
+# html_permalinks_icon = "<span>¶</span>"
+# <- End of setting for sphinxawesome_theme
 
 html_theme_options = {
     'github_user'     : 'hyperpower', # github icon shows under the logo
@@ -103,7 +112,6 @@ html_theme_options = {
     'logo_name'       : True,
     'logo_text_align' : 'center',
     'show_powered_by' : False,
-    'font_size'       : '18px'
 }
 
 codeautolink_autodoc_inject = True

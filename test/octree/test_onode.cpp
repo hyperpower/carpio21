@@ -81,16 +81,18 @@ TEST(onode, exposes_morton_code){
 
     EXPECT_EQ(child->code(),
               (UniformNode2::MortonCode::Code{1} << UniformNode2::MortonCode::LevelShift)
-              | UniformNode2::MortonCode::Code{UniformNode2::Idx::_PP_});
+              | (UniformNode2::MortonCode::Code{UniformNode2::Idx::_PP_}
+                 << (UniformNode2::MortonCode::PathBits - UniformNode2::MortonCode::BitsPerLevel)));
 
     child->set_child(UniformNode2::Idx::_MP_, new UniformNode2());
     auto grandchild = child->child[UniformNode2::Idx::_MP_];
     ASSERT_NE(grandchild, nullptr);
 
     const auto expected_path =
-        UniformNode2::MortonCode::Code{UniformNode2::Idx::_PP_}
+        (UniformNode2::MortonCode::Code{UniformNode2::Idx::_PP_}
+         << (UniformNode2::MortonCode::PathBits - UniformNode2::MortonCode::BitsPerLevel))
         | (UniformNode2::MortonCode::Code{UniformNode2::Idx::_MP_}
-           << UniformNode2::MortonCode::BitsPerLevel);
+           << (UniformNode2::MortonCode::PathBits - 2 * UniformNode2::MortonCode::BitsPerLevel));
     EXPECT_EQ(grandchild->code(),
               (UniformNode2::MortonCode::Code{2} << UniformNode2::MortonCode::LevelShift)
               | expected_path);

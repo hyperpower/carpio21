@@ -4,6 +4,8 @@
 
 #include <array>
 #include <list>
+#include <sstream>
+#include <string>
 #include "domain/domain_define.hpp"
 
 namespace carpio{
@@ -229,6 +231,12 @@ std::ostream& operator<<(std::ostream& stream, const Indices_<DIM>& index) {
     }
     stream << ")";
     return stream;
+}
+template<St DIM>
+std::string ToString(const Indices_<DIM>& indices) {
+    std::ostringstream sst;
+    sst << indices;
+    return sst.str();
 }
 template<St DIM>
 void Shift(Indices_<DIM>& index, St dim, St ori, St step = 1) {

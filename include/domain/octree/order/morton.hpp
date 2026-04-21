@@ -53,6 +53,10 @@ public:
 protected:
     Code _code;
 
+    static constexpr St ChildShift(St level) {
+        return PathBits - (level + 1) * DIM;
+    }
+
 public:
     MortonCode_() :
         _code(0) {
@@ -101,7 +105,7 @@ public:
         ASSERT(level < MaxLevels);
         ASSERT(child_idx < NumChildren);
 
-        const St shift = level * DIM;
+        const St shift = ChildShift(level);
         const Code mask = static_cast<Code>(ChildMask << shift);
         const Code child = static_cast<Code>(child_idx) << shift;
         set_path_code((path() & ~mask) | child);
@@ -110,7 +114,7 @@ public:
     St child_at(St level) const {
         ASSERT(level < this->level());
 
-        const St shift = level * DIM;
+        const St shift = ChildShift(level);
         return St((path() >> shift) & ChildMask);
     }
 
@@ -138,6 +142,34 @@ public:
 using MortonCode1 = MortonCode_<1>;
 using MortonCode2 = MortonCode_<2>;
 using MortonCode3 = MortonCode_<3>;
+
+template<St DIM, typename CODE = std::uint64_t>
+inline CODE EncodeGridMortonCode(St i, St j, St k) {
+    static_assert(DIM >= 1 && DIM <= 3, "EncodeGridMortonCode only supports dimensions 1, 2, and 3");
+    static_assert(std::is_integral_v<CODE>, "Morton code type must be integral");
+    static_assert(std::is_unsigned_v<CODE>, "Morton code type must be unsigned");
+
+    constexpr St CoordinateBits = std::numeric_limits<CODE>::digits / DIM;
+    ASSERT((i >> CoordinateBits) == 0);
+    if constexpr (DIM >= 2) {
+        ASSERT((j >> CoordinateBits) == 0);
+    }
+    if constexpr (DIM >= 3) {
+        ASSERT((k >> CoordinateBits) == 0);
+    }
+
+    CODE code = 0;
+    for (St bit = 0; bit < CoordinateBits; ++bit) {
+        code |= CODE((i >> bit) & St(1)) << (DIM * bit);
+        if constexpr (DIM >= 2) {
+            code |= CODE((j >> bit) & St(1)) << (DIM * bit + 1);
+        }
+        if constexpr (DIM >= 3) {
+            code |= CODE((k >> bit) & St(1)) << (DIM * bit + 2);
+        }
+    }
+    return code;
+}
 
 }
 

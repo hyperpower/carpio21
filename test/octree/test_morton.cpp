@@ -75,11 +75,7 @@ GnuplotActor MakeMortonLabelActor(const std::vector<RootMortonEntry>& entries) {
     actor.command("using 1:2:3 title \"\" ");
     actor.style("with labels center textcolor lt 1");
     for (const auto& entry : entries) {
-        const std::string text = "\""
-            + ToString(entry.indices)
-            + " / "
-            + ToString(entry.morton_code)
-            + "\"";
+        std::string text = ToString(entry.indices);
         actor.data().push_back(ToString(entry.x, entry.y, " ") + " " + text);
     }
     return actor;
@@ -139,7 +135,12 @@ TEST(morton, append_increments_level_and_stores_children) {
     code.append(1);
     code.append(4);
 
+    const auto expected_path =
+        (MortonCode3::Code{7} << (MortonCode3::PathBits - MortonCode3::BitsPerLevel))
+        | (MortonCode3::Code{1} << (MortonCode3::PathBits - 2 * MortonCode3::BitsPerLevel))
+        | (MortonCode3::Code{4} << (MortonCode3::PathBits - 3 * MortonCode3::BitsPerLevel));
     EXPECT_EQ(code.level(), 3u);
+    EXPECT_EQ(code.path(), expected_path);
     EXPECT_EQ(code.child_at(0), 7u);
     EXPECT_EQ(code.child_at(1), 1u);
     EXPECT_EQ(code.child_at(2), 4u);
@@ -175,6 +176,16 @@ TEST(morton, set_child_overwrites_without_changing_level) {
     EXPECT_EQ(code.child_at(0), 7u);
     EXPECT_EQ(code.child_at(1), 6u);
     EXPECT_EQ(code.child_at(2), 4u);
+}
+
+TEST(morton, encodes_grid_indices_to_3d_morton_code) {
+    EXPECT_EQ(EncodeGridMortonCode<3>(0, 0, 0), MortonCode3::Code{0});
+    EXPECT_EQ(EncodeGridMortonCode<3>(1, 0, 0), MortonCode3::Code{1});
+    EXPECT_EQ(EncodeGridMortonCode<3>(0, 1, 0), MortonCode3::Code{2});
+    EXPECT_EQ(EncodeGridMortonCode<3>(0, 0, 1), MortonCode3::Code{4});
+    EXPECT_EQ(EncodeGridMortonCode<3>(1, 1, 1), MortonCode3::Code{7});
+    EXPECT_EQ(EncodeGridMortonCode<3>(2, 3, 1), MortonCode3::Code{30});
+    EXPECT_EQ((EncodeGridMortonCode<3, std::uint32_t>(2, 3, 1)), std::uint32_t{30});
 }
 
 TEST(morton, max_levels_follow_code_bits_minus_level_bits) {
