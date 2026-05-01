@@ -1,305 +1,174 @@
 #ifndef _OCTREE_DIRECTION_HPP_
 #define _OCTREE_DIRECTION_HPP_
 
-#include "domain/domain_define.hpp"
-
-#include <sstream>
-#include <string>
+#include "domain/octree/direction_code.hpp"
 
 namespace carpio {
 
-typedef unsigned short Direction;
+struct FaceDirection {
 
-static const Direction _XM_ = 8;  //001 000
-static const Direction _XP_ = 9;  //001 001
-static const Direction _YM_ = 16; //010 000
-static const Direction _YP_ = 18; //010 010
-static const Direction _ZM_ = 32; //100 000
-static const Direction _ZP_ = 36; //100 100
+    typedef DirectionCode Code;
 
-inline unsigned short HI(const Direction &d) {
-	return d >> 3;
-}
+    Orientation orientation;
+    Axes axes;
 
-inline unsigned short LO(const Direction &d) {
-	return d & 7;
-}
-inline Direction ToDirection(
-		const Orientation &x,
-		const Orientation &y,
-		const Orientation &z) {
-	ASSERT(x != _C_);
-	ASSERT(y != _C_);
-	ASSERT(z != _C_);
-	return 56 + x + (y << 1) + (z << 2);
-}
-inline Direction Opposite(const Direction& ori) {
-	Direction res = ori;
-	unsigned short hi = HI(ori);
-	//unsigned short hi = LO(ori);
-	return (res ^ hi);
-}
+    FaceDirection() : orientation(_P_), axes(_X_) {}
 
-static const short COUNT_1[8] = { 0, 1, 1, 2, 1, 2, 2, 3 };
+    FaceDirection(const Code& c) {
+        ASSERT(IsFaceDirection(c));
+        FaceDirectionToOrientationAndAxes(c, orientation, axes);
+    }
 
-inline bool IsFaceDirection(const Direction &d) {
-	return COUNT_1[(d >> 3)] == 1;
-}
-inline bool IsCornerDirection(const Direction &d) {
-	return COUNT_1[(d >> 3)] == 2;
-}
-inline bool IsVertexDirection(const Direction &d) {
-	return COUNT_1[(d >> 3)] == 3;
-}
+    operator Code() const { 
+        return ToFaceDirection(orientation, axes);
+    }
 
-inline bool GetBit(const Direction &d, St i) {
-	const Direction ARR_BIT[6] = { 1, 2, 4, 8, 16, 32 };
-	return (d & ARR_BIT[i]) == ARR_BIT[i];
-}
+    std::string to_string() const {
+        return ToString(static_cast<Code>(*this));
+    }
 
-inline Direction ToFaceDirection(const Orientation &o, const Axes& a) {
-	ASSERT(o != _C_);
-	St lo = (o == _P_) ? 7 : 0;
-	St hi = 0;
-	switch (a) {
-	case _X_: {
-		hi = 1;
-		break;
-	}
-	case _Y_: {
-		hi = 2;
-		break;
-	}
-	case _Z_: {
-		hi = 4;
-		break;
-	}
-	}
-	St nlo = lo & hi;
-	return (hi << 3) | nlo;
-}
+    bool is_valid_in_dim(const St& dim) const {
+        return St(axes) < dim && orientation != _C_;
+    }
+};
 
-inline Direction ToCornerDirection( //
-		const Orientation &o1, const Axes& a1, //
-		const Orientation &o2, const Axes& a2 //
-		) {
-	ASSERT(o1 != _C_);
-	ASSERT(o2 != _C_);
-	Direction d1 = ToFaceDirection(o1, a1);
-	Direction d2 = ToFaceDirection(o2, a2);
-	return d1 | d2;
-}
+struct CornerDirection {
 
-inline Axes FaceDirectionToAxes(const Direction &d) {
-	ASSERT(IsFaceDirection(d));
-	Axes a;
-	unsigned short hi = d >> 3;
-	if ((hi & 1) == 1) {
-		a = _X_;
-		return a;
-	}
-	if ((hi & 2) == 2) {
-		a = _Y_;
-		return a;
-	}
+    typedef DirectionCode Code;
 
-	if ((hi & 4) == 4) {
-		a = _Z_;
-		return a;
-	}
-	SHOULD_NOT_REACH;
-	return _X_;
-}
-inline Orientation FaceDirectionToOrientation(const Direction &d) {
-	ASSERT(IsFaceDirection(d));
-	unsigned short hi = d >> 3;
-	if ((hi & 1) == 1) {
-		return (GetBit(d, 0)) ? _P_ : _M_;
-	}
-	if ((hi & 2) == 2) {
-		return (GetBit(d, 1)) ? _P_ : _M_;
-	}
-	if ((hi & 4) == 4) {
-		return (GetBit(d, 2)) ? _P_ : _M_;
-	}
-	SHOULD_NOT_REACH;
-	return _C_;
-}
-inline void FaceDirectionToOrientationAndAxes(const Direction &d,
-		Orientation &o, Axes &a) {
-	o = FaceDirectionToOrientation(d);
-	a = FaceDirectionToAxes(d);
-}
-inline void CornerDirectionToOrientationAndAxes(const Direction &d,
-		Orientation &o1, Axes &a1, Orientation &o2, Axes& a2) {
-	ASSERT(IsCornerDirection(d));
-	unsigned short hi = d >> 3;
-	if ((hi & 1) == 1 && (hi & 2) == 2) {
-		a1 = _X_;
-		a2 = _Y_;
-		o1 = (GetBit(d, 0)) ? _P_ : _M_;
-		o2 = (GetBit(d, 1)) ? _P_ : _M_;
-		return;
-	}
-	if ((hi & 2) == 2 && (hi& 4)== 4) {
-		a1 = _Y_;
-		a2 = _Z_;
-		o1 = (GetBit(d, 1)) ? _P_ : _M_;
-		o2 = (GetBit(d, 2)) ? _P_ : _M_;
-		return;
-	}
-	if ((hi & 4) == 4 && (hi & 1) == 1) {
-		a1 = _Z_;
-		a2 = _X_;
-		o1 = (GetBit(d, 2)) ? _P_ : _M_;
-		o2 = (GetBit(d, 0)) ? _P_ : _M_;
-		return;
-	}
-	SHOULD_NOT_REACH;
-}
-/*
- * Does Direction on axes active
- */
-inline bool IsDirectionOn(const Direction &d, const Axes& a) {
-	unsigned short hi = d >> 3;
-	switch (a) {
-	case _X_:
-		return ((hi & 1) == 1);
-	case _Y_:
-		return ((hi & 2) == 2);
-	case _Z_:
-		return ((hi & 4) == 4);
-	}
-	return false;
-}
+    std::array<Orientation, 2> orientations;
+    std::array<Axes, 2> axes;
 
-template<St DIM>
-inline bool IsValidFaceDirection(const Direction& d) {
-	if (!IsFaceDirection(d)) {
-		return false;
-	}
-	return St(FaceDirectionToAxes(d)) < DIM;
-}
+    CornerDirection() {
+        for (St i = 0; i < 2; ++i) {
+            orientations[i] = _P_;
+            axes[i] = ArrAxes<2>()[i];
+        }
+    }
 
-inline bool IsFacePDirection(const Direction &d) {
-	unsigned short hi = d >> 3;
-	unsigned short low = d & 7;
-	return (COUNT_1[hi] == 1) && (hi & low) != 0;
-}
+    CornerDirection(const Code& c) {
+        ASSERT(IsCornerDirection(c));
+        CornerDirectionToOrientationAndAxes(
+            c,
+            orientations[0], axes[0],
+            orientations[1], axes[1]);
+    }
 
-inline bool IsXYDirection(const Direction &d) {
-	return (d >> 3) == 3;
-}
+    operator Code() const { 
+        return ToCornerDirection(
+            orientations[0], axes[0],
+            orientations[1], axes[1]);
+    }
 
-inline bool IsYZDirection(const Direction &d) {
-	return (d >> 3) == 6;
-}
+    std::string to_string() const {
+        return ToString(static_cast<Code>(*this));
+    }
 
-inline bool IsZXDirection(const Direction &d) {
-	return (d >> 3) == 5;
-}
+    Axes axes_first() const {
+        return axes[0];
+    }
 
+    Axes axes_second() const {
+        return axes[1];
+    }
+    
+    Orientation orientation_first() const {
+        return orientations[0];
+    }
 
-inline bool IsXYZDirection(const Direction &d) {
-	return (d >> 3) == 7;
-}
+    Orientation orientation_second() const {
+        return orientations[1];
+    }
 
-inline Orientation ToOrientation(const Direction &d, const Axes &a) {
-	if (IsDirectionOn(d, a)) {
-		switch (a) {
-		case _X_:
-			return (GetBit(d, 0) == true) ? _P_ : _M_;
-		case _Y_:
-			return (GetBit(d, 1) == true) ? _P_ : _M_;
-		case _Z_:
-			return (GetBit(d, 2) == true) ? _P_ : _M_;
-		}
-	} else {
-		return _C_;
-	}
-}
+    Orientation orientation(const Axes& a) const {
+        if (a == axes[0]) {
+            return orientations[0];
+        } else if (a == axes[1]) {
+            return orientations[1];
+        }
+        SHOULD_NOT_REACH;
+        return _P_;
+    }
 
-inline Direction FaceDirectionInOrder(const St& i) {
-	ASSERT(i < 6);
-	static const Direction ARR_FD[] = { 8, 9, 16, 18, 32, 36 };
-	return ARR_FD[i];
-}
-inline St FaceDirectionInOrder(const Direction& dir) {
-	ASSERT(IsFaceDirection(dir));
-	static const Direction ARR_FD[] = { 8, 9, 16, 18, 32, 36 };
-	for (St i = 0; i < 6; i++) {
-		if (ARR_FD[i] == dir) {
-			return i;
-		}
-	}
-	SHOULD_NOT_REACH;
-	return 1;
-}
-inline St FaceDirectionInOrder(const Axes& a, const Orientation& o){
-	// axes and orientation construct a direction
-	Direction d = ToFaceDirection(o, a);
-	return FaceDirectionInOrder(d);
-}
+    bool is_valid_in_dim(const St& dim) const {
+        return St(axes[0]) < dim && St(axes[1]) < dim
+            && orientations[0] != _C_ && orientations[1] != _C_;
+    }
+};
 
-inline Direction XYDirectionInOrder(const St& i) {
-	ASSERT(i < 4);
-	return 24 + i;
-}
+struct VertexDirection {
 
-inline Direction YZDirectionInOrder(const St& i) {
-	ASSERT(i < 4);
-	return 48 + i * 2;
-}
+    typedef DirectionCode Code;
 
-inline Direction ZXDirectionInOrder(const St& i) {
-	ASSERT(i < 4);
-	static const Direction ARR_ZXD[] = {
-			40 + 0, //101 000
-	        40 + 1, //101 001
-	        40 + 4, //101 100
-	        40 + 5, //101 101
-			};
-	return ARR_ZXD[i];
-}
+    std::array<Orientation, 3> orientations;
 
-inline Direction XYZDirectionInOrder(const St& i) {
-	ASSERT(i < 8);
-	return 56 + i;
-}
+    VertexDirection() {
+        for (St i = 0; i < 3; ++i) {
+            orientations[i] = _P_;
+        }
+    }
 
-inline Direction DirectionInOrder(const St& i) {
-	ASSERT(i < 26);
-	if (i < 6)
-		return FaceDirectionInOrder(i);
-	if (i < 10)
-		return XYDirectionInOrder(i - 6);
-	if (i < 14)
-		return YZDirectionInOrder(i - 10);
-	if (i < 18)
-		return ZXDirectionInOrder(i - 14);
-	return XYZDirectionInOrder(i - 18);
-}
+    VertexDirection(const Code& c) {
+        ASSERT(IsVertexDirection(c));
+        orientations[0] = ToOrientation(c, _X_);
+        orientations[1] = ToOrientation(c, _Y_);
+        orientations[2] = ToOrientation(c, _Z_);
+    }
 
-inline std::string ToString(const Direction& d) {
-	std::stringstream sst;
-	std::stringstream sst2;
-	unsigned short hi = HI(d);
-	unsigned short lo = LO(d);
-	if ((hi & 1) == 1) {
-		sst << "X";
-		sst2 << (((lo & 1) == 1) ? "P" : "M");
-	}
-	if ((hi & 2) == 2) {
-		sst << "Y";
-		sst2 << (((lo & 2) == 2) ? "P" : "M");
-	}
-	if ((hi & 4) == 4) {
-		sst << "Z";
-		sst2 << (((lo & 4) == 4) ? "P" : "M");
-	}
-	sst << "_" << sst2.str();
-	return sst.str();
-}
+    operator Code() const {
+        return ToDirectionCode(orientations[0], orientations[1], orientations[2]);
+    }
+
+    std::string to_string() const {
+        return ToString(static_cast<Code>(*this));
+    }
+
+    Axes axes_first() const {
+        return _X_;
+    }
+
+    Axes axes_second() const {
+        return _Y_;
+    }
+
+    Axes axes_third() const {
+        return _Z_;
+    }
+
+    Orientation orientation_first() const {
+        return orientations[0];
+    }
+
+    Orientation orientation_second() const {
+        return orientations[1];
+    }
+
+    Orientation orientation_third() const {
+        return orientations[2];
+    }
+
+    Orientation orientation(const Axes& a) const {
+        switch (a) {
+        case _X_:
+            return orientations[0];
+        case _Y_:
+            return orientations[1];
+        case _Z_:
+            return orientations[2];
+        }
+        SHOULD_NOT_REACH;
+        return _P_;
+    }
+
+    bool is_valid_in_dim(const St& dim) const {
+        return St(_Z_) < dim
+            && orientations[0] != _C_
+            && orientations[1] != _C_
+            && orientations[2] != _C_;
+    }
+
+};
+
 
 }
 

@@ -28,7 +28,7 @@ public:
     static const St Dim = DIM;
     static const St NumFaces = DIM + DIM;
     static const St NumVertexes = (DIM == 3) ? 8 : (DIM + DIM);
-    static const St NumNeighbors = NumFaces;
+    static const St NumNeighbors = NumNeighborDirections<DIM>();
     static const St GhostLayer = 1;
 
     typedef OGrid_<DATA, CELL, DIM> Self;
@@ -199,32 +199,26 @@ public:
         return root_node(idx.i(), idx.j(), idx.k());
     }
 
-    pNode find_face_neighbor(const_pNode node, const Direction& d) {
+    pNode find_neighbor(const_pNode node, const DirectionCode& d) {
         return const_cast<pNode>(
-            static_cast<const Self*>(this)->find_face_neighbor(node, d));
+            static_cast<const Self*>(this)->find_neighbor(node, d));
     }
 
-    const_pNode find_face_neighbor(const_pNode node, const Direction& d) const {
+    const_pNode find_neighbor(const_pNode node, const DirectionCode& d) const {
         if (node == nullptr) {
             return nullptr;
         }
-        ASSERT(node != nullptr);
         ASSERT(node->is_root());
         if (!node->is_root()) {
             return nullptr;
         }
-        ASSERT(IsFaceDirection(d));
-        if (!IsFaceDirection(d)) {
-            return nullptr;
-        }
-        Orientation ori;   Axes axis;
-        FaceDirectionToOrientationAndAxes(d, ori, axis);
-        ASSERT(St(axis) < Dim);
-        if (St(axis) >= Dim) {
+        if (!IsValidNeighborDirection<Dim>(d)) {
             return nullptr;
         }
         ASSERT(node->root_idx() < storage_size());
-        return _find_face_neighbor(_storage_1d_idx_to_storage_indices(node->root_idx()), axis, ori);
+        return _find_neighbor(
+            _storage_1d_idx_to_storage_indices(node->root_idx()),
+            d);
     }
 
     void connect_neighbors() {
@@ -232,9 +226,15 @@ public:
             auto& node = _roots[i];
             const auto idx = _storage_1d_idx_to_storage_indices(i);
             for (St n = 0; n < Node::NumNeighbors; ++n) {
-                Orientation ori;  Axes axis;
-                FaceDirectionToOrientationAndAxes(FaceDirectionInOrder(n), ori, axis);
-                node.neighbor[n] = _find_face_neighbor(idx, axis, ori);
+                node.neighbor[n] = _find_neighbor(
+                    idx, NeighborDirectionInOrder<Dim>(n));
+            }
+        }
+        for (auto& root : _roots) {
+            for (auto& node : root) {
+                if (!node.is_root()) {
+                    node.connect_neighbors();
+                }
             }
         }
     }
@@ -307,22 +307,24 @@ protected:
         return res;
     }
 
-    pNode _find_face_neighbor(
-        const Indices& storage_idx,
-        const Axes& axis,
-        const Orientation& ori) {
+    pNode _find_neighbor(const Indices& storage_idx, const DirectionCode& d) {
         return const_cast<pNode>(
-            static_cast<const Self*>(this)->_find_face_neighbor(storage_idx, axis, ori));
+            static_cast<const Self*>(this)->_find_neighbor(storage_idx, d));
     }
 
-    const_pNode _find_face_neighbor(
-        const Indices& storage_idx,
-        const Axes& axis,
-        const Orientation& ori) const {
-        ASSERT(St(axis) < Dim);
-        auto target_indices = storage_idx.shift(axis, ori);
-        if (target_indices[axis] < 0 || target_indices[axis] >= Int(_len[axis])) {
-            return nullptr;
+    const_pNode _find_neighbor(const Indices& storage_idx, const DirectionCode& d) const {
+        ASSERT(IsValidNeighborDirection<Dim>(d));
+        auto target_indices = storage_idx;
+        for (St i = 0; i < Dim; ++i) {
+            const Axes axis = ToAxes(i);
+            if (IsDirectionOn(d, axis)) {
+                target_indices = target_indices.shift(axis, ToOrientation(d, axis));
+            }
+        }
+        for (St i = 0; i < Dim; ++i) {
+            if (target_indices[i] < 0 || target_indices[i] >= Int(_len[i])) {
+                return nullptr;
+            }
         }
         return _root_node_storage(target_indices);
     }

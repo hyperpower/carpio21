@@ -101,11 +101,32 @@ inline bool IsZM(St i) {
     return (i | 3) == 3;
 }
 
-inline bool IsOnDirection(St i, const Direction& dir) {
+inline bool IsOnDirection(St i, const DirectionCode& dir) {
     ASSERT(i >= 0 && i < 8);
     unsigned short hi = HI(dir);
     unsigned short lo = LO(dir);
     return (hi & i) == (hi & lo);
+}
+
+inline unsigned short OnDirectionMask(St i, const DirectionCode& dir) {
+    ASSERT(i >= 0 && i < 8);
+    const unsigned short hi = HI(dir);
+    const unsigned short lo = LO(dir);
+    unsigned short res = 0;
+    for (St a = 0; a < 3; ++a) {
+        const unsigned short bit = 1 << a;
+        if ((hi & bit) != 0 && (i & bit) == (lo & bit)) {
+            res |= bit;
+        }
+    }
+    return res;
+}
+
+inline DirectionCode ToDirectionCode(
+        const unsigned short mask,
+        const DirectionCode& dir) {
+    ASSERT(mask > 0 && mask < 8);
+    return (mask << 3) | (LO(dir) & mask);
 }
 
 
@@ -115,7 +136,7 @@ public:
     static const St Dim = DIM;
     static const St NumFaces = DIM + DIM;
     static const St NumVertexes = (DIM == 3) ? 8 : (DIM + DIM);
-    static const St NumNeighbors = NumFaces;
+    static const St NumNeighbors = NumNeighborDirections<DIM>();
     static const St NumChildren = NumVertexes;
 
     typedef ONodeIdx<DIM> Idx;
@@ -383,16 +404,35 @@ public:
         }
     }
 
-    pNode find_face_neighbor(const Direction& d) {
+    pNode find_neighbor(const DirectionCode& d) {
         return const_cast<pNode>(
-            static_cast<const Self*>(this)->find_face_neighbor(d));
+            static_cast<const Self*>(this)->find_neighbor(d));
     }
 
-    const_pNode find_face_neighbor(const Direction& d) const {
-        if (!IsValidFaceDirection<Dim>(d)) {
+    const_pNode find_neighbor(const DirectionCode& d) const {
+        if (!IsValidNeighborDirection<Dim>(d)) {
             return nullptr;
         }
-        return _find_face_neighbor(this, d);
+        return _find_neighbor(this, d);
+    }
+
+    pNode get_neighbor(const DirectionCode& d) {
+        return const_cast<pNode>(
+            static_cast<const Self*>(this)->get_neighbor(d));
+    }
+
+    const_pNode get_neighbor(const DirectionCode& d) const {
+        if (!IsValidNeighborDirection<Dim>(d)) {
+            return nullptr;
+        }
+        return neighbor[NeighborDirectionInOrder<Dim>(d)];
+    }
+
+    void connect_neighbors() {
+        for (St n = 0; n < NumNeighbors; ++n) {
+            const DirectionCode d = NeighborDirectionInOrder<Dim>(n);
+            neighbor[n] = find_neighbor(d);
+        }
     }
 
     ref_Node find_root() {
@@ -427,21 +467,23 @@ public:
 
 
 protected:
-    const_pNode _find_face_neighbor(const_pNode pnode, const Direction& d) const {
+    const_pNode _find_neighbor(const_pNode pnode, const DirectionCode& d) const {
         ASSERT(pnode != nullptr);
-        ASSERT(IsValidFaceDirection<Dim>(d));
+        ASSERT(IsValidNeighborDirection<Dim>(d));
         if (pnode->is_root()) {
-            return pnode->neighbor[FaceDirectionInOrder(d)];
+            return pnode->neighbor[NeighborDirectionInOrder<Dim>(d)];
         }
 
         const St mask = HI(d);
         const St node_idx = pnode->idx();
         const St neighbor_child_idx = node_idx ^ mask;
-        if (!IsOnDirection(node_idx, d)) {
+        const unsigned short coarse_mask = OnDirectionMask(node_idx, d);
+        if (coarse_mask == 0) {
             return pnode->father->child[neighbor_child_idx];
         }
 
-        const_pNode coarse_neighbor = _find_face_neighbor(pnode->father, d);
+        const_pNode coarse_neighbor = _find_neighbor(
+            pnode->father, ToDirectionCode(coarse_mask, d));
         if (coarse_neighbor == nullptr) {
             return nullptr;
         }

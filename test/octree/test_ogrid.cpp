@@ -19,6 +19,45 @@ TEST(ogrid, converts_face_direction_to_orientation){
     EXPECT_EQ(FaceDirectionToOrientation(_ZP_), _P_);
 }
 
+TEST(ogrid, validates_direction_objects_by_dimension){
+    EXPECT_TRUE(FaceDirection(_XP_).is_valid_in_dim(1));
+    EXPECT_FALSE(FaceDirection(_ZP_).is_valid_in_dim(2));
+
+    EXPECT_FALSE(CornerDirection(ToCornerDirection(_P_, _X_, _P_, _Y_)).is_valid_in_dim(1));
+    EXPECT_TRUE(CornerDirection(ToCornerDirection(_P_, _X_, _P_, _Y_)).is_valid_in_dim(2));
+    EXPECT_FALSE(CornerDirection(ToCornerDirection(_P_, _Y_, _P_, _Z_)).is_valid_in_dim(2));
+
+    EXPECT_FALSE(VertexDirection(ToDirectionCode(_P_, _P_, _P_)).is_valid_in_dim(2));
+    EXPECT_TRUE(VertexDirection(ToDirectionCode(_P_, _P_, _P_)).is_valid_in_dim(3));
+}
+
+TEST(ogrid, orders_neighbor_directions_compactly_by_dimension){
+    EXPECT_EQ(NumNeighborDirections<1>(), 2);
+    EXPECT_EQ(NumNeighborDirections<2>(), 8);
+    EXPECT_EQ(NumNeighborDirections<3>(), 26);
+
+    EXPECT_EQ(NeighborDirectionInOrder<1>(St(0)), _XM_);
+    EXPECT_EQ(NeighborDirectionInOrder<1>(St(1)), _XP_);
+
+    EXPECT_EQ(NeighborDirectionInOrder<2>(St(0)), _XM_);
+    EXPECT_EQ(NeighborDirectionInOrder<2>(St(1)), _XP_);
+    EXPECT_EQ(NeighborDirectionInOrder<2>(St(2)), _YM_);
+    EXPECT_EQ(NeighborDirectionInOrder<2>(St(3)), _YP_);
+    EXPECT_EQ(NeighborDirectionInOrder<2>(St(4)), ToCornerDirection(_M_, _X_, _M_, _Y_));
+    EXPECT_EQ(NeighborDirectionInOrder<2>(St(7)), ToCornerDirection(_P_, _X_, _P_, _Y_));
+
+    EXPECT_EQ(NeighborDirectionInOrder<3>(St(6)), ToCornerDirection(_M_, _X_, _M_, _Y_));
+    EXPECT_EQ(NeighborDirectionInOrder<3>(St(10)), ToCornerDirection(_M_, _Y_, _M_, _Z_));
+    EXPECT_EQ(NeighborDirectionInOrder<3>(St(14)), ToCornerDirection(_M_, _Z_, _M_, _X_));
+    EXPECT_EQ(NeighborDirectionInOrder<3>(St(18)), ToDirectionCode(_M_, _M_, _M_));
+    EXPECT_EQ(NeighborDirectionInOrder<3>(St(25)), ToDirectionCode(_P_, _P_, _P_));
+
+    EXPECT_EQ(NeighborDirectionInOrder<2>(ToCornerDirection(_P_, _X_, _P_, _Y_)), 7);
+    EXPECT_EQ(NeighborDirectionInOrder<3>(ToDirectionCode(_P_, _P_, _P_)), 25);
+    EXPECT_FALSE(IsValidNeighborDirection<2>(ToCornerDirection(_P_, _Y_, _P_, _Z_)));
+    EXPECT_FALSE(IsValidNeighborDirection<2>(ToDirectionCode(_P_, _P_, _P_)));
+}
+
 TEST(ogrid, constructs_padded_tree_array_1d){
 
     OctreeGrid1 grid(5);
@@ -263,6 +302,7 @@ TEST(ogrid, connects_root_neighbors_2d){
     OctreeGrid2 grid(3, 4);
     auto root = grid.root_node(0, 0);
     ASSERT_NE(root, nullptr);
+    EXPECT_EQ(OctreeGrid2::Node::NumNeighbors, 8);
     for (St i = 0; i < OctreeGrid2::Node::NumNeighbors; ++i) {
         EXPECT_EQ(root->neighbor[i], nullptr);
     }
@@ -278,17 +318,42 @@ TEST(ogrid, connects_root_neighbors_2d){
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_XM_)], grid.root_node(-1, 0));
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YP_)], grid.root_node(0, 1));
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YM_)], grid.root_node(0, -1));
-    EXPECT_EQ(grid.find_face_neighbor(root, _XP_), grid.root_node(1, 0));
-    EXPECT_EQ(grid.find_face_neighbor(nullptr, _XP_), nullptr);
+    EXPECT_EQ(root->neighbor[NeighborDirectionInOrder<2>(ToCornerDirection(_P_, _X_, _P_, _Y_))],
+              grid.root_node(1, 1));
+    EXPECT_EQ(root->neighbor[NeighborDirectionInOrder<2>(ToCornerDirection(_M_, _X_, _M_, _Y_))],
+              grid.root_node(-1, -1));
+    EXPECT_EQ(grid.find_neighbor(root, _XP_), grid.root_node(1, 0));
+    EXPECT_EQ(grid.find_neighbor(root, FaceDirection(_XP_)), grid.root_node(1, 0));
+
+    FaceDirection ym;
+    ym.orientation = _M_;
+    ym.axes = _Y_;
+    EXPECT_EQ(grid.find_neighbor(root, ym), grid.root_node(0, -1));
+
+    FaceDirection invalid_z;
+    invalid_z.orientation = _P_;
+    invalid_z.axes = _Z_;
+    EXPECT_EQ(grid.find_neighbor(root, invalid_z), nullptr);
+
+    EXPECT_EQ(grid.find_neighbor(nullptr, _XP_), nullptr);
 
     EXPECT_EQ(grid.root_node(-1, 0)->neighbor[FaceDirectionInOrder(_XP_)],
               grid.root_node(0, 0));
     EXPECT_EQ(grid.root_node(-1, 0)->neighbor[FaceDirectionInOrder(_XM_)],
               nullptr);
+    EXPECT_EQ(grid.root_node(-1, -1)->neighbor[
+                  NeighborDirectionInOrder<2>(ToCornerDirection(_M_, _X_, _M_, _Y_))],
+              nullptr);
 
-    for (St i = 0; i < OctreeGrid2::Node::NumNeighbors; ++i) {
-        EXPECT_EQ(child->neighbor[i], nullptr);
-    }
+    EXPECT_EQ(child->get_neighbor(_XP_), child->find_neighbor(_XP_));
+    EXPECT_EQ(child->get_neighbor(_XP_), grid.root_node(1, 0));
+    EXPECT_EQ(child->get_neighbor(_YP_), child->find_neighbor(_YP_));
+    EXPECT_EQ(child->get_neighbor(_YP_), grid.root_node(0, 1));
+    EXPECT_EQ(child->get_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              child->find_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)));
+    EXPECT_EQ(child->get_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              grid.root_node(1, 1));
+    EXPECT_EQ(child->get_neighbor(ToDirectionCode(_P_, _P_, _P_)), nullptr);
 }
 
 TEST(ogrid, connects_root_neighbors_3d){
@@ -296,6 +361,7 @@ TEST(ogrid, connects_root_neighbors_3d){
     OctreeGrid3 grid(2, 3, 4);
     auto root = grid.root_node(0, 0, 0);
     ASSERT_NE(root, nullptr);
+    EXPECT_EQ(OctreeGrid3::Node::NumNeighbors, 26);
 
     grid.connect_neighbors();
 
@@ -305,7 +371,18 @@ TEST(ogrid, connects_root_neighbors_3d){
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_XM_)], grid.root_node(-1, 0, 0));
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_YM_)], grid.root_node(0, -1, 0));
     EXPECT_EQ(root->neighbor[FaceDirectionInOrder(_ZM_)], grid.root_node(0, 0, -1));
-    EXPECT_EQ(grid.find_face_neighbor(root, _ZP_), grid.root_node(0, 0, 1));
+    EXPECT_EQ(root->neighbor[NeighborDirectionInOrder<3>(ToCornerDirection(_P_, _X_, _P_, _Y_))],
+              grid.root_node(1, 1, 0));
+    EXPECT_EQ(root->neighbor[NeighborDirectionInOrder<3>(ToCornerDirection(_P_, _Y_, _P_, _Z_))],
+              grid.root_node(0, 1, 1));
+    EXPECT_EQ(root->neighbor[NeighborDirectionInOrder<3>(ToCornerDirection(_P_, _Z_, _P_, _X_))],
+              grid.root_node(1, 0, 1));
+    EXPECT_EQ(root->neighbor[NeighborDirectionInOrder<3>(ToDirectionCode(_P_, _P_, _P_))],
+              grid.root_node(1, 1, 1));
+    EXPECT_EQ(grid.find_neighbor(root, _ZP_), grid.root_node(0, 0, 1));
+    EXPECT_EQ(grid.find_neighbor(root, FaceDirection(_ZP_)), grid.root_node(0, 0, 1));
+    EXPECT_EQ(grid.find_neighbor(root, ToDirectionCode(_P_, _P_, _P_)),
+              grid.root_node(1, 1, 1));
 
     EXPECT_EQ(grid.root_node(-1, 0, 0)->neighbor[FaceDirectionInOrder(_XP_)],
               grid.root_node(0, 0, 0));
@@ -314,6 +391,159 @@ TEST(ogrid, connects_root_neighbors_3d){
     EXPECT_EQ(grid.root_node(0, 0, -1)->neighbor[FaceDirectionInOrder(_ZP_)],
               grid.root_node(0, 0, 0));
     EXPECT_EQ(grid.root_node(0, 0, -1)->neighbor[FaceDirectionInOrder(_ZM_)],
+              nullptr);
+    EXPECT_EQ(grid.root_node(-1, -1, -1)->neighbor[
+                  NeighborDirectionInOrder<3>(ToDirectionCode(_M_, _M_, _M_))],
+              nullptr);
+}
+
+TEST(ogrid, finds_corner_neighbors_1d){
+
+    OctreeGrid1 grid(3);
+    auto root = grid.root_node(0);
+    ASSERT_NE(root, nullptr);
+
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              nullptr);
+    EXPECT_EQ(grid.find_neighbor(root, CornerDirection(ToCornerDirection(_P_, _X_, _P_, _Y_))),
+              nullptr);
+    EXPECT_EQ(grid.find_neighbor(nullptr, ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              nullptr);
+}
+
+TEST(ogrid, finds_corner_neighbors_2d){
+
+    OctreeGrid2 grid(3, 4);
+    auto root = grid.root_node(0, 0);
+    ASSERT_NE(root, nullptr);
+
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              grid.root_node(1, 1));
+    EXPECT_EQ(grid.find_neighbor(root, CornerDirection(ToCornerDirection(_P_, _X_, _P_, _Y_))),
+              grid.root_node(1, 1));
+    CornerDirection xmyp;
+    xmyp.orientations[0] = _M_;
+    xmyp.axes[0] = _X_;
+    xmyp.orientations[1] = _P_;
+    xmyp.axes[1] = _Y_;
+    EXPECT_EQ(grid.find_neighbor(root, xmyp), grid.root_node(-1, 1));
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_M_, _X_, _P_, _Y_)),
+              grid.root_node(-1, 1));
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_P_, _X_, _M_, _Y_)),
+              grid.root_node(1, -1));
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_M_, _X_, _M_, _Y_)),
+              grid.root_node(-1, -1));
+    EXPECT_EQ(grid.find_neighbor(grid.root_node(-1, -1),
+                                 ToCornerDirection(_M_, _X_, _M_, _Y_)),
+              nullptr);
+    EXPECT_EQ(grid.find_neighbor(nullptr, ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              nullptr);
+
+    const OctreeGrid2& const_grid = grid;
+    EXPECT_EQ(const_grid.find_neighbor(root, ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              const_grid.root_node(1, 1));
+    EXPECT_EQ(const_grid.find_neighbor(root, CornerDirection(ToCornerDirection(_P_, _X_, _P_, _Y_))),
+              const_grid.root_node(1, 1));
+}
+
+TEST(ogrid, rejects_corner_directions_outside_dimension_2d){
+
+    OctreeGrid2 grid(3, 4);
+    auto root = grid.root_node(0, 0);
+    ASSERT_NE(root, nullptr);
+
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_P_, _Y_, _P_, _Z_)),
+              nullptr);
+    EXPECT_EQ(grid.find_neighbor(root, CornerDirection(ToCornerDirection(_P_, _Y_, _P_, _Z_))),
+              nullptr);
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_P_, _Z_, _P_, _X_)),
+              nullptr);
+}
+
+TEST(ogrid, finds_corner_neighbors_3d){
+
+    OctreeGrid3 grid(2, 3, 4);
+    auto root = grid.root_node(0, 0, 0);
+    ASSERT_NE(root, nullptr);
+
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              grid.root_node(1, 1, 0));
+    EXPECT_EQ(grid.find_neighbor(root, CornerDirection(ToCornerDirection(_P_, _X_, _P_, _Y_))),
+              grid.root_node(1, 1, 0));
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_P_, _Y_, _P_, _Z_)),
+              grid.root_node(0, 1, 1));
+    EXPECT_EQ(grid.find_neighbor(root, ToCornerDirection(_P_, _Z_, _P_, _X_)),
+              grid.root_node(1, 0, 1));
+    EXPECT_EQ(grid.find_neighbor(grid.root_node(-1, 0, -1),
+                                 ToCornerDirection(_M_, _Z_, _M_, _X_)),
+              nullptr);
+}
+
+TEST(ogrid, node_finds_compact_neighbors_2d){
+
+    OctreeGrid2 grid(2, 2);
+    auto root = grid.root_node(0, 0);
+    ASSERT_NE(root, nullptr);
+    for (St i = 0; i < OctreeGrid2::Node::NumChildren; ++i) {
+        root->set_child(i, new OctreeGrid2::Node());
+    }
+    grid.connect_neighbors();
+
+    auto mm = root->child[OctreeGrid2::Node::Idx::_MM_];
+    auto pp = root->child[OctreeGrid2::Node::Idx::_PP_];
+    ASSERT_NE(mm, nullptr);
+    ASSERT_NE(pp, nullptr);
+
+    EXPECT_EQ(mm->find_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)), pp);
+    EXPECT_EQ(mm->get_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)), pp);
+    EXPECT_EQ(pp->find_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              grid.root_node(1, 1));
+    EXPECT_EQ(pp->get_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              grid.root_node(1, 1));
+    EXPECT_EQ(pp->find_neighbor(ToCornerDirection(_P_, _X_, _M_, _Y_)),
+              grid.root_node(1, 0));
+    EXPECT_EQ(pp->get_neighbor(ToCornerDirection(_P_, _X_, _M_, _Y_)),
+              grid.root_node(1, 0));
+    EXPECT_EQ(pp->find_neighbor(_XP_), grid.root_node(1, 0));
+    EXPECT_EQ(pp->get_neighbor(_XP_), grid.root_node(1, 0));
+    EXPECT_EQ(pp->find_neighbor(ToDirectionCode(_P_, _P_, _P_)), nullptr);
+    EXPECT_EQ(pp->get_neighbor(ToDirectionCode(_P_, _P_, _P_)), nullptr);
+}
+
+TEST(ogrid, node_finds_compact_neighbors_3d){
+
+    OctreeGrid3 grid(2, 2, 2);
+    auto root = grid.root_node(0, 0, 0);
+    ASSERT_NE(root, nullptr);
+    for (St i = 0; i < OctreeGrid3::Node::NumChildren; ++i) {
+        root->set_child(i, new OctreeGrid3::Node());
+    }
+    grid.connect_neighbors();
+
+    auto mmm = root->child[OctreeGrid3::Node::Idx::_MMM_];
+    auto ppp = root->child[OctreeGrid3::Node::Idx::_PPP_];
+    ASSERT_NE(mmm, nullptr);
+    ASSERT_NE(ppp, nullptr);
+
+    EXPECT_EQ(mmm->find_neighbor(ToDirectionCode(_P_, _P_, _P_)), ppp);
+    EXPECT_EQ(mmm->get_neighbor(ToDirectionCode(_P_, _P_, _P_)), ppp);
+    EXPECT_EQ(ppp->find_neighbor(ToDirectionCode(_P_, _P_, _P_)),
+              grid.root_node(1, 1, 1));
+    EXPECT_EQ(ppp->get_neighbor(ToDirectionCode(_P_, _P_, _P_)),
+              grid.root_node(1, 1, 1));
+    EXPECT_EQ(ppp->find_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              grid.root_node(1, 1, 0));
+    EXPECT_EQ(ppp->get_neighbor(ToCornerDirection(_P_, _X_, _P_, _Y_)),
+              grid.root_node(1, 1, 0));
+    EXPECT_EQ(ppp->find_neighbor(ToCornerDirection(_P_, _X_, _M_, _Y_)),
+              grid.root_node(1, 0, 0));
+    EXPECT_EQ(ppp->get_neighbor(ToCornerDirection(_P_, _X_, _M_, _Y_)),
+              grid.root_node(1, 0, 0));
+    EXPECT_EQ(ppp->find_neighbor(_ZP_), grid.root_node(0, 0, 1));
+    EXPECT_EQ(ppp->get_neighbor(_ZP_), grid.root_node(0, 0, 1));
+    EXPECT_EQ(grid.root_node(-1, -1, -1)->find_neighbor(ToDirectionCode(_M_, _M_, _M_)),
+              nullptr);
+    EXPECT_EQ(grid.root_node(-1, -1, -1)->get_neighbor(ToDirectionCode(_M_, _M_, _M_)),
               nullptr);
 }
 
@@ -405,12 +635,13 @@ TEST(ogrid, gnuplot_random_grid_4x5_2d){
     gnu.set_yrange(-0.05, 1.30);
     gnu.set_equal_aspect_ratio();
     auto agrid = ToGnuplotActorWireFrame(*grid);
-    auto& n1 = *grid->locate(UniformGrid2::Point(0.4, 0.36));
+    auto& n1 = *grid->locate(UniformGrid2::Point(0.05, 0.33 ));
     auto anode = ToGnuplotActorWireFrame(n1);
     anode.line_width(2);
     anode.line_color("red");
     agrid.line_width(1);
-    auto nn = n1.find_face_neighbor(_YM_);
+    auto nn = n1.get_neighbor(ToCornerDirection(_P_, _X_, _M_, _Y_));
+    // auto nn = n1.find_neighbor(_XM_);
     if (nn != nullptr) {
         auto anode2 = ToGnuplotActorWireFrame(*nn);
         auto al = ToGnuplotActorLabel(*nn, "level");

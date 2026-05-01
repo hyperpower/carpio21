@@ -94,7 +94,7 @@ public:
         return false;
     }
 
-    virtual bool is_boundary(const_pNode node, const Direction& dir) const {
+    virtual bool is_boundary(const_pNode node, const DirectionCode& dir) const {
         if (!IsValidFaceDirection<Dim>(dir) || node == nullptr) {
             return false;
         }
@@ -104,12 +104,12 @@ public:
             return false;
         }
 
-        const_pNode neighbor = node->find_face_neighbor(dir);
+        const_pNode neighbor = node->find_neighbor(dir);
         return neighbor != nullptr && is_ghost(neighbor);
     }
 
     // TODO: implement octree boundary mapping logic.
-    virtual const_pNode boundary_node(const_pNode, const Direction&) const {
+    virtual const_pNode boundary_node(const_pNode, const DirectionCode&) const {
         return nullptr;
     }
 };

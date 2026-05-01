@@ -415,9 +415,9 @@ TEST(onode, find_face_neighbor_same_parent_siblings_2d){
     root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
     root.set_child(NonUniformNode2::Idx::_PM_, new NonUniformNode2());
 
-    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MM_]->find_face_neighbor(_XP_),
+    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MM_]->find_neighbor(_XP_),
               root.child[NonUniformNode2::Idx::_MP_]);
-    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MM_]->find_face_neighbor(_YP_),
+    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MM_]->find_neighbor(_YP_),
               root.child[NonUniformNode2::Idx::_PM_]);
 }
 
@@ -432,7 +432,7 @@ TEST(onode, find_face_neighbor_climbs_to_common_ancestor_2d){
     left_parent->set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
     right_parent->set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
 
-    EXPECT_EQ(left_parent->child[NonUniformNode2::Idx::_MP_]->find_face_neighbor(_XP_),
+    EXPECT_EQ(left_parent->child[NonUniformNode2::Idx::_MP_]->find_neighbor(_XP_),
               right_parent->child[NonUniformNode2::Idx::_MM_]);
 }
 
@@ -445,7 +445,43 @@ TEST(onode, find_face_neighbor_crosses_root_neighbor_and_descends_2d){
     left_root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
     right_root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
 
-    EXPECT_EQ(left_root.child[NonUniformNode2::Idx::_MP_]->find_face_neighbor(_XP_),
+    EXPECT_EQ(left_root.child[NonUniformNode2::Idx::_MP_]->find_neighbor(_XP_),
+              right_root.child[NonUniformNode2::Idx::_MM_]);
+}
+
+TEST(onode, get_neighbor_returns_direct_neighbor_slot_without_search_2d){
+
+    NonUniformNode2 left_root;
+    NonUniformNode2 right_root;
+    left_root.neighbor[FaceDirectionInOrder(_XP_)] = &right_root;
+
+    left_root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    right_root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+
+    EXPECT_EQ(left_root.get_neighbor(_XP_), &right_root);
+    EXPECT_EQ(left_root.child[NonUniformNode2::Idx::_MP_]->get_neighbor(_XP_), nullptr);
+    EXPECT_EQ(left_root.child[NonUniformNode2::Idx::_MP_]->find_neighbor(_XP_),
+              right_root.child[NonUniformNode2::Idx::_MM_]);
+    EXPECT_EQ(left_root.get_neighbor(_ZP_), nullptr);
+}
+
+TEST(onode, connect_neighbors_fills_direct_neighbor_slots_2d){
+
+    NonUniformNode2 left_root;
+    NonUniformNode2 right_root;
+    left_root.neighbor[FaceDirectionInOrder(_XP_)] = &right_root;
+
+    left_root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
+    right_root.set_child(NonUniformNode2::Idx::_MM_, new NonUniformNode2());
+
+    auto child = left_root.child[NonUniformNode2::Idx::_MP_];
+    ASSERT_NE(child, nullptr);
+    EXPECT_EQ(child->get_neighbor(_XP_), nullptr);
+
+    child->connect_neighbors();
+
+    EXPECT_EQ(child->get_neighbor(_XP_), child->find_neighbor(_XP_));
+    EXPECT_EQ(child->get_neighbor(_XP_),
               right_root.child[NonUniformNode2::Idx::_MM_]);
 }
 
@@ -457,7 +493,7 @@ TEST(onode, find_face_neighbor_returns_coarser_neighbor_when_child_is_missing_2d
 
     left_root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
 
-    EXPECT_EQ(left_root.child[NonUniformNode2::Idx::_MP_]->find_face_neighbor(_XP_),
+    EXPECT_EQ(left_root.child[NonUniformNode2::Idx::_MP_]->find_neighbor(_XP_),
               &right_root);
 }
 
@@ -466,14 +502,14 @@ TEST(onode, find_face_neighbor_returns_nullptr_for_missing_boundary_neighbor_2d)
     NonUniformNode2 root;
     root.set_child(NonUniformNode2::Idx::_MP_, new NonUniformNode2());
 
-    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MP_]->find_face_neighbor(_XP_), nullptr);
+    EXPECT_EQ(root.child[NonUniformNode2::Idx::_MP_]->find_neighbor(_XP_), nullptr);
 }
 
 TEST(onode, find_face_neighbor_rejects_direction_outside_dimension_2d){
 
     NonUniformNode2 root;
 
-    EXPECT_EQ(root.find_face_neighbor(_ZP_), nullptr);
+    EXPECT_EQ(root.find_neighbor(_ZP_), nullptr);
 }
 
 TEST(onode, find_face_neighbor_climbs_to_common_ancestor_3d_z_direction){
@@ -487,6 +523,6 @@ TEST(onode, find_face_neighbor_climbs_to_common_ancestor_3d_z_direction){
     lower_parent->set_child(NonUniformNode3::Idx::_PMM_, new NonUniformNode3());
     upper_parent->set_child(NonUniformNode3::Idx::_MMM_, new NonUniformNode3());
 
-    EXPECT_EQ(lower_parent->child[NonUniformNode3::Idx::_PMM_]->find_face_neighbor(_ZP_),
+    EXPECT_EQ(lower_parent->child[NonUniformNode3::Idx::_PMM_]->find_neighbor(_ZP_),
               upper_parent->child[NonUniformNode3::Idx::_MMM_]);
 }

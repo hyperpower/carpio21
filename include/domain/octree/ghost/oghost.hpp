@@ -75,11 +75,11 @@ public:
         return false;
     }
 
-    virtual bool is_boundary(const_pNode, const Direction&) const {
+    virtual bool is_boundary(const_pNode, const DirectionCode&) const {
         return false;
     }
 
-    virtual const_pNode boundary_node(const_pNode, const Direction&) const {
+    virtual const_pNode boundary_node(const_pNode, const DirectionCode&) const {
         return nullptr;
     }
 };
