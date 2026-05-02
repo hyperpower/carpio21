@@ -26,7 +26,7 @@ typedef SFieldCenter_<dim, double, Grid, Ghost, Order> Field;
 
 
 void PlotFieldAsVolume(const std::string& fn, const Field& a){
-    Plotly_ plotly;
+    Plotly plotly;
     plotly.margin(0, 0, 0, 0);
     plotly.layout("width",  660.0);
     plotly.layout("height", 400.0);

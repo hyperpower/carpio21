@@ -17,7 +17,7 @@ void PlaneBoxIntersection(const std::string& name,
                           const Box3& box, const Plane& plane){
     std::cout << "The box is " << box << std::endl;
     
-    Plotly_ plotly;
+    Plotly plotly;
     std::cout << plotly.version() << std::endl;
 
     auto abox = ToPlotlyActor(box);

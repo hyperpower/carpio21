@@ -137,7 +137,7 @@ void Iterative(const std::string& method, const Field& fe, double dt,
     };
     EventGnuplotField egs("phi", fun, -1, -1, 1, Event::AFTER );
 
-    egs.set_figure_font("Fira Code");
+    egs.set_figure_font("Palatino");
     egs.set_figure_width(fig_width);
     egs.set_figure_height(fig_height);
     egs.set_path(FIG_PATH + method + "_" );
@@ -235,19 +235,19 @@ void A_Run(std::string& method) {
     set_gnu(method, gnu1);
     gnu1.set_ylabel("L1-Norm");
     gnu1.set_terminal_png(FIG_PATH + method +"_Norm1Compare", 
-                    fig_width, fig_height, "Fira Code");
+                    fig_width, fig_height);
     gnu1.plot();
     
     set_gnu(method, gnu2);
     gnu2.set_ylabel("L2-Norm");
     gnu2.set_terminal_png(FIG_PATH + method +"_Norm2Compare", 
-                    fig_width, fig_height, "Fira Code");
+                    fig_width, fig_height);
     gnu2.plot();
 
     set_gnu(method, gnui);
     gnui.set_ylabel("Linf-Norm");
     gnui.set_terminal_png(FIG_PATH + method +"_NormInfCompare", 
-                    fig_width, fig_height, "Fira Code");
+                    fig_width, fig_height);
     gnui.plot();
     
 }

@@ -34,7 +34,7 @@ template<St DIM, class GRID>
 class SGhostRegular_ : public SGhost_<DIM, GRID>{
 public:
     typedef SGhost_<DIM, GRID> Base;
-    typedef Indices_<DIM> Index;
+    typedef Indices_<DIM> Indices;
     typedef typename DimTagTraits_<DIM>::Type DimTag;
     typedef GRID Grid;
     typedef std::shared_ptr<Grid> spGrid;
@@ -72,7 +72,7 @@ public:
     }
 
     virtual bool 
-    is_ghost(const Index& cindex) const{
+    is_ghost(const Indices& cindex) const{
         for (St d = 0; d < DIM; ++d) {
             Idx res = cindex.value(d);
             if (res < 0) {
@@ -86,7 +86,7 @@ public:
     
     virtual bool 
     is_ghost(
-        const Index& vindex,
+        const Indices& vindex,
         VertexTag) const
     {
         for (St d = 0; d < DIM; ++d) {
@@ -100,13 +100,13 @@ public:
         return false;
     };
     virtual bool 
-    is_ghost_vertex(const Index& vindex) const
+    is_ghost_vertex(const Indices& vindex) const
     {
         return is_ghost(vindex, VertexTag());
     };
 
     virtual bool is_boundary(
-                const Index& index,
+                const Indices& index,
                 const Axes& a,
                 const Orientation& o) const{
         Idx idx = index.value(a);
@@ -120,7 +120,7 @@ public:
         }
     }
     virtual bool is_boundary(
-                const Index& index,
+                const Indices& index,
                 const Orientation& o) const{
         for(auto& a : ArrAxes<DIM>()){
             if(is_boundary(index, a, o)){
@@ -131,7 +131,7 @@ public:
     }
 
     virtual bool 
-    is_boundary_vertex(const Index& vindex) const{
+    is_boundary_vertex(const Indices& vindex) const{
         for(auto& a : ArrAxes<DIM>()){
             if(is_boundary_vertex(vindex, a)){
                 return true;
@@ -142,49 +142,49 @@ public:
     
     virtual bool 
     is_boundary_vertex(
-        const Index& vindex, 
+        const Indices& vindex, 
         const Axes& a) const
     {
-        Index m = vindex.m(a);
+        Indices m = vindex.m(a);
         if(is_ghost_vertex(m)){
             return true;
         }
-        Index p = vindex.p(a);
+        Indices p = vindex.p(a);
         if(is_ghost_vertex(p)){
             return true;
         }
         return false; 
     }
     virtual bool is_boundary_face(
-            const Index& findex,
+            const Indices& findex,
             const St&    a) const{
         ASSERT(a < DIM);
         Idx idx = findex.value(a);
         return (idx == 0) || (idx == _grid->n().value(a)); 
     };
     
-    virtual bool is_cut(const Index& index) const{
+    virtual bool is_cut(const Indices& index) const{
         return false;
     }
 
-    virtual bool is_normal(const Index& index) const{
+    virtual bool is_normal(const Indices& index) const{
         return !(is_ghost(index));
     }
 
-    virtual bool is_normal_vertex(const Index& vidx) const{
+    virtual bool is_normal_vertex(const Indices& vidx) const{
         return (!is_ghost(vidx, VertexTag()));
     }
 
     virtual int 
     boundary_id(
-        const Index& indexc,
-        const Index& indexg,
+        const Indices& indexc,
+        const Indices& indexg,
         const St& a,
         const St& ori) const
     {
         // get seg idx in BCID
         // St ABI[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
-        Index n = this->_grid->n();
+        Indices n = this->_grid->n();
         Idx res = indexg.value(a);
         if (res < 0) {
             return _BID[a][0];
@@ -198,14 +198,14 @@ public:
 
     virtual int 
     boundary_id_vertex(
-        const Index& indexc,
-        const Index& indexg,
+        const Indices& indexc,
+        const Indices& indexg,
         const St& a,
         const St& ori) const
     {
         // get seg idx in BCID
         // St ABI[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
-        Index n = this->_grid->n();
+        Indices n = this->_grid->n();
         Idx res = indexg[a];
         if (res <= 0) {
             return _BID[a][0];
@@ -220,8 +220,8 @@ public:
         return 0;
     };
 
-    virtual Index boundary_index(const Index& indexc,
-                                 const Index& indexg,
+    virtual Indices boundary_index(const Indices& indexc,
+                                 const Indices& indexg,
                                  const St&    axe,
                                  const St&    ori) const{
         auto oori = Opposite(Orientation(ori));  // opposite oritation

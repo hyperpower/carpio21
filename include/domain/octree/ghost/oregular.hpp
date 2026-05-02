@@ -108,10 +108,32 @@ public:
         return neighbor != nullptr && is_ghost(neighbor);
     }
 
-    // TODO: implement octree boundary mapping logic.
-    virtual const_pNode boundary_node(const_pNode, const DirectionCode&) const {
-        return nullptr;
+    virtual int boundary_id(
+        const_pNode cnode,
+        const_pNode gnode,
+        const St& a,
+        const St& ori) const
+    {
+        (void)cnode; //not used
+        (void)ori;   //not used
+
+        ASSERT(this->has_grid());
+        ASSERT(gnode != nullptr);
+        ASSERT(a < Dim);
+
+        const auto& root = gnode->find_root();
+        auto indices = this->grid().storage_1d_idx_to_indices(root.root_idx());
+        Idx res = indices.value(a);
+        if (res < 0) {
+            return static_cast<int>(a * 2);
+        } else if (res >= this->grid().size(a)) {
+            return static_cast<int>(a * 2 + 1);
+        }
+
+        SHOULD_NOT_REACH;
+        return 0;
     }
+   
 };
 
 }

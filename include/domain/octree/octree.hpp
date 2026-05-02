@@ -3,6 +3,7 @@
 
 #include "domain/domain_define.hpp"
 #include "domain/octree/grid/ocell.hpp"
+#include "domain/octree/order/oorder.hpp"
 
 
 namespace carpio{

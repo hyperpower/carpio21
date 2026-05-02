@@ -1,30 +1,11 @@
-cmake_minimum_required(VERSION 3.0)
-project(unit_sine_square)
+cmake_minimum_required(VERSION 3.10)
+project(unit_sine_cube)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake/ExampleCommonSetup.cmake)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/)
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+include_directories("${Python_INCLUDE_DIRS}")
 
-set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+carpio_setup_example(TARGET main)
 
-find_package(Python COMPONENTS Interpreter Development)
-
-IF(Python_FOUND)
-  INCLUDE_DIRECTORIES("${Python_INCLUDE_DIRS}")
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
-ENDIF()
-
-# location of header files
-INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/../../include
-    ${PROJECT_SOURCE_DIR}/../include
-)
-
-add_executable(main ${SOURCE_FILES})
-
-if(Python_FOUND)
-  target_link_libraries(main PUBLIC ${Python_LIBRARIES})
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to link python libraries")
-ENDIF()
+target_link_libraries(main PUBLIC ${Python_LIBRARIES})

@@ -1,55 +1,21 @@
-cmake_minimum_required(VERSION 3.0)
-project(segments_intersection)
+cmake_minimum_required(VERSION 3.10)
+project(segments_intersection_benchmark)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
-  set(CMAKE_CXX20_EXTENSION_COMPILE_OPTION "-std:c++latest")
-  # add_definitions(-DNOMINMAX)
-else()
-  set(CMAKE_CXX_STANDARD 20)
-endif()
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake/ExampleCommonSetup.cmake)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/)
+set(CMAKE_BUILD_TYPE "Release")
 
-set(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
-
-SET(CMAKE_BUILD_TYPE "Release")
-
-# GGAL =========
 find_package(CGAL)
 
-# python =======
-set(REQUIRED_PYTHON_VERSION 3.4)
-# message(STATUS "======== LOOKING FOR PYTHON ${REQUIRED_PYTHON_VERSION} ========================")
-find_package ( PythonInterp ${REQUIRED_PYTHON_VERSION} REQUIRED)
-find_package ( PythonLibs ${REQUIRED_PYTHON_VERSION} REQUIRED)
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+include_directories("${Python_INCLUDE_DIRS}")
 
-message(STATUS "PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}")
+carpio_setup_example(TARGET main)
 
-IF(PYTHONLIBS_FOUND)
-  INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}")
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
-ENDIF()
-# end python ===
+target_link_libraries(main PUBLIC ${Python_LIBRARIES})
 
-# location of header files
-INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/../../include
-)
-
-add_executable(main ${SOURCE})
-
-if(PYTHON_LIBRARIES)
-  TARGET_LINK_LIBRARIES(main ${PYTHON_LIBRARIES})
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to link python libraries")
-ENDIF()
-
-If(CGAL_FOUND)
-  TARGET_LINK_LIBRARIES(main CGAL::CGAL)
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to link CGAL libraries")
-ENDIF()
-
-  
+if(CGAL_FOUND)
+    target_link_libraries(main PUBLIC CGAL::CGAL)
+else()
+    message(FATAL_ERROR "Unable to link CGAL libraries")
+endif()

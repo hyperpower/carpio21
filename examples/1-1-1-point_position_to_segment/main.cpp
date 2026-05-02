@@ -23,7 +23,7 @@ std::string a_case(const Point& p1, const Point& p2, const Point& p3){
 			650,                // double  x         = 800,
 			488,                // double  y         = 600,
 			"Palatino",         // const std::string& font     = "Helvetica",
-			12                  // int  fontsize  = 12);
+			16                  // int  fontsize  = 12);
 			);
 	gnu.set_xrange(-0.5, 1.5);
 	gnu.set_yrange(-0.5, 1.5);

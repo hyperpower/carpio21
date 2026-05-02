@@ -18,7 +18,7 @@ exclude_patterns = []
 #modindex_common_prefix = []
 numfig = True
 project = u'Carpio'
-copyright = u'2024, Chengsi ZHOU'
+copyright = u'2026, Chengsi ZHOU'
 
 math_numfig = True
 math_eqref_format   = "Eq.{number}"
@@ -47,13 +47,5 @@ html_theme_options = {
 html_context = {
     'current_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
 }
-# html_theme_path = ['themes']
-# html_title = "Music for Geeks and Nerds"
-#html_short_title = None
-#html_logo = None
-#html_favicon = None
-# html_static_path = ['_static']
-# html_domain_indices = False
-# html_use_index = False
-# html_show_sphinx = False
+
 html_show_sourcelink = False

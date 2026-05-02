@@ -5,8 +5,10 @@ import platform
 import sys
 import errno
 import argparse
+import logging
 import subprocess
 import time
+import webbrowser
 from path import *
 import pathlib
 # sphinx should be installed
@@ -15,6 +17,9 @@ from env_para import *
 
 # 
 from rst_supplement import *
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 def parse_name(name):
     sn = name.split("-")
@@ -63,7 +68,7 @@ def is_code_file_in(path, fn):
         return False
 
 def print_bar(name):
-        print(TermColor.BLUE + '===== {:^10s} ====='.format(name)+ TermColor.RESET )
+        logger.info(TermColor.BLUE + '===== {:^10s} ====='.format(name)+ TermColor.RESET )
 
 def clean(path, original_files):
     print_bar("clean")
@@ -142,7 +147,7 @@ class Runer:
 
     def show_info(self):
         for k, v in self._info.items():
-            print("%15s : " % k, v)
+            logger.info("%15s : %s", k, v)
 
     def mkdir_all(self):
         # creat the last level of folder
@@ -159,57 +164,76 @@ class Runer:
     def cmake(self):
         path_build = os.path.join(self._path.this, "build")
         if platform.system() == "Darwin":
-            cmd = f"cmake --no-warn-unused-cli" \
-                  f" -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE" \
-                  f" -DCMAKE_BUILD_TYPE:STRING=Release" \
-                  f" -S \"{self._path.this}\"" \
-                  f" -B \"{path_build}\"" \
-                  f" -G \"Unix Makefiles\""
+            cmd = [
+                "cmake",
+                "--no-warn-unused-cli",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE",
+                "-DCMAKE_BUILD_TYPE:STRING=Release",
+                "-S",
+                self._path.this,
+                "-B",
+                path_build,
+                "-G",
+                "Unix Makefiles",
+            ]
         else:
-            cmd = f"cmake -S \"{self._path.this}\"" \
-                  f" -B \"{path_build}\"" 
-        print(cmd)
-        # os.system(cmd)
-        result = os.popen(cmd)
-        print(result.read())
+            cmd = ["cmake", "-S", self._path.this, "-B", path_build]
+        logger.info(subprocess.list2cmdline(cmd))
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.stdout:
+            logger.info(result.stdout.rstrip())
 
     def build(self):
         project_name = self._info["name"]
-        if platform.system() == "Windows":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 4 --clean-first")
-        elif platform.system() == "Linux":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 4 --clean-first")
-        elif platform.system() == "Darwin":
-            cmd = "cmake --build \""+ os.path.join(self._path.this, "build\"" + " --config Release -j 4 --clean-first")
-        print(cmd)
-        result = os.popen(cmd)
-        # result = subprocess.Popen(cmd)
-        # print(result.stdout)
-        print(result.read())
+        cmd = [
+            "cmake",
+            "--build",
+            os.path.join(self._path.this, "build"),
+            "--config",
+            "Release",
+            "-j",
+            "4",
+            "--clean-first",
+        ]
+        logger.info(subprocess.list2cmdline(cmd))
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.stdout:
+            logger.info(result.stdout.rstrip())
     
     def print_bar(self, name):
-        print(TermColor.BLUE + '===== {:^10s} ====='.format(name)+ TermColor.RESET )
+        logger.info(TermColor.BLUE + '===== {:^10s} ====='.format(name)+ TermColor.RESET )
 
     def execute(self):
         current = os.getcwd()
         os.chdir(self._path.this)
         exe = self._path.this + "/build/Release/main.exe"
         if os.path.exists(exe):
-            cmd = "\"" + exe +"\""
+            cmd = [exe]
         elif os.path.exists(self._path.this + "/build/main"):
-            cmd = self._path.this + "/build/main"
+            cmd = [self._path.this + "/build/main"]
         else:
-            print("! executable file not found !")
+            logger.error("executable file not found")
             os.chdir(current)
             return False
 
-        exit_code = os.system(cmd)
+        result = subprocess.run(cmd, cwd=self._path.this)
+        exit_code = result.returncode
         os.chdir(current)
         if exit_code == 0:
             return True
         else:
-            print("! cmd         : %s", cmd)
-            print("! return code :", exit_code)
+            logger.error("cmd         : %s", subprocess.list2cmdline(cmd))
+            logger.error("return code : %s", exit_code)
             return False
 
     def execute_mpi(self):
@@ -217,34 +241,41 @@ class Runer:
         os.chdir(self._path.this)
         exe = self._path.this + "/build/Release/main.exe"
         if os.path.exists(exe):
-            cmd = "mpiexec -n %d \"" % (self._num_mpi) + exe +"\""
+            cmd = ["mpiexec", "-n", str(self._num_mpi), exe]
         elif os.path.exists(self._path.this + "/build/main"):
-            cmd = "mpiexec -n %d " % (self._num_mpi) + self._path.this + "/build/main"
+            cmd = ["mpiexec", "-n", str(self._num_mpi), self._path.this + "/build/main"]
         else:
-            print("! executable file not found !")
+            logger.error("executable file not found")
             os.chdir(current)
             return False
 
-        exit_code = os.system(cmd)
+        result = subprocess.run(cmd, cwd=self._path.this)
+        exit_code = result.returncode
         os.chdir(current)
         if exit_code == 0:
             return True
         else:
-            print("! cmd         : %s", cmd)
-            print("! return code :", exit_code)
+            logger.error("cmd         : %s", subprocess.list2cmdline(cmd))
+            logger.error("return code : %s", exit_code)
             return False
         
 
     def plot(self):
-        current = os.getcwd()
-        os.chdir(self._path.this)
-        if os.path.isfile("./plot.py"):
-            if platform.system() == "Windows":
-                os.system("python3 ./plot.py")
-            # exec(open('./plot.py').read())
-            elif platform.system() == "Darwin":
-                os.system("python3 ./plot.py")
-        os.chdir(current)
+        plot_file = os.path.join(self._path.this, "plot.py")
+        if not os.path.isfile(plot_file):
+            return False
+        cmd = [sys.executable, plot_file]
+        logger.info(subprocess.list2cmdline(cmd))
+        result = subprocess.run(
+            cmd,
+            cwd=self._path.this,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.stdout:
+            logger.info(result.stdout.rstrip())
+        return result.returncode == 0
 
     def clean_doc(self):
         doc_dir = os.path.abspath(os.path.join(self._path.this, "doc"))
@@ -280,6 +311,13 @@ class Runer:
         build_format  = 'html'  # singlehtml
         args = ["-b", str(build_format), str(doc_source_dir), str(doc_build_dir)]
         sphinx_main(args)
+
+    def open_html(self):
+        report = pathlib.Path(self._path.this, "doc", "build", "report.html").resolve()
+        if not report.is_file():
+            logger.error("html file not found : %s", report)
+            return False
+        return webbrowser.open(report.as_uri())
 
     def _init_time_record(self):
         names = [
@@ -329,7 +367,7 @@ class Runer:
             record["clean"] = True
             self.clean()
         if args.make:
-            print("make ===== ")
+            logger.info("make ===== ")
             t  = time.perf_counter()
             record["make"] = True
             #
@@ -343,33 +381,33 @@ class Runer:
             self.build()
             self._info["build_wall_time"] = time.perf_counter() - t
         if args.execute:
-            print("execute ===== ")
+            logger.info("execute ===== ")
             t  = time.perf_counter()
             record["execute"] = True
             self.execute()
             self._info["execute_wall_time"] = time.perf_counter() - t
         if args.mpi:
-            print("execute by mpi ===== ")
+            logger.info("execute by mpi ===== ")
             t  = time.perf_counter()
             record["execute"] = True
             self.execute_mpi()
             self._info["execute_wall_time"] = time.perf_counter() - t
         if args.plot:
-            print("plot ======== ")
+            logger.info("plot ======== ")
             t  = time.perf_counter()
             record["plot"] = True
             self.plot()
             self._info["plot_wall_time"] = time.perf_counter() - t
         if args.document:
-            print(" build document ===== ")
+            logger.info(" build document ===== ")
             t  = time.perf_counter()
             record["document"] = True
             self.clean_doc()
             self.build_doc()
             self._info["document_wall_time"] = time.perf_counter() - t
         if args.html:
-            print(" open document ===== ")
-            os.system("open ./doc/build/report.html")
+            logger.info(" open document ===== ")
+            self.open_html()
             record["html"] = True
             
 
@@ -391,23 +429,30 @@ def rename_last_png(fn_prefix):
         if file_name.endswith('.png') and file_name.startswith("%s_" % fn_prefix):
             lf.append(file_name)
     lf.sort()
-    print("The last fig = ", lf[-1])
+    logger.info("The last fig = %s", lf[-1])
 
-    cmd = "cp " + "./fig/" + lf[-1] + " ./fig/%s-last.png" % fn_prefix
-    print(cmd) 
-    os.system(cmd)
+    src = os.path.join(".", "fig", lf[-1])
+    dst = os.path.join(".", "fig", "%s-last.png" % fn_prefix)
+    logger.info("copy %s %s", src, dst)
+    shutil.copyfile(src, dst)
 
 
 def make_gif(fn_prefix, gifname):
     # make gif
-    print("making gif ...")
-    cmd = "{} {} {}".format(
-            "ffmpeg -i ./fig/{}_%03d.png".format(fn_prefix),
-            "-vf \"fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\"",
-            "-y -loop 0 ./fig/%s.gif" % gifname
-        )
-    os.system(cmd)
-    # os.system("ffmpeg -i ./fig/lb_%02d.png -vf \"fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 ./fig/%s.gif" % (fn_prefix, filename))
+    logger.info("making gif ...")
+    cmd = [
+        "ffmpeg",
+        "-i",
+        "./fig/{}_%03d.png".format(fn_prefix),
+        "-vf",
+        "fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
+        "-y",
+        "-loop",
+        "0",
+        "./fig/%s.gif" % gifname,
+    ]
+    subprocess.run(cmd)
+    # ffmpeg -i ./fig/lb_%02d.png -vf "fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 ./fig/<filename>.gif
 
     # delete files
     # for file_name in os.listdir("./fig"):

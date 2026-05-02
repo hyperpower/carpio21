@@ -38,10 +38,11 @@ public:
     typedef Indices_<Dim> Indices;
 
     typedef CELL Cell;
+    typedef DATA Data;
     typedef typename Cell::vt vt;
     typedef typename Cell::Point Point;
 
-    typedef ONode_<DATA, CELL, DIM> Node;
+    typedef ONode_<Data, CELL, DIM> Node;
     typedef Node *pNode;
     typedef const Node *const_pNode;
     typedef Node& ref_Node;

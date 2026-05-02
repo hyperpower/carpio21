@@ -1,34 +1,14 @@
-cmake_minimum_required(VERSION 3.0)
-project(segment_vs_box)
+cmake_minimum_required(VERSION 3.10)
+project(affine_transformation)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
-  set(CMAKE_CXX20_EXTENSION_COMPILE_OPTION "-std:c++latest")
-else()
-  set(CMAKE_CXX_STANDARD 20)
-endif()
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/)
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake/ExampleCommonSetup.cmake)
 
-set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+include_directories("${Python_INCLUDE_DIRS}")
 
-find_package(Python COMPONENTS Interpreter Development)
-
-IF(Python_FOUND)
-  INCLUDE_DIRECTORIES("${Python_INCLUDE_DIRS}")
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
-ENDIF()
-
-# location of header files
-INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}
-    ${PROJECT_SOURCE_DIR}/../../include
+carpio_setup_example(
+    TARGET main
+    EXTRA_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(main ${SOURCE_FILES})
-
-if(Python_FOUND)
-  target_link_libraries(main PUBLIC ${Python_LIBRARIES})
-ELSE()
-  MESSAGE(FATAL_ERROR "Unable to link python libraries")
-ENDIF()
+target_link_libraries(main PUBLIC ${Python_LIBRARIES})

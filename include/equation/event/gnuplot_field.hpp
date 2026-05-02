@@ -49,8 +49,8 @@ public:
         _terminal_name = "png";
         _size_x        = 800;
         _size_y        = 600;
-        _font          = "Helvetica";
-        _size_font     = 12;
+        _font          = "Palatino";
+        _size_font     = 16;
 
         // _init_fun_plot();
     }
@@ -67,8 +67,8 @@ public:
             _terminal_name = "png";
             _size_x        = 800;
             _size_y        = 600;
-            _font          = "Helvetica";
-            _size_font     = 12;
+            _font          = "Palatino";
+            _size_font     = 16;
 
             _fun = fun;
     }

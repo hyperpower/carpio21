@@ -1,17 +1,6 @@
-cmake_minimum_required(VERSION 3.0)
-project(unit_sine_square)
+cmake_minimum_required(VERSION 3.10)
+project(one_boundary)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake/ExampleCommonSetup.cmake)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/)
-
-set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
-
-
-# location of header files
-INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/../../include
-    ${PROJECT_SOURCE_DIR}/../include
-)
-
-add_executable(main ${SOURCE_FILES})
+carpio_setup_example(TARGET main)
