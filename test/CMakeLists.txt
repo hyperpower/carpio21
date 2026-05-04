@@ -19,6 +19,7 @@ cmake_minimum_required(VERSION 3.10)
   ##############
   set(Source
       test_gtest.cpp
+      geometry/test_circle_box.cpp
   )
   add_executable(TestGTest ${Source})
 
@@ -38,8 +39,8 @@ cmake_minimum_required(VERSION 3.10)
   # add_subdirectory(io)
   # add_subdirectory(utility)
   # add_subdirectory(substance)
-#   add_subdirectory(geometry)
-  add_subdirectory(octree)
+  add_subdirectory(geometry)
+  # add_subdirectory(octree)
   # add_subdirectory(structure)
   # add_subdirectory(domain)
   # add_subdirectory(equation)

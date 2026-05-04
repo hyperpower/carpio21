@@ -29,6 +29,7 @@ public:
     typedef typename OrderVector::const_iterator const_iterator;
 
 protected:
+    OrderVector _roots_sorted;
     OrderVector _ov;
 
 public:
@@ -61,40 +62,38 @@ public:
     }
 
 protected:
-    void _build_order_vector() {
-        struct RootEntry {
-            const_pNode node;
-            typename MortonCode_<Grid::Dim>::Code code;
-            St order;
-        };
+    void _build_roots_sorted() {
+        _roots_sorted.clear();
+        _roots_sorted.reserve(this->grid().size());
 
-        std::vector<RootEntry> roots;
-        roots.reserve(this->grid().size());
-
-        St order = 0;
         for (auto it = this->grid().cbegin(); it != this->grid().cend(); ++it) {
-            const auto indices = it.indices();
-            roots.push_back({
-                &(*it),
-                EncodeGridMortonCode<Grid::Dim>(
-                    St(indices.i()),
-                    Grid::Dim >= 2 ? St(indices.j()) : 0,
-                    Grid::Dim >= 3 ? St(indices.k()) : 0),
-                order
-            });
-            ++order;
+            _roots_sorted.push_back(&(*it));
         }
 
-        std::sort(roots.begin(), roots.end(), [](const RootEntry& lhs, const RootEntry& rhs) {
-            if (lhs.code != rhs.code) {
-                return lhs.code < rhs.code;
-            }
-            return lhs.order < rhs.order;
-        });
+        std::sort(_roots_sorted.begin(), _roots_sorted.end(), [this](const_pNode lhs, const_pNode rhs) {
+            const auto lhs_indices = this->grid().storage_1d_idx_to_indices(lhs->root_idx());
+            const auto rhs_indices = this->grid().storage_1d_idx_to_indices(rhs->root_idx());
+            const auto lhs_code = EncodeGridMortonCode<Grid::Dim>(
+                St(lhs_indices.i()),
+                Grid::Dim >= 2 ? St(lhs_indices.j()) : 0,
+                Grid::Dim >= 3 ? St(lhs_indices.k()) : 0);
+            const auto rhs_code = EncodeGridMortonCode<Grid::Dim>(
+                St(rhs_indices.i()),
+                Grid::Dim >= 2 ? St(rhs_indices.j()) : 0,
+                Grid::Dim >= 3 ? St(rhs_indices.k()) : 0);
 
+            if (lhs_code != rhs_code) {
+                return lhs_code < rhs_code;
+            }
+            return lhs->root_idx() < rhs->root_idx();
+        });
+    }
+
+    void _build_order_vector() {
+        _build_roots_sorted();
         _ov.clear();
-        for (const auto& root : roots) {
-            for (auto it = root.node->cbegin(); it != root.node->cend(); ++it) {
+        for (const auto& root : _roots_sorted) {
+            for (auto it = root->cbegin(); it != root->cend(); ++it) {
                 const_pNode node = &(*it);
                 if (node->is_leaf() && !this->ghost().is_ghost(node)) {
                     _ov.push_back(node);

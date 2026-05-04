@@ -4,21 +4,7 @@
 #include <type_define.hpp>
 #include <iostream>
 #include <fstream>
-#ifdef __linux__ 
-    //linux code goes here
-    #include <unistd.h>
-    #include <sys/stat.h> 
-#elif _WIN32 || _WIN64
-    // windows code goes here
-    #include <io.h>
-    #include <process.h>
-    #include <windows.h>
-    #include <direct.h>
-#elif __APPLE__
-    #include <unistd.h>
-    #include <sys/stat.h> 
-#endif
-
+#include <filesystem>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -26,6 +12,7 @@
 #include <list>
 #include <map>
 #include <algorithm>
+#include <system_error>
 
 #include "utility/tinyformat.hpp"
 
@@ -202,36 +189,12 @@ std::basic_string<T> ToUpperCase(const std::basic_string<T>& s)
 
 inline std::string GetWorkingPath()
 {
-    char temp [ 256 ];
-
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__)
-    if ( _getcwd(temp, 256) != 0)
-#elif defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
-    if ( getcwd(temp, 256) != 0)
-#endif
-    return std::string ( temp );
-
-    int error = errno;
-
-    switch ( error ) {
-    // EINVAL can't happen - size argument > 0
-
-    // PATH_MAX includes the terminating nul, 
-    // so ERANGE should not be returned
-
-    case EACCES:
-        throw std::runtime_error("Access denied");
-
-    case ENOMEM:
-        // I'm not sure whether this can happen or not 
-        throw std::runtime_error("Insufficient storage");
-
-    default: {
-        std::ostringstream str;
-        str << "Unrecognised error" << error;
-        throw std::runtime_error(str.str());
+    std::error_code ec;
+    const auto path = std::filesystem::current_path(ec);
+    if (ec) {
+        throw std::runtime_error(ec.message());
     }
-    }
+    return path.string();
 }
 
 inline bool FileAccessCheck( //
@@ -244,42 +207,21 @@ inline bool FileAccessCheck( //
         return false;
     }
 
-    //  int _access(const char *path, int mode);
-    //  returns 0 if the file has the given mode,
-    //  it returns -1 if the named file does not exist or is not accessible in
-    //  the given mode
-    // mode = 0 (F_OK) (default): checks file for existence only
-    // mode = 1 (X_OK): execution permission
-    // mode = 2 (W_OK): write permission
-    // mode = 4 (R_OK): read permission
-    // mode = 6       : read and write permission
-    // mode = 7       : read, write and execution permission
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__)
-    if (_access(filename.c_str(), mode) == 0)
-#elif defined(unix) || defined(__unix) || defined(__unix__) || defined(__APPLE__)
-    if (access(filename.c_str(), mode) == 0)
-#endif
-    {
-    return true;
-    } else {
-        return false;
-    }
+    std::error_code ec;
+    return std::filesystem::exists(std::filesystem::path(filename), ec);
 }
 
-inline bool MakeDir(std::string dir) {
-#if defined _MSC_VER   // windows
-    int rc = _mkdir( dir.data() );
-    if( rc == 0 ){
+inline bool MakeDir(const std::string& dir) {
+    std::error_code ec;
+    const std::filesystem::path path(dir);
+    if (std::filesystem::is_directory(path, ec)) {
         return true;
-    }else if(rc == EEXIST){
-        // file exist
-        return true;
-    }else{
+    }
+    if (std::filesystem::exists(path, ec)) {
         return false;
     }
-#else // defined __GNUC__
-    return (0 == mkdir(dir.data(), 0777));
-#endif
+    return std::filesystem::create_directories(path, ec)
+        || std::filesystem::is_directory(path, ec);
 }
 
 

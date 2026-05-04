@@ -32,7 +32,7 @@ void AddNode(
     std::list<double> lx, ly;
     int n = 20;
     double r = 0.8;
-    double da = 2 * _PI_ / n;
+    double da = 2 * pi / n;
     for (int i = 0; i < n; i++) {
         Vt rx = r * cos(i * da) + x;
         Vt ry = r * sin(i * da) + y;
@@ -55,7 +55,7 @@ void AddNodeEmphi(
     std::list<double> lx, ly;
     int n = 20;
     double r = 0.8;
-    double da = 2 * _PI_ / n;
+    double da = 2 * pi / n;
     for (int i = 0; i < n; i++) {
         Vt rx = r * cos(i * da) + x;
         Vt ry = r * sin(i * da) + y;

@@ -38,7 +38,6 @@
             return ;                           \
         }
 
-#define _PI_ (3.1415926)
 #define ENABLE_IF(__T, __CONDITION)  typename std::enable_if< __CONDITION<__T>::value , bool>::type = true
                  
              
@@ -91,6 +90,7 @@ typedef double      Float;
 typedef void*             utPointer;
 typedef const void* const_utPointer;
 
+inline constexpr double pi = 3.141592653589793238462643383279502884;
 
 typedef std::function<  Vt(Vt, Vt, Vt, Vt)> FunXYZT_V;
 typedef std::function<void(Vt, Vt, Vt, Vt)> FunXYZT;

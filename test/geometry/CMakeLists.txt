@@ -11,7 +11,8 @@ set(Sources
     # test_affine.cpp
     # test_point_chain.cpp
     # test_ts.cpp
-    test_tri_tri.cpp
+    # test_tri_tri.cpp
+    test_circle_box.cpp
     # test_seg_tri.cpp
     # test_predicate.cpp
     # test_polygon_partition.cpp

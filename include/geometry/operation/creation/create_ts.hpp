@@ -75,7 +75,7 @@ public:
         std::vector<pEdge> v_edge;
         std::vector<pTriFace> v_face;
         pVertex pverc = new Vertex(0, 0, 0);
-        double da = 2 * _PI_ / n;
+        double da = 2 * pi / n;
         v_vertex.push_back(pverc);
         for (uInt i = 0; i < n; i++) {
             Vt x = r * cos(i * da);

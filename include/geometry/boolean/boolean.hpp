@@ -9,6 +9,7 @@
 // #include "multi_segments.hpp"
 
 #include "line_box.hpp"
+#include "intersection_circle_box.hpp"
 
 
 namespace carpio{

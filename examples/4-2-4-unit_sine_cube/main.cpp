@@ -78,7 +78,7 @@ void ExactSolution(){
                 typename Field::ValueType y,
                 typename Field::ValueType z,
                 double t){
-        return std::sin( _PI_ * x) * std::sin( _PI_ * y) * std::sin( _PI_ * z);
+        return std::sin( pi * x) * std::sin( pi * y) * std::sin( pi * z);
     });
 
     PlotFieldAsVolume(FIG_PATH + "exact", a);
@@ -125,7 +125,7 @@ void PoissonSolver(int n,
     equ.set_source([](typename Domain::ValueType x,
                       typename Domain::ValueType y,
                       typename Domain::ValueType z){
-                        return  -3.0 * _PI_ * _PI_ * std::sin(_PI_*x)*std::sin(_PI_*y)*std::sin(_PI_*z);
+                        return  -3.0 * pi * pi * std::sin(pi*x)*std::sin(pi*y)*std::sin(pi*z);
                       });
     // Add events
 	typedef Event_<Domain> Event;
@@ -146,7 +146,7 @@ void PoissonSolver(int n,
                     typename Field::ValueType y,
                     typename Field::ValueType z,
                 double t){
-        return std::sin(_PI_ * x) * std::sin(_PI_ * y)* std::sin(_PI_ * z);
+        return std::sin(pi * x) * std::sin(pi * y)* std::sin(pi * z);
     });
     auto error = exact - equ.field("phi");
 

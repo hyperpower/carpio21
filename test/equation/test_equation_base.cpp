@@ -143,7 +143,7 @@ TEST(equation, equation_base){
 //     equ.set_source([](typename Domain::ValueType x,
 //                       typename Domain::ValueType y,
 //                       typename Domain::ValueType z){
-//                         return  -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+//                         return  -8.0 * pi * pi * std::sin(2.0*pi*x)*std::sin(2.0*pi*y);
 //                       });
 //     // Add events
 // 	typedef Event_<Domain> Event;
@@ -171,7 +171,7 @@ TEST(equation, equation_base){
 //     exact.assign([](typename Domain::ValueType x,
 //                     typename Domain::ValueType y,
 //                     typename Domain::ValueType z){
-//         return std::sin(2.0 * _PI_ * x) * std::sin(2.0 * _PI_ * y);
+//         return std::sin(2.0 * pi * x) * std::sin(2.0 * pi * y);
 //     });
 
 //     // 

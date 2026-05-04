@@ -46,7 +46,7 @@ TEST(s_interpolate, dim2){
                 typename Field::ValueType y,
                 typename Field::ValueType z
                 ){
-        return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
+        return std::sin(2 * pi * x) * std::sin(2 * pi * y);
     });
 
     auto fa = InterpolateCenterToFace(a, _X_);

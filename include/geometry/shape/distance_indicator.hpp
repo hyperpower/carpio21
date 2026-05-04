@@ -108,7 +108,7 @@ public:
 protected:
     void _cal_normal_vector(){
         this->_n_vector = this->_p2;
-        Rotate(this->_n_vector, _PI_ * 0.5, this->_p1);
+        Rotate(this->_n_vector, pi * 0.5, this->_p1);
         this->_n_vector = this->_n_vector - this->_p1;
         this->_n_vector.normalize();
     }

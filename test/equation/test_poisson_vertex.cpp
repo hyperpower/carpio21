@@ -88,19 +88,19 @@ void PoissonSolver(int n,
     equ.set_source([](typename Domain::ValueType x,
                       typename Domain::ValueType y,
                       typename Domain::ValueType z){
-        return  - 8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+        return  - 8.0 * pi * pi * std::sin(2.0*pi*x)*std::sin(2.0*pi*y);
     });
     equ.set_analytical_d2x_source([](
         typename Domain::ValueType x,
         typename Domain::ValueType y,
         typename Domain::ValueType z){
-            return   32.0 * std::pow(_PI_,4.0) * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+            return   32.0 * std::pow(pi,4.0) * std::sin(2.0*pi*x)*std::sin(2.0*pi*y);
         });
     equ.set_analytical_d2y_source([](
         typename Domain::ValueType x,
         typename Domain::ValueType y,
         typename Domain::ValueType z){
-            return   32.0 * std::pow(_PI_,4.0) * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+            return   32.0 * std::pow(pi,4.0) * std::sin(2.0*pi*x)*std::sin(2.0*pi*y);
         });
     // Add events
 	typedef Event_<Domain> Event;
@@ -127,7 +127,7 @@ void PoissonSolver(int n,
     exact.assign([](typename Field::ValueType x,
                     typename Field::ValueType y,
                     typename Field::ValueType z){
-        return std::sin(2.0 * _PI_ * x) * std::sin(2.0 * _PI_ * y);
+        return std::sin(2.0 * pi * x) * std::sin(2.0 * pi * y);
     });
     auto error = exact - equ.field("phi");
     

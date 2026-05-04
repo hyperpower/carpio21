@@ -157,7 +157,7 @@ void PoissonSolver(int n,
     equ.set_source([](typename Domain::ValueType x,
                       typename Domain::ValueType y,
                       typename Domain::ValueType z){
-                        return  -8.0 * _PI_ * _PI_ * std::sin(2.0*_PI_*x)*std::sin(2.0*_PI_*y);
+                        return  -8.0 * pi * pi * std::sin(2.0*pi*x)*std::sin(2.0*pi*y);
                       });
     // Add events
 	typedef Event_<Domain> Event;
@@ -180,7 +180,7 @@ void PoissonSolver(int n,
                     typename Field::ValueType y,
                     typename Field::ValueType z,
                 double t){
-        return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
+        return std::sin(2 * pi * x) * std::sin(2 * pi * y);
     });
     auto error = exact - equ.field("phi");
     
@@ -229,7 +229,7 @@ TEST(equation, DISABLED_explicit_3d){
                 typename Field::ValueType y,
                 typename Field::ValueType z,
                 double t){
-        return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y) * std::sin(2 * _PI_ * z);
+        return std::sin(2 * pi * x) * std::sin(2 * pi * y) * std::sin(2 * pi * z);
     });
 
     Plotly plotly;

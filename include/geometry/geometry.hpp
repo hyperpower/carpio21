@@ -6,6 +6,7 @@
 #include "predicate.hpp"
 
 #include "objects/analytic/line.hpp"
+#include "objects/analytic/circle.hpp"
 
 #include "objects/basic/point.hpp"
 #include "objects/basic/segment.hpp"

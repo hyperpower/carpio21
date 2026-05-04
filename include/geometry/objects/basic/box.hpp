@@ -178,7 +178,7 @@ public:
 			return 0;
 		}
 		CV xv = 0;
-		const Self& self = (*this);
+		// const Self& self = (*this);
 		switch (loc) {
 		case _M_: {
 			xv = _min[aix];

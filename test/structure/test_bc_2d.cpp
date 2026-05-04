@@ -55,7 +55,7 @@ TEST(s_bc2d, dim2){
     //             typename Field::ValueType y,
     //             typename Field::ValueType z
     //             ){
-    //     return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
+    //     return std::sin(2 * pi * x) * std::sin(2 * pi * y);
     // });
 
     BoundaryIndex bi;

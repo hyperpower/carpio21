@@ -40,7 +40,46 @@ enum IntervalType {
     _oo_, _oc_, _co_, _cc_,
 };
 
+template<class TYPE>
+inline bool IsInRange(const TYPE& vmin, const TYPE& v, const TYPE& vmax, const IntervalType& type) {
+    const TYPE& lower = (vmin < vmax) ? vmin : vmax;
+    const TYPE& upper = (vmin < vmax) ? vmax : vmin;
 
+    switch (type) {
+    case _oo_:
+        return lower < v && v < upper;
+    case _oc_:
+        return lower < v && v <= upper;
+    case _co_:
+        return lower <= v && v < upper;
+    case _cc_:
+        return lower <= v && v <= upper;
+    default:
+        SHOULD_NOT_REACH;
+        return false;
+    }
+}
+template<class TYPE>
+inline bool IsInRange(const TYPE& vmin, const TYPE& v, const TYPE& vmax, 
+    const IntervalType& type, const TYPE& tol) {
+    const TYPE& lower = (vmin < vmax) ? vmin : vmax;
+    const TYPE& upper = (vmin < vmax) ? vmax : vmin;
+    const TYPE tolerance = std::abs(tol);
+
+    switch (type) {
+    case _oo_:
+        return lower + tolerance < v && v < upper - tolerance;
+    case _oc_:
+        return lower + tolerance < v && v <= upper + tolerance;
+    case _co_:
+        return lower - tolerance <= v && v < upper - tolerance;
+    case _cc_:
+        return lower - tolerance <= v && v <= upper + tolerance;
+    default:
+        SHOULD_NOT_REACH;
+        return false;
+    }
+}
 // a number is prime or not
 inline bool IsPrime(St n) {
     if (n == 1) {

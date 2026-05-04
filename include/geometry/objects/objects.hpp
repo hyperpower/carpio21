@@ -6,6 +6,7 @@
 #include "geometry/geometry_define.hpp"
 #include "analytic/line.hpp"
 #include "analytic/plane.hpp"
+#include "analytic/circle.hpp"
 
 #include "basic/point.hpp"
 #include "basic/ray.hpp"

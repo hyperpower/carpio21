@@ -46,7 +46,7 @@ TEST(s_lap, dim2){
                 typename Field::ValueType y,
                 typename Field::ValueType z
                 ){
-        return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
+        return std::sin(2 * pi * x) * std::sin(2 * pi * y);
     });
 
     BoundaryIndex bi;
@@ -111,7 +111,7 @@ TEST(s_lap, HOC4_op){
                 typename Field::ValueType y,
                 typename Field::ValueType z
                 ){
-        return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
+        return std::sin(2 * pi * x) * std::sin(2 * pi * y);
     });
 
     BoundaryIndex bi;
