@@ -7,8 +7,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 set(Sources
     # test_bc_2d.cpp
     # test_sgrid_io.cpp
-    test_sorder.cpp
+    # test_sorder.cpp
     # test_sfield.cpp
+    test_color_function_assign.cpp
     # test_sfield_face.cpp
     # test_sgrid.cpp
     # test_sinterpolate.cpp

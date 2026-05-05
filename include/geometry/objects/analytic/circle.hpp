@@ -181,6 +181,10 @@ public:
         return CalculateCircleY(this->xc(), this->yc(), this->r(), x);
     }
 
+    Vt area() const {
+        return Vt(_PI_) * this->r() * this->r();
+    }
+
     bool empty() const {
         return this->r() <= 0.0;
     }

@@ -10,6 +10,7 @@
 
 #include "line_box.hpp"
 #include "intersection_circle_box.hpp"
+#include "intersection_box_box.hpp"
 
 
 namespace carpio{

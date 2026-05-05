@@ -17,7 +17,7 @@ namespace carpio{
 // O-----> x
 ///
 //z
-#if __cplusplus >= 201703L
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
 inline static const std::array<std::array<short, 2>, 3> _BID = 
 {{
      { 0, 1 }, 

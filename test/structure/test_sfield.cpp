@@ -20,7 +20,7 @@ TEST(field, DISABLED_init){
     typedef SGhostRegular_<2, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<2, double, Grid, Ghost, Order> Field;
@@ -71,7 +71,7 @@ TEST(field, add){
     typedef SGhostRegular_<2, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef typename Grid::Index Index;
@@ -136,7 +136,7 @@ TEST(field, minus){
     typedef SGhostRegular_<2, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef typename Grid::Index Index;
@@ -201,7 +201,7 @@ TEST(field, mutiply){
     typedef SGhostRegular_<2, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef typename Grid::Index Index;
@@ -254,7 +254,7 @@ TEST(field, coutour){
     typedef SGhostRegular_<dim, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<dim, double, Grid, Ghost, Order> Field;
@@ -274,7 +274,7 @@ TEST(field, coutour){
                 typename Field::ValueType y,
                 typename Field::ValueType z
                 ){
-        return std::sin(2 * pi * x) * std::sin(2 * pi * y);
+        return std::sin(2 * _PI_ * x) * std::sin(2 * _PI_ * y);
     });
 
     Gnuplot gnu;
@@ -298,7 +298,7 @@ TEST(field, divide){
     typedef SGhostRegular_<2, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<2, Grid, Ghost> Order;
+    typedef SOrderXYZ_<2, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef typename Grid::Index Index;
@@ -355,7 +355,7 @@ TEST(field, different_type){
     typedef SGhostRegular_<dim, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<dim, Grid, Ghost> Order;
+    typedef SOrderXYZ_<dim, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef LinearPolynomial_<double, typename Grid::Index> Exp;

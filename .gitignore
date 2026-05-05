@@ -40,6 +40,9 @@
 /fig/
 /external/
 /doc-gen/html/
+/doc/build/
+/examples/*/build/
+/examples/*/fig/
 
 #other
 *.DS_Store

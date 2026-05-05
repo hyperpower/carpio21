@@ -475,13 +475,13 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& circle, CircleTag){
     }
 
     const double target_length = r / 10.0;
-    int n = int(std::ceil(2.0 * pi * r / target_length));
+    int n = int(std::ceil(2.0 * _PI_ * r / target_length));
     if (n < 8) {
         n = 8;
     }
 
     for (int i = 0; i <= n; ++i) {
-        const double theta = 2.0 * pi * double(i) / double(n);
+        const double theta = 2.0 * _PI_ * double(i) / double(n);
         const double x = double(circle.xc()) + r * std::cos(theta);
         const double y = double(circle.yc()) + r * std::sin(theta);
         actor.data().push_back(ToString(x, y, " "));

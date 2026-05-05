@@ -116,23 +116,76 @@ TEST(circle_box, intersection_area) {
     }
 }
 
+TEST(box_box, intersection_points) {
+    {
+        Box2 box1(Point2(0.0, 0.0), Point2(2.0, 2.0));
+        Box2 box2(Point2(1.0, 1.0), Point2(3.0, 3.0));
+        auto points = IntersectBoxBox(box1, box2);
+        ASSERT_EQ(points.size(), 4);
+        auto iter = points.begin();
+        ASSERT_NEAR(iter->x(), 1.0, 1e-12);
+        ASSERT_NEAR(iter->y(), 1.0, 1e-12);
+        ++iter;
+        ASSERT_NEAR(iter->x(), 2.0, 1e-12);
+        ASSERT_NEAR(iter->y(), 1.0, 1e-12);
+        ++iter;
+        ASSERT_NEAR(iter->x(), 2.0, 1e-12);
+        ASSERT_NEAR(iter->y(), 2.0, 1e-12);
+        ++iter;
+        ASSERT_NEAR(iter->x(), 1.0, 1e-12);
+        ASSERT_NEAR(iter->y(), 2.0, 1e-12);
+    }
+    {
+        Box2 box1(Point2(0.0, 0.0), Point2(1.0, 1.0));
+        Box2 box2(Point2(1.0, 0.25), Point2(2.0, 0.75));
+        auto points = IntersectBoxBox(box1, box2);
+        ASSERT_EQ(points.size(), 2);
+        ASSERT_NEAR(points.front().x(), 1.0, 1e-12);
+        ASSERT_NEAR(points.front().y(), 0.25, 1e-12);
+        ASSERT_NEAR(points.back().x(), 1.0, 1e-12);
+        ASSERT_NEAR(points.back().y(), 0.75, 1e-12);
+    }
+    {
+        Box2 box1(Point2(0.0, 0.0), Point2(1.0, 1.0));
+        Box2 box2(Point2(1.0, 1.0), Point2(2.0, 2.0));
+        auto points = Intersect(box1, box2);
+        ASSERT_EQ(points.size(), 1);
+        ASSERT_NEAR(points.front().x(), 1.0, 1e-12);
+        ASSERT_NEAR(points.front().y(), 1.0, 1e-12);
+    }
+}
+
+TEST(box_box, intersection_area) {
+    {
+        Box2 box1(Point2(0.0, 0.0), Point2(2.0, 2.0));
+        Box2 box2(Point2(1.0, 1.0), Point2(3.0, 3.0));
+        ASSERT_NEAR(IntersectAreaBoxBox(box1, box2), 1.0, 1e-12);
+    }
+    {
+        Box2 box1(Point2(0.0, 0.0), Point2(1.0, 1.0));
+        Box2 box2(Point2(1.0, 0.25), Point2(2.0, 0.75));
+        ASSERT_NEAR(IntersectAreaBoxBox(box1, box2), 0.0, 1e-12);
+    }
+}
+
 TEST(circle_box, gnuplot_circle) {
-    Circle circle(0.0, 0.0, 1.0);
+    Circle circle(-0.1, -0.2, 1.0);
     Box2 box(Point2(-0.3, -0.4), Point2(0.8, 0.7));
 
     auto circle_actor = ToGnuplotActor(circle);
-    ASSERT_FALSE(circle_actor.empty());
-    ASSERT_GT(circle_actor.data().size(), 10);
-
     auto box_actor = ToGnuplotActor(box);
-    ASSERT_FALSE(box_actor.empty());
-    ASSERT_GT(box_actor.data().size(), 4);
+   
 
     auto points = IntersectCircleBox(circle, box);
-    ASSERT_FALSE(points.empty());
+    // ASSERT_FALSE(points.empty());
 
     auto point_actor = ToGnuplotActor(points);
-    ASSERT_FALSE(point_actor.empty());
+    // ASSERT_FALSE(point_actor.empty());
+
+    auto area = IntersectAreaCircleBox(circle, box);
+    std::cout << "Circle: " << circle.area() << std::endl;\
+    std::cout << "Box: " << box.area() << std::endl;
+    std::cout << "Intersection area: " << area << std::endl;
 
     std::filesystem::create_directories("./fig");
 

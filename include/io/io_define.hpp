@@ -25,7 +25,7 @@ std::string ToString(V1 a) {
 }
 
 template<>
-std::string ToString(bool a) {
+inline std::string ToString(bool a) {
     std::ostringstream sst;
     if (a == true){
         sst << "True";

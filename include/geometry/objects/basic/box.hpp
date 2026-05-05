@@ -21,6 +21,18 @@ struct BoxTag: public GeometryTag {
 	}
 };
 
+template<class NUM>
+void MinMaxPointsForBox(
+		const NUM& point_ax, const NUM& point_ay,
+		const NUM& point_bx, const NUM& point_by,
+		NUM& min_x, NUM& min_y,
+		NUM& max_x, NUM& max_y) {
+	min_x = (std::min)(point_ax, point_bx);
+	max_x = (std::max)(point_ax, point_bx);
+	min_y = (std::min)(point_ay, point_by);
+	max_y = (std::max)(point_ay, point_by);
+}
+
 template<typename TYPE, St DIM>
 class Box_ {
 public:
@@ -207,6 +219,14 @@ public:
 		Point res;
 		for (St i = 0; i < Dim; i++) {
 			res[i] = _max[i] - _min[i];
+		}
+		return res;
+	}
+
+	CV area() const {
+		CV res = 1;
+		for (St i = 0; i < Dim; i++) {
+			res *= _max[i] - _min[i];
 		}
 		return res;
 	}

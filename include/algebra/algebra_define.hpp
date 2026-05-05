@@ -12,6 +12,8 @@
 #include <math.h>
 #include <iostream>
 #include <cmath>
+#include <limits>
+#include <type_traits>
 
 #include "type_define.hpp"
 
@@ -19,6 +21,13 @@
 #undef min
 
 namespace carpio {
+
+template<class NUM>
+inline NUM DefaultFloatTolerance() {
+    typedef typename std::conditional<
+            std::is_floating_point<NUM>::value, NUM, double>::type Float;
+    return NUM(Float(64) * std::numeric_limits<Float>::epsilon());
+}
 
 inline int StepFun(Float x) {
     return (x <= 0) ? 0 : 1;

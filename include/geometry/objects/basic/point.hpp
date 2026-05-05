@@ -472,12 +472,22 @@ inline NUM Distance2_PointToPoint2d(const NUM& x0, const NUM& y0,
 }
 
 template <typename NUM>
+inline NUM Distance2_OriginToPoint2d(const NUM& x0, const NUM& y0){
+    return x0 * x0 + y0 * y0;
+}
+
+template <typename NUM>
 inline NUM Distance2_PointToPoint3d(const NUM& x0, const NUM& y0, const NUM& z0,
                                     const NUM& x1, const NUM& y1, const NUM& z1){
     NUM dx = x0 - x1;
     NUM dy = y0 - y1;
     NUM dz = z0 - z1;
     return dx * dx + dy * dy + dz * dz;
+}
+
+template <typename NUM>
+inline NUM Distance2_OriginToPoint3d(const NUM& x0, const NUM& y0, const NUM& z0){
+    return x0 * x0 + y0 * y0 + z0 * z0;
 }
 
 template <typename NUM>
