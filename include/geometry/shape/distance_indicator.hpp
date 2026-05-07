@@ -35,7 +35,7 @@ public:
                        const double& x2, const double& y2):
             _p1(x1, y1), _p2(x2, y2), _space(0.2), _height(0.4), _offset(0), 
             _normal_line_length(0.5){
-        // this->_cal_height();
+        this->_cal_height();
         this->_cal_normal_vector();
         this->_cal_tangent_vector();
     }

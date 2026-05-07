@@ -140,6 +140,14 @@ auto Intersect(const GEO1& g1, const GEO2& g2,
     return IntersectBoxBox(g1, g2);
 }
 
+template<class GEO1, class GEO2>
+auto IntersectArea(const GEO1& g1, const GEO2& g2, 
+               const std::string& method,
+               BoxTag, BoxTag){
+    (void)method;
+    return IntersectAreaBoxBox(g1, g2);
+}
+
 }
 
 #endif

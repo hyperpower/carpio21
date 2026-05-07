@@ -15,6 +15,7 @@
 #include "order/sorder.hpp"
 #include "order/xyz.hpp"
 #include "field/sfield.hpp"
+#include "field/sfield_object.hpp"
 #include "field/sfield_center.hpp"
 #include "field/sfield_vertex.hpp"
 #include "field/svector_center.hpp"

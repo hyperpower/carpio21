@@ -251,6 +251,22 @@ auto Intersect(const GEO1& g1, const GEO2& g2,
     return IntersectCircleBox(g2, g1);
 }
 
+template<class GEO1, class GEO2>
+auto IntersectArea(const GEO1& g1, const GEO2& g2, 
+               const std::string& method,
+               CircleTag, BoxTag){
+    (void)method;
+    return IntersectAreaCircleBox(g1, g2);
+}
+
+template<class GEO1, class GEO2>
+auto IntersectArea(const GEO1& g1, const GEO2& g2, 
+               const std::string& method,
+               BoxTag, CircleTag){
+    (void)method;
+    return IntersectAreaCircleBox(g2, g1);
+}
+
 
 }
 

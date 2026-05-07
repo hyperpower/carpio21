@@ -39,6 +39,28 @@ auto Intersect(const GEO1& g1, const GEO2& g2, const std::string& method){
     return Intersect(g1, g2, method, Tag1(), Tag2());
 }
 
+template<class GEO1, class GEO2, 
+        typename std::enable_if<
+                   IsGeometry<GEO1>::value
+                && IsGeometry<GEO2>::value 
+        , bool>::type = true>
+auto IntersectArea(const GEO1& g1, const GEO2& g2){
+    typedef typename GEO1::Tag Tag1;
+    typedef typename GEO2::Tag Tag2;
+    return IntersectArea(g1, g2, "", Tag1(), Tag2());
+}
+
+template<class GEO1, class GEO2, 
+        typename std::enable_if<
+                   IsGeometry<GEO1>::value
+                && IsGeometry<GEO2>::value 
+        , bool>::type = true>
+auto IntersectArea(const GEO1& g1, const GEO2& g2, const std::string& method){
+    typedef typename GEO1::Tag Tag1;
+    typedef typename GEO2::Tag Tag2;
+    return IntersectArea(g1, g2, method, Tag1(), Tag2());
+}
+
 template<class CONTAINER,
         typename std::enable_if<
                    (! IsGeometry<CONTAINER>::value)

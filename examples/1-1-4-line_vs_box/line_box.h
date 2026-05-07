@@ -58,7 +58,7 @@ int LineBox(double a, double b, double alpha, const std::string& name){
         auto sppoint = ToGnuplotActor(sp);
         sppoint.style("with points pt 7 ps 2 lc 7");
         gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", sp.x(), sp.y()),
-                     sp.x(), sp.y()+ 0.05, "left font \",13\"");
+                     sp.x(), sp.y()+ 0.05, "left font \",18\"");
         gnu.add(sppoint);
         numlabel++;
     }
@@ -66,7 +66,7 @@ int LineBox(double a, double b, double alpha, const std::string& name){
     // gnu.set_label(2,"(0.0, 0.0)", 0.0, -0.05, "textcolor rgb \"#7FBA00\" center font \",13\"");
 
     gnu.set_label(4,tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(), line.alpha()),
-                    0.1, 1.3, "left font \",13\"");
+                    0.1, 1.3, "left font \",18\"");
 
 
     gnu.plot();
@@ -106,7 +106,7 @@ void BoxLinePositiveCase(int num_case,
         sppoint.style("with points pt 7 ps 2 lc 7");
         gnu.set_label(numlabel, tfm::format("(%.2f, %.2f)", 
                       sp.x(), sp.y()),
-                      sp.x(), sp.y() + 0.05, "left font \",13\"");
+                      sp.x(), sp.y() + 0.05, "left font \",18\"");
         gnu.add(sppoint);
         numlabel++;
     }
@@ -120,7 +120,7 @@ void BoxLinePositiveCase(int num_case,
 
     gnu.set_label(4,
             tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(),
-                    line.alpha()), -0.1, 1.3, "left font \",16\"");
+                    line.alpha()), -0.1, 1.3, "left font \",20\"");
     std::cout << "Line : " << line << std::endl;
     gnu.plot();
 }

@@ -39,6 +39,8 @@ public:
     virtual ~OrderBase_(){};
 };
 
+struct ObjectValueTag{};
+
 template<St DIM, 
          class VT,
          class GRID, 
@@ -46,6 +48,8 @@ template<St DIM,
          class ORDER>
 class _DataInitial_{
 public:
+    typedef ObjectValueTag ValueTag;
+
     static void InitZero(){
         std::cout << "Abstract" << std::endl;
     }

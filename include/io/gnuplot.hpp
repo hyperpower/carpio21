@@ -766,9 +766,9 @@ public:
     //------------------------------------------------------------------------------
     //
     Gnuplot& set_terminal_pdf(const std::string& filename, 
-            double x = 800,
-            double y = 600, 
-            const std::string& font = "Helvetica",
+            double x = 1200,
+            double y = 900, 
+            const std::string& font = "Fira Code",
             int fontsize = 12) {
         this->terminal_std = "pdfcairo";
         std::stringstream sst;
@@ -781,9 +781,9 @@ public:
 
     Gnuplot& set_terminal_png(
             const std::string& filename,
-            double  x  = 800,  double  y  = 600,
+            double  x  = 1200,  double  y = 900,
             const std::string& font       = "Fira Code",
-                          int  fontsize   = 12,
+                          int  fontsize   = 20,
             const std::string& str_add        = "") {
         this->terminal_std = "pngcairo";
         std::stringstream sst;

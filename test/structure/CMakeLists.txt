@@ -10,6 +10,7 @@ set(Sources
     # test_sorder.cpp
     # test_sfield.cpp
     test_color_function_assign.cpp
+    test_reconstruct_plic.cpp
     # test_sfield_face.cpp
     # test_sgrid.cpp
     # test_sinterpolate.cpp

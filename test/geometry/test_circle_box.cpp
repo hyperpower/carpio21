@@ -1,5 +1,6 @@
 #include "geometry/geometry.hpp"
 #include "geometry/boolean/boolean.hpp"
+#include "geometry/boolean/line_box.hpp"
 #include "gtest/gtest.h"
 
 #include <cmath>
@@ -8,8 +9,10 @@
 using namespace carpio;
 
 typedef Point_<double, 2> Point2;
+typedef Point_<double, 3> Point3;
 typedef Box_<double, 2>   Box2;
 typedef Circle_<double>   Circle;
+typedef Line_<double>     Line;
 
 namespace {
 
@@ -108,6 +111,8 @@ TEST(circle_box, intersection_area) {
         Circle circle(0.0, 0.0, 1.0);
         Box2 box(Point2(0.0, 0.0), Point2(1.0, 1.0));
         ASSERT_NEAR(IntersectAreaCircleBox(circle, box), Pi() * 0.25, 1e-12);
+        ASSERT_NEAR(IntersectArea(circle, box), Pi() * 0.25, 1e-12);
+        ASSERT_NEAR(IntersectArea(box, circle), Pi() * 0.25, 1e-12);
     }
     {
         Circle circle(0.0, 0.0, 1.0);
@@ -160,11 +165,59 @@ TEST(box_box, intersection_area) {
         Box2 box1(Point2(0.0, 0.0), Point2(2.0, 2.0));
         Box2 box2(Point2(1.0, 1.0), Point2(3.0, 3.0));
         ASSERT_NEAR(IntersectAreaBoxBox(box1, box2), 1.0, 1e-12);
+        ASSERT_NEAR(IntersectArea(box1, box2), 1.0, 1e-12);
     }
     {
         Box2 box1(Point2(0.0, 0.0), Point2(1.0, 1.0));
         Box2 box2(Point2(1.0, 0.25), Point2(2.0, 0.75));
         ASSERT_NEAR(IntersectAreaBoxBox(box1, box2), 0.0, 1e-12);
+    }
+}
+
+TEST(line_box, intersection_area_unit_box_outside_line) {
+    Point2 min(0.0, 0.0);
+    Point2 max(1.0, 1.0);
+    Box2 box(min, max);
+
+    {
+        Line line(1.0, 1.0, 2.0);
+        auto negative = NegativeLineBox(min, max, line.a(), line.b(), line.alpha());
+        ASSERT_EQ(negative.size(), 4);
+        ASSERT_NEAR(IntersectionAreaNegative(line, box), 1.0, 1e-12);
+        ASSERT_NEAR(IntersectionAreaPositive(line, box), 0.0, 1e-12);
+    }
+    {
+        Line line(1.0, 1.0, -1.0);
+        auto positive = PositiveLineBox(min, max, line.a(), line.b(), line.alpha());
+        ASSERT_EQ(positive.size(), 4);
+        ASSERT_NEAR(IntersectionAreaNegative(line, box), 0.0, 1e-12);
+        ASSERT_NEAR(IntersectionAreaPositive(line, box), 1.0, 1e-12);
+    }
+    {
+        Line line(1.0, 1.0, 1.0);
+        ASSERT_NEAR(IntersectionAreaNegative(line, box), 0.5, 1e-12);
+        ASSERT_NEAR(IntersectionAreaPositive(line, box), 0.5, 1e-12);
+    }
+    {
+        Line line(0.0, 1.0, 0.0);
+        ASSERT_NEAR(IntersectionAreaNegative(line, box), 0.0, 1e-12);
+        ASSERT_NEAR(IntersectionAreaPositive(line, box), 1.0, 1e-12);
+    }
+    {
+        Line line(0.0, 1.0, 1.0);
+        ASSERT_NEAR(IntersectionAreaNegative(line, box), 1.0, 1e-12);
+        ASSERT_NEAR(IntersectionAreaPositive(line, box), 0.0, 1e-12);
+    }
+}
+
+TEST(plane_box, intersection_points_scaled_box) {
+    Point3 min(0.0, 0.0, 0.0);
+    Point3 max(2.0, 4.0, 8.0);
+
+    auto points = IntersectPlaneBox(min, max, 0.0, 0.0, 1.0, 4.0);
+    ASSERT_EQ(points.size(), 4);
+    for (const auto& point : points) {
+        ASSERT_NEAR(point.z(), 4.0, 1e-12);
     }
 }
 

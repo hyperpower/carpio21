@@ -4,6 +4,7 @@
 #include "geometry/geometry_define.hpp"
 #include "geometry/objects/basic/point.hpp"
 #include "geometry/objects/basic/segment.hpp"
+#include "geometry/objects/basic/box.hpp"
 #include "geometry/objects/analytic/line.hpp"
 #include "geometry/objects/analytic/plane.hpp"
 #include "geometry/objects/basic/point_chain.hpp"
@@ -12,7 +13,11 @@
 #include "algebra/algebra.hpp"
 
 #include <memory>
+#include <algorithm>
 #include <array>
+#include <cmath>
+#include <iterator>
+#include <list>
 
 namespace carpio {
 
@@ -34,13 +39,13 @@ protected:
     double on_x;
     bool   is_trivial;
 
-    void _cal_on_y(const double& b, const double& alpha, const double& tol){
+    void _cal_on_y(const double& b, const double& alpha, const double&){
         // x = 0
-        on_y = alpha / (b + tol);
+        on_y = alpha / b;
     }    
-    void _cal_on_x(const double& a, const double& alpha, const double& tol){
+    void _cal_on_x(const double& a, const double& alpha, const double&){
         // y = 0
-        on_x = alpha / (a + tol);
+        on_x = alpha / a;
     }    
 public:
     _FunctorIntersectOrientLineUnitBox_():on_x(0), on_y(0), is_trivial(false){};
@@ -106,7 +111,7 @@ public:
         }
         else if (on_y > 1.0)
         {
-            double on_y1 = (alpha - b) / (a + tol);
+            double on_y1 = (alpha - b) / a;
             res.emplace_back(Point(on_y1, 1.0));
         }
         // point on X, Y = 0
@@ -117,7 +122,7 @@ public:
         }
         else if (this->on_x > 1.0)
         {
-            double on_x1 = (alpha - a) / (b + tol);
+            double on_x1 = (alpha - a) / b;
             res.emplace_back(Point(1.0, on_x1));
         }
         return res;
@@ -135,17 +140,17 @@ protected:
     double on_z;
     bool   is_trivial;
 
-    void _cal_on_x(const double& a, const double& alpha, const double& tol){
+    void _cal_on_x(const double& a, const double& alpha, const double&){
         // y = 0, z = 0
-        on_x = alpha / (a + tol);
+        on_x = alpha / a;
     }    
-    void _cal_on_y(const double& b, const double& alpha, const double& tol){
+    void _cal_on_y(const double& b, const double& alpha, const double&){
         // x = 0, z = 0
-        on_y = alpha / (b + tol);
+        on_y = alpha / b;
     }    
-    void _cal_on_z(const double& c, const double& alpha, const double& tol){
+    void _cal_on_z(const double& c, const double& alpha, const double&){
         // x = 0, y = 0
-        on_z = alpha / (c + tol);
+        on_z = alpha / c;
     }    
 public:
     _FunctorIntersectOrientPlaneUnitBox_():on_x(0), on_y(0), on_z(0), is_trivial(false){};
@@ -258,16 +263,16 @@ public:
             res.emplace_back(Point(0.0, 0.0, on_z));
         } 
         this->_cal_on_x(a, alpha, tol);
-        double on_x1y1 = (alpha - a - b) / (c + tol);
+        double on_x1y1 = (alpha - a - b) / c;
         if (0 < this->on_x && this->on_x <=1.0){
             res.emplace_back(Point(this->on_x, 0.0, 0.0));
         } else if (this->on_x > 1.0){
-            double on_x1y0 = (alpha - a) / (c + tol);
+            double on_x1y0 = (alpha - a) / c;
             if( 0 < on_x1y0 && on_x1y0 <= 1.0){
                 res.emplace_back(Point(1.0, 0.0, on_x1y0));
             }
             if (on_x1y1 < 0){
-                double on_x1z0 = (alpha - a) / (b + tol);
+                double on_x1z0 = (alpha - a) / b;
                 res.emplace_back(Point(1.0, on_x1z0, 0.0));
             } else { 
                 res.emplace_back(Point(1.0, 1.0, on_x1y1));
@@ -278,33 +283,44 @@ public:
             res.emplace_back(Point(0.0, this->on_y, 0.0));
         } else if (this->on_y > 1.0) {
             if (on_x1y1 < 0){
-                double on_y1z0 = (alpha - b) / (a + tol);
+                double on_y1z0 = (alpha - b) / a;
                 res.emplace_back(Point(on_y1z0, 1.0, 0.0));
             }
-            double on_x0y1 = (alpha - b) / (c + tol);
+            double on_x0y1 = (alpha - b) / c;
             if( 0 < on_x0y1 && on_x0y1 <= 1.0){
                 res.emplace_back(Point(0.0, 1.0, on_x0y1));
             }
         }
         if ( this->on_z > 1.0){
-            double on_y0z1 = (alpha - c) / (a + tol);
+            double on_y0z1 = (alpha - c) / a;
             if (0 < on_y0z1 && on_y0z1 <= 1.0){
                 res.emplace_front(Point(on_y0z1, 0.0, 1.0));
             } else {
-                double on_x1z1 = (alpha - a - c) / (b + tol);
+                double on_x1z1 = (alpha - a - c) / b;
                 res.emplace_front(Point(1.0, on_x1z1, 1.0));
             }
-            double on_x0z1 = (alpha - c) / (b + tol);
+            double on_x0z1 = (alpha - c) / b;
             if (0 < on_x0z1 && on_x0z1 <= 1.0){
                 res.emplace_back(Point(0.0, on_x0z1, 1.0));
             } else {
-                double on_y1z1 = (alpha - b - c) / (a + tol);
+                double on_y1z1 = (alpha - b - c) / a;
                 res.emplace_back(Point(on_y1z1, 1.0, 1.0));
             }
         }
         return res;
     } 
 };
+
+template<class POINT>
+std::list<POINT> _UnitBoxPolygon2d(){
+    std::list<POINT> res;
+    res.emplace_back(POINT(0.0, 0.0));
+    res.emplace_back(POINT(1.0, 0.0));
+    res.emplace_back(POINT(1.0, 1.0));
+    res.emplace_back(POINT(0.0, 1.0));
+    return res;
+}
+
 template<class POINT>
 class _FunctorNegativeOrientLineUnitBox_:public _FunctorIntersectOrientLineUnitBox_<POINT>{
 protected:
@@ -318,7 +334,10 @@ public:
     
     ListPoint operator()(const double& a, const double& b, const double& alpha,// Point max=(1,1)
                         const double& tol = 1e-14){
-        ListPoint res = this->Base::operator()(a, b, alpha);
+        if (alpha >= a + b - tol){
+            return _UnitBoxPolygon2d<POINT>();
+        }
+        ListPoint res = this->Base::operator()(a, b, alpha, tol);
         if (res.size() <= 1){
             return res;
         }
@@ -350,6 +369,9 @@ public:
     
     ListPoint operator()(const double& a, const double& b, const double& alpha,// Point max=(1,1)
                         const double& tol = 1e-14){
+        if (alpha <= tol){
+            return _UnitBoxPolygon2d<POINT>();
+        }
         ListPoint res = this->Base::operator()(a, b, alpha, tol);
         if (res.size() <= 1){
             return res;
@@ -372,7 +394,7 @@ public:
 template<class POINT, class FUNCTOR>
 std::list<POINT>
 _Orient(const double& a, const double& b, const double& alpha,// Point max=(1,1)
-                      const double& tol){     
+        const double& tol){     
     double na = std::abs(a);
     double nb = std::abs(b);
     double nalpha = alpha;
@@ -399,7 +421,7 @@ _Orient(const double& a, const double& b, const double& alpha,// Point max=(1,1)
 template<class POINT, class FUNCTOR>
 std::list<POINT>
 _Orient(const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
-                     const double& tol){
+        const double& tol){
     double na = std::abs(a);
     double nb = std::abs(b);
     double nc = std::abs(c);
@@ -439,7 +461,10 @@ _TranslateAndScale(const POINT& min, const POINT& max,
     auto arr_scale = max - min;
     auto inv_scale(arr_scale);
     for(auto& d : inv_scale){
-        d = 1.0/(d + tol);
+        if (std::abs(d) <= tol){
+            return std::list<POINT>();
+        }
+        d = 1.0 / d;
     }
     Translate(line, -min);
     Scale(line, inv_scale);
@@ -460,7 +485,10 @@ _TranslateAndScale(const POINT& min, const POINT& max,
     auto arr_scale = max - min;
     auto inv_scale(arr_scale);
     for(auto& d : inv_scale){
-        d = 1.0/(d + tol);
+        if (std::abs(d) <= tol){
+            return std::list<POINT>();
+        }
+        d = 1.0 / d;
     }
     Translate(plane,  -min);
     Scale(plane, inv_scale);
@@ -472,6 +500,7 @@ _TranslateAndScale(const POINT& min, const POINT& max,
     
     return res;
 }
+
 template<class POINT>
 std::list<POINT>
 IntersectLineBox(const POINT& min, const POINT& max, 
@@ -504,6 +533,75 @@ PositiveLineBox(const POINT& min, const POINT& max,
                  const double& tol = 1e-14){     
     typedef _FunctorPositiveOrientLineUnitBox_<POINT> Functor;
     return _TranslateAndScale<POINT, Functor>(min, max, a, b, alpha, tol);
+}
+
+template<class POINT>
+double _AreaPolygon2d(const std::list<POINT>& points){
+    if (points.size() < 3){
+        return 0.0;
+    }
+    double area = 0.0;
+    auto prev = std::prev(points.end());
+    for (auto iter = points.begin(); iter != points.end(); ++iter){
+        area += double(prev->x()) * double(iter->y())
+              - double(iter->x()) * double(prev->y());
+        prev = iter;
+    }
+    return std::abs(area) * 0.5;
+}
+
+template<class POINT>
+double IntersectionAreaNegative(
+        const POINT& min, const POINT& max,
+        const double& a, const double& b, const double& alpha,
+        const double& tol = 1e-14){
+    auto polygon = NegativeLineBox(min, max, a, b, alpha, tol);
+    return _AreaPolygon2d(polygon);
+}
+
+template<class POINT>
+double IntersectionAreaPositive(
+        const POINT& min, const POINT& max,
+        const double& a, const double& b, const double& alpha,
+        const double& tol = 1e-14){
+    auto polygon = PositiveLineBox(min, max, a, b, alpha, tol);
+    return _AreaPolygon2d(polygon);
+}
+
+template<class TYPE>
+double IntersectionAreaNegative(
+        const Line_<TYPE>& line,
+        const Box_<TYPE, 2>& box){
+    return IntersectionAreaNegative(
+            box.min(), box.max(),
+            line.a(), line.b(), line.alpha(),
+            DefaultFloatTolerance<TYPE>());
+}
+
+template<class TYPE>
+double IntersectionAreaPositive(
+        const Line_<TYPE>& line,
+        const Box_<TYPE, 2>& box){
+    return IntersectionAreaPositive(
+            box.min(), box.max(),
+            line.a(), line.b(), line.alpha(),
+            DefaultFloatTolerance<TYPE>());
+}
+
+template<class GEO1, class GEO2>
+auto IntersectArea(const GEO1& g1, const GEO2& g2,
+               const std::string& method,
+               LineTag, BoxTag){
+    (void)method;
+    return IntersectionAreaNegative(g1, g2);
+}
+
+template<class GEO1, class GEO2>
+auto IntersectArea(const GEO1& g1, const GEO2& g2,
+               const std::string& method,
+               BoxTag, LineTag){
+    (void)method;
+    return IntersectionAreaNegative(g2, g1);
 }
 
 // Tools for VOF
