@@ -124,7 +124,7 @@ This folder include all the examples for Carpio project.
 
    4-4-1 Reconstruct line
 
-   4-4-2 Reconstruct eclipse
+   4-4-2 Reconstruct circle
 
    4-4-3 Reconstruct rectangle
 

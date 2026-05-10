@@ -1,5 +1,5 @@
-#ifndef _OCTREE_DIRECTION_HPP_
-#define _OCTREE_DIRECTION_HPP_
+#ifndef _DOMAIN_DIRECTION_HPP_
+#define _DOMAIN_DIRECTION_HPP_
 
 #include "domain/octree/direction_code.hpp"
 
@@ -52,6 +52,16 @@ struct CornerDirection {
             c,
             orientations[0], axes[0],
             orientations[1], axes[1]);
+    }
+
+    CornerDirection(const Axes& a1,const Orientation& o1,
+                    const Axes& a2,const Orientation& o2) {
+        ASSERT(o1 != _C_);
+        ASSERT(o2 != _C_);
+        orientations[0] = o1;
+        axes[0] = a1;
+        orientations[1] = o2;
+        axes[1] = a2;
     }
 
     operator Code() const { 

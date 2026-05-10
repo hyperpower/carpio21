@@ -52,12 +52,12 @@ class MultiArray_ {
     MultiArray_(St iLen, St jLen= 0, St kLen= 0){
     	St len         = iLen;
 		this->m_len[0] = iLen;
-		if (Dim >= 2) {
+		if constexpr (Dim >= 2) {
 			ASSERT(iLen > 0 && jLen > 0);
 			this->m_len[1] = jLen;
 			len *= jLen;
 		}
-		if (Dim == 3) {
+		if constexpr (Dim == 3) {
 			ASSERT(iLen > 0 && jLen > 0 && kLen > 0);
 			this->m_len[2] = kLen;
 			len *= kLen;
@@ -73,12 +73,12 @@ class MultiArray_ {
     void reconstruct(St iLen, St jLen = 0, St kLen= 0){
 		St len         = iLen;
 		this->m_len[0] = iLen;
-		if (Dim >= 2) {
+		if constexpr (Dim >= 2) {
 			ASSERT(iLen > 0 && jLen > 0);
 			this->m_len[1] = jLen;
 			len *= jLen;
 		}
-		if (Dim == 3) {
+		if constexpr (Dim == 3) {
 			ASSERT(iLen > 0 && jLen > 0 && kLen > 0);
 			this->m_len[2] = kLen;
 			len *= kLen;
@@ -106,10 +106,18 @@ class MultiArray_ {
         return m_len[0];
     }
     St size_j() const {
-        return Dim >= 2 ? m_len[1] : 0;
+        if constexpr (Dim >= 2) {
+            return m_len[1];
+        } else {
+            return 0;
+        }
     }
     St size_k() const {
-        return Dim >= 3 ? m_len[2] : 0;
+        if constexpr (Dim >= 3) {
+            return m_len[2];
+        } else {
+            return 0;
+        }
     }
     bool empty() const {
         return m_array.empty();
@@ -132,16 +140,16 @@ class MultiArray_ {
     //Element access===============================
     St to_1d_idx(St i, St j = 0, St k = 0) const{
 		ASSERT(i < this->m_len[0]);
-		if (Dim >= 2)
+		if constexpr (Dim >= 2)
 			ASSERT(j < this->m_len[1]);
-		if (Dim >= 3)
+		if constexpr (Dim >= 3)
 			ASSERT(k < this->m_len[2]);
 		std::array<St, Dim> inp;
 		inp[0] = i;
-		if (Dim >= 2) {
+		if constexpr (Dim >= 2) {
 			inp[1] = j;
 		}
-		if (Dim >= 3) {
+		if constexpr (Dim >= 3) {
 			inp[2] = k;
 		}
 		St idx = 0;
@@ -206,8 +214,13 @@ class MultiArray_ {
         }
     }
     inline bool check_idx_ijk(St i, St j, St k) const {
-        return check_idx(0, i) && ((Dim >= 2) ? check_idx(1, j) : true)
-               && ((Dim >= 3) ? check_idx(2, k) : true);
+        if constexpr (Dim == 1) {
+            return check_idx(0, i);
+        } else if constexpr (Dim == 2) {
+            return check_idx(0, i) && check_idx(1, j);
+        } else {
+            return check_idx(0, i) && check_idx(1, j) && check_idx(2, k);
+        }
     }
 
     inline St count_equal(const T& nd) const { //overload ==

@@ -69,13 +69,13 @@ typename FIELD::ValueType GetBoundaryVertexValue(
         const Vt&              time = 0.0){
     switch (bc.type()){
     case BoundaryCondition::_BC1_:
-        return GetBoundaryVertexValueType1(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexValueType1(fc, bc, idxc, idxg, axe, ori, time);
         break;
     case BoundaryCondition::_BC2_:
-        return GetBoundaryVertexValueType2(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexValueType2(fc, bc, idxc, idxg, axe, ori, time);
         break;
     case BoundaryCondition::_BC3_:
-        return GetBoundaryVertexValueType3(fc,bc, idxc, idxg, axe, ori, time);
+        return GetBoundaryVertexValueType3(fc, bc, idxc, idxg, axe, ori, time);
         break;
     default:
         return 0.0;
@@ -246,7 +246,7 @@ typename FIELD::ValueType GetBoundaryVertexExpType2(
     //    +--dx-+--dg-+
     // equation:
     //  vx - vg
-    // --------- = vbc  ==> vx - vg = vbc * (dx + dg);
+    // -------- = vbc  ==> vx - vg = vbc * (dx + dg);
     //  dx + dg                  vg = vx - vbc * (dx + dg);
     Vt dx = std::abs(field.grid().c_(axe, idxb) - fp[axe]);
     Vt dg = std::abs(field.grid().c_(axe, idxg) - fp[axe]);

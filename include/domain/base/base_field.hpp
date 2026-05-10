@@ -41,52 +41,47 @@ public:
 
 struct ObjectValueTag{};
 
-template<St DIM, 
-         class VT,
-         class GRID, 
-         class GHOST, 
-         class ORDER>
+template<class VT>
 class _DataInitial_{
 public:
     typedef ObjectValueTag ValueTag;
 
-    static void InitZero(){
-        std::cout << "Abstract" << std::endl;
+    template<class INDEX>
+    static VT InitZero(const INDEX&){
+        return VT();
+    }
+
+    template<class INDEX>
+    static VT InitCoeOne(const INDEX&){
+        return VT();
     }
 };
 
-template<St DIM, 
-         class GRID, 
-         class GHOST, 
-         class ORDER>
-class _DataInitial_<DIM, Vt, GRID, GHOST, ORDER>{
+template<>
+class _DataInitial_<Vt>{
 public:
-    typedef typename GRID::Index  Index;
     typedef ArithmeticTag ValueTag;
 
-    static Vt InitZero(const Index&){
+    template<class INDEX>
+    static Vt InitZero(const INDEX&){
         return 0.0;
     }
-    static Vt InitCoeOne(const Index&){
+    template<class INDEX>
+    static Vt InitCoeOne(const INDEX&){
         return 1.0;
     }
 };
 
-template<St DIM, 
-         class GRID, 
-         class GHOST, 
-         class ORDER>
-class _DataInitial_<DIM, 
-                    LinearPolynomial_<Vt, typename GRID::Index>,
-                    GRID, GHOST, ORDER>{
+template<class INDEX, class IS_ZERO, class COMPARE_TERM>
+class _DataInitial_<LinearPolynomial_<Vt, INDEX, IS_ZERO, COMPARE_TERM> >{
 public:
-    typedef LinearPolynomial_<Vt, typename GRID::Index>  Poly;
+    typedef LinearPolynomial_<Vt, INDEX, IS_ZERO, COMPARE_TERM> Poly;
     typedef LinearPolynomialTag ValueTag;
-    typedef typename GRID::Index  Index;
-    static Poly InitZero(const Index& index){
+
+    static Poly InitZero(const INDEX&){
         return Poly();
     }
-    static Vt InitCoeOne(const Index& index){
+    static Poly InitCoeOne(const INDEX& index){
         return Poly(index);
     }
 };
@@ -118,7 +113,7 @@ public:
     typedef const std::shared_ptr<Ghost> spcGhost;
     typedef const std::shared_ptr<Order> spcOrder;
     
-    typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef _DataInitial_<VT> _DataInit;
     typedef typename _DataInit::ValueTag ValueTag;
 protected:
     spGrid  _spgrid;

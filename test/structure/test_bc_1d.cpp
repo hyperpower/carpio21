@@ -48,7 +48,7 @@ TEST(bc_on_dim1, type1){
     typedef SGhostRegular_<1, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<1, Grid, Ghost> Order;
+    typedef SOrderXYZ_<1, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<1, double, Grid, Ghost, Order> Field;
@@ -171,7 +171,7 @@ TEST(bc_on_dim1, type2){
     typedef SGhostRegular_<1, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<1, Grid, Ghost> Order;
+    typedef SOrderXYZ_<1, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<1, double, Grid, Ghost, Order> Field;
@@ -294,7 +294,7 @@ TEST(bc_on_dim1, type3){
     typedef SGhostRegular_<1, Grid> Ghost;
     typedef std::shared_ptr<Ghost> spGhost;
 
-    typedef SOrderXYZ_<1, Grid, Ghost> Order;
+    typedef SOrderXYZ_<1, Grid, Ghost, CenterTag> Order;
     typedef std::shared_ptr<Order> spOrder;
 
     typedef SFieldCenter_<1, double, Grid, Ghost, Order> Field;

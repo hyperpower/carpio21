@@ -191,7 +191,6 @@ public:
         } else if (res >= n.value(a)) {
             return _BID[a][1];
         }
-        
         SHOULD_NOT_REACH;
         return 0;
     };

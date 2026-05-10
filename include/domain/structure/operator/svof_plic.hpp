@@ -10,13 +10,18 @@
 #include "domain/structure/grid/uniform.hpp"
 #include "domain/structure/ghost/regular.hpp"
 #include "domain/structure/order/xyz.hpp"
+#include "domain/structure/stencil/sstencil_2x2.hpp"
+#include "domain/structure/stencil/sstencil_3x3.hpp"
 
 #include "geometry/fraction/piecewise_linear.hpp"
+
+
 
 #include <array>
 #include <cmath>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 namespace carpio{
 
@@ -36,29 +41,82 @@ auto ReconstructInterfacePLIC(
 // Numerical Methods in Fluids 41, 251–274. https://doi.org/10.1002/fld.431
 
 
+template<class FIELD>
+auto _SCornerGrad(
+    const FIELD& field, const BoundaryIndex& bi,
+    const typename FIELD::Index& idx, 
+    const CornerDirection& dir, Dim2Tag){
+    EXPAND_FIELD(FIELD);
+
+    std::array<ValueType, 2> normal{{ValueType(0), ValueType(0)}};
+    typedef SStencil2x2_<ValueType> Stencil;
+
+    Stencil stencil(dir);
+    stencil.set_value(field, idx, bi);
+    
+    normal[0] = -(stencil.grad(field, _X_));
+    normal[1] = -(stencil.grad(field, _Y_));
+    return normal;
+}
+
+
 // Parker and Youngs' Method
 template<class FIELD>
 auto _SPLICYoungsNormal(
     const FIELD& field, const BoundaryIndex& bi,
-    const typename FIELD::Index& idx, SGridUniformTag){
+    const typename FIELD::Index& idx, Dim2Tag){
     EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD);
 
     std::array<ValueType, 2> normal{{ValueType(0), ValueType(0)}};
-    const auto& grid  = field.grid();
 
-    for(auto& main_axes : ArrAxes<2>()){
-        const auto normal_axes = main_axes == _X_ ? _Y_ : _X_;
-        const auto idxm = idx.m(main_axes);
-        const auto idxp = idx.p(main_axes);
+    std::array<CornerDirection, 4> corner_dirs{
+        CornerDirection(_X_, _M_, _Y_, _M_),
+        CornerDirection(_X_, _P_, _Y_, _M_),
+        CornerDirection(_X_, _M_, _Y_, _P_),
+        CornerDirection(_X_, _P_, _Y_, _P_)};
+    
+    
+    for(auto& dir : corner_dirs){
+        auto n = _SCornerGrad(field, bi, idx, dir, DimTag());
+        normal[0] += n[0];
+        normal[1] += n[1];
+    }
+    normal[0] /= 4.0;
+    normal[1] /= 4.0;
+    return normal;
+}
 
-        const auto phi_m = Value(field, bi, idx, idxm, main_axes, _M_, 0.0);
-        const auto phi_p = Value(field, bi, idx, idxp, main_axes, _P_, 0.0);
-        const auto grad = (phi_p - phi_m)
-                        / (grid.c_(main_axes, idxp) - grid.c_(main_axes, idxm));
-        normal[main_axes] = -grad;
+// Centered Columns Scheme (CCS)
+template<class FIELD>
+auto _SPLICCCSNormal(
+    const FIELD& field, const BoundaryIndex& bi,
+    const typename FIELD::Index& idx, Dim2Tag){
+    EXPAND_FIELD(FIELD);
+    EXPAND_FIELD_TAG(FIELD);
+    // static_assert(std::is_same<GridTag, SGridUniformTag>::value,
+            //   "_SPLICCCSNormal requires FIELD::GridTag to be SGridUniformTag");
+    
+    std::array<ValueType, 2> normal{{ValueType(0), ValueType(0)}};
+
+    typedef SStencil3x3_<ValueType> Stencil;
+
+    Stencil stencil;
+    stencil.set_value(field, idx, bi);
+
+    auto mxc = -(stencil.sum_y(_P_) - stencil.sum_y(_M_)) * 0.5;
+    auto myc = -(stencil.sum_x(_P_) - stencil.sum_x(_M_)) * 0.5;
+
+    if(std::abs(mxc) < std::abs(myc)){
+        normal[0] = mxc;
+        normal[1] = 1.0 * Sign(myc);
+    }else{
+        normal[0] = 1.0 * Sign(mxc);
+        normal[1] = myc;
     }
     return normal;
 }
+  
 
 template<class FIELD>
 auto _SReconstructInterfacePLIC(
@@ -70,7 +128,8 @@ auto _SReconstructInterfacePLIC(
     typedef std::shared_ptr<Line> spLine;
     typedef SFieldObject_<FIELD::Dim, spLine, Grid, Ghost, Order> FieldInterface;
 
-    ASSERT(method.empty() || method == "youngs" || method == "Youngs");
+    const bool use_ccs = method == "ccs" || method == "CCS";
+    ASSERT(method.empty() || method == "youngs" || method == "Youngs" || use_ccs);
 
     FieldInterface res(field.spgrid(), field.spghost(), field.sporder());
     const auto tol = DefaultFloatTolerance<ValueType>();
@@ -83,7 +142,9 @@ auto _SReconstructInterfacePLIC(
             continue;
         }
 
-        const auto normal = _SPLICYoungsNormal(field, bi, idx, GridTag());
+        const auto normal = use_ccs
+            ? _SPLICCCSNormal(field, bi, idx, DimTag())
+            : _SPLICYoungsNormal(field, bi, idx, DimTag());
         const auto nx = normal[0];
         const auto ny = normal[1];
         if(std::abs(nx) <= tol && std::abs(ny) <= tol){

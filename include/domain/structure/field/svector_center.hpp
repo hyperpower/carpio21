@@ -23,7 +23,7 @@ public:
     typedef typename GHOST::Tag GhostTag;
     typedef typename ORDER::Tag OrderTag;
 
-    typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef _DataInitial_<VT> _DataInit;
     typedef typename _DataInit::ValueTag ValueTag;
 
     typedef VT ValueType;

@@ -335,6 +335,10 @@ enum Orientation {
     _C_ = 2, //
 };
 
+inline int ToOffsetStep(const Orientation& ori) {
+    return (ori == _M_) ? -1 : ((ori == _P_) ? 1 : 0);
+}
+
 inline Orientation ToOrientation(const St& i) {
     ASSERT(i >= 0 && i < 3);
     switch (i) {

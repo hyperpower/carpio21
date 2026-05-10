@@ -1,7 +1,7 @@
 #ifndef _O_DEFINE_HPP
 #define _O_DEFINE_HPP
 
-#include "domain/octree/direction.hpp"
+#include "domain/direction.hpp"
 
 namespace carpio {
 

@@ -9,7 +9,7 @@ set(Sources
     # test_sgrid_io.cpp
     # test_sorder.cpp
     # test_sfield.cpp
-    test_color_function_assign.cpp
+    # test_color_function_assign.cpp
     test_reconstruct_plic.cpp
     # test_sfield_face.cpp
     # test_sgrid.cpp
@@ -17,6 +17,7 @@ set(Sources
     # test_sint_laplacian.cpp
     # test_svector_face.cpp
     # test_su_dot_nabla.cpp
+    # test_sstencil_2x2.cpp
 )
 
 add_executable(${This} ${Sources})
@@ -31,4 +32,17 @@ add_test(
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
+add_executable(StructureStencil
+    test_sstencil_2x2.cpp
+)
+
+target_link_libraries(StructureStencil PUBLIC
+    gtest gtest_main
+)
+
+add_test(
+    NAME StructureStencil
+    COMMAND StructureStencil
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+)
 

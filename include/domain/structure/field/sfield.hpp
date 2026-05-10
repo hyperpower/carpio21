@@ -36,7 +36,7 @@ public:
     typedef SField_<Dim, VT, GRID, GHOST, ORDER> Self;
     typedef typename Grid::Index Index;
 
-    typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef _DataInitial_<VT> _DataInit;
     typedef typename _DataInit::ValueTag ValueTag;
 
     typedef ArrayListV_<ValueType> Arr; 

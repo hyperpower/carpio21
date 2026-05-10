@@ -23,17 +23,7 @@ void ApplyBoundaryValue(
     _ApplyBoundaryValue(field, bi, time,
         FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
 }
-// template<class FIELD>
-// void ApplyBoundaryValue(
-//     FIELD&               field,
-//     const BoundaryIndex& bi,
-//     const Vt&            time, 
-//     SFieldVertexTag, LinearPolynomialTag)
-// {
-//     EXPAND_FIELD_TAG(FIELD); 
-//     _ApplyBoundaryValue(field, bi, time,
-//         FieldTag(), GridTag(), GhostTag(), OrderTag(), DimTag());
-// }
+
 template<class FIELD>
 typename FIELD::ValueType Value(
     const FIELD&         field,
@@ -98,6 +88,52 @@ typename FIELD::ValueType GetGhostCenterExp(
     }
 }
 template<class FIELD>
+struct _GhostValueLinearParam {
+    typename FIELD::Index idxb;
+    Vt dx;
+    Vt dg;
+    Vt v_boundary;
+};
+
+template<class FIELD>
+auto GetGhostValueParam(
+        const FIELD&             field,
+        const BoundaryCondition& bc,
+        const typename FIELD::Index& idxg,
+        const Axes&            axe,
+        const Orientation&     ori,
+        const Vt&              time = 0.0)
+{
+    auto oori = Opposite(Orientation(ori));
+    auto idxb = idxg.shift(axe, oori);
+    while(field.ghost().is_ghost(idxb)){
+        Shift(idxb, axe, oori);
+    }
+    auto fp = field.grid().f(axe, ori, idxb);
+    ASSERT(field.ghost().is_normal(idxb));
+    Vt dx = std::abs(field.grid().c_(axe, idxb) - fp[axe]);
+    Vt dg = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
+    Vt v_boundary = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
+    return _GhostValueLinearParam<FIELD>{idxb, dx, dg, v_boundary};
+}
+
+template<class FIELD, class VALUE>
+auto _GhostValueType1Formula(
+        const _GhostValueLinearParam<FIELD>& param,
+        const VALUE&                         v_x)
+{
+    return v_x + (param.v_boundary - v_x) * (param.dx + param.dg) / param.dx;
+}
+
+template<class FIELD, class VALUE>
+auto _GhostValueType2Formula(
+        const _GhostValueLinearParam<FIELD>& param,
+        const VALUE&                         v_x)
+{
+    return v_x - param.v_boundary * (param.dx + param.dg);
+}
+
+template<class FIELD>
 typename FIELD::ValueType GetGhostCenterValueType1(
         const FIELD&             field,
         const BoundaryCondition& bc,
@@ -106,33 +142,16 @@ typename FIELD::ValueType GetGhostCenterValueType1(
         const Axes&            axe,
         const Orientation&     ori,
         const Vt&              time = 0.0){
-        // boundary condition must be type 1
-        // walk back
-        auto oori = Opposite(Orientation(ori));  // opposite oritation
-        auto idxb = idxg.shift(axe, oori);
-        //    int  step  = 0;
-        while(field.ghost().is_ghost(idxb)){ // find nearest normal cell
-            Shift(idxb, axe, oori);
-        //    step++;
-        }
-        auto fp = field.grid().f(axe, ori, idxb);   // face point
-        // auto idxsym = idxb;
-        // for(int i = 0; i < step; ++i){
-        //    Shift(idxsym, axe, oori);
-        // }
-        ASSERT(field.ghost().is_normal(idxb));
+        const auto param = GetGhostValueParam(field, bc, idxg, axe, ori, time);
         //  idxb   face  ghost
         // ---x-----|-----g-----
         //    +--dx-+--dg-+
         // equation:
-        //  vg - vx     vbc - vx
-        // --------- = ----------  ==> vg - vx = (vbc - vx) * (dx + dg) / dx;
-        //  dx + dg        dx          vg = vx + (vbc - vx) * (dx + dg) / dx;
-        Vt dx  = std::abs(field.grid().c_(axe, idxb) - fp[axe]);
-        Vt dg  = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
-        Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-        Vt vx  = field(idxb);
-        return vx + (vbc - vx) * (dx + dg) / dx;
+        //  vg - vx     v_boundary - vx
+        // --------- = ---------------  ==> vg - vx = (v_boundary - vx) * (dx + dg) / dx;
+        //  dx + dg           dx           vg = vx + (v_boundary - vx) * (dx + dg) / dx;
+        const auto v_x  = field(param.idxb);
+        return _GhostValueType1Formula(param, v_x);
 }
 template<class FIELD>
 typename FIELD::ValueType GetGhostCenterValueType2(
@@ -143,33 +162,16 @@ typename FIELD::ValueType GetGhostCenterValueType2(
         const Axes&            axe,
         const Orientation&     ori,
         const Vt&              time = 0.0){
-    // boundary condition must be type 2
-    // walk back
-    auto oori = Opposite(Orientation(ori));
-    auto idxb = idxg.shift(axe, oori);
-    // int step  = 0;
-    while (field.ghost().is_ghost(idxb))
-    {
-        Shift(idxb, axe, oori);
-        // step++;
-    }
-    auto fp = field.grid().f(axe, ori, idxb);
-    //        for(int i = 0; i < step; ++i){
-    //            Shift(idxb, axe, oori);
-    //        }
-    ASSERT(field.ghost().is_normal(idxb));
+    const auto param = GetGhostValueParam(field, bc, idxg, axe, ori, time);
     //  idxb   face  ghost
     // ---x-----|-----g-----
     //    +--dx-+--dg-+
     // equation:
     //  vx - vg
-    // --------- = vbc  ==> vx - vg = vbc * (dx + dg);
-    //  dx + dg                  vg = vx - vbc * (dx + dg);
-    Vt dx = std::abs(field.grid().c_(axe, idxb) - fp[axe]);
-    Vt dg = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
-    Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-    Vt vx  = field(idxb);
-    return vx - vbc * (dx + dg);
+    // --------- = v_boundary  ==> vx - vg = v_boundary * (dx + dg);
+    //  dx + dg                           vg = vx - v_boundary * (dx + dg);
+    const auto v_x  = field(param.idxb);
+    return _GhostValueType2Formula(param, v_x);
 }
 template<class FIELD>
 typename FIELD::ValueType GetGhostCenterValueType3(
@@ -242,27 +244,16 @@ typename FIELD::ValueType GetGhostCenterExpType1(
         const Vt&              time = 0.0)
 {        
         typedef typename FIELD::ValueType Exp;
-        // boundary condition must be type 1
-        // walk back
-        auto oori = Opposite(Orientation(ori));  // opposite oritation
-        auto idxb = idxg.shift(axe, oori);
-        while(field.ghost().is_ghost(idxb)){ // find nearest normal cell
-            Shift(idxb, axe, oori);
-        }
-        auto fp = field.grid().f(axe, ori, idxb);   // face point
-        ASSERT(field.ghost().is_normal(idxb));
+        const auto param = GetGhostValueParam(field, bc, idxg, axe, ori, time);
         //  idxb   face  ghost
         // ---x-----|-----g-----
         //    +--dx-+--dg-+
         // equation:
-        //  vg - vx     vbc - vx
-        // --------- = ----------  ==> vg - vx = (vbc - vx) * (dx + dg) / dx;
-        //  dx + dg        dx          vg = vx + (vbc - vx) * (dx + dg) / dx;
-        Vt dx  = std::abs(field.grid().c_(axe, idxb) - fp[axe]);
-        Vt dg  = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
-        Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-        Exp expx(idxb);
-        return expx + (vbc - expx) * (dx + dg) / dx;
+        //  vg - vx     v_boundary - vx
+        // --------- = ---------------  ==> vg - vx = (v_boundary - vx) * (dx + dg) / dx;
+        //  dx + dg           dx           vg = vx + (v_boundary - vx) * (dx + dg) / dx;
+        Exp v_x(param.idxb);
+        return _GhostValueType1Formula(param, v_x);
 }
 template<class FIELD>
 typename FIELD::ValueType GetGhostCenterExpType2(
@@ -275,28 +266,16 @@ typename FIELD::ValueType GetGhostCenterExpType2(
         const Vt&              time = 0.0)
 {
     typedef typename FIELD::ValueType Exp;
-    // boundary condition must be type 2
-    // walk back
-    auto oori = Opposite(Orientation(ori));
-    auto idxb = idxg.shift(axe, oori);
-    while (field.ghost().is_ghost(idxb))
-    {
-        Shift(idxb, axe, oori);
-    }
-    auto fp = field.grid().f(axe, ori, idxb);
-    ASSERT(field.ghost().is_normal(idxb));
+    const auto param = GetGhostValueParam(field, bc, idxg, axe, ori, time);
     //  idxb   face  ghost
     // ---x-----|-----g-----
     //    +--dx-+--dg-+
     // equation:
     //  vx - vg
-    // --------- = vbc  ==> vx - vg = vbc * (dx + dg);
-    //  dx + dg                  vg = vx - vbc * (dx + dg);
-    Vt dx = std::abs(field.grid().c_(axe, idxb) - fp[axe]);
-    Vt dg = std::abs(field.grid().c_(axe, idxg) - fp[axe]);
-    Vt vbc = bc.value(fp.value(_X_), fp.value(_Y_), fp.value(_Z_), time);
-    Exp expx(idxb);
-    return expx - vbc * (dx + dg);
+    // --------- = v_boundary  ==> vx - vg = v_boundary * (dx + dg);
+    //  dx + dg                           vg = vx - v_boundary * (dx + dg);
+    Exp v_x(param.idxb);
+    return _GhostValueType2Formula(param, v_x);
 }
 template<class FIELD>
 typename FIELD::ValueType GetGhostCenterExpType3(

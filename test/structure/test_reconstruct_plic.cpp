@@ -7,6 +7,7 @@
 #include "domain/structure/io/sgnuplot_actor.hpp"
 #include "domain/structure/order/xyz.hpp"
 #include "domain/structure/operator/scommon.hpp"
+#include "domain/structure/operator/snorm.hpp"
 #include "domain/structure/operator/svof_plic.hpp"
 #include "geometry/boolean/line_box.hpp"
 #include "geometry/io/ggnuplot_actor_maker.hpp"
@@ -15,6 +16,7 @@
 
 #include <cmath>
 #include <filesystem>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -117,7 +119,8 @@ TEST(reconstruct_plic, youngs_line_fraction_field) {
 
     BoundaryIndex bi;
     auto interfaces = ReconstructInterfacePLIC(
-            fraction, bi, "youngs", SFieldCenterTag());
+            fraction, bi, "ccs", SFieldCenterTag());
+    Field reconstructed_fraction(grid, ghost, order);
 
     int interface_count = 0;
     const double tol = 1e-12;
@@ -129,6 +132,7 @@ TEST(reconstruct_plic, youngs_line_fraction_field) {
 
         if(value <= tol || value >= 1.0 - tol){
             ASSERT_EQ(interfaces(idx), nullptr);
+            reconstructed_fraction(idx) = value;
             continue;
         }
 
@@ -140,9 +144,16 @@ TEST(reconstruct_plic, youngs_line_fraction_field) {
         const auto area = FractionVolume(
                 interfaces(idx)->a(), interfaces(idx)->b(),
                 interfaces(idx)->alpha(), dx, dy);
-        ASSERT_NEAR(area / (dx * dy), value, 1e-10);
+        reconstructed_fraction(idx) = area / (dx * dy);
+        ASSERT_NEAR(reconstructed_fraction(idx), value, 1e-10);
     }
     ASSERT_GT(interface_count, 0);
+
+    auto error_fraction = reconstructed_fraction - fraction;
+    std::cout << "PLIC reconstructed fraction error\n";
+    std::cout << "Norm1   = " << Norm1(error_fraction) << std::endl;
+    std::cout << "Norm2   = " << Norm2(error_fraction) << std::endl;
+    std::cout << "NormInf = " << NormInf(error_fraction) << std::endl;
 
     std::filesystem::create_directories(OUTPUTPATH);
 

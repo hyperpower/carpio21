@@ -33,7 +33,7 @@ public:
 
     typedef ArrayListV_<ValueType> Arr; 
 
-    typedef _DataInitial_<Dim, VT, GRID, GHOST, ORDER> _DataInit;
+    typedef _DataInitial_<VT> _DataInit;
     typedef typename _DataInit::ValueTag ValueTag;
 
     typedef std::function<Vt(Vt, Vt, Vt, Vt)> FunXYZT_Value;
