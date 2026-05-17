@@ -10,6 +10,7 @@
 #include "geometry/objects/basic/point_chain.hpp"
 #include "geometry/affine.hpp"
 
+#include "algebra/algebra_define.hpp"
 #include "algebra/algebra.hpp"
 
 #include <memory>
@@ -377,14 +378,14 @@ public:
             return res;
         }
         // additional points
-        if (this->on_y <= 1.0 && this->on_y > 0){
+        if (IsInRange(0.0, this->on_y, 1.0, _oo_, tol)){
             res.emplace_front(Point(0.0, 1.0));
         }
         // point on X, Y = 0
-        if (this->on_x <= 1.0 && this->on_x > 0){
+        if (IsInRange(0.0, this->on_x, 1.0, _oo_, tol)){
             res.emplace_back(Point(1.0, 0.0));
             res.emplace_back(Point(1.0, 1.0));
-        }else if (this->on_x > 1.0){
+        }else if (this->on_x >= 1.0 - tol){
             res.emplace_back(Point(1.0, 1.0));
         }
         return res;
@@ -455,7 +456,7 @@ _Orient(const double& a, const double& b, const double& c, const double& alpha,/
 template<class POINT, class FUNCTOR>
 std::list<POINT>
 _TranslateAndScale(const POINT& min, const POINT& max, 
-            const double& a, const double& b, const double& alpha,// Point max=(1,1)
+            const double& a, const double& b, const double& alpha,
             const double& tol){ 
     Line_<double> line(a, b, alpha);
     auto arr_scale = max - min;
@@ -479,7 +480,7 @@ _TranslateAndScale(const POINT& min, const POINT& max,
 template<class POINT, class FUNCTOR>
 std::list<POINT>
 _TranslateAndScale(const POINT& min, const POINT& max, 
-            const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
+            const double& a, const double& b, const double& c, const double& alpha,
             const double& tol){ 
     Plane_<double> plane(a, b, c, alpha);
     auto arr_scale = max - min;
@@ -501,7 +502,7 @@ _TranslateAndScale(const POINT& min, const POINT& max,
     return res;
 }
 
-template<class POINT>
+template<class POINT>  
 std::list<POINT>
 IntersectLineBox(const POINT& min, const POINT& max, 
                  const double& a, const double& b, const double& alpha,// Point max=(1,1)
@@ -526,6 +527,17 @@ NegativeLineBox(const POINT& min, const POINT& max,
     typedef _FunctorNegativeOrientLineUnitBox_<POINT> Functor;
     return _TranslateAndScale<POINT, Functor>(min, max, a, b, alpha, tol);
 }
+template<class NUM>
+std::list<Point_<NUM, 2> >
+NegativeLineBox(const NUM& dx, const NUM& dy, 
+                const Line_<NUM>& line){
+    typedef Point_<NUM, 2> Point;     
+    typedef _FunctorNegativeOrientLineUnitBox_<Point> Functor;
+    return _TranslateAndScale<Point, Functor>(
+                Point(0, 0), Point(dx, dy), 
+                line.a(), line.b(), line.alpha(), DefaultFloatTolerance<NUM>());
+}
+
 template<class POINT>
 std::list<POINT>
 PositiveLineBox(const POINT& min, const POINT& max, 
@@ -534,21 +546,17 @@ PositiveLineBox(const POINT& min, const POINT& max,
     typedef _FunctorPositiveOrientLineUnitBox_<POINT> Functor;
     return _TranslateAndScale<POINT, Functor>(min, max, a, b, alpha, tol);
 }
-
-template<class POINT>
-double _AreaPolygon2d(const std::list<POINT>& points){
-    if (points.size() < 3){
-        return 0.0;
-    }
-    double area = 0.0;
-    auto prev = std::prev(points.end());
-    for (auto iter = points.begin(); iter != points.end(); ++iter){
-        area += double(prev->x()) * double(iter->y())
-              - double(iter->x()) * double(prev->y());
-        prev = iter;
-    }
-    return std::abs(area) * 0.5;
+template<class NUM>
+std::list<Point_<NUM, 2> >
+PositiveLineBox(const NUM& dx, const NUM& dy, 
+                const Line_<NUM>& line){
+    typedef Point_<NUM, 2> Point;     
+    typedef _FunctorPositiveOrientLineUnitBox_<Point> Functor;
+    return _TranslateAndScale<Point, Functor>(
+                Point(0, 0), Point(dx, dy), 
+                line.a(), line.b(), line.alpha(), DefaultFloatTolerance<NUM>());
 }
+
 
 template<class POINT>
 double IntersectionAreaNegative(
@@ -556,7 +564,7 @@ double IntersectionAreaNegative(
         const double& a, const double& b, const double& alpha,
         const double& tol = 1e-14){
     auto polygon = NegativeLineBox(min, max, a, b, alpha, tol);
-    return _AreaPolygon2d(polygon);
+    return AreaPointChain(polygon);
 }
 
 template<class POINT>
@@ -565,7 +573,7 @@ double IntersectionAreaPositive(
         const double& a, const double& b, const double& alpha,
         const double& tol = 1e-14){
     auto polygon = PositiveLineBox(min, max, a, b, alpha, tol);
-    return _AreaPolygon2d(polygon);
+    return AreaPointChain(polygon);
 }
 
 template<class TYPE>

@@ -20,6 +20,13 @@ double Pi() {
     return std::acos(-1.0);
 }
 
+double SectorArea(
+        const double ax, const double ay,
+        const double bx, const double by,
+        const double r) {
+    return SignedSectorAreaOrigin(ax, ay, bx, by, r);
+}
+
 } // namespace
 
 TEST(circle_box, intersection_points) {
@@ -118,6 +125,54 @@ TEST(circle_box, intersection_area) {
         Circle circle(0.0, 0.0, 1.0);
         Box2 box(Point2(-1.0, 0.0), Point2(1.0, 1.0));
         ASSERT_NEAR(IntersectAreaCircleBox(circle, box), Pi() * 0.5, 1e-12);
+    }
+}
+
+TEST(circle_tri, signed_area_origin_circle) {
+    {
+        const double area = IntersectSignedAreaCircleOriginTri(
+                1.0, 0.0, 0.0, 1.0, 2.0);
+        ASSERT_NEAR(area, 0.5, 1e-12);
+    }
+    {
+        const double area = IntersectSignedAreaCircleOriginTri(
+                0.0, 1.0, 1.0, 0.0, 2.0);
+        ASSERT_NEAR(area, -0.5, 1e-12);
+    }
+    {
+        const double area = IntersectSignedAreaCircleOriginTri(
+                2.0, 0.0, 0.0, 2.0, 1.0);
+        ASSERT_NEAR(area, Pi() * 0.25, 1e-12);
+    }
+    {
+        const double h = std::sqrt(0.75);
+        const double expected =
+                SectorArea(-2.0, 0.5, -h, 0.5, 1.0)
+              + SignedAreaOriginTri2d(-h, 0.5, h, 0.5)
+              + SectorArea(h, 0.5, 2.0, 0.5, 1.0);
+        const double area = IntersectSignedAreaCircleOriginTri(
+                -2.0, 0.5, 2.0, 0.5, 1.0);
+        ASSERT_NEAR(area, expected, 1e-12);
+    }
+    {
+        const double h = std::sqrt(0.75);
+        const double expected =
+                SignedAreaOriginTri2d(0.0, 0.5, h, 0.5)
+              + SectorArea(h, 0.5, 2.0, 0.5, 1.0);
+        const double area = IntersectSignedAreaCircleOriginTri(
+                0.0, 0.5, 2.0, 0.5, 1.0);
+        ASSERT_NEAR(area, expected, 1e-12);
+    }
+    {
+        const double area = IntersectSignedAreaCircleOriginTri(
+                1.0, 0.0, 0.0, 1.0, 1.0);
+        ASSERT_NEAR(area, 0.5, 1e-12);
+    }
+    {
+        ASSERT_NEAR(IntersectSignedAreaCircleOriginTri(
+                1.0, 0.0, 1.0, 0.0, 1.0), 0.0, 1e-12);
+        ASSERT_NEAR(IntersectSignedAreaCircleOriginTri(
+                1.0, 0.0, 0.0, 1.0, 0.0), 0.0, 1e-12);
     }
 }
 

@@ -12,6 +12,7 @@
 #include "domain/structure/order/xyz.hpp"
 #include "geometry/boolean/intersection_circle_box.hpp"
 #include "geometry/boolean/line_box.hpp"
+#include "geometry/fraction/error_area.hpp"
 #include "geometry/fraction/piecewise_linear.hpp"
 #include "geometry/io/ggnuplot_actor_maker.hpp"
 #include "geometry/objects/analytic/circle.hpp"
@@ -19,6 +20,8 @@
 
 #include "convergence_analysis.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <list>
@@ -150,6 +153,48 @@ inline void PlotReconstructedInterface(
     gnu.plot();
 }
 
+template<class FIELD_INTERFACE>
+inline void PlotErrorAreaContour(
+        const std::string& method, int n,
+        const Field& error_area,
+        const FIELD_INTERFACE& interfaces) {
+    std::filesystem::create_directories(OUTPUTPATH);
+
+    double max_error_area = 0.0;
+    for(auto& idx : error_area.order()) {
+        max_error_area = std::max(max_error_area, error_area(idx));
+    }
+
+    Gnuplot gnu;
+    gnu.set_xrange(domain_min, domain_max);
+    gnu.set_yrange(domain_min, domain_max);
+    gnu.set_equal_aspect_ratio();
+    gnu.set_palette_red_blue();
+    gnu.set_ticslevel(0.1);
+    gnu.set_view(55, 25, 1.2, 1.0);
+    if(max_error_area > 0.0) {
+        gnu.set_cbrange(0.0, 10e-3);
+    }
+
+    auto agrid = ToGnuplotActorWireFrame(error_area.grid());
+    agrid.command("using 1:2:(0.0) title \"Domain\" ");
+    agrid.line_color_grey().line_width(1);
+
+    auto circle = MakePresetCircle();
+    auto acircle = ToGnuplotActor(circle);
+    acircle.command("using 1:2:(0.0) title \"circle\" ");
+    acircle.line_color_red().line_width(3);
+
+    gnu.add(ToGnuplotActorContour(error_area));
+    gnu.add(agrid);
+    gnu.add(acircle);
+    gnu.add(ToGnuplotActorReconstructedInterface(interfaces));
+    gnu.set_terminal_png(
+            OUTPUTPATH + "error_area_" + method + "_n" + ToString(n),
+            fig_width, fig_height);
+    gnu.plot();
+}
+
 inline void ReconstructSolver(const std::string& method, int n,
                               std::list<double>& l1,
                               std::list<double>& l2,
@@ -168,33 +213,52 @@ inline void ReconstructSolver(const std::string& method, int n,
             fraction, bi, method, SFieldCenterTag());
     PlotReconstructedInterface(method, n, fraction, interfaces);
 
-    Field reconstructed_fraction(grid, ghost, order);
+    double domain_area = 0.0;
+    double l1_integral = 0.0;
+    double l2_integral = 0.0;
+    double linf_average = 0.0;
+
+    Field error_area(grid, ghost, order);
+    error_area.assign(0.0);
+
     const double tol = 1e-16;
+    auto circle = MakePresetCircle();
     for(auto& idx : fraction.order()) {
+        const auto dx = grid->s_(_X_, idx);
+        const auto dy = grid->s_(_Y_, idx);
+        const auto cell_area = dx * dy;
+        domain_area += cell_area;
+
         const auto value = fraction(idx);
 
         if(value <= tol || value >= 1.0 - tol) {
-            reconstructed_fraction(idx) = value;
             continue;
         }
 
+        ASSERT(interfaces(idx) != nullptr);
         if(interfaces(idx) == nullptr) {
-            reconstructed_fraction(idx) = 0.0;
             continue;
         }
 
-        const auto dx = grid->s_(_X_, idx);
-        const auto dy = grid->s_(_Y_, idx);
-        const auto area = FractionVolume(
-                interfaces(idx)->a(), interfaces(idx)->b(),
-                interfaces(idx)->alpha(), dx, dy);
-        reconstructed_fraction(idx) = area / (dx * dy);
-    }
+        auto pbox_min = grid->v(0, idx);
+        Circle local_circle(
+                circle.xc() - pbox_min.x(),
+                circle.yc() - pbox_min.y(),
+                circle.r());
+        const auto cell_error_area = ErrorArea(
+                dx, dy, *(interfaces(idx)), local_circle);
+        const auto cell_error_average = cell_error_area / cell_area;
+        error_area(idx) = cell_error_area;
 
-    auto error_fraction = reconstructed_fraction - fraction;
-    auto n1 = Norm1(error_fraction);
-    auto n2 = Norm2(error_fraction);
-    auto ni = NormInf(error_fraction);
+        l1_integral += cell_error_area;
+        l2_integral += cell_error_average * cell_error_average * cell_area;
+        linf_average = std::max(linf_average, cell_error_area);
+    }
+    PlotErrorAreaContour(method, n, error_area, interfaces);
+
+    auto n1 = l1_integral / domain_area;
+    auto n2 = std::sqrt(l2_integral / domain_area);
+    auto ni = linf_average;
 
     std::cout << "Norm1   = " << n1 << std::endl;
     std::cout << "Norm2   = " << n2 << std::endl;
@@ -208,7 +272,7 @@ inline void ReconstructSolver(const std::string& method, int n,
 inline void RunMethod(const std::string& method) {
     std::filesystem::create_directories(OUTPUTPATH);
 
-    std::vector<int> vn = {8, 16, 32};
+    std::vector<int> vn = {8, 16, 32, 64, 128};
     std::list<double> l1, l2, li;
     for(auto& n : vn) {
         ReconstructSolver(method, n, l1, l2, li);

@@ -13,6 +13,13 @@ namespace carpio {
 
 struct TriangleTag: public GeometryTag {};
 
+template<class NUM>
+inline NUM SignedAreaOriginTri2d(
+        const NUM& ax, const NUM& ay,
+        const NUM& bx, const NUM& by) {
+    return NUM(0.5) * Cross2(ax, ay, bx, by);
+}
+
 template<typename TYPE, St DIM, class POINT = Point_<TYPE, DIM> >
 class Triangle_: public std::array<POINT, 3> {
 public:

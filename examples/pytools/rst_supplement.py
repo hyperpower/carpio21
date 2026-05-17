@@ -7,9 +7,8 @@ import cpuinfo
 
 def generate_0_svg(p):
     fn = "0.svg"
-    f = open(os.path.abspath(os.path.join(p, fn)), "w")
-    f.write("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"0\"/>")
-    f.close()
+    with open(os.path.abspath(os.path.join(p, fn)), "w", encoding="utf-8") as f:
+        f.write("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"0\"/>")
 
 
 def float_sec_to_str(sec):
@@ -30,10 +29,8 @@ def revise_report_rst(dir_in, info, dir_out):
         print(" >! report.rst is not in " + path)
         return 0
 
-    f = open(fullname, "r")
-    
-    fstr = f.read()
-    f.close()
+    with open(fullname, "r", encoding="utf-8") as f:
+        fstr = f.read()
 
     # order is important !!!
     fstr = add_title(info, fstr)
@@ -43,9 +40,8 @@ def revise_report_rst(dir_in, info, dir_out):
     fstr = append_wall_time_table(info, fstr)
 
     outname = os.path.join(dir_out, "report.rst")
-    fout = open(outname, "w")
-    fout.write(fstr)
-    fout.close 
+    with open(outname, "w", encoding="utf-8") as fout:
+        fout.write(fstr)
 
 
 def add_title(info, fstr):

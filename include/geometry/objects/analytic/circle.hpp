@@ -19,6 +19,16 @@ namespace carpio {
 struct CircleTag: public GeometryTag {};
 
 template<typename NUM>
+inline NUM SignedSectorAreaOrigin(
+        const NUM& ax, const NUM& ay,
+        const NUM& bx, const NUM& by,
+        const NUM& r) {
+    const NUM cross = Cross2(ax, ay, bx, by);
+    const NUM dot   = Dot(ax, ay, bx, by);
+    return NUM(0.5) * r * r * std::atan2(cross, dot);
+}
+
+template<typename NUM>
 inline NUM CalculateCircleY2(
         const NUM& xc, const NUM& r,
         const NUM& x) {

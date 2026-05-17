@@ -9,7 +9,10 @@
 // #include "multi_segments.hpp"
 
 #include "line_box.hpp"
+#include "line_circle.hpp"
 #include "intersection_circle_box.hpp"
+#include "intersection_circle_tri.hpp"
+#include "intersection_circle_point_chain.hpp"
 #include "intersection_box_box.hpp"
 
 

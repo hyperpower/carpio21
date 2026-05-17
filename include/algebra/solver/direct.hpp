@@ -60,6 +60,9 @@ int SolveQuadraticEquation(const TYPE &a, const TYPE &b, const TYPE &c,
     if (numroot == 2) {
         x1 = (-b - std::sqrt(discri)) / 2 / a;
         x2 = (-b + std::sqrt(discri)) / 2 / a;
+		if(x1 > x2){
+			std::swap(x1, x2);
+		}
         return 2;
     } else if (numroot == 1) {
         x1 = -b / 2 / a;

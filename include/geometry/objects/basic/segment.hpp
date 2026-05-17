@@ -428,6 +428,14 @@ inline std::string ToString(const Segment_<TYPE, DIM>& p){
 }
 
 template<typename TYPE, St DIM>
+inline Point_<TYPE, DIM> PointOnSegment(
+        const Point_<TYPE, DIM>& a,
+        const Point_<TYPE, DIM>& b,
+        const TYPE& t) {
+    return a + (b - a) * t;
+}
+
+template<typename TYPE, St DIM>
 inline TYPE MinX(const Segment_<TYPE, DIM>& p) {
 	return p.psx() < p.pex() ? p.psx() : p.pex();
 }

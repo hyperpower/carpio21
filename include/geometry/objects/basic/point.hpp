@@ -490,10 +490,22 @@ inline NUM Distance2_OriginToPoint3d(const NUM& x0, const NUM& y0, const NUM& z0
     return x0 * x0 + y0 * y0 + z0 * z0;
 }
 
-template <typename NUM>
-inline NUM Dot(const NUM& x0, const NUM& y0,
-               const NUM& x1, const NUM& y1){
-    return x0 * x1 + y0 * y1;
+template<typename TYPE, St DIM>
+inline TYPE Distance2_OriginToPoint(const Point_<TYPE, DIM>& p) {
+    TYPE res = 0;
+    for (St i = 0; i < DIM; ++i) {
+        res += p[i] * p[i];
+    }
+    return res;
+}
+
+template<typename TYPE, St DIM>
+inline TYPE Dot(const Point_<TYPE, DIM>& lhs, const Point_<TYPE, DIM>& rhs) {
+    TYPE res = 0;
+    for (St i = 0; i < DIM; ++i) {
+        res += lhs[i] * rhs[i];
+    }
+    return res;
 }
 
 template<typename TYPE, St DIM>

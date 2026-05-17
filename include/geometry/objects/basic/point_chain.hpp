@@ -19,7 +19,9 @@
 #include <list>
 #include <fstream>
 #include <algorithm>
+#include <cmath>
 #include <functional>
+#include <iterator>
 
 namespace carpio {
 
@@ -356,6 +358,27 @@ private:
         return true;
     }
 };
+
+template<class CONTAINER>
+double SignedAreaPointChain(const CONTAINER& points){
+    if (points.size() < 3){
+        return 0.0;
+    }
+    double area = 0.0;
+    auto prev = std::prev(points.end());
+    for (auto iter = points.begin(); iter != points.end(); ++iter){
+        area += double(prev->x()) * double(iter->y())
+              - double(iter->x()) * double(prev->y());
+        prev = iter;
+    }
+    return area * 0.5;
+}
+
+template<class CONTAINER>
+double AreaPointChain(const CONTAINER& points){
+    return std::abs(SignedAreaPointChain(points));
+}
+
 // Only for 2D
 template<class TYPE>
 bool IsInOn(const Point_<TYPE, 2>& p, const PointChain_<TYPE, 2>& pc){

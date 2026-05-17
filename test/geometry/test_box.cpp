@@ -115,6 +115,61 @@ TEST(box, box_vs_line){
     gnu.plot();
 }
 
+TEST(box, negative_line_box_point_order){
+    Point2 min1(0.0, 0.0);
+    Point2 max1(1.0, 1.0);
+    Box2 box1(min1, max1);
+    Line line(1.0, -1.0, -0.1);
+
+    auto lspp = NegativeLineBox(min1, max1, line.a(), line.b(), line.alpha());
+    // ASSERT_EQ(lspp.size(), 3);
+
+    std::cout << "NegativeLineBox point order" << std::endl;
+    std::cout << "Box  : " << box1 << std::endl;
+    std::cout << "Line : " << line << std::endl;
+    int order = 0;
+    for(auto& sp : lspp){
+        std::cout << "   p" << order << " = " << sp << std::endl;
+        order++;
+    }
+
+    Gnuplot gnu;
+    GAM     gam;
+    gnu.set_xrange(-0.2, 1.2);
+    gnu.set_yrange(-0.2, 1.2);
+    gnu.set_equal_aspect_ratio();
+    gnu.set_terminal_png("./fig/negative_line_box_point_order");
+
+    auto spbox1 = gam.lines(box1);
+    spbox1->style() = "with lines lw 2 lc 8";
+    gnu.add(spbox1);
+
+    auto spline = gam.lines(line, -0.2, 1.2);
+    spline->style() = "with lines lw 3 lc 6";
+    gnu.add(spline);
+
+    auto sppolygon = gam.lines(lspp.begin(), lspp.end(), 2, true);
+    sppolygon->style() = "with lines lw 2 lc 2";
+    gnu.add(sppolygon);
+
+    auto sppoints = gam.points(lspp.begin(), lspp.end(), 7);
+    sppoints->style() = "with points pt 7 ps 2 lc 7";
+    gnu.add(sppoints);
+
+    int numlabel = 30;
+    order = 0;
+    for(auto& sp : lspp){
+        gnu.set_label(numlabel, tfm::format("p%d (%.2f, %.2f)", order, sp.x(), sp.y()),
+                     sp.x(), sp.y() + 0.05, "left font \",16\"");
+        numlabel++;
+        order++;
+    }
+    gnu.set_label(1, tfm::format("Line : %.1f X + %.1f Y = %.1f",
+                  line.a(), line.b(), line.alpha()),
+                  0.1, 1.1, "left font \",16\"");
+    gnu.plot();
+}
+
 TEST(box, box3_vs_plane){
     std::cout << "Initial box3d" << std::endl;
     Point3 min1(0.0, 0.0, 0.0);

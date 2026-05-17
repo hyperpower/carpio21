@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include <memory>
 #include <string>
 #include "geometry/geometry.hpp"
@@ -21,6 +22,35 @@ auto AddAxes(Gnuplot& gnu){
     auto actor_y = ToGnuplotActorVector(Seg2(Point2(0.0,0.0), Point2(0.0,0.5)));
     actor_y.style("with vectors lt 1 lw 3 lc rgb \"#F25022\"");
     gnu.add(actor_y);
+}
+
+template<class POINTS>
+void AddLineNormalArrow(Gnuplot& gnu, const POINTS& points, const Line& line){
+    if(points.size() != 2){
+        return;
+    }
+
+    const double length = 0.3;
+    const double norm = std::sqrt(line.a() * line.a() + line.b() * line.b());
+    if(norm == 0.0){
+        return;
+    }
+
+    auto it = points.begin();
+    const auto& p0 = *it;
+    ++it;
+    const auto& p1 = *it;
+
+    Point2 center(
+            0.5 * (p0.x() + p1.x()),
+            0.5 * (p0.y() + p1.y()));
+    Point2 end(
+            center.x() + length * line.a() / norm,
+            center.y() + length * line.b() / norm);
+
+    auto actor_normal = ToGnuplotActorVector(Seg2(center, end));
+    actor_normal.style("with vectors filled head lw 3 lc rgb \"#F25022\"");
+    gnu.add(actor_normal);
 }
 
 int LineBox(double a, double b, double alpha, const std::string& name){
@@ -62,8 +92,6 @@ int LineBox(double a, double b, double alpha, const std::string& name){
         gnu.add(sppoint);
         numlabel++;
     }
-    // gnu.set_label(1,"(1.0, 1.0)", 1.0, 1.05, "textcolor rgb \"#7FBA00\" center font \",13\"");
-    // gnu.set_label(2,"(0.0, 0.0)", 0.0, -0.05, "textcolor rgb \"#7FBA00\" center font \",13\"");
 
     gnu.set_label(4,tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(), line.alpha()),
                     0.1, 1.3, "left font \",18\"");
@@ -112,11 +140,9 @@ void BoxLinePositiveCase(int num_case,
     }
     gnu.set_object2d(5, lspp,
             "fillstyle transparent solid 0.3 fc rgb \"blue\"");
+    auto lp = IntersectLineBox(min1, max1, line.a(), line.b(), line.alpha());
+    AddLineNormalArrow(gnu, lp, line);
 
-//    gnu.set_label(1, tfm::format("(%.1f, %.1f)", min1.x(), min1.y()), min1.x(),
-//            min1.y() + 0.06, "center font \",16\"");
-//    gnu.set_label(2, tfm::format("(%.1f, %.1f)", max1.x(), max1.y()), max1.x(),
-//            max1.y() + 0.06, "center font \",16\"");
 
     gnu.set_label(4,
             tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(),
@@ -128,7 +154,7 @@ void BoxLinePositiveCase(int num_case,
 
 void RotateLineCutBox(){
     int n = 100;
-    Vt dt = 3.1415926 / double(n);
+    Vt dt = carpio::_PI_ / double(n);
     for(int i = 0; i<n; i++){
         Vt x1 = 0.5, y1 = 0.5;
         Vt r = 1;
@@ -184,11 +210,9 @@ void BoxLinePNCase(int num_case,
             "fillstyle transparent solid 0.3 fc rgb \"blue\"");
     gnu.set_object2d(6, lspn,
             "fillstyle transparent solid 0.3 fc rgb \"green\"");
-
-//    gnu.set_label(1, tfm::format("(%.1f, %.1f)", min1.x(), min1.y()), min1.x(),
-//            min1.y() + 0.06, "center font \",16\"");
-//    gnu.set_label(2, tfm::format("(%.1f, %.1f)", max1.x(), max1.y()), max1.x(),
-//            max1.y() + 0.06, "center font \",16\"");
+    
+    auto lp = IntersectLineBox(min1, max1, line.a(), line.b(), line.alpha());
+    AddLineNormalArrow(gnu, lp, line);
 
     gnu.set_label(4,
             tfm::format("Line : %.1f X + %.1f Y = %.1f", line.a(), line.b(),

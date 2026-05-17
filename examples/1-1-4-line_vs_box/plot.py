@@ -1,6 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import os, sys
+import subprocess
 import numpy as np
 
 import multiprocessing
@@ -66,12 +67,15 @@ def plot_annotation(plt):
 def make_gif(fn_prefix, filename):
     # make gif
     print("making gif ...")
-    cmd = "{} {} {}".format(
-            "ffmpeg -i ./fig/{}_%02d.png".format(fn_prefix),
-            "-vf \"fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\"",
-            "-y -loop 0 ./fig/%s.gif" % filename
-        )
-    os.system(cmd)
+    cmd = [
+        "ffmpeg",
+        "-i", "./fig/{}_%02d.png".format(fn_prefix),
+        "-vf", "fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
+        "-y",
+        "-loop", "0",
+        "./fig/%s.gif" % filename,
+    ]
+    subprocess.run(cmd, cwd=PATH_THIS, check=True)
     # os.system("ffmpeg -i ./fig/lb_%02d.png -vf \"fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 ./fig/%s.gif" % (fn_prefix, filename))
 
     # delete files
