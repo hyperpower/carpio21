@@ -27,12 +27,16 @@ auto Zero(const T& num){
 }
 
 template <class TYPE>
-inline bool IsCloseTo(const TYPE& v, const TYPE& dst, const Vt tol = 1e-12){
+inline bool IsCloseTo(
+        const TYPE& v, const TYPE& dst,
+        const Vt tol = DefaultTolerance<TYPE>()){
     return std::abs(v - dst) < tol;
 }
 template <class TYPE>
-inline bool IsCloseToZero(const TYPE& v, const Vt tol = 1e-12){
-    return std::abs(v - 0.0) < tol;
+inline bool IsCloseToZero(
+        const TYPE& v,
+        const Vt tol = DefaultTolerance<TYPE>()){
+    return std::abs(v - TYPE(0)) < tol;
 }
 
 template<class T>
@@ -51,22 +55,30 @@ inline bool IsEqual(const T& x, const T& y){
 template<class T, typename = std::enable_if_t<
         !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
 inline bool IsEqual(const T& x, const T& y){
-    auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
-    return std::fabs(x - y) <= std::numeric_limits<T>::epsilon()*maxXYOne ;
+    return std::fabs(x - y) <= EpsilonForComparison(x, y);
+}
+template<class T,
+         typename std::enable_if<
+            std::is_integral<T>::value, bool>::type = true>
+inline bool IsZero(const T& x){
+    return IsEqual(x, T(0));
+}
+template<class T, typename = std::enable_if_t<
+        !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
+inline bool IsZero(const T& x){
+    return IsEqual(x, T(0));
 }
 
 template<class T, typename = std::enable_if_t<
         !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
 inline bool IsLess(const T& x, const T& y){  // x < y
-    auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
-    return y - x > std::numeric_limits<T>::epsilon()*maxXYOne ;
+    return y - x > EpsilonForComparison(x, y);
 }
 
 template<class T, typename = std::enable_if_t<
         !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
 inline bool IsGreater(const T& x, const T& y){  // x > y
-    auto maxXYOne = std::max( { T(1.0), std::fabs(x) , std::fabs(y) } ) ;
-    return x - y > std::numeric_limits<T>::epsilon()*maxXYOne ;
+    return x - y > EpsilonForComparison(x, y);
 }
 template<class T, typename = std::enable_if_t<
         !std::is_integral<T>::value && std::is_arithmetic_v<T> > >
@@ -79,7 +91,7 @@ inline bool IsGreaterEqual(const T& x, const T& y){  // x < y
     return !IsLess(x, y);
 }
 template<typename T>
-inline std::enable_if_t<std::is_floating_point<T>::value, bool> 
+inline std::enable_if_t<std::is_floating_point<T>::value, bool>
 IsInInterval(const T& down, const T& value, const T& up, IntervalType interval) {
     auto maxXYOne = std::max( { T(1.0), std::fabs(down) , std::fabs(up), std::fabs(value) } );
     auto e = std::numeric_limits<T>::epsilon()*maxXYOne;
@@ -98,7 +110,7 @@ IsInInterval(const T& down, const T& value, const T& up, IntervalType interval) 
     return false;
 }
 template<typename T>
-inline std::enable_if_t<std::is_integral<T>::value, bool> 
+inline std::enable_if_t<std::is_integral<T>::value, bool>
 IsInInterval(const T& down, const T& value, const T& up, IntervalType interval) {
     switch (interval) {
     case _oo_:
@@ -112,7 +124,6 @@ IsInInterval(const T& down, const T& value, const T& up, IntervalType interval) 
     }
     return false;
 }
-
 //implements ULP method
 //use this when you are only concerned about floating point precision issue
 //for example, if you want to see if a is 1.0 by checking if its within

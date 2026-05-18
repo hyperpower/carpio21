@@ -15,9 +15,12 @@ void Case2d(){
     int r = LineBox(1.5, 1.0, 1.3, "line_box_normal");
     LineBox(1.5, 1.0, 0.0, "line_box_corner");
     LineBox(0.0, 1.0, 1.0, "line_box_edge");
+    LineBox(1.5, 1.0, 3.1, "line_box_no_intersect");
     RotateLineCutBox();
     BoxLinePNCase(1, 1.3, 0.9,  1.5, 1.0, 1.1);
     BoxLinePNCase(2, 1.3, 0.9, -1.5, -1.0, -1.5);
+    BoxLinePNCase(3, 1.3, 0.9, 1.5, 1.0, 2.9);
+    BoxLinePNCase(4, 1.3, 0.9, 1.5, 1.0, -0.4);
 }
 
 void Case3d(){

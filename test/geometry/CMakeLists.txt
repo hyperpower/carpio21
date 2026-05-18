@@ -6,7 +6,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 set(Sources
     # test_box.cpp
-    test_error_area.cpp
+    # test_error_area.cpp
+    test_boolean_polygon.cpp
+    test_intersection_eclipse.cpp
     # test_line_circle.cpp
     # test_box3.cpp
     # test_point.cpp

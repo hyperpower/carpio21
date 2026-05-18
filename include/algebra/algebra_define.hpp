@@ -23,10 +23,12 @@
 namespace carpio {
 
 template<class NUM>
-inline NUM DefaultFloatTolerance() {
-    typedef typename std::conditional<
-            std::is_floating_point<NUM>::value, NUM, double>::type Float;
-    return NUM(Float(64) * std::numeric_limits<Float>::epsilon());
+inline NUM DefaultTolerance() {
+    if constexpr (std::is_floating_point<NUM>::value) {
+        return NUM(NUM(64) * std::numeric_limits<NUM>::epsilon());
+    } else {
+        return NUM(0);
+    }
 }
 
 inline int StepFun(Float x) {
@@ -69,7 +71,7 @@ inline bool IsInRange(const TYPE& vmin, const TYPE& v, const TYPE& vmax, const I
     }
 }
 template<class TYPE>
-inline bool IsInRange(const TYPE& vmin, const TYPE& v, const TYPE& vmax, 
+inline bool IsInRange(const TYPE& vmin, const TYPE& v, const TYPE& vmax,
     const IntervalType& type, const TYPE& tol) {
     const TYPE& lower = (vmin < vmax) ? vmin : vmax;
     const TYPE& upper = (vmin < vmax) ? vmax : vmin;

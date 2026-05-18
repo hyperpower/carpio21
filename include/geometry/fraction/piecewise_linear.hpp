@@ -71,7 +71,7 @@ NUM _FractionVolumeOrientedUnitBox3D(
  */
 template<class NUM>
 NUM _FractionVolumeUnitBox(const NUM& a, const NUM& b, const NUM& alpha){
-    const NUM tol = DefaultFloatTolerance<NUM>();
+    const NUM tol = DefaultTolerance<NUM>();
     NUM na = std::abs(a);
     NUM nb = std::abs(b);
     NUM nalpha = alpha;
@@ -120,7 +120,7 @@ NUM _FractionVolumeUnitBox(const NUM& a, const NUM& b, const NUM& alpha){
 template<class NUM>
 NUM _FractionVolumeUnitBox(
         const NUM& a, const NUM& b, const NUM& c, const NUM& alpha){
-    const NUM tol = DefaultFloatTolerance<NUM>();
+    const NUM tol = DefaultTolerance<NUM>();
     std::array<NUM, 3> m{{std::abs(a), std::abs(b), std::abs(c)}};
     NUM nalpha = alpha;
     if (a < NUM(0)){
@@ -208,7 +208,7 @@ NUM FractionVolume(const NUM& a, const NUM& b, const NUM& c, const NUM& alpha,
  */
 template<class NUM>
 NUM _CalAlphaUnitBox(const NUM& a, const NUM& b, const NUM& fraction){
-    const NUM tol = DefaultFloatTolerance<NUM>();
+    const NUM tol = DefaultTolerance<NUM>();
     const NUM na = std::abs(a);
     const NUM nb = std::abs(b);
     const NUM max_alpha = na + nb;
@@ -251,7 +251,7 @@ template<class NUM>
 NUM _ChooseCubicRootInRange(
         const double& x1, const double& x2, const double& x3,
         const NUM& lower, const NUM& upper){
-    const NUM tol = DefaultFloatTolerance<NUM>();
+    const NUM tol = DefaultTolerance<NUM>();
     const std::array<double, 3> roots{{x1, x2, x3}};
     for (auto root : roots){
         if (IsInRange(lower, NUM(root), upper, _cc_, tol)){
@@ -343,7 +343,7 @@ NUM _CalAlphaOrientedUnitBox3D(
 template<class NUM>
 NUM _CalAlphaUnitBox(
         const NUM& a, const NUM& b, const NUM& c, const NUM& fraction){
-    const NUM tol = DefaultFloatTolerance<NUM>();
+    const NUM tol = DefaultTolerance<NUM>();
     std::array<NUM, 3> m{{std::abs(a), std::abs(b), std::abs(c)}};
     NUM nalpha = NUM(0);
 

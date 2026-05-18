@@ -3,6 +3,7 @@
 
 #include "geometry/geometry_define.hpp"
 #include "geometry/predicate.hpp"
+#include "algebra/number/number_define.hpp"
 #include <array>
 #include <sstream>
 #include <iostream>
@@ -535,9 +536,13 @@ double Distance(const Point_<TYPE, DIM>& p1,
 }
 template<typename TYPE, St DIM>
 bool IsSame(const Point_<TYPE, DIM>& p1,
-            const Point_<TYPE, DIM>& p2,
-            double tol = 1e-10) {
-    return Distance(p1, p2) < tol ? true : false;
+            const Point_<TYPE, DIM>& p2) {
+    for (St i = 0; i < DIM; ++i) {
+        if (!IsEqual(p1[i], p2[i])) {
+            return false;
+        }
+    }
+    return true;
 }
 template<typename TYPE, St DIM>
 Point_<TYPE, DIM> Mid(

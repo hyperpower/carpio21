@@ -209,8 +209,7 @@ inline void ReconstructSolver(const std::string& method, int n,
     auto fraction = MakeFractionField(grid, ghost, order);
 
     BoundaryIndex bi;
-    auto interfaces = ReconstructInterfacePLIC(
-            fraction, bi, method, SFieldCenterTag());
+    auto interfaces = ReconstructInterfacePLIC(fraction, bi, method);
     PlotReconstructedInterface(method, n, fraction, interfaces);
 
     double domain_area = 0.0;

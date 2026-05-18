@@ -17,7 +17,7 @@ NUM IntersectSignedAreaCircleOriginTri(
         const NUM& point_ax, const NUM& point_ay,
         const NUM& point_bx, const NUM& point_by,
         const NUM& r,
-        const NUM& tol = DefaultFloatTolerance<NUM>()) {
+        const NUM& tol = DefaultTolerance<NUM>()) {
 
     typedef Point_<NUM, 2> Point;
     Point a(point_ax, point_ay);
@@ -104,7 +104,7 @@ NUM IntersectSignedAreaCircleOutOriginTri(
         const NUM& point_ax, const NUM& point_ay,
         const NUM& point_bx, const NUM& point_by,
         const NUM& r,
-        const NUM& tol = DefaultFloatTolerance<NUM>()) {
+        const NUM& tol = DefaultTolerance<NUM>()) {
     return SignedAreaOriginTri2d(point_ax, point_ay, point_bx, point_by)
          - IntersectSignedAreaCircleOriginTri(
                 point_ax, point_ay, point_bx, point_by, r, tol);

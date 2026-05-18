@@ -17,7 +17,7 @@ namespace carpio {
 template<class NUM>
 NUM ErrorArea(const NUM& dx, const NUM& dy, 
               const Line_<NUM>& line, const Circle_<NUM>& circle) {
-    const NUM tol = DefaultFloatTolerance<NUM>();
+    const NUM tol = DefaultTolerance<NUM>();
 
     auto nagpc = NegativeLineBox(dx, dy, line);
     auto area_nagpc= AreaPointChain(nagpc);

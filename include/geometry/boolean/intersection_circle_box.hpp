@@ -32,7 +32,7 @@ void _CircleBoxAddPoint(
         return;
     }
     for (const auto& op : res) {
-        if (IsSame(op, p, tol)) {
+        if (IsSame(op, p)) {
             return;
         }
     }
@@ -130,7 +130,7 @@ IntersectCircleBox(
         const NUM& point_ax, const NUM& point_ay,
         const NUM& point_bx, const NUM& point_by,
         const NUM& xc, const NUM& yc, const NUM& r,
-        const NUM& tol = DefaultFloatTolerance<NUM>()) {
+        const NUM& tol = DefaultTolerance<NUM>()) {
     typedef Point_<NUM, 2> Point;
     typedef std::list<Point> ListPoint;
     ListPoint res;
@@ -176,7 +176,7 @@ NUM IntersectAreaCircleBox(
         const NUM& point_ax, const NUM& point_ay,
         const NUM& point_bx, const NUM& point_by,
         const NUM& xc, const NUM& yc, const NUM& r,
-        const NUM& tol = DefaultFloatTolerance<NUM>()) {
+        const NUM& tol = DefaultTolerance<NUM>()) {
     if (r <= NUM(0)) {
         return NUM(0);
     }
@@ -222,7 +222,7 @@ IntersectCircleBox(const Circle_<TYPE>& circle,
     return IntersectCircleBox<TYPE>(
             box.min().x(), box.min().y(),
             box.max().x(), box.max().y(),
-            circle.xc(), circle.yc(), circle.r(), DefaultFloatTolerance<TYPE>());
+            circle.xc(), circle.yc(), circle.r(), DefaultTolerance<TYPE>());
 }
 
 template<class TYPE>
@@ -232,7 +232,7 @@ double IntersectAreaCircleBox(
     return IntersectAreaCircleBox<TYPE>(
             box.min().x(), box.min().y(),
             box.max().x(), box.max().y(),
-            circle.xc(), circle.yc(), circle.r(), DefaultFloatTolerance<TYPE>());
+            circle.xc(), circle.yc(), circle.r(), DefaultTolerance<TYPE>());
 }
 
 template<class GEO1, class GEO2>

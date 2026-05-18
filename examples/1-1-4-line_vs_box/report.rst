@@ -41,7 +41,7 @@ The box is fixed at (0,0) to (1,1). The line is on one edge of the box.
 
    A line intersects with box (Edge).
 
-Positive Polygon
+Positive\Positive Polygon
 -----------------------------
 A line cuts a box into two sides. Here, we get a positive side as a ploygon.
 
@@ -74,9 +74,6 @@ p2 is also a point on a circle. The center of the circle is p1. Radius of this c
 
    A line intersects with box and its positive side.
 
-Negative Polygon
------------------------------
-
 The figure shows the both side of a line splitted box. The positive side colored in blue. And, the negative side colored in green.
 
 .. figure:: fig/pn_01.png
@@ -88,6 +85,16 @@ The figure shows the both side of a line splitted box. The positive side colored
    :align: center 
 
    A line intersects with box and its positive and negative sides.
+
+.. figure:: fig/pn_03.png
+   :align: center 
+
+   The box is all in negative side.
+
+.. figure:: fig/pn_04.png
+   :align: center 
+
+   The box is all in positive side.
 
 Plane Box
 ==========================

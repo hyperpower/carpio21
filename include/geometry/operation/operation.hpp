@@ -10,7 +10,7 @@
 // #include "geometry/operation/boolean/ben_ott_intersection_2.hpp"
 #include "geometry/operation/boolean/intersection.hpp"
 
-#include "geometry/operation/polygon_boolean.hpp"
+#include "geometry/boolean/boolean_polygon.hpp"
 #include "geometry/operation/distance/distance.hpp"
 #include "geometry/affine.hpp"
 

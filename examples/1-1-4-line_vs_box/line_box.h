@@ -206,6 +206,8 @@ void BoxLinePNCase(int num_case,
         gnu.add(sppoint);
         numlabel++;
     }
+    std::cout << "Positive Line Box Points: " << lspp.size() << std::endl;
+    std::cout << "Negative Line Box Points: " << lspn.size() << std::endl;
     gnu.set_object2d(5, lspp,
             "fillstyle transparent solid 0.3 fc rgb \"blue\"");
     gnu.set_object2d(6, lspn,

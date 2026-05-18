@@ -1,12 +1,13 @@
-#ifndef _BOOLEAN_LINE_CIRCLE_HPP_
-#define _BOOLEAN_LINE_CIRCLE_HPP_
+#ifndef _BOOLEAN_LINE_ECLIPSE_HPP_
+#define _BOOLEAN_LINE_ECLIPSE_HPP_
 
 #include "algebra/algebra_define.hpp"
 #include "algebra/solver/direct.hpp"
 #include "geometry/geometry_define.hpp"
-#include "geometry/objects/analytic/circle.hpp"
+#include "geometry/objects/analytic/eclipse.hpp"
 #include "geometry/objects/analytic/line.hpp"
 #include "geometry/objects/basic/point.hpp"
+#include "geometry/objects/basic/segment.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -16,7 +17,7 @@
 namespace carpio {
 
 template<class NUM>
-inline void _LineCircleOrderAlongLineDirection(
+inline void _LineEclipseOrderAlongLineDirection(
         std::list<Point_<NUM, 2> >& points,
         const NUM& a,
         const NUM& b) {
@@ -36,24 +37,29 @@ inline void _LineCircleOrderAlongLineDirection(
 
 template<class NUM>
 std::list<Point_<NUM, 2> >
-IntersectLineCircle(
-        const NUM& a, const NUM& b, const NUM& alpha,
-        const NUM& xc, const NUM& yc, const NUM& r,
+IntersectLineEclipse(
+        const NUM& la, const NUM& lb, const NUM& alpha,
+        const NUM& xc, const NUM& yc,
+        const NUM& ea, const NUM& eb,
         const NUM& tol = DefaultTolerance<NUM>()) {
     typedef Point_<NUM, 2> Point;
     typedef std::list<Point> ListPoint;
     ListPoint res;
 
-    if (r <= NUM(0)) {
+    if (ea <= NUM(0) || eb <= NUM(0)) {
         return res;
     }
-    if (std::abs(a) <= tol && std::abs(b) <= tol) {
+    if (std::abs(la) <= tol && std::abs(lb) <= tol) {
         return res;
     }
 
-    if (std::abs(b) <= tol) {
-        const NUM x = alpha / a;
-        const NUM d = r * r - (x - xc) * (x - xc);
+    const NUM ea2 = ea * ea;
+    const NUM eb2 = eb * eb;
+
+    if (std::abs(lb) <= tol) {
+        const NUM x = alpha / la;
+        const NUM dx = x - xc;
+        const NUM d = eb2 * (NUM(1) - dx * dx / ea2);
         if (d < -tol) {
             return res;
         }
@@ -64,16 +70,16 @@ IntersectLineCircle(
         const NUM sd = std::sqrt(d);
         res.emplace_back(x, yc - sd);
         res.emplace_back(x, yc + sd);
-        _LineCircleOrderAlongLineDirection(res, a, b);
+        _LineEclipseOrderAlongLineDirection(res, la, lb);
         return res;
     }
 
-    const NUM k = -a / b;
-    const NUM c = alpha / b;
+    const NUM k = -la / lb;
+    const NUM c = alpha / lb;
     const NUM cb = c - yc;
-    const NUM coef_a = NUM(1) + k * k;
-    const NUM coef_b = NUM(2) * (k * cb - xc);
-    const NUM coef_c = xc * xc + cb * cb - r * r;
+    const NUM coef_a = NUM(1) / ea2 + k * k / eb2;
+    const NUM coef_b = NUM(-2) * xc / ea2 + NUM(2) * k * cb / eb2;
+    const NUM coef_c = xc * xc / ea2 + cb * cb / eb2 - NUM(1);
 
     const NUM discri = coef_b * coef_b - NUM(4) * coef_a * coef_c;
     if (discri < -tol) {
@@ -102,50 +108,56 @@ IntersectLineCircle(
     const NUM nx2 = NUM(x2);
     res.emplace_back(nx1, k * nx1 + c);
     res.emplace_back(nx2, k * nx2 + c);
-    _LineCircleOrderAlongLineDirection(res, a, b);
+    _LineEclipseOrderAlongLineDirection(res, la, lb);
     return res;
 }
 
 template<class NUM>
 std::list<Point_<NUM, 2> >
-IntersectLineCircle(
+IntersectLineEclipse(
         const Line_<NUM>& line,
-        const Circle_<NUM>& circle) {
-    return IntersectLineCircle(
+        const Eclipse_<NUM>& eclipse) {
+    return IntersectLineEclipse(
             line.a(), line.b(), line.alpha(),
-            circle.xc(), circle.yc(), circle.r(),
+            eclipse.xc(), eclipse.yc(), eclipse.a(), eclipse.b(),
             DefaultTolerance<NUM>());
 }
 
 template<class NUM>
 std::list<Point_<NUM, 2> >
-IntersectSegmentCircleOrigin(
+IntersectSegmentEclipseOrigin(
         const NUM& start_x, const NUM& start_y,
         const NUM& end_x,   const NUM& end_y,
-        const NUM& r,
+        const NUM& ea, const NUM& eb,
         const NUM& tol = DefaultTolerance<NUM>()) {
     typedef Point_<NUM, 2> Point;
     typedef std::list<Point> ListPoint;
     ListPoint res;
 
-    if (r <= NUM(0)) {
+    if (ea <= NUM(0) || eb <= NUM(0)) {
         return res;
     }
 
     const NUM dx = end_x - start_x;
     const NUM dy = end_y - start_y;
+    const NUM ea2 = ea * ea;
+    const NUM eb2 = eb * eb;
 
-    const NUM coef_a = Dot(dx, dy, dx, dy);
+    const NUM coef_a = dx * dx / ea2 + dy * dy / eb2;
     if (coef_a <= tol * tol) {
-        const NUM dist2 = Dot(start_x, start_y, start_x, start_y);
-        if (std::abs(dist2 - r * r) <= tol) {
+        const NUM value = start_x * start_x / ea2
+                        + start_y * start_y / eb2;
+        if (std::abs(value - NUM(1)) <= tol) {
             res.emplace_back(start_x, start_y);
         }
         return res;
     }
 
-    const NUM coef_b = NUM(2) * Dot(start_x, start_y, dx, dy);
-    const NUM coef_c = Dot(start_x, start_y, start_x, start_y) - r * r;
+    const NUM coef_b = NUM(2) * (start_x * dx / ea2
+                               + start_y * dy / eb2);
+    const NUM coef_c = start_x * start_x / ea2
+                     + start_y * start_y / eb2
+                     - NUM(1);
     const NUM discri = coef_b * coef_b - NUM(4) * coef_a * coef_c;
 
     if (discri < -tol) {
@@ -188,15 +200,16 @@ IntersectSegmentCircleOrigin(
 
 template<class NUM>
 std::list<Point_<NUM, 2> >
-IntersectSegmentCircle(
+IntersectSegmentEclipse(
         const NUM& start_x, const NUM& start_y,
         const NUM& end_x,   const NUM& end_y,
-        const NUM& xc, const NUM& yc, const NUM& r,
+        const NUM& xc, const NUM& yc,
+        const NUM& ea, const NUM& eb,
         const NUM& tol = DefaultTolerance<NUM>()) {
-    auto res = IntersectSegmentCircleOrigin(
+    auto res = IntersectSegmentEclipseOrigin(
             start_x - xc, start_y - yc,
             end_x - xc, end_y - yc,
-            r, tol);
+            ea, eb, tol);
     for (auto& p : res) {
         p.x() += xc;
         p.y() += yc;
@@ -206,55 +219,56 @@ IntersectSegmentCircle(
 
 template<class NUM>
 std::list<Point_<NUM, 2> >
-IntersectSegmentCircle(
-        const Point_<NUM,2 >& start, const Point_<NUM,2>& end,
-        const Circle_<NUM>& circle) {
-    return IntersectSegmentCircle(
+IntersectSegmentEclipse(
+        const Point_<NUM, 2>& start, const Point_<NUM, 2>& end,
+        const Eclipse_<NUM>& eclipse) {
+    return IntersectSegmentEclipse(
             start.x(), start.y(),
             end.x(), end.y(),
-            circle.xc(), circle.yc(), circle.r(),
+            eclipse.xc(), eclipse.yc(), eclipse.a(), eclipse.b(),
             DefaultTolerance<NUM>());
 }
 
 template<class NUM>
 std::list<Point_<NUM, 2> >
-IntersectSegmentCircle(
-        const Segment_<NUM,2>& segment,
-        const Circle_<NUM>& circle) {
-    return IntersectSegmentCircle(
-            segment.start(), segment.end(),
-            circle);
+IntersectSegmentEclipse(
+        const Segment_<NUM, 2>& segment,
+        const Eclipse_<NUM>& eclipse) {
+    return IntersectSegmentEclipse(
+            segment.ps(), segment.pe(),
+            eclipse);
 }
 
 template<class GEO1, class GEO2>
 auto Intersect(const GEO1& g1, const GEO2& g2,
                const std::string& method,
-               LineTag, CircleTag) {
+               LineTag, EclipseTag) {
     (void)method;
-    return IntersectLineCircle(g1, g2);
+    return IntersectLineEclipse(g1, g2);
 }
 
 template<class GEO1, class GEO2>
 auto Intersect(const GEO1& g1, const GEO2& g2,
                const std::string& method,
-               CircleTag, LineTag) {
+               EclipseTag, LineTag) {
     (void)method;
-    return IntersectLineCircle(g2, g1);
+    return IntersectLineEclipse(g2, g1);
 }
 
 template<class GEO1, class GEO2>
 auto Intersect(const GEO1& g1, const GEO2& g2,
                const std::string& method,
-               SegmentTag, CircleTag) {
+               SegmentTag, EclipseTag) {
     (void)method;
-    return IntersectSegmentCircle(g1, g2);
+    return IntersectSegmentEclipse(g1, g2);
 }
+
 template<class GEO1, class GEO2>
 auto Intersect(const GEO1& g1, const GEO2& g2,
                const std::string& method,
-               CircleTag, SegmentTag) {
+               EclipseTag, SegmentTag) {
     (void)method;
-    return IntersectSegmentCircle(g2, g1);
+    return IntersectSegmentEclipse(g2, g1);
 }
 
 }

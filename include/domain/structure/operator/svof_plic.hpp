@@ -132,7 +132,7 @@ auto _SReconstructInterfacePLIC(
     ASSERT(method.empty() || method == "youngs" || method == "Youngs" || use_ccs);
 
     FieldInterface res(field.spgrid(), field.spghost(), field.sporder());
-    const auto tol = DefaultFloatTolerance<ValueType>();
+    const auto tol = DefaultTolerance<ValueType>();
     const auto& grid = field.grid();
 
     for(auto& idx : field.order()){

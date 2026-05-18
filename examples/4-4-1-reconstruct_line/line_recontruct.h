@@ -161,8 +161,7 @@ inline void ReconstructSolver(const std::string& method, int n,
     auto fraction = MakeFractionField(grid, ghost, order);
 
     BoundaryIndex bi;
-    auto interfaces = ReconstructInterfacePLIC(
-            fraction, bi, method, SFieldCenterTag());
+    auto interfaces = ReconstructInterfacePLIC(fraction, bi, method);
     PlotReconstructedInterface(method, n, fraction, interfaces);
 
     Field reconstructed_fraction(grid, ghost, order);

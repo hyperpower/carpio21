@@ -10,10 +10,13 @@
 
 #include "line_box.hpp"
 #include "line_circle.hpp"
+#include "line_eclipse.hpp"
 #include "intersection_circle_box.hpp"
 #include "intersection_circle_tri.hpp"
+#include "intersection_eclipse_tri.hpp"
 #include "intersection_circle_point_chain.hpp"
 #include "intersection_box_box.hpp"
+#include "boolean_polygon.hpp"
 
 
 namespace carpio{

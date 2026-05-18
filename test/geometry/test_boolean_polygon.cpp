@@ -1,13 +1,16 @@
-#ifndef GEOMETRY_TEST_POLYGON_BOOLEAN_HPP_
-#define GEOMETRY_TEST_POLYGON_BOOLEAN_HPP_
-
 #include "geometry/geometry.hpp"
+#include "geometry/boolean/boolean_polygon.hpp"
 #include "gtest/gtest.h"
 
-namespace carpio {
+#include <list>
+#include <string>
+
+using namespace carpio;
+
+namespace {
 
 typedef GGnuplotActor_<double, 2> GA;
-typedef GFile_<double,2> GF;
+typedef GFile_<double, 2> GF;
 
 
 inline void two_pointchains(
@@ -58,7 +61,9 @@ inline void two_pointchains(
 	gnu.plot();
 }
 
-TEST(polygon_boolean, test1) {
+} // namespace
+
+TEST(boolean_polygon, test1) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -78,7 +83,7 @@ TEST(polygon_boolean, test1) {
 	two_pointchains("test1", pclip, pobject);
 }
 
-TEST(polygon_boolean, test2) {
+TEST(boolean_polygon, test2) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -98,7 +103,7 @@ TEST(polygon_boolean, test2) {
 	two_pointchains("test2", pclip, pobject);
 }
 
-TEST(polygon_boolean, test3) {
+TEST(boolean_polygon, test3) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -118,7 +123,7 @@ TEST(polygon_boolean, test3) {
 	two_pointchains("test3", pclip, pobject);
 }
 
-TEST(polygon_boolean, test4) {
+TEST(boolean_polygon, test4) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -139,7 +144,7 @@ TEST(polygon_boolean, test4) {
 	two_pointchains("test4", pclip, pobject);
 }
 
-TEST(polygon_boolean, test5) {
+TEST(boolean_polygon, test5) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -162,7 +167,7 @@ TEST(polygon_boolean, test5) {
 	two_pointchains("test5", pclip, pobject);
 }
 
-TEST(polygon_boolean, test6) {
+TEST(boolean_polygon, test6) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -184,7 +189,7 @@ TEST(polygon_boolean, test6) {
 	two_pointchains("test6", pclip, pobject);
 }
 
-TEST(polygon_boolean, test7) {
+TEST(boolean_polygon, test7) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -205,7 +210,7 @@ TEST(polygon_boolean, test7) {
 
 	two_pointchains("test7", pclip, pobject);
 }
-TEST(polygon_boolean, test8) {
+TEST(boolean_polygon, test8) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -227,7 +232,7 @@ TEST(polygon_boolean, test8) {
 	two_pointchains("test8", pclip, pobject);
 }
 
-TEST(polygon_boolean, test9) {
+TEST(boolean_polygon, test9) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -249,7 +254,7 @@ TEST(polygon_boolean, test9) {
 	two_pointchains("test9", pclip, pobject);
 }
 //
-TEST(polygon_boolean, test10) {
+TEST(boolean_polygon, test10) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -270,7 +275,7 @@ TEST(polygon_boolean, test10) {
 	two_pointchains("test10", pclip, pobject);
 }
 
-TEST(polygon_boolean, test11) {
+TEST(boolean_polygon, test11) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -290,7 +295,7 @@ TEST(polygon_boolean, test11) {
 	two_pointchains("test11", pclip, pobject);
 }
 
-TEST(polygon_boolean, test12) {
+TEST(boolean_polygon, test12) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -314,7 +319,7 @@ TEST(polygon_boolean, test12) {
 }
 
 
-TEST(polygon_boolean, test13) {
+TEST(boolean_polygon, test13) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -343,7 +348,7 @@ TEST(polygon_boolean, test13) {
 	two_pointchains("test13", pclip, pobject);
 }
 
-TEST(polygon_boolean, test14) {
+TEST(boolean_polygon, test14) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -371,7 +376,7 @@ TEST(polygon_boolean, test14) {
 }
 
 
-TEST(polygon_boolean, test15) {
+TEST(boolean_polygon, test15) {
 	// box seperate
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
@@ -395,7 +400,7 @@ TEST(polygon_boolean, test15) {
 	two_pointchains("test15", pclip, pobject);
 }
 
-TEST(polygon_boolean, test16) {
+TEST(boolean_polygon, test16) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -415,7 +420,7 @@ TEST(polygon_boolean, test16) {
 
 	two_pointchains("test16", pclip, pobject);
 }
-TEST(polygon_boolean, test17) {
+TEST(boolean_polygon, test17) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -435,7 +440,7 @@ TEST(polygon_boolean, test17) {
 
 	two_pointchains("test17", pclip, pobject);
 }
-TEST(polygon_boolean, test18) {
+TEST(boolean_polygon, test18) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -456,7 +461,7 @@ TEST(polygon_boolean, test18) {
 	two_pointchains("test18", pclip, pobject);
 }
 
-TEST(polygon_boolean, test19) {
+TEST(boolean_polygon, test19) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -476,7 +481,7 @@ TEST(polygon_boolean, test19) {
 
 	two_pointchains("test19", pclip, pobject);
 }
-TEST(polygon_boolean, test20) {
+TEST(boolean_polygon, test20) {
 	typedef Point_<double, 2> Point;
 	typedef PointChain_<double, 2> PC;
 
@@ -499,9 +504,3 @@ TEST(polygon_boolean, test20) {
 
 	two_pointchains("test20", pclip, pobject);
 }
-
-
-
-
-} //end namespace
-#endif

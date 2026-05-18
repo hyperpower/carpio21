@@ -3,22 +3,17 @@
 
 #include "geometry/geometry_define.hpp"
 #include "geometry/objects/basic/point.hpp"
-#include "geometry/objects/basic/segment.hpp"
 #include "geometry/objects/basic/box.hpp"
 #include "geometry/objects/analytic/line.hpp"
-#include "geometry/objects/analytic/plane.hpp"
 #include "geometry/objects/basic/point_chain.hpp"
-#include "geometry/affine.hpp"
 
 #include "algebra/algebra_define.hpp"
 #include "algebra/algebra.hpp"
 
-#include <memory>
 #include <algorithm>
-#include <array>
 #include <cmath>
-#include <iterator>
 #include <list>
+#include <vector>
 
 namespace carpio {
 
@@ -38,93 +33,85 @@ protected:
     typedef POINT Point;
     double on_y;
     double on_x;
-    bool   is_trivial;
 
-    void _cal_on_y(const double& b, const double& alpha, const double&){
-        // x = 0
-        on_y = alpha / b;
-    }    
-    void _cal_on_x(const double& a, const double& alpha, const double&){
-        // y = 0
-        on_x = alpha / a;
-    }    
-public:
-    _FunctorIntersectOrientLineUnitBox_():on_x(0), on_y(0), is_trivial(false){};
-    _FunctorIntersectOrientLineUnitBox_(const Self& other):
-        on_x(other.on_x), on_y(other.on_y), is_trivial(other.is_trivial){};
-
-    ListPoint trivial(const double& a, const double& b, const double& alpha // Point max=(1,1)
-                      ){
-        // line pass (0,0)
-        ListPoint res;
-        bool zero_a     = a == 0.0;
-        bool zero_b     = b == 0.0;
-        if (zero_a && zero_b){
-            is_trivial = true;
-            return res;
+    static void _emplace_unique(ListPoint& res, const Point& p) {
+        for (const auto& op : res) {
+            if (IsSame(op, p)) {
+                return;
+            }
         }
-        if (zero_a && alpha/b == 0.0){ // Y = 0
-            res.emplace_back(Point(0.0, 0.0));
-            res.emplace_back(Point(1.0, 0.0));
-            is_trivial = true;
-            return res;
-        }else if (zero_b && alpha/a == 0.0){ // X = 0
-            res.emplace_back(Point(0.0, 0.0));
-            res.emplace_back(Point(0.0, 1.0));
-            is_trivial = true;
-            return res;
-        }else if (alpha == 0.0){
-            res.emplace_back(Point(0.0, 0.0));
-            is_trivial = true;
-            return res;
-        }
-        if ( zero_a && (alpha/b - 1.0) == 0.0){ // Y = 1
-            res.emplace_back(Point(0.0, 1.0));
-            res.emplace_back(Point(1.0, 1.0));
-            is_trivial = true;
-            return res;
-        }else if (zero_b && (alpha/a - 1.0) == 0.0){ // X = 1
-            res.emplace_back(Point(1.0, 0.0));
-            res.emplace_back(Point(1.0, 1.0));
-            is_trivial = true;
-            return res;
-        }else if (a + b - 1.0 == 0.0){
-            res.emplace_back(Point(1.0, 1.0));
-            is_trivial = true;
-            return res;
-        }
-        return res;
+        res.emplace_back(p);
     }
+    static void _append_edge_intersections(
+            ListPoint& res,
+            const double& a, const double& b, const double& alpha,
+            const Point& p0, const Point& p1) {
+        const double f0 = a * p0[0] + b * p0[1] - alpha;
+        const double f1 = a * p1[0] + b * p1[1] - alpha;
+        const bool z0 = IsZero(f0);
+        const bool z1 = IsZero(f1);
+
+        if (z0 && z1) {
+            _emplace_unique(res, p0);
+            _emplace_unique(res, p1);
+            return;
+        }
+        if (z0) {
+            _emplace_unique(res, p0);
+            return;
+        }
+        if (z1) {
+            _emplace_unique(res, p1);
+            return;
+        }
+        if ((f0 < 0.0 && f1 > 0.0) || (f0 > 0.0 && f1 < 0.0)) {
+            const double t = f0 / (f0 - f1);
+            _emplace_unique(res, Point(
+                    p0[0] + t * (p1[0] - p0[0]),
+                    p0[1] + t * (p1[1] - p0[1])));
+        }
+    }
+public:
+    _FunctorIntersectOrientLineUnitBox_():on_x(0), on_y(0){};
+
+    _FunctorIntersectOrientLineUnitBox_(const Self& other):
+        on_x(other.on_x), on_y(other.on_y){};
 
     ListPoint operator()(const double& a, const double& b, const double& alpha,// Point max=(1,1)
                         const double& tol = 1e-10){
-        ListPoint res = this->trivial(a, b, alpha);
-        // no intersection or on intersection
-        if ((a + b - alpha < 0) || (-alpha > 0) || this->is_trivial)
-        {
+        this->on_x = 0.0;
+        this->on_y = 0.0;
+        ListPoint res;
+
+        if (IsZero(a) && IsZero(b)) {
             return res;
         }
-        // point on Y, that is X = 0
-        this->_cal_on_y(b, alpha, tol);
-        if (this->on_y <= 1.0 && this->on_y > 0)
-        {
-            res.emplace_back(Point(0.0, on_y));
+
+        if ((a + b - alpha < -tol) || (alpha < -tol)) {
+            return res;
         }
-        else if (on_y > 1.0)
-        {
-            double on_y1 = (alpha - b) / a;
-            res.emplace_back(Point(on_y1, 1.0));
-        }
-        // point on X, Y = 0
-        this->_cal_on_x(a, alpha, tol);
-        if (this->on_x <= 1.0 && this->on_x > 0)
-        {
-            res.emplace_back(Point(on_x, 0.0));
-        }
-        else if (this->on_x > 1.0)
-        {
-            double on_x1 = (alpha - a) / b;
-            res.emplace_back(Point(1.0, on_x1));
+
+        this->on_y = IsZero(b) ? 0.0 : alpha / b;
+        this->on_x = IsZero(a) ? 0.0 : alpha / a;
+
+        _append_edge_intersections(
+                res, a, b, alpha, Point(0.0, 0.0), Point(0.0, 1.0));
+        _append_edge_intersections(
+                res, a, b, alpha, Point(0.0, 1.0), Point(1.0, 1.0));
+        _append_edge_intersections(
+                res, a, b, alpha, Point(0.0, 0.0), Point(1.0, 0.0));
+        _append_edge_intersections(
+                res, a, b, alpha, Point(1.0, 0.0), Point(1.0, 1.0));
+
+        if (res.size() == 2) {
+            auto first = res.begin();
+            auto second = first;
+            ++second;
+            const double d0 = (*first)[0] - (*second)[0];
+            const double d1 = (*first)[1] - (*second)[1];
+            if (d0 * (-b) + d1 * a < 0.0) {
+                std::swap(*first, *second);
+            }
         }
         return res;
     } 
@@ -134,181 +121,165 @@ class _FunctorIntersectOrientPlaneUnitBox_{
 protected:
     typedef std::list<POINT> ListPoint;
     typedef _FunctorIntersectOrientPlaneUnitBox_<POINT> Self;
-    typedef _FunctorIntersectOrientLineUnitBox_<POINT>  FunctorLine;
     typedef POINT Point;
     double on_y;
     double on_x;
     double on_z;
-    bool   is_trivial;
 
-    void _cal_on_x(const double& a, const double& alpha, const double&){
-        // y = 0, z = 0
-        on_x = alpha / a;
-    }    
-    void _cal_on_y(const double& b, const double& alpha, const double&){
-        // x = 0, z = 0
-        on_y = alpha / b;
-    }    
-    void _cal_on_z(const double& c, const double& alpha, const double&){
-        // x = 0, y = 0
-        on_z = alpha / c;
-    }    
-public:
-    _FunctorIntersectOrientPlaneUnitBox_():on_x(0), on_y(0), on_z(0), is_trivial(false){};
-    _FunctorIntersectOrientPlaneUnitBox_(const Self& other):
-        on_x(other.on_x), on_y(other.on_y), on_z(other.on_z), is_trivial(other.is_trivial){};
+    static void _emplace_unique(std::vector<Point>& res, const Point& p) {
+        for (const auto& op : res) {
+            if (IsSame(op, p)) {
+                return;
+            }
+        }
+        res.emplace_back(p);
+    }
+    static double _dot(
+            const double& x0, const double& y0, const double& z0,
+            const double& x1, const double& y1, const double& z1) {
+        return x0 * x1 + y0 * y1 + z0 * z1;
+    }
+    static void _append_edge_intersections(
+            std::vector<Point>& res,
+            const double& a, const double& b, const double& c, const double& alpha,
+            const Point& p0, const Point& p1) {
+        const double f0 = a * p0[0] + b * p0[1] + c * p0[2] - alpha;
+        const double f1 = a * p1[0] + b * p1[1] + c * p1[2] - alpha;
+        const bool z0 = IsZero(f0);
+        const bool z1 = IsZero(f1);
 
-    ListPoint trivial(const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
-                      const double& tol){
-        // line pass (0,0)
+        if (z0 && z1) {
+            _emplace_unique(res, p0);
+            _emplace_unique(res, p1);
+            return;
+        }
+        if (z0) {
+            _emplace_unique(res, p0);
+            return;
+        }
+        if (z1) {
+            _emplace_unique(res, p1);
+            return;
+        }
+        if ((f0 < 0.0 && f1 > 0.0) || (f0 > 0.0 && f1 < 0.0)) {
+            const double t = f0 / (f0 - f1);
+            _emplace_unique(res, Point(
+                    p0[0] + t * (p1[0] - p0[0]),
+                    p0[1] + t * (p1[1] - p0[1]),
+                    p0[2] + t * (p1[2] - p0[2])));
+        }
+    }
+    static ListPoint _ordered_polygon(
+            std::vector<Point>& points,
+            const double& a, const double& b, const double& c) {
         ListPoint res;
-        bool zero_a = (a == 0.0);
-        bool zero_b = (b == 0.0);
-        bool zero_c = (c == 0.0);
-        if (zero_a && zero_b && zero_c){
-            is_trivial = true;
+        if (points.empty()) {
             return res;
         }
-        if (zero_a && zero_c){ // Y =  alpha / b
-            double adb = alpha/b;
-            if ( adb >= 0.0 && adb <= 1.0 ){ 
-                res.emplace_back(Point(0.0, adb, 0.0));
-                res.emplace_back(Point(0.0, adb, 1.0));
-                res.emplace_back(Point(1.0, adb, 1.0));
-                res.emplace_back(Point(1.0, adb, 0.0));
-                is_trivial = true;
-                return res;
+        if (points.size() <= 2) {
+            for (const auto& p : points) {
+                res.emplace_back(p);
             }
-        }else if (zero_b && zero_c ){ // X = 0
-            double ada = alpha/a;
-            if ( ada >= 0.0 && ada <= 1.0 ){ 
-                res.emplace_back(Point(ada, 0.0, 0.0));
-                res.emplace_back(Point(ada, 1.0, 0.0));
-                res.emplace_back(Point(ada, 1.0, 1.0));
-                res.emplace_back(Point(ada, 0.0, 1.0));
-                is_trivial = true;
-                return res;
-            }
-        }else if (zero_a && zero_b){ // z = 0
-            double adc = alpha/c;
-            if ( 0.0 <= adc && adc <= 1.0 ){ 
-                res.emplace_back(Point(0.0, 0.0, adc));
-                res.emplace_back(Point(1.0, 0.0, adc));
-                res.emplace_back(Point(1.0, 1.0, adc));
-                res.emplace_back(Point(0.0, 1.0, adc));
-                is_trivial = true;
-                return res;
-            }
-        }else if (zero_a ){
-            FunctorLine fun;
-            auto lp = fun(b, c, alpha, tol);
-            for (auto& p : lp){
-                res.emplace_back(Point(0.0, p[0], p[1]));
-            } 
-            for (auto i = lp.rbegin(); i != lp.rend(); ++i ) {
-                auto& p = *i; 
-                res.emplace_back(Point(1.0, p[0], p[1]));
-            }         
-            is_trivial = true;
             return res;
-        } else if ( zero_b ){
-            FunctorLine fun;
-            auto lp = fun(a, c, alpha, tol);
-            for (auto& p : lp){
-                res.emplace_back(Point( p[0], 0.0, p[1]));
-            } 
-            for (auto i = lp.rbegin(); i != lp.rend(); ++i ) {
-                auto& p = *i; 
-                res.emplace_back(Point( p[0], 1.0, p[1]));
-            }      
-            is_trivial = true;
-            return res;
-        } else if ( zero_c ){
-            FunctorLine fun;
-            auto lp = fun(a, b, alpha, tol);
-            for (auto& p : lp){
-                res.emplace_back(Point( p[0], p[1], 0.0));
-            } 
-            for (auto i = lp.rbegin(); i != lp.rend(); ++i ) {
-                auto& p = *i; 
-                res.emplace_back(Point( p[0], p[1], 1.0));
-            }      
-            is_trivial = true;
-            return res;
-        }else if (alpha == 0.0){
-            res.emplace_back(Point(0.0, 0.0, 0.0));
-            is_trivial = true;
-            return res;
-        }else if (a + b + c - 1.0 == 0.0){
-            res.emplace_back(Point(1.0, 1.0, 1.0));
-            is_trivial = true;
-            return res;
+        }
+
+        double cx = 0.0;
+        double cy = 0.0;
+        double cz = 0.0;
+        for (const auto& p : points) {
+            cx += p[0];
+            cy += p[1];
+            cz += p[2];
+        }
+        const double inv_size = 1.0 / static_cast<double>(points.size());
+        cx *= inv_size;
+        cy *= inv_size;
+        cz *= inv_size;
+
+        double ux = 0.0;
+        double uy = 0.0;
+        double uz = 0.0;
+        if (std::abs(a) > std::abs(b)) {
+            ux = -c;
+            uz = a;
+        } else {
+            uy = c;
+            uz = -b;
+        }
+        const double vx = b * uz - c * uy;
+        const double vy = c * ux - a * uz;
+        const double vz = a * uy - b * ux;
+
+        std::sort(points.begin(), points.end(),
+                [&](const Point& p0, const Point& p1) {
+            const double r0x = p0[0] - cx;
+            const double r0y = p0[1] - cy;
+            const double r0z = p0[2] - cz;
+            const double r1x = p1[0] - cx;
+            const double r1y = p1[1] - cy;
+            const double r1z = p1[2] - cz;
+            const double a0 = std::atan2(
+                    _dot(r0x, r0y, r0z, vx, vy, vz),
+                    _dot(r0x, r0y, r0z, ux, uy, uz));
+            const double a1 = std::atan2(
+                    _dot(r1x, r1y, r1z, vx, vy, vz),
+                    _dot(r1x, r1y, r1z, ux, uy, uz));
+            return a0 < a1;
+        });
+
+        for (const auto& p : points) {
+            res.emplace_back(p);
         }
         return res;
     }
+public:
+    _FunctorIntersectOrientPlaneUnitBox_():on_x(0), on_y(0), on_z(0){};
+    _FunctorIntersectOrientPlaneUnitBox_(const Self& other):
+        on_x(other.on_x), on_y(other.on_y), on_z(other.on_z){};
 
     ListPoint operator()(const double& a, const double& b, const double& c, const double& alpha,// Point max=(1,1)
                         const double& tol = 1e-10){
-        // std::cout << "trivial size = " << res.size() << std::endl;
-        // std::cout << "is trivail   = " << this->is_trivial << std::endl;
-        // no intersection or on intersection
-        if ((a + b + c - alpha < 0) || (-alpha > 0) ){
+        this->on_x = 0.0;
+        this->on_y = 0.0;
+        this->on_z = 0.0;
+
+        if (IsZero(a) && IsZero(b) && IsZero(c)) {
             return ListPoint();
         }
-        ListPoint res = this->trivial(a, b, c, alpha, tol);
-        if (this->is_trivial){
-            return res;
+        if ((a + b + c - alpha < -tol) || (alpha < -tol)) {
+            return ListPoint();
         }
-        this->_cal_on_z(c, alpha, tol);
-        if (0 < this->on_z && this->on_z <= 1.0 ){
-            res.emplace_back(Point(0.0, 0.0, on_z));
-        } 
-        this->_cal_on_x(a, alpha, tol);
-        double on_x1y1 = (alpha - a - b) / c;
-        if (0 < this->on_x && this->on_x <=1.0){
-            res.emplace_back(Point(this->on_x, 0.0, 0.0));
-        } else if (this->on_x > 1.0){
-            double on_x1y0 = (alpha - a) / c;
-            if( 0 < on_x1y0 && on_x1y0 <= 1.0){
-                res.emplace_back(Point(1.0, 0.0, on_x1y0));
-            }
-            if (on_x1y1 < 0){
-                double on_x1z0 = (alpha - a) / b;
-                res.emplace_back(Point(1.0, on_x1z0, 0.0));
-            } else { 
-                res.emplace_back(Point(1.0, 1.0, on_x1y1));
-            }
-        }
-        this->_cal_on_y(b, alpha, tol);
-        if (0 < this->on_y && this->on_y <= 1.0) {
-            res.emplace_back(Point(0.0, this->on_y, 0.0));
-        } else if (this->on_y > 1.0) {
-            if (on_x1y1 < 0){
-                double on_y1z0 = (alpha - b) / a;
-                res.emplace_back(Point(on_y1z0, 1.0, 0.0));
-            }
-            double on_x0y1 = (alpha - b) / c;
-            if( 0 < on_x0y1 && on_x0y1 <= 1.0){
-                res.emplace_back(Point(0.0, 1.0, on_x0y1));
-            }
-        }
-        if ( this->on_z > 1.0){
-            double on_y0z1 = (alpha - c) / a;
-            if (0 < on_y0z1 && on_y0z1 <= 1.0){
-                res.emplace_front(Point(on_y0z1, 0.0, 1.0));
-            } else {
-                double on_x1z1 = (alpha - a - c) / b;
-                res.emplace_front(Point(1.0, on_x1z1, 1.0));
-            }
-            double on_x0z1 = (alpha - c) / b;
-            if (0 < on_x0z1 && on_x0z1 <= 1.0){
-                res.emplace_back(Point(0.0, on_x0z1, 1.0));
-            } else {
-                double on_y1z1 = (alpha - b - c) / a;
-                res.emplace_back(Point(on_y1z1, 1.0, 1.0));
-            }
-        }
-        return res;
+
+        this->on_x = IsZero(a) ? 0.0 : alpha / a;
+        this->on_y = IsZero(b) ? 0.0 : alpha / b;
+        this->on_z = IsZero(c) ? 0.0 : alpha / c;
+
+        std::vector<Point> points;
+        points.reserve(6);
+
+        const Point p000(0.0, 0.0, 0.0);
+        const Point p100(1.0, 0.0, 0.0);
+        const Point p010(0.0, 1.0, 0.0);
+        const Point p110(1.0, 1.0, 0.0);
+        const Point p001(0.0, 0.0, 1.0);
+        const Point p101(1.0, 0.0, 1.0);
+        const Point p011(0.0, 1.0, 1.0);
+        const Point p111(1.0, 1.0, 1.0);
+
+        _append_edge_intersections(points, a, b, c, alpha, p000, p100);
+        _append_edge_intersections(points, a, b, c, alpha, p010, p110);
+        _append_edge_intersections(points, a, b, c, alpha, p001, p101);
+        _append_edge_intersections(points, a, b, c, alpha, p011, p111);
+        _append_edge_intersections(points, a, b, c, alpha, p000, p010);
+        _append_edge_intersections(points, a, b, c, alpha, p100, p110);
+        _append_edge_intersections(points, a, b, c, alpha, p001, p011);
+        _append_edge_intersections(points, a, b, c, alpha, p101, p111);
+        _append_edge_intersections(points, a, b, c, alpha, p000, p001);
+        _append_edge_intersections(points, a, b, c, alpha, p100, p101);
+        _append_edge_intersections(points, a, b, c, alpha, p010, p011);
+        _append_edge_intersections(points, a, b, c, alpha, p110, p111);
+
+        return _ordered_polygon(points, a, b, c);
     } 
 };
 
@@ -399,21 +370,23 @@ _Orient(const double& a, const double& b, const double& alpha,// Point max=(1,1)
     double na = std::abs(a);
     double nb = std::abs(b);
     double nalpha = alpha;
-    if (a == -na){
+    const bool negative_a = a < -tol;
+    const bool negative_b = b < -tol;
+    if (negative_a){
         nalpha = alpha - a;
     }
-    if (b == -nb){
+    if (negative_b){
         nalpha = nalpha - b;
     }
     FUNCTOR fun;
     auto res = fun(na, nb, nalpha, tol);
 
     for(auto& p : res){
-        if (a == -na){
-            Reflect(p, _X_, 1.0);
+        if (negative_a){
+            p[0] = 1.0 - p[0];
         }
-        if (b == -nb){
-            Reflect(p, _Y_, 1.0);
+        if (negative_b){
+            p[1] = 1.0 - p[1];
         }
     }
     
@@ -427,27 +400,30 @@ _Orient(const double& a, const double& b, const double& c, const double& alpha,/
     double nb = std::abs(b);
     double nc = std::abs(c);
     double nalpha = alpha;
-    if (a == -na){
+    const bool negative_a = a < -tol;
+    const bool negative_b = b < -tol;
+    const bool negative_c = c < -tol;
+    if (negative_a){
         nalpha = alpha - a;
     }
-    if (b == -nb){
+    if (negative_b){
         nalpha = nalpha - b;
     }
-    if (c == -nc){
+    if (negative_c){
         nalpha = nalpha - c;
     }
     FUNCTOR fun;
     auto res = fun(na, nb, nc, nalpha, tol);
 
     for(auto& p : res){
-        if (a == -na){
-            Reflect(p, _X_, 1.0);
+        if (negative_a){
+            p[0] = 1.0 - p[0];
         }
-        if (b == -nb){
-            Reflect(p, _Y_, 1.0);
+        if (negative_b){
+            p[1] = 1.0 - p[1];
         }
-        if (c == -nc){
-            Reflect(p, _Z_, 1.0);
+        if (negative_c){
+            p[2] = 1.0 - p[2];
         }
     }
     
@@ -458,22 +434,23 @@ std::list<POINT>
 _TranslateAndScale(const POINT& min, const POINT& max, 
             const double& a, const double& b, const double& alpha,
             const double& tol){ 
-    Line_<double> line(a, b, alpha);
     auto arr_scale = max - min;
-    auto inv_scale(arr_scale);
-    for(auto& d : inv_scale){
+    for(auto& d : arr_scale){
         if (std::abs(d) <= tol){
             return std::list<POINT>();
         }
-        d = 1.0 / d;
     }
-    Translate(line, -min);
-    Scale(line, inv_scale);
 
-    auto res = _Orient<POINT, FUNCTOR>(line.a(), line.b(), line.alpha(), tol);
+    const double scaled_a = a * arr_scale[0];
+    const double scaled_b = b * arr_scale[1];
+    const double scaled_alpha = alpha - a * min[0] - b * min[1];
+
+    auto res = _Orient<POINT, FUNCTOR>(scaled_a, scaled_b, scaled_alpha, tol);
     
-    Scale(res, arr_scale);
-    Translate(res, min);
+    for (auto& p : res) {
+        p[0] = p[0] * arr_scale[0] + min[0];
+        p[1] = p[1] * arr_scale[1] + min[1];
+    }
     
     return res;
 }
@@ -482,22 +459,26 @@ std::list<POINT>
 _TranslateAndScale(const POINT& min, const POINT& max, 
             const double& a, const double& b, const double& c, const double& alpha,
             const double& tol){ 
-    Plane_<double> plane(a, b, c, alpha);
     auto arr_scale = max - min;
-    auto inv_scale(arr_scale);
-    for(auto& d : inv_scale){
-        if (std::abs(d) <= tol){
+    for(auto& d : arr_scale){
+        if (IsZero(d)){
             return std::list<POINT>();
         }
-        d = 1.0 / d;
     }
-    Translate(plane,  -min);
-    Scale(plane, inv_scale);
 
-    auto res = _Orient<POINT, FUNCTOR>(plane.a(), plane.b(), plane.c(), plane.alpha(), tol);
+    const double scaled_a = a * arr_scale[0];
+    const double scaled_b = b * arr_scale[1];
+    const double scaled_c = c * arr_scale[2];
+    const double scaled_alpha = alpha - a * min[0] - b * min[1] - c * min[2];
+
+    auto res = _Orient<POINT, FUNCTOR>(
+            scaled_a, scaled_b, scaled_c, scaled_alpha, tol);
     
-    Scale(res, arr_scale);
-    Translate(res, min);
+    for (auto& p : res) {
+        p[0] = p[0] * arr_scale[0] + min[0];
+        p[1] = p[1] * arr_scale[1] + min[1];
+        p[2] = p[2] * arr_scale[2] + min[2];
+    }
     
     return res;
 }
@@ -535,7 +516,7 @@ NegativeLineBox(const NUM& dx, const NUM& dy,
     typedef _FunctorNegativeOrientLineUnitBox_<Point> Functor;
     return _TranslateAndScale<Point, Functor>(
                 Point(0, 0), Point(dx, dy), 
-                line.a(), line.b(), line.alpha(), DefaultFloatTolerance<NUM>());
+                line.a(), line.b(), line.alpha(), DefaultTolerance<NUM>());
 }
 
 template<class POINT>
@@ -554,7 +535,7 @@ PositiveLineBox(const NUM& dx, const NUM& dy,
     typedef _FunctorPositiveOrientLineUnitBox_<Point> Functor;
     return _TranslateAndScale<Point, Functor>(
                 Point(0, 0), Point(dx, dy), 
-                line.a(), line.b(), line.alpha(), DefaultFloatTolerance<NUM>());
+                line.a(), line.b(), line.alpha(), DefaultTolerance<NUM>());
 }
 
 
@@ -583,7 +564,7 @@ double IntersectionAreaNegative(
     return IntersectionAreaNegative(
             box.min(), box.max(),
             line.a(), line.b(), line.alpha(),
-            DefaultFloatTolerance<TYPE>());
+            DefaultTolerance<TYPE>());
 }
 
 template<class TYPE>
@@ -593,7 +574,7 @@ double IntersectionAreaPositive(
     return IntersectionAreaPositive(
             box.min(), box.max(),
             line.a(), line.b(), line.alpha(),
-            DefaultFloatTolerance<TYPE>());
+            DefaultTolerance<TYPE>());
 }
 
 template<class GEO1, class GEO2>

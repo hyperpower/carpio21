@@ -118,8 +118,7 @@ TEST(reconstruct_plic, youngs_line_fraction_field) {
     auto fraction = MakeFractionField(grid, ghost, order);
 
     BoundaryIndex bi;
-    auto interfaces = ReconstructInterfacePLIC(
-            fraction, bi, "ccs", SFieldCenterTag());
+    auto interfaces = ReconstructInterfacePLIC(fraction, bi, "ccs");
     Field reconstructed_fraction(grid, ghost, order);
 
     int interface_count = 0;

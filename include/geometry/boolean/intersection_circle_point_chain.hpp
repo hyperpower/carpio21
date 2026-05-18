@@ -15,7 +15,7 @@ template<class NUM, class POINT_CHAIN>
 NUM IntersectSignedAreaCirclePointChain(
         const Circle_<NUM>& circle,
         const POINT_CHAIN& point_chain,
-        const NUM& tol = DefaultFloatTolerance<NUM>()) {
+        const NUM& tol = DefaultTolerance<NUM>()) {
     if (circle.r() <= NUM(0) || point_chain.size() < 3) {
         return NUM(0);
     }
@@ -39,7 +39,7 @@ template<class NUM, class POINT_CHAIN>
 NUM IntersectAreaCirclePointChain(
         const Circle_<NUM>& circle,
         const POINT_CHAIN& point_chain,
-        const NUM& tol = DefaultFloatTolerance<NUM>()) {
+        const NUM& tol = DefaultTolerance<NUM>()) {
     return std::abs(IntersectSignedAreaCirclePointChain(
             circle, point_chain, tol));
 }

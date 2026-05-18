@@ -95,7 +95,7 @@ int run_a_scheme(const std::string& scheme){
         Vt xc = 20;
         Vt yc = 40;
         Vt l  = 8;
-        if(   IsInRange(xc-l, x, xc+l, _cc_) 
+        if(   IsInRange(xc-l, x, xc+l, _cc_)
            && IsInRange(yc-l, y, yc+l, _cc_)){
             return 1.0;
         }else{
@@ -126,7 +126,7 @@ int run_a_scheme(const std::string& scheme){
             Vt xc = 20;
             Vt yc = 40;
             Vt l  = 8;
-            if(   IsInRange(xc-l, x, xc+l, _cc_) 
+            if(   IsInRange(xc-l, x, xc+l, _cc_)
             && IsInRange(yc-l, y, yc+l, _cc_)){
                 return 1.0;
             }else{

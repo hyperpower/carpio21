@@ -23,7 +23,7 @@ void _BoxBoxAddPoint(
         return;
     }
     for (const auto& op : res) {
-        if (IsSame(op, p, tol)) {
+        if (IsSame(op, p)) {
             return;
         }
     }
@@ -37,7 +37,7 @@ IntersectBoxBox(
         const NUM& box1_point_bx, const NUM& box1_point_by,
         const NUM& box2_point_ax, const NUM& box2_point_ay,
         const NUM& box2_point_bx, const NUM& box2_point_by,
-        const NUM& tol = DefaultFloatTolerance<NUM>()) {
+        const NUM& tol = DefaultTolerance<NUM>()) {
     typedef Point_<NUM, 2> Point;
     typedef std::list<Point> ListPoint;
     ListPoint res;
@@ -87,7 +87,7 @@ IntersectBoxBox(
             box1.max().x(), box1.max().y(),
             box2.min().x(), box2.min().y(),
             box2.max().x(), box2.max().y(),
-            DefaultFloatTolerance<TYPE>());
+            DefaultTolerance<TYPE>());
 }
 
 template<class NUM>
@@ -96,7 +96,7 @@ NUM IntersectAreaBoxBox(
         const NUM& box1_point_bx, const NUM& box1_point_by,
         const NUM& box2_point_ax, const NUM& box2_point_ay,
         const NUM& box2_point_bx, const NUM& box2_point_by,
-        const NUM& tol = DefaultFloatTolerance<NUM>()) {
+        const NUM& tol = DefaultTolerance<NUM>()) {
     NUM b1_xmin, b1_ymin, b1_xmax, b1_ymax;
     MinMaxPointsForBox(
             box1_point_ax, box1_point_ay,
@@ -129,7 +129,7 @@ TYPE IntersectAreaBoxBox(
             box1.max().x(), box1.max().y(),
             box2.min().x(), box2.min().y(),
             box2.max().x(), box2.max().y(),
-            DefaultFloatTolerance<TYPE>());
+            DefaultTolerance<TYPE>());
 }
 
 template<class GEO1, class GEO2>

@@ -220,7 +220,7 @@ int BuildMatrix(const FIELD& field, MAT& mat, ARR& b){
 }
 // VOF PLIC ============================
 template<class FIELD, class BI>
-FIELD ReconstructInterfacePLIC(const FIELD& field, const BI& bi, std::string method = ""){
+auto ReconstructInterfacePLIC(const FIELD& field, const BI& bi, std::string method = ""){
     typedef typename FIELD::Tag Tag; 
     return ReconstructInterfacePLIC(field, bi, method, Tag());
 }

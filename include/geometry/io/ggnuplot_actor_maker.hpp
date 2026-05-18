@@ -489,6 +489,34 @@ void MakeGnuplotActor(GnuplotActor& actor, const ANY& circle, CircleTag){
     actor.data().push_back("");
 }
 template<typename ANY>
+void MakeGnuplotActor(GnuplotActor& actor, const ANY& eclipse, EclipseTag){
+    actor.command() = "using 1:2 title \"\" ";
+    actor.set_using(ANY::Dim);
+    actor.style()   = "with lines lc 1"; // default color is 1
+
+    const double a = double(eclipse.a());
+    const double b = double(eclipse.b());
+    if (a <= 0.0 || b <= 0.0) {
+        actor.data().push_back("");
+        return;
+    }
+
+    const double scale = (std::max)(a, b);
+    const double target_length = scale / 10.0;
+    int n = int(std::ceil(2.0 * _PI_ * scale / target_length));
+    if (n < 8) {
+        n = 8;
+    }
+
+    for (int i = 0; i <= n; ++i) {
+        const double theta = 2.0 * _PI_ * double(i) / double(n);
+        const double x = double(eclipse.xc()) + a * std::cos(theta);
+        const double y = double(eclipse.yc()) + b * std::sin(theta);
+        actor.data().push_back(ToString(x, y, " "));
+    }
+    actor.data().push_back("");
+}
+template<typename ANY>
 void MakeGnuplotActor(GnuplotActor& actor, const ANY& pc, PointChainTag){
     actor.command() = "using 1:2 title \"\" ";
     actor.set_using(ANY::Dim);
